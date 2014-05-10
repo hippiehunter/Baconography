@@ -6,45 +6,48 @@
     xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
     xmlns:converters="clr-namespace:SnooStreamWP8.Converters">
 
-    <DataTemplate x:Name="mixedTypeTemplate">
-        <Grid HorizontalAlignment="Left">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="70" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Image Grid.Column ="0" Height="70" Width="70" Source="{Binding Content.PreviewImage}" VerticalAlignment="Center" />
-            <TextBlock Grid.Column="1" TextWrapping="Wrap" Text="{Binding Content.PreviewText}" VerticalAlignment="Center"
-                    TextTrimming="WordEllipsis" FontSize="{StaticResource PhoneFontSizeMediumLarge}" MaxHeight="110" />
-        </Grid>
-    </DataTemplate>
-
-    <DataTemplate x:Name="previewImageTemplate">
-        <Image Stretch="UniformToFill" HorizontalAlignment="Stretch"
-                Source="{Binding Content.PreviewImage, Converter={StaticResource asyncImageSourceConverter}}" />
-    </DataTemplate>
-
-    <DataTemplate x:Name="previewTextTemplate">
-        <TextBlock TextWrapping="Wrap" Text="{Binding Content.PreviewText}" VerticalAlignment="Center" HorizontalAlignment="Left"
-                FontSize="{StaticResource PhoneFontSizeMediumLarge}" MaxHeight="110" TextTrimming="WordEllipsis"/>
-    </DataTemplate>
-
-    <DataTemplate x:Name="linkSelector">
-        <selectors:SubredditRiverTemplateSelector HorizontalAlignment="Left" VerticalAlignment="Center"
-                HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="{Binding}"
-                MixedTemplate="{StaticResource mixedTypeTemplate}"
-                ImagesTemplate="{StaticResource previewImageTemplate}"
-                TextTemplate="{StaticResource previewTextTemplate}" />
+    <DataTemplate x:Name="groupHeader">
+        <Border BorderBrush="{StaticResource PhoneChromeBrush}" HorizontalAlignment="Stretch" BorderThickness="0,0,0,2" Margin="0,0,18,0" Visibility="{Binding Visible, Converter={StaticResource booleanVisibilityConverter}}">
+            <TextBlock Text="{Binding Title}" Foreground="{StaticResource PhoneForegroundBrush}" FontSize="48" Padding="6" 
+                                    FontFamily="{StaticResource PhoneFontFamilySemiLight}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        </Border>
     </DataTemplate>
 
     <DataTemplate x:Name="normalSubreddit">
-        <telerikPrimitives:RadCycleHubTile ItemsSource="{Binding PreviewBinding.ContextBinding}"
-                                        Title="{Binding Thing.DisplayName}"
-                                        HorizontalAlignment="Stretch"
-                                        Width="Auto"
-                                        HorizontalContentAlignment="Stretch"
-                                        ItemTemplate="{StaticResource linkSelector}"
-                                        CycleRandomly="True" />
+        <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" MinWidth="460">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*2" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="25" />
+            </Grid.RowDefinitions>
 
+            <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Height="50" Width="125"
+                Background="White" BorderThickness="0" Padding="0" Margin="0"
+                VerticalAlignment="Center">
+                <Image 
+               Source="{Binding Thing.HeaderImage}" MaxHeight="50" MaxWidth="125" Height="{Binding Thing.HeaderImageHeight}"
+               Width="{Binding Thing.HeaderImageWidth}" HorizontalAlignment="Center" Margin="0"
+               VerticalAlignment="Center"/>
+            </Border>
 
+            <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding Thing.DisplayName}"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal" Visibility="{Binding IsUserMultiReddit, Converter={StaticResource booleanVisibilityConverter}}">
+                <TextBlock FontSize="14" Foreground="Gray" Text="by"/>
+                <TextBlock FontSize="14" Foreground="Goldenrod" Text="{Binding MultiRedditUser}" Margin="5,0,0,0" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal" Visibility="{Binding IsUserMultiReddit, Converter={StaticResource invertedBooleanVisibilityConverter}}">
+                <TextBlock FontSize="14" Foreground="Goldenrod" Text="{Binding Thing.Subscribers}" />
+                <TextBlock FontSize="13" Foreground="Gray" Text="subscribers" Margin="5,1,0,0"/>
+            </StackPanel>
+
+        </Grid>
     </DataTemplate>
 </ResourceDictionary>

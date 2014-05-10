@@ -15,17 +15,19 @@ namespace SnooStream.ViewModel
 {
     public class SubredditRiverViewModel : ViewModelBase
     {
-        public string SmallGroupNameSelector(LinkRiverViewModel viewModel)
+        static public string SmallGroupNameSelector(LinkRiverViewModel viewModel)
         {
             return viewModel.IsLocal ? "local" : "subscribed";
         }
 
-        public string LargeGroupNameSelector(LinkRiverViewModel viewModel)
+        static public string LargeGroupNameSelector(LinkRiverViewModel viewModel)
         {
             return viewModel.Thing.DisplayName.Substring(0, 1);
         }
-
+        
         public ObservableCollection<LinkRiverViewModel> CombinedRivers { get; private set; }
+        public LinkRiverViewModel SelectedRiver { get; private set; }
+        public string SearchString { get; set; }
         public SubredditRiverViewModel(SubredditRiverInit initBlob)
         {
             if (initBlob != null)
@@ -33,7 +35,7 @@ namespace SnooStream.ViewModel
                 
                 var localSubreddits = initBlob.Pinned.Select(blob => new LinkRiverViewModel(true, blob.Thing, blob.DefaultSort, blob.Links));
                 var subscribbedSubreddits = initBlob.Subscribed.Select(blob => new LinkRiverViewModel(false, blob.Thing, blob.DefaultSort, blob.Links));
-
+                
                 CombinedRivers = new ObservableCollection<LinkRiverViewModel>(localSubreddits.Concat(subscribbedSubreddits));
                 EnsureFrontPage();
                 ReloadSubscribed(false);
@@ -43,8 +45,14 @@ namespace SnooStream.ViewModel
                 LoadWithoutInitial();
                 EnsureFrontPage();
             }
-
+            SelectedRiver = CombinedRivers.FirstOrDefault() ?? new LinkRiverViewModel(true, new Subreddit("/"), "hot", null);
             MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
+        }
+
+        public void SelectSubreddit(LinkRiverViewModel viewModel)
+        {
+            SelectedRiver = viewModel;
+            RaisePropertyChanged("SelectSubreddit");
         }
 
         private void OnUserLoggedIn(UserLoggedInMessage obj)
@@ -58,7 +66,6 @@ namespace SnooStream.ViewModel
             {
                 CombinedRivers.Add(new LinkRiverViewModel(true, new Subreddit("/"), "hot", null));
             }
-
         }
 
         private async void LoadWithoutInitial()

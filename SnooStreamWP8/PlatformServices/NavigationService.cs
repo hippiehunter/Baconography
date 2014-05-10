@@ -1,6 +1,7 @@
 ﻿using SnooStream.Services;
 using SnooStream.ViewModel;
 using SnooStreamWP8.Common;
+using SnooStreamWP8.View.Pages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,8 +31,19 @@ namespace SnooStreamWP8.PlatformServices
 
         public void NavigateToLinkRiver(LinkRiverViewModel viewModel)
         {
-            var url = string.Format("/View/Pages/LinkRiver.xaml?state={0}", _navState.AddState(viewModel));
-            _frame.Navigate(new Uri(url, UriKind.Relative));
+            //if the current frame is already the hub just change pages and dont introduce any back stack
+            if (_frame.Content is SnooStreamHub)
+            {
+                var hub = _frame.Content as SnooStreamHub;
+                var ssvm = hub.DataContext as SnooStreamViewModel;
+                ssvm.SubredditRiver.SelectSubreddit(viewModel);
+                hub.FocusLinkRiver();
+            }
+            else
+            {
+                var url = string.Format("/View/Pages/LinkRiver.xaml?state={0}", _navState.AddState(viewModel));
+                _frame.Navigate(new Uri(url, UriKind.Relative));
+            }
         }
 
         public void NavigateToLinkStream(LinkStreamViewModel viewModel)

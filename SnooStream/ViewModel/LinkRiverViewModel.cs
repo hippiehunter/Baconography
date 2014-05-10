@@ -20,6 +20,46 @@ namespace SnooStream.ViewModel
         public bool Loading { get { return _loadingTask != null; } }
         private string LastLinkId { get; set; }
         public bool IsLocal { get; private set; }
+        public bool IsUserMultiReddit
+        {
+            get
+            {
+                if (Thing == null || Thing.Url == "/")
+                    return false;
+                else
+                    return Thing.Url.Contains("/m/") || Thing.Url.Contains("+");
+            }
+        }
+
+        public bool IsMultiReddit
+        {
+            get
+            {
+                if (Thing == null || Thing.Url == "/")
+                    return true;
+                else
+                    return Thing.Url.Contains("/m/") || Thing.Url.Contains("+");
+            }
+        }
+
+        public string MultiRedditUser
+        {
+            get
+            {
+                if (IsMultiReddit && Thing.Url.Length > 2)
+                {
+                    if (Thing.Url.Contains("/me/"))
+                    {
+                        return SnooStreamViewModel.RedditUserState.Username;
+                    }
+                    int endOfSlashU = Thing.Url.IndexOf("/", 2);
+                    int startOfSlashM = Thing.Url.IndexOf("/m/", endOfSlashU);
+                    return Thing.Url.Substring(endOfSlashU + 1, startOfSlashM - endOfSlashU - 1);
+                }
+                else
+                    return "";
+            }
+        }
         public LinkRiverViewModel(bool isLocal, Subreddit thing, string sort, IEnumerable<Link> initialLinks)
         {
             IsLocal = isLocal;
