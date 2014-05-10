@@ -4,13 +4,19 @@
     xmlns:local="clr-namespace:SnooStreamWP8.View.Controls"
     xmlns:selectors="clr-namespace:SnooStreamWP8.View.Selectors"
     xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
-    xmlns:converters="clr-namespace:SnooStreamWP8.Converters"
-    xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives">
+    xmlns:converters="clr-namespace:SnooStreamWP8.Converters">
 
 
     <DataTemplate x:Name="normalSubreddit">
         <Button BorderThickness="0">
-            <local:SubredditView />
+            <local:SubredditSmallView />
         </Button>
+    </DataTemplate>
+
+    <DataTemplate x:Name="subredditGroupHeader">
+        <Border BorderBrush="{StaticResource PhoneChromeBrush}" HorizontalAlignment="Stretch" BorderThickness="0,0,0,2" Margin="0,0,18,0" Visibility="{Binding Converter={StaticResource blankVisibilityConverter}}">
+            <TextBlock Text="{Binding}" Foreground="{StaticResource PhoneForegroundBrush}" FontSize="48" Padding="6" 
+                                    FontFamily="{StaticResource PhoneFontFamilySemiLight}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        </Border>
     </DataTemplate>
 </ResourceDictionary>

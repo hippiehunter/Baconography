@@ -380,8 +380,6 @@ namespace SnooStreamWP8.PlatformServices
                 return true;
 
             var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
-            if (connectionProfile.GetConnectionCost().NetworkCostType != NetworkCostType.Unrestricted)
-                return false;
 
             return DeviceNetworkInformation.IsNetworkAvailable && !connectionProfile.GetConnectionCost().OverDataLimit;
         }

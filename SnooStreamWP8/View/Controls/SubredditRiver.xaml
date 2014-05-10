@@ -32,8 +32,9 @@
             HorizontalContentAlignment="Stretch"
             Margin="0,0,-12,0" ItemsSource="{Binding CombinedRivers}"
             ItemTap="listBox_ItemTap"
+            GroupDescriptorsSource="{Binding Descriptors, Source={StaticResource subredditGroupDescriptorSource}}"
             ItemTemplate="{StaticResource normalSubreddit}"
-            GroupHeaderTemplate="{StaticResource groupHeader}">
+            GroupHeaderTemplate="{StaticResource subredditGroupHeader}">
             <telerikData:RadJumpList.ListHeaderContent>
                 <StackPanel Margin="12,0,0,0">
                     <TextBlock TextWrapping="Wrap" FontSize="17" Margin="0,5,0,3">

@@ -101,6 +101,7 @@
     <Compile Include="Common\NavigationStateUtility.cs" />
     <Compile Include="Common\OrientationManager.cs" />
     <Compile Include="Common\SnooApplicationPage.cs" />
+    <Compile Include="Common\SubredditGroupDescriptorSource.cs" />
     <Compile Include="Common\Utility.cs" />
     <Compile Include="Converters\AsyncImageSourceConverter.cs" />
     <Compile Include="Converters\AuthorFlairKindConverter.cs" />
@@ -185,6 +186,9 @@
     </Compile>
     <Compile Include="View\Controls\SubredditRiver.xaml.cs">
       <DependentUpon>SubredditRiver.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Controls\SubredditSmallView.xaml.cs">
+      <DependentUpon>SubredditSmallView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Pages\Comments.xaml.cs">
       <DependentUpon>Comments.xaml</DependentUpon>
@@ -294,6 +298,10 @@
     <Page Include="View\Controls\SubredditRiverResources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Controls\SubredditSmallView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Pages\Comments.xaml">
       <SubType>Designer</SubType>

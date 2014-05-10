@@ -31,6 +31,8 @@
         <converters:ForegroundAuthorFlairKindConverter x:Key="fgAuthorFlairKindConverter"/>
         <common:OrientationManager x:Key="orientationManager" />
         <converters:AsyncImageSourceConverter x:Key="asyncImageSourceConverter" />
+        <common:SubredditGroupDescriptorSource x:Key="subredditGroupDescriptorSource" />
+        <converters:BlankVisibilityConverter x:Key="blankVisibilityConverter" />
     </Application.Resources>
 
     <Application.ApplicationLifetimeObjects>

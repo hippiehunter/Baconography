@@ -37,4 +37,25 @@ namespace SnooStreamWP8.Converters
             return original == Visibility.Collapsed ? true : false;
         }
     }
+
+	public class BlankVisibilityConverter : IValueConverter
+	{
+		public object Convert (object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+		{
+			try
+			{
+				var valueStr = value as dynamic;
+				return string.IsNullOrWhiteSpace((string)valueStr.Key) ? Visibility.Collapsed : Visibility.Visible;
+			}
+			catch
+			{
+				return Visibility.Collapsed;
+			}
+		}
+
+		public object ConvertBack (object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

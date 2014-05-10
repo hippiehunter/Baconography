@@ -25,10 +25,13 @@ namespace SnooStreamWP8.View.Controls
 
         private async void listBox_DataRequested(object sender, EventArgs e)
         {
-            if (((SelfViewModel)DataContext).Activities.Count == 0)
-                await ((SelfViewModel)DataContext).PullNew();
-            else
-                await ((SelfViewModel)DataContext).PullOlder();
+			if(((SelfViewModel)DataContext).IsLoggedIn)
+			{
+				if(((SelfViewModel)DataContext).Activities.Count == 0)
+					await ((SelfViewModel)DataContext).PullNew();
+				else
+					await ((SelfViewModel)DataContext).PullOlder();
+			}
         }
         private void ctrLoadMore_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
