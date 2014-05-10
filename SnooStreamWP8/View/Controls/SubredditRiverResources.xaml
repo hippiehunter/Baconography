@@ -4,47 +4,13 @@
     xmlns:local="clr-namespace:SnooStreamWP8.View.Controls"
     xmlns:selectors="clr-namespace:SnooStreamWP8.View.Selectors"
     xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
-    xmlns:converters="clr-namespace:SnooStreamWP8.Converters">
+    xmlns:converters="clr-namespace:SnooStreamWP8.Converters"
+    xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives">
 
-    <DataTemplate x:Name="mixedTypeTemplate">
-        <Grid HorizontalAlignment="Left">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="70" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Image Grid.Column ="0" Height="70" Width="70" Source="{Binding Content.PreviewImage}" VerticalAlignment="Center" />
-            <TextBlock Grid.Column="1" TextWrapping="Wrap" Text="{Binding Content.PreviewText}" VerticalAlignment="Center"
-                    TextTrimming="WordEllipsis" FontSize="{StaticResource PhoneFontSizeMediumLarge}" MaxHeight="110" />
-        </Grid>
-    </DataTemplate>
-
-    <DataTemplate x:Name="previewImageTemplate">
-        <Image Stretch="UniformToFill" HorizontalAlignment="Stretch"
-                Source="{Binding Content.PreviewImage, Converter={StaticResource asyncImageSourceConverter}}" />
-    </DataTemplate>
-
-    <DataTemplate x:Name="previewTextTemplate">
-        <TextBlock TextWrapping="Wrap" Text="{Binding Content.PreviewText}" VerticalAlignment="Center" HorizontalAlignment="Left"
-                FontSize="{StaticResource PhoneFontSizeMediumLarge}" MaxHeight="110" TextTrimming="WordEllipsis"/>
-    </DataTemplate>
-
-    <DataTemplate x:Name="linkSelector">
-        <selectors:SubredditRiverTemplateSelector HorizontalAlignment="Left" VerticalAlignment="Center"
-                HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="{Binding}"
-                MixedTemplate="{StaticResource mixedTypeTemplate}"
-                ImagesTemplate="{StaticResource previewImageTemplate}"
-                TextTemplate="{StaticResource previewTextTemplate}" />
-    </DataTemplate>
 
     <DataTemplate x:Name="normalSubreddit">
-        <telerikPrimitives:RadCycleHubTile ItemsSource="{Binding PreviewBinding.ContextBinding}"
-                                        Title="{Binding Thing.DisplayName}"
-                                        HorizontalAlignment="Stretch"
-                                        Width="Auto"
-                                        HorizontalContentAlignment="Stretch"
-                                        ItemTemplate="{StaticResource linkSelector}"
-                                        CycleRandomly="True" />
-
-
+        <Button BorderThickness="0">
+            <local:SubredditView />
+        </Button>
     </DataTemplate>
 </ResourceDictionary>

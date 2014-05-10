@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using SnooSharp;
 using SnooStream.Common;
+using SnooStream.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,11 +16,15 @@ namespace SnooStream.ViewModel
     public class LinkRiverViewModel : ViewModelBase, ICollection<LinkViewModel>, INotifyCollectionChanged
     {
         //need to come up with an init blob setup for this, meaining a per river blob
+		public int HeaderImageWidth { get { return HeaderSizeOrDefault(true); } }
+		public int HeaderImageHeight { get { return HeaderSizeOrDefault(false); } }
         public Subreddit Thing { get; private set; }
         public string Sort { get; private set; }
         public bool Loading { get { return _loadingTask != null; } }
         private string LastLinkId { get; set; }
         public bool IsLocal { get; private set; }
+		public bool IsUserMultiReddit { get { return LinkGlyphUtility.IsUserMultiReddit(Thing.Url); } }
+		//public bool IsUserMultiReddit { get { return LinkGlyphUtility.IsUserMultiReddit(Thing.Url); } }
         public LinkRiverViewModel(bool isLocal, Subreddit thing, string sort, IEnumerable<Link> initialLinks)
         {
             IsLocal = isLocal;
@@ -44,6 +49,16 @@ namespace SnooStream.ViewModel
                     return previewTask;
                 });
         }
+
+		private const int DefaultHeaderWidth = 125;
+		private const int DefaultHeaderHeight = 50;
+		private int HeaderSizeOrDefault (bool width)
+		{
+			if(Thing == null || Thing.HeaderSize == null || Thing.HeaderSize.Length < 2)
+				return width ? DefaultHeaderWidth : DefaultHeaderHeight;
+			else
+				return width ? Thing.HeaderSize[0] : Thing.HeaderSize[1];
+		}
 
         public LinkStreamPreviewEnumerator PreviewBinding
         {
