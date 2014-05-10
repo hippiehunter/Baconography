@@ -20,13 +20,6 @@ namespace SnooStreamWP8.View.Controls
             InitializeComponent();
         }
 
-        private void listBox_ItemTap(object sender, Telerik.Windows.Controls.ListBoxItemTapEventArgs e)
-        {
-            var linkRiver = e.Item.DataContext as LinkRiverViewModel;
-            if (linkRiver != null)
-                SnooStreamViewModel.NavigationService.NavigateToLinkRiver(linkRiver);
-        }
-
         private void manualBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Enter)
@@ -67,5 +60,12 @@ namespace SnooStreamWP8.View.Controls
             _disableFocusHack = true;
             _needToHackFocus = false;
         }
+
+		private void listBox_ItemTap (object sender, System.Windows.Input.GestureEventArgs e)
+		{
+			var linkRiver = ((Button)sender).DataContext as LinkRiverViewModel;
+			if(linkRiver != null)
+				SnooStreamViewModel.NavigationService.NavigateToLinkRiver(linkRiver);
+		}
     }
 }
