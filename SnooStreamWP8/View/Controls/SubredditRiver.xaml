@@ -33,8 +33,23 @@
             Margin="0,0,-12,0" ItemsSource="{Binding CombinedRivers}"
             ItemTap="listBox_ItemTap"
             ItemTemplate="{StaticResource normalSubreddit}"
-            GroupHeaderTemplate="{StaticResource subredditGroupHeader}"
-            ListHeaderTemplate="{StaticResource riverHeaderTemplate}">
+            GroupHeaderTemplate="{StaticResource groupHeader}">
+            <telerikData:RadJumpList.ListHeaderContent>
+                <StackPanel Margin="12,0,0,0">
+                    <TextBlock TextWrapping="Wrap" FontSize="17" Margin="0,5,0,3">
+                                        Enter a subreddit:
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox HorizontalAlignment="Stretch" MinHeight="25" Width="320"
+                                             Margin="-13,0,0,0"
+                                             x:Name="manualBox" Text="{Binding SearchString, Mode=TwoWay}"
+                                                 KeyUp="manualBox_KeyDown"
+                                                 LostFocus="manualBox_LostFocus"
+                                                 MouseLeave="manualBox_MouseLeave"/>
+                    </StackPanel>
+                    <TextBlock TextWrapping="Wrap" FontSize="17" Margin="0,5,0,7" Text="Or select a subreddit from below"/>
+                </StackPanel>
+            </telerikData:RadJumpList.ListHeaderContent>
         </telerikData:RadJumpList>
     </Grid>
 </UserControl>

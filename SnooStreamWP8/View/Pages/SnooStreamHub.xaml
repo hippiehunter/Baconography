@@ -15,21 +15,24 @@
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <Grid x:Name="LayoutRoot">
-        <phone:Pivot>
-            <phone:PivotItem Header="Subreddits" DataContext="{Binding SubredditRiver}">
-                <local:SubredditRiver/>
+        <phone:Pivot x:Name="pivot">
+            <phone:PivotItem Header="{Binding SubredditRiver.SelectedRiver.Thing.DisplayName}">
+                <local:SubredditRiver DataContext="{Binding SubredditRiver.SelectedRiver}"/>
             </phone:PivotItem>
-            <phone:PivotItem Header="Self" DataContext="{Binding UserHub.Self}" Visibility="{Binding IsLoggedIn, Converter={StaticResource booleanVisibilityConverter}}">
-                <local:SelfActivityView/>
-            </phone:PivotItem>
-            <phone:PivotItem Header="Login" DataContext="{Binding UserHub}" Visibility="{Binding Self.IsLoggedIn, Converter={StaticResource invertedBooleanVisibilityConverter}}">
-                <local:LoginView DataContext="{Binding Login}"/>
+            <phone:PivotItem Header="Self">
+                <Grid>
+                    <local:SelfActivityView DataContext="{Binding UserHub.Self}" Visibility="{Binding IsLoggedIn, Converter={StaticResource booleanVisibilityConverter}}"/>
+                    <local:LoginView DataContext="{Binding UserHub.Login}" Visibility="{Binding Self.IsLoggedIn, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>
+                </Grid>
             </phone:PivotItem>
             <phone:PivotItem Header="Settings" DataContext="{Binding Settings}">
                 <local:SettingsView />
             </phone:PivotItem>
             <phone:PivotItem Header="Moderator" DataContext="{Binding ModeratorHub}" Visibility="{Binding IsUserModerator, Converter={StaticResource booleanVisibilityConverter}}">
                 <Grid/>
+            </phone:PivotItem>
+            <phone:PivotItem Header="Subreddits">
+
             </phone:PivotItem>
         </phone:Pivot>
     </Grid>

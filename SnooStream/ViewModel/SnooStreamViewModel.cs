@@ -45,14 +45,6 @@ namespace SnooStream.ViewModel
             ModeratorHub = new ModeratorHubViewModel();
             SettingsHub = new SettingsViewModel();
             SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
-            if (_initializationBlob.LockscreenImages != null && _initializationBlob.LockscreenImages.Count > 0)
-            {
-                Random rnd = new Random();
-                FeaturedImage = _initializationBlob.LockscreenImages[rnd.Next() % _initializationBlob.LockscreenImages.Count].Item2;
-            }
-            else
-                FeaturedImage = "http://www.darelparker.com/dp/wp-content/uploads/2011/01/reddit-coat-of-arms-logo-widescreen-1440-900-wallpaper.jpg";
-
             if (!IsInDesignMode)
             {
                 LoadLargeImages();
