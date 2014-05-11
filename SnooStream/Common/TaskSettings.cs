@@ -31,7 +31,6 @@ namespace SnooStream.TaskSettings
 		LiveTileImageURIs = 0xB03
 	}
 
-	// Serializer for this class is located in WP8Core Utility.cs
 	public class TaskSettings
 	{
 		#region Lock Screen Settings
