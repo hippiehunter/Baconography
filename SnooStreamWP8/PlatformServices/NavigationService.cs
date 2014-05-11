@@ -77,10 +77,16 @@ namespace SnooStreamWP8.PlatformServices
             throw new NotImplementedException();
         }
 
-        public void NavigateToSettingsWithPreview(SettingsViewModel viewModel)
-        {
-            throw new NotImplementedException();
-        }
+		public void NavigateToContentSettings(SettingsViewModel viewModel)
+		{
+			var url = string.Format("/View/Pages/ContentSettings.xaml?state={0}", _navState.AddState(viewModel));
+			_frame.Navigate(new Uri(url, UriKind.Relative));
+		}
+
+		public void NavigateToLockScreenSettings(SettingsViewModel viewModel)
+		{
+			throw new NotImplementedException();
+		}
 
         public Task<bool> ShowPopup(GalaSoft.MvvmLight.ViewModelBase viewModel)
         {
@@ -139,5 +145,5 @@ namespace SnooStreamWP8.PlatformServices
                 //TODO message box this?
             }
         }
-    }
+	}
 }

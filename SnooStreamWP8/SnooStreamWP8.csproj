@@ -102,6 +102,9 @@
     <Compile Include="Common\OrientationManager.cs" />
     <Compile Include="Common\SnooApplicationPage.cs" />
     <Compile Include="Common\SubredditGroupDescriptorSource.cs" />
+    <Compile Include="Common\TaskSettings\Procurios.JSON.cs" />
+    <Compile Include="Common\TaskSettings\TaskSettingsExtensions.cs" />
+    <Compile Include="Common\TaskSettings\TaskSettingsLoader.cs" />
     <Compile Include="Common\Utility.cs" />
     <Compile Include="Converters\AsyncImageSourceConverter.cs" />
     <Compile Include="Converters\AuthorFlairKindConverter.cs" />
@@ -193,11 +196,20 @@
     <Compile Include="View\Pages\Comments.xaml.cs">
       <DependentUpon>Comments.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Pages\ContentSettings.xaml.cs">
+      <DependentUpon>ContentSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Pages\LinkRiver.xaml.cs">
       <DependentUpon>LinkRiver.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Pages\LinkStream.xaml.cs">
       <DependentUpon>LinkStream.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Pages\LockScreenSettings.xaml.cs">
+      <DependentUpon>LockScreenSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Pages\SnooHubMark2.xaml.cs">
+      <DependentUpon>SnooHubMark2.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Pages\SnooStreamHub.xaml.cs">
       <DependentUpon>SnooStreamHub.xaml</DependentUpon>
@@ -307,11 +319,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\Pages\ContentSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Pages\LinkRiver.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Pages\LinkStream.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Pages\LockScreenSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Pages\SnooHubMark2.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -335,6 +359,7 @@
     <Content Include="Assets\ApplicationIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\RainbowGlass.jpg" />
     <Content Include="Assets\Tiles\FlipCycleTileLarge.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

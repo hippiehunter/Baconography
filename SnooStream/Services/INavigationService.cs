@@ -20,7 +20,8 @@ namespace SnooStream.Services
         void NavigateToSearch(SearchViewModel viewModel);
         void NavigateToAboutReddit(AboutRedditViewModel viewModel);
         void NavigateToAboutUser(AboutUserViewModel viewModel);
-        void NavigateToSettingsWithPreview(SettingsViewModel viewModel);
+		void NavigateToContentSettings(SettingsViewModel viewModel);
+		void NavigateToLockScreenSettings(SettingsViewModel viewModel);
         Task<bool> ShowPopup(ViewModelBase viewModel);
         void GoBack();
 

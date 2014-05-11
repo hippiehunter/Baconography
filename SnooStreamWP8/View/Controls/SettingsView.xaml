@@ -11,144 +11,54 @@
     d:DesignHeight="480" d:DesignWidth="480">
     
     <Grid x:Name="LayoutRoot">
-        <Grid.Resources>
-            <Style x:Key="RoundButtonStyle" TargetType="Button">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Grid Background="Transparent">
-                                <Ellipse x:Name="Circle" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" StrokeThickness="2"/>
-                                <ContentControl x:Name="Content" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" />
-
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal">
-                                            <Storyboard>
-                                                <ObjectAnimationUsingKeyFrames
-                                                Storyboard.TargetName="Circle"
-                                                Storyboard.TargetProperty="Stroke">
-                                                    <DiscreteObjectKeyFrame
-                                                    KeyTime="0"
-                                                    Value="{StaticResource PhoneForegroundBrush}" />
-                                                </ObjectAnimationUsingKeyFrames>
-
-                                                <ObjectAnimationUsingKeyFrames
-                                                Storyboard.TargetName="Content"
-                                                Storyboard.TargetProperty="Foreground">
-                                                    <DiscreteObjectKeyFrame
-                                                    KeyTime="0"
-                                                    Value="{StaticResource PhoneForegroundBrush}" />
-                                                </ObjectAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-
-                                        <VisualState x:Name="Disabled">
-                                            <Storyboard>
-                                                <ObjectAnimationUsingKeyFrames
-                                                Storyboard.TargetName="Circle"
-                                                Storyboard.TargetProperty="Stroke">
-                                                    <DiscreteObjectKeyFrame
-                                                    KeyTime="0"
-                                                    Value="{StaticResource PhoneDisabledBrush}" />
-                                                </ObjectAnimationUsingKeyFrames>
-
-                                                <ObjectAnimationUsingKeyFrames
-                                                Storyboard.TargetName="Content"
-                                                Storyboard.TargetProperty="Foreground">
-                                                    <DiscreteObjectKeyFrame
-                                                    KeyTime="0"
-                                                    Value="{StaticResource PhoneDisabledBrush}" />
-                                                </ObjectAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-
-                                        <VisualState x:Name="Pressed">
-                                            <Storyboard>
-                                                <ObjectAnimationUsingKeyFrames
-                                                Storyboard.TargetName="Circle"
-                                                Storyboard.TargetProperty="Stroke">
-                                                    <DiscreteObjectKeyFrame
-                                                    KeyTime="0"
-                                                    Value="{StaticResource PhoneAccentBrush}" />
-                                                </ObjectAnimationUsingKeyFrames>
-
-                                                <ObjectAnimationUsingKeyFrames
-                                                Storyboard.TargetName="Content"
-                                                Storyboard.TargetProperty="Foreground">
-                                                    <DiscreteObjectKeyFrame
-                                                    KeyTime="0"
-                                                    Value="{StaticResource PhoneAccentBrush}" />
-                                                </ObjectAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
-                            </Grid>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-        </Grid.Resources>
         <ScrollViewer>
             <StackPanel Margin="12,0,12,0">
-                <TextBlock FontWeight="SemiBold" Text="CONTENT"/>
-                <telerikPrimitives:RadToggleSwitch Header="Upgrade to Ad-Free"
-                                IsEnabled="{Binding AllowAdvertising}"
-                                IsChecked="{Binding AllowAdvertising, Converter={StaticResource invertedBooleanConverter}}"
-                                Checked="AdFreeUpgrade_Click"/>
-                <telerikPrimitives:RadToggleSwitch Header="Allow NSFW (over 18) content"
-                                IsChecked="{Binding AllowNSFWContent, Mode=TwoWay}" />
-                <telerikPrimitives:RadToggleSwitch Header="Only flipview unvisited content"
-                                IsChecked="{Binding OnlyFlipViewUnread, Mode=TwoWay}" />
-                <telerikPrimitives:RadToggleSwitch Header="Only flipview through images"
-                                IsChecked="{Binding OnlyFlipViewImages, Mode=TwoWay}" />
-                <telerikPrimitives:RadToggleSwitch Header="Visit web links in app"
-                                IsChecked="{Binding OptimizeWebContent, Mode=TwoWay}" />
+                <Button BorderThickness="0"
+                        HorizontalContentAlignment="Left"
+                        Padding="0,0,0,0"
+                        Margin="0,0,0,0"
+                        Tap="Content_Tap">
+                    <StackPanel>
+                        <TextBlock FontWeight="Bold"
+                                   FontSize="36">
+                            CONTENT
+                        </TextBlock>
+                        <TextBlock Margin="0,-2,0,0"
+                            FontSize="18" Foreground="{StaticResource PhoneSubtleBrush}">
+                            Control what you see and when you see it
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
 
-                <TextBlock FontWeight="SemiBold" Text="LAYOUT"/>
-                <telerikPrimitives:RadToggleSwitch Header="Left-handed thumbnail layout"
-                                IsChecked="{Binding LeftHandedMode, Mode=TwoWay}" />
-                <telerikPrimitives:RadToggleSwitch Header="Use single-reddit layout"
-                                IsChecked="{Binding SimpleLayoutMode, Mode=TwoWay}" />
-                <telerikPrimitives:RadToggleSwitch Header="Enable one-touch voting"
-                                IsChecked="{Binding OneTouchVoteMode, Mode=TwoWay}" />
-                <telerikPrimitives:RadToggleSwitch Header="Lock current orientation"
-                                IsChecked="{Binding OrientationLock, Mode=TwoWay}"
-                                Checked="OrientationLock_Checked"
-                                Unchecked="OrientationLock_Unchecked"/>
-                <telerikPrimitives:RadToggleSwitch Header="Tap title for comments"
-                                IsChecked="{Binding TapForComments, Mode=TwoWay}" />
-                <telerikPrimitives:RadToggleSwitch Header="Invert system theme"
-                                IsChecked="{Binding InvertSystemTheme, Mode=TwoWay}" />
-                <telerikPrimitives:RadToggleSwitch Header="Use multi-color comment margins"
-                                IsChecked="{Binding MultiColorCommentMargins, Mode=TwoWay}" />
+                <Button BorderThickness="0"
+                        HorizontalContentAlignment="Left"
+                        Padding="0,0,0,0"
+                        Margin="0,0,0,0">
+                    <StackPanel>
+                        <TextBlock FontWeight="Bold"
+                                   FontSize="36">
+                            LAYOUT
+                        </TextBlock>
+                        <TextBlock FontSize="18" Foreground="{StaticResource PhoneSubtleBrush}">
+                            Change the way the app looks
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
 
-
-                <TextBlock FontWeight="SemiBold" Text="BACKGROUND"/>
-                <telerikPrimitives:RadToggleSwitch Header="Disable background activity"
-                                IsChecked="{Binding DisableBackground, Mode=TwoWay}" />
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock HorizontalAlignment="Left" FontWeight="SemiBold" Text="OFFLINE CONTENT"/>
-                    <Button 
-                                    Margin="20,-1,0,0"
-                                    FontFamily="Segoe UI Symbol" FontSize="14"
-                                    Width="34" Height="34"
-                                    Tap="HelpOfflineButton_Tap"
-                                    Content="&#xE11B;" Style="{StaticResource RoundButtonStyle}"/>
-                </StackPanel>
-
-                <telerikPrimitives:RadToggleSwitch Header="Predictive offline caching"
-                                IsChecked="{Binding AllowPredictiveOfflining, Mode=TwoWay}" />
-                <telerikPrimitives:RadToggleSwitch Header="Overnight offline caching"
-                                IsChecked="{Binding EnableOvernightUpdates, Mode=TwoWay}" />
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Margin="12,0,0,0" Text="Cleanup data every"/>
-                    <TextBlock Margin="6,0,0,0" Text="{Binding OfflineCacheDays}" />
-                    <TextBlock Margin="6,0,0,0" Text="days" />
-                </StackPanel>
-                <Slider Margin="0,0,0,0" Minimum="1" Maximum="7" Value="{Binding OfflineCacheDays, Mode=TwoWay}"/>
-                <Button Margin="0,-12,0,0" Content="Clear Offline Data" Command="{Binding ClearOffline}"/>
-
+                <Button BorderThickness="0"
+                        HorizontalContentAlignment="Left"
+                        Padding="0,0,0,0"
+                        Margin="0,0,0,0">
+                    <StackPanel>
+                        <TextBlock FontWeight="Bold"
+                                   FontSize="36">
+                            LOCK SCREEN
+                        </TextBlock>
+                        <TextBlock FontSize="18" Foreground="{StaticResource PhoneSubtleBrush}">
+                            Customize the lock screen source and display
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </ScrollViewer>
     </Grid>
