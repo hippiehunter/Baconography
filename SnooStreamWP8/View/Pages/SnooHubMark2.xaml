@@ -1,0 +1,107 @@
+﻿<phone:PhoneApplicationPage
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Primitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone"
+    xmlns:local="clr-namespace:SnooStreamWP8.View.Controls"
+    xmlns:common="clr-namespace:SnooStreamWP8.Common"
+    x:Class="SnooStreamWP8.View.Pages.SnooHubMark2"
+    mc:Ignorable="d"
+    SupportedOrientations="Portrait"  Orientation="Portrait"
+    shell:SystemTray.IsVisible="False"
+    DataContext="{StaticResource SnooStream}">
+
+    <phone:PhoneApplicationPage.Resources>
+        <ControlTemplate x:Key="SnooHubTemplate" TargetType="phone:Panorama">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="12"/>
+                </Grid.RowDefinitions>
+
+                <Primitives:PanningBackgroundLayer x:Name="BackgroundLayer" Grid.RowSpan="3" HorizontalAlignment="Left">
+                    <Grid>
+                        <Image x:Name="background" Source="/Assets/RainbowGlass.jpg" />
+                        <!--<Border x:Name="background" Background="{TemplateBinding Background}" />-->
+
+                        <TextBlock Margin="12,12,12,12"
+                           FontWeight="Bold"
+                           FontSize="36"
+                           Text="SNOO STREAM"
+                           Foreground="{StaticResource PhoneSubtleBrush}"/>
+                    </Grid>
+                </Primitives:PanningBackgroundLayer>
+
+                <Primitives:PanningTitleLayer x:Name="TitleLayer" Grid.Row="0" HorizontalAlignment="Left"  Margin="10,-34,0,0"
+					Content="{TemplateBinding Title}" ContentTemplate="{TemplateBinding TitleTemplate}"
+					FontSize="130" FontFamily="{StaticResource PhoneFontFamilyLight}" CharacterSpacing="-35" />
+
+                <Primitives:PanningLayer x:Name="ItemsLayer" Grid.Row="1" HorizontalAlignment="Left">
+                    <ItemsPresenter x:Name="items"/>
+                </Primitives:PanningLayer>
+
+            </Grid>
+        </ControlTemplate>
+        <Style x:Key="PanoramaItemStyle" TargetType="phone:PanoramaItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="phone:PanoramaItem">
+                        <Grid Margin="12,0,0,0">
+                            <Grid.Background>
+                                <SolidColorBrush Color="Black" Opacity=".75" />
+                            </Grid.Background>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <ContentControl x:Name="header" CharacterSpacing="-10" ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" FontSize="40" FontFamily="{StaticResource PhoneFontFamilySemiLight}" HorizontalAlignment="Left" Margin="12,-2,0,38">
+                                <ContentControl.RenderTransform>
+                                    <TranslateTransform x:Name="headerTransform"/>
+                                </ContentControl.RenderTransform>
+                            </ContentControl>
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" Grid.Row="1" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </phone:PhoneApplicationPage.Resources>
+    <phone:PhoneApplicationPage.FontFamily>
+        <StaticResource ResourceKey="PhoneFontFamilyNormal"/>
+    </phone:PhoneApplicationPage.FontFamily>
+    <phone:PhoneApplicationPage.FontSize>
+        <StaticResource ResourceKey="PhoneFontSizeNormal"/>
+    </phone:PhoneApplicationPage.FontSize>
+    <phone:PhoneApplicationPage.Foreground>
+        <StaticResource ResourceKey="PhoneForegroundBrush"/>
+    </phone:PhoneApplicationPage.Foreground>
+    <!--LayoutRoot contains the root grid where all other page content is placed-->
+    <Grid x:Name="LayoutRoot">
+
+        <phone:Panorama Title=" " Template="{StaticResource SnooHubTemplate}">
+
+            <!--Panorama item one-->
+            <phone:PanoramaItem Header="subreddits" Style="{StaticResource PanoramaItemStyle}"
+                                DataContext="{Binding SubredditRiver}">
+                <Grid>
+                    <local:SubredditRiver DataContext="{Binding SubredditRiver}"/>
+                </Grid>
+            </phone:PanoramaItem>
+
+            <!--Panorama item two-->
+            <phone:PanoramaItem Header="settings" Style="{StaticResource PanoramaItemStyle}"
+                                DataContext="{Binding Settings}">
+                <Grid>
+                    <local:SettingsView />
+                </Grid>
+            </phone:PanoramaItem>
+        </phone:Panorama>
+    </Grid>
+
+</phone:PhoneApplicationPage>
