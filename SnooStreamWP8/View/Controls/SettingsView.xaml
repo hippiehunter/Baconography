@@ -12,20 +12,20 @@
     
     <Grid x:Name="LayoutRoot">
         <ScrollViewer>
-            <StackPanel Margin="12,0,12,0">
+            <StackPanel Margin="0,0,0,0">
                 <Button BorderThickness="0"
                         HorizontalContentAlignment="Left"
                         Padding="0,0,0,0"
-                        Margin="0,0,0,0"
+                        Margin="0,0,0,-8"
                         Tap="Content_Tap">
                     <StackPanel>
                         <TextBlock FontWeight="Bold"
-                                   FontSize="36">
+                                   FontSize="{StaticResource PhoneFontSizeLarge}">
                             CONTENT
                         </TextBlock>
                         <TextBlock Margin="0,-2,0,0"
-                            FontSize="18" Foreground="{StaticResource PhoneSubtleBrush}">
-                            Control what you see and when you see it
+                            FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                            Choose what you see and when you see it
                         </TextBlock>
                     </StackPanel>
                 </Button>
@@ -33,13 +33,13 @@
                 <Button BorderThickness="0"
                         HorizontalContentAlignment="Left"
                         Padding="0,0,0,0"
-                        Margin="0,0,0,0">
+                        Margin="0,0,0,-8">
                     <StackPanel>
                         <TextBlock FontWeight="Bold"
-                                   FontSize="36">
+                                   FontSize="{StaticResource PhoneFontSizeLarge}">
                             LAYOUT
                         </TextBlock>
-                        <TextBlock FontSize="18" Foreground="{StaticResource PhoneSubtleBrush}">
+                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
                             Change the way the app looks
                         </TextBlock>
                     </StackPanel>
@@ -48,14 +48,61 @@
                 <Button BorderThickness="0"
                         HorizontalContentAlignment="Left"
                         Padding="0,0,0,0"
-                        Margin="0,0,0,0">
+                        Margin="0,0,0,-8">
                     <StackPanel>
                         <TextBlock FontWeight="Bold"
-                                   FontSize="36">
+                                   FontSize="{StaticResource PhoneFontSizeLarge}">
                             LOCK SCREEN
                         </TextBlock>
-                        <TextBlock FontSize="18" Foreground="{StaticResource PhoneSubtleBrush}">
-                            Customize the lock screen source and display
+                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                            Customize your reddit lock screen
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+
+                <Button BorderThickness="0"
+                        HorizontalContentAlignment="Left"
+                        Padding="0,0,0,0"
+                        Margin="0,0,0,-8">
+                    <StackPanel>
+                        <TextBlock FontWeight="Bold"
+                                   FontSize="{StaticResource PhoneFontSizeLarge}">
+                            LIVE TILE
+                        </TextBlock>
+                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                            Have the live tile your way
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+
+                <Button BorderThickness="0"
+                        HorizontalContentAlignment="Left"
+                        Padding="0,0,0,0"
+                        Margin="0,0,0,-8">
+                    <StackPanel>
+                        <TextBlock FontWeight="Bold"
+                                   FontSize="{StaticResource PhoneFontSizeLarge}">
+                            OFFLINE DATA
+                        </TextBlock>
+                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                            Decide what gets stored or clear your cache
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+
+                <Button BorderThickness="0"
+                        HorizontalContentAlignment="Left"
+                        Padding="0,0,0,0"
+                        Margin="0,0,0,-8"
+                        IsEnabled="False">
+                    <StackPanel>
+                        <TextBlock FontWeight="Bold"
+                                   FontSize="{StaticResource PhoneFontSizeLarge}">
+                            THANK YOU!
+                        </TextBlock>
+                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}"
+                                   Foreground="{StaticResource PhoneSubtleBrush}">
+                            Enjoy your Ad-Free experience
                         </TextBlock>
                     </StackPanel>
                 </Button>

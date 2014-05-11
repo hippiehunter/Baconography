@@ -13,6 +13,15 @@
     <Grid x:Name="LayoutRoot">
         <ScrollViewer>
             <StackPanel>
+                <ContentControl x:Name="header"
+                                CharacterSpacing="-10"
+                                FontSize="40" FontFamily="{StaticResource PhoneFontFamilySemiLight}"
+                                HorizontalAlignment="Left" Margin="12,6,0,24"
+                                Content="login">
+                    <ContentControl.RenderTransform>
+                        <TranslateTransform x:Name="headerTransform"/>
+                    </ContentControl.RenderTransform>
+                </ContentControl>
                 <telerik:RadPickerBox Visibility="{Binding HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}" 
                                       Header="stored logins" Content="{Binding StoredCredentials}">
                     <ControlTemplate>

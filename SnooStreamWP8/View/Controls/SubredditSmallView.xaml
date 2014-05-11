@@ -12,7 +12,7 @@
     <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" MinWidth="460">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="125" />
-            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="12" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -29,13 +29,15 @@
                VerticalAlignment="Center"/>
         </Border>
 
-        <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal">
-            <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding Thing.DisplayName}"/>
-        </StackPanel>
+        <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
+                   Margin="0,2,0,0"
+                   FontSize="{StaticResource PhoneFontSizeLarge}"
+                   FontWeight="Normal" Text="{Binding Thing.DisplayName}"/>
 
         <!--<TextBlock Grid.Column="2" Grid.Row="1" FontSize="15" Text="{Binding PublicDescription}"
                    TextWrapping="Wrap" LineHeight="20"/>-->
 
+        <!--
         <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal" Visibility="{Binding IsUserMultiReddit, Converter={StaticResource booleanVisibilityConverter}}">
             <TextBlock FontSize="14" Foreground="Gray" Text="by"/>
             <TextBlock FontSize="14" Foreground="Goldenrod" Text="{Binding MultiRedditUser}" Margin="5,0,0,0" />
@@ -45,6 +47,7 @@
             <TextBlock FontSize="14" Foreground="Goldenrod" Text="{Binding Thing.Subscribers}" />
             <TextBlock FontSize="13" Foreground="Gray" Text="subscribers" Margin="5,1,0,0"/>
         </StackPanel>
+        -->
 
     </Grid>
 </UserControl>
