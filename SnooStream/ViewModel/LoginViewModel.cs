@@ -21,6 +21,8 @@ namespace SnooStream.ViewModel
             LoadStoredCredentials();
         }
 
+        private static string UnselectedUsername = "<None Selected>";
+
         private async void LoadStoredCredentials()
         {
             var storedCredentials = await SnooStreamViewModel.UserCredentialService.StoredCredentials();
@@ -28,10 +30,66 @@ namespace SnooStream.ViewModel
             {
                 StoredCredentials.Add(credential);
             }
+
+            if (StoredCredentials.Count > 0)
+            {
+                _selectedCredential = StoredCredentials.First();
+                StoredCredentials.Add(new UserCredential { Username = UnselectedUsername, IsDefault = false });
+            }
+            RaisePropertyChanged("StoredCredentials");
             RaisePropertyChanged("HasStoredLogins");
+            RaisePropertyChanged("SelectedCredential");
         }
 
-        public ObservableCollection<UserCredential> StoredCredentials { get; private set; }
+        public ObservableCollection<UserCredential> StoredCredentials
+        {
+            get;
+            private set;
+        }
+
+        UserCredential _selectedCredential;
+        public UserCredential SelectedCredential
+        {
+            get
+            {
+                return _selectedCredential;
+            }
+            set
+            {
+                _selectedCredential = value;
+                RaisePropertyChanged("SelectedCredential");
+                RaisePropertyChanged("SelectedUsername");
+                UsingStoredCredential = UnselectedUsername != _selectedCredential.Username;
+                if (UsingStoredCredential)
+                {
+                    Username = SelectedCredential.Username;
+                    IsRememberLogin = true;
+                    IsDefaultLogin = SelectedCredential.IsDefault;
+                }
+            }
+        }
+
+        bool _usingStoredCredential;
+        public bool UsingStoredCredential
+        {
+            get
+            {
+                return _usingStoredCredential;
+            }
+            set
+            {
+                _usingStoredCredential = value;
+                RaisePropertyChanged("UsingStoredCredential");
+            }
+        }
+
+        public string SelectedUsername
+        {
+            get
+            {
+                return SelectedCredential != null ? SelectedCredential.Username : "None";
+            }
+        }
 
         string _username;
         public string Username
@@ -135,35 +193,42 @@ namespace SnooStream.ViewModel
                 Working = true;
                 try
                 {
-                    var loggedInUser = await SnooStreamViewModel.RedditService.Login(Username, Password);
-                    if (loggedInUser == null)
+                    if (UsingStoredCredential)
                     {
-                        HasErrors = true;
-                        Working = false;
+                        // TODO: Do login-y things with the currently selected credential
                     }
                     else
                     {
-                        HasErrors = false;
-                        Working = false;
-                        if (IsRememberLogin)
+                        var loggedInUser = await SnooStreamViewModel.RedditService.Login(Username, Password);
+                        if (loggedInUser == null)
                         {
-                            var newCredentials = new UserCredential
+                            HasErrors = true;
+                            Working = false;
+                        }
+                        else
+                        {
+                            HasErrors = false;
+                            Working = false;
+                            if (IsRememberLogin)
                             {
-                                IsDefault = IsDefaultLogin,
-                                LoginCookie = loggedInUser.LoginCookie,
-                                Username = loggedInUser.Username,
-                                Me = new Thing { Kind = "t2", Data = loggedInUser.Me }
-                            };
-                            await SnooStreamViewModel.UserCredentialService.AddStoredCredential(newCredentials, Password);
-                            //reload credentials
-                            StoredCredentials.Clear();
-                            LoadStoredCredentials();
-                            SnooStreamViewModel.RedditUserState.Username = loggedInUser.Username;
-                            SnooStreamViewModel.RedditUserState.IsGold = loggedInUser.Me.IsGold;
-                            SnooStreamViewModel.RedditUserState.LoginCookie = loggedInUser.LoginCookie;
-                            SnooStreamViewModel.RedditUserState.ModHash = loggedInUser.Me.ModHash;
-                            SnooStreamViewModel.RedditUserState.NeedsCaptcha = false;
-                            MessengerInstance.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = IsDefaultLogin });
+                                var newCredentials = new UserCredential
+                                {
+                                    IsDefault = IsDefaultLogin,
+                                    LoginCookie = loggedInUser.LoginCookie,
+                                    Username = loggedInUser.Username,
+                                    Me = new Thing { Kind = "t2", Data = loggedInUser.Me }
+                                };
+                                await SnooStreamViewModel.UserCredentialService.AddStoredCredential(newCredentials, Password);
+                                //reload credentials
+                                StoredCredentials.Clear();
+                                LoadStoredCredentials();
+                                SnooStreamViewModel.RedditUserState.Username = loggedInUser.Username;
+                                SnooStreamViewModel.RedditUserState.IsGold = loggedInUser.Me.IsGold;
+                                SnooStreamViewModel.RedditUserState.LoginCookie = loggedInUser.LoginCookie;
+                                SnooStreamViewModel.RedditUserState.ModHash = loggedInUser.Me.ModHash;
+                                SnooStreamViewModel.RedditUserState.NeedsCaptcha = false;
+                                MessengerInstance.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = IsDefaultLogin });
+                            }
                         }
                     }
                 }
