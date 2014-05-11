@@ -91,6 +91,13 @@
                 <local:SubredditRiver DataContext="{Binding SubredditRiver}"/>
             </phone:PanoramaItem>
 
+            <phone:PanoramaItem Header="self" Style="{StaticResource PanoramaItemStyle}">
+                <Grid>
+                    <local:SelfActivityView DataContext="{Binding UserHub.Self}" Visibility="{Binding UserHub.Self.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}"/>
+                    <local:LoginView DataContext="{Binding UserHub.Login}" Visibility="{Binding UserHub.Self.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>
+                </Grid>
+            </phone:PanoramaItem>
+
             <!--Panorama item two-->
             <phone:PanoramaItem Header="settings" Style="{StaticResource PanoramaItemStyle}"
                                 DataContext="{Binding Settings}">
