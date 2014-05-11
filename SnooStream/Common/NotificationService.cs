@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,9 +13,9 @@ namespace SnooStream.Common
     public class NotificationService : ViewModelBase
     {
         public string NotificationText { get; private set; }
-        public float ProgressPercent { get; private set; }
+        public double ProgressPercent { get; private set; }
         public bool ProgressActive { get; private set; }
-
+		bool _isProcessing;
         class NotificationInfo
         {
             public string Text { get; set; }
@@ -27,15 +28,64 @@ namespace SnooStream.Common
         {
             lock (this)
             {
-                
+				_notificationStack.Add(info);
+				ProgressActive = true;
             }
+
+			if(!_isProcessing)
+			{
+				_isProcessing = true;
+				Task.Run(() => ProcessProgress());
+			}
         }
+
+		async void ProcessProgress ()
+		{
+			try
+			{
+				while(ProgressActive)
+				{
+					var notificationStack = new List<NotificationInfo>();
+					lock(this)
+					{
+						notificationStack.AddRange(_notificationStack);
+					}
+
+
+					if(notificationStack.Count == 1)
+					{
+						NotificationText = notificationStack[0].Text;
+						ProgressPercent = Math.Max(0.0, ((double)notificationStack[0].Progress) / 100.0);
+					}
+					else
+					{
+						NotificationText = string.Format("loading {0} items", notificationStack.Count);
+						ProgressPercent = Math.Max(0.0, ((double)notificationStack.Sum(notification => notification.Progress) / notificationStack.Count) / 100.0);
+					}
+
+					SnooStreamViewModel.SystemServices.ShowProgress(NotificationText, ProgressPercent);
+					await Task.Delay(500);
+				}
+				SnooStreamViewModel.SystemServices.HideProgress();
+
+			}
+			finally
+			{
+				_isProcessing = false;
+			}
+		}
 
         private void FinishNotificationInfo(NotificationInfo info)
         {
             lock (this)
             {
-
+				try
+				{
+					_notificationStack.Remove(info);
+					if(_notificationStack.Count == 0)
+						ProgressActive = false;
+				}
+				catch { }
             }
         }
 
