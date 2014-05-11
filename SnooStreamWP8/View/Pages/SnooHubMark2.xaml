@@ -60,12 +60,12 @@
                                 <RowDefinition Height="auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <ContentControl x:Name="header" CharacterSpacing="-10" ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" FontSize="40" FontFamily="{StaticResource PhoneFontFamilySemiLight}" HorizontalAlignment="Left" Margin="12,-2,0,38">
+                            <ContentControl x:Name="header" CharacterSpacing="-10" ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" FontSize="40" FontFamily="{StaticResource PhoneFontFamilySemiLight}" HorizontalAlignment="Left" Margin="24,6,0,24">
                                 <ContentControl.RenderTransform>
                                     <TranslateTransform x:Name="headerTransform"/>
                                 </ContentControl.RenderTransform>
                             </ContentControl>
-                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" Grid.Row="1" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="12,0,12,0" Grid.Row="1" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
@@ -87,11 +87,8 @@
         <phone:Panorama Title=" " Template="{StaticResource SnooHubTemplate}">
 
             <!--Panorama item one-->
-            <phone:PanoramaItem Header="subreddits" Style="{StaticResource PanoramaItemStyle}"
-                                DataContext="{Binding SubredditRiver}">
-                <Grid>
-                    <local:SubredditRiver DataContext="{Binding SubredditRiver}"/>
-                </Grid>
+            <phone:PanoramaItem Header="subreddits" Style="{StaticResource PanoramaItemStyle}">
+                <local:SubredditRiver DataContext="{Binding SubredditRiver}"/>
             </phone:PanoramaItem>
 
             <!--Panorama item two-->
