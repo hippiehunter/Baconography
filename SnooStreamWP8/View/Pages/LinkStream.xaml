@@ -9,6 +9,7 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
     xmlns:telerikSlideView="clr-namespace:Telerik.Windows.Controls.SlideView;assembly=Telerik.Windows.Controls.Primitives"
+    xmlns:mmppf="clr-namespace:Microsoft.PlayerFramework;assembly=Microsoft.PlayerFramework"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -35,7 +36,38 @@
                     ImageSource="{Binding ImageSource.ImageData}" ManipulationController="{Binding ManipulationController, ElementName=linkStream}" />
             </DataTemplate>
 
-           
+            <DataTemplate x:Name="videoTemplate" >
+                <mmppf:MediaPlayer x:Name="player" Source="{Binding Url}" IsFullScreen="True"/>
+            </DataTemplate>
+
+            <DataTemplate x:Key="Type:ReadableArticleParagraph">
+                <TextBlock HorizontalAlignment="Left" FontSize="20" Padding="0" Margin="10" Text="{Binding Text}" TextWrapping="Wrap"/>
+            </DataTemplate>
+            <DataTemplate x:Key="Type:ReadableArticleImage">
+                <Image Source="{Binding Url}" Stretch="Uniform" Margin="10"/>
+            </DataTemplate>
+
+            <DataTemplate x:Name="articleTemplateSelector" >
+                <selectors:TypedTemplateSelector Content="{Binding}" />
+            </DataTemplate>
+            
+            <DataTemplate x:Name="webTemplate" >
+                <telerikPrimitives:RadDataBoundListBox ItemsSource="{Binding WebParts}"
+                                                       Margin="0" Padding="0"
+                                                       BorderThickness="0" VerticalAlignment="Stretch" 
+                                                       ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                       ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                                                       HorizontalContentAlignment="Stretch"
+                                                       ItemTemplate="{StaticResource articleTemplateSelector}">
+                    <telerikPrimitives:RadDataBoundListBox.ListHeaderContent>
+                        <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" FontSize="32" Margin="20" TextWrapping="Wrap"/>
+                    </telerikPrimitives:RadDataBoundListBox.ListHeaderContent>
+                </telerikPrimitives:RadDataBoundListBox>
+            </DataTemplate>
+            
+            <DataTemplate x:Name="selfTemplate">
+                <local:CommentsView/>
+            </DataTemplate>
 
             <DataTemplate x:Name="imageSelector" >
                 <selectors:ImageTemplateSelector 
@@ -53,7 +85,11 @@
                 <selectors:ContentTemplateSelector Content="{Binding}" 
                                                    ImageContentTemplate="{StaticResource imageSelector}"
                                                    AlbumContentTemplate="{StaticResource albumTemplate}"
-                                                   LoadingContentTemplate="{StaticResource loadingTemplate}"/>
+                                                   LoadingContentTemplate="{StaticResource loadingTemplate}"
+                                                   TextWebContentTemplate="{StaticResource webTemplate}"
+                                                   WebContentTemplate="{StaticResource webTemplate}"
+                                                   VideoContentTemplate="{StaticResource videoTemplate}"
+                                                   SelfContentTemplate="{StaticResource selfTemplate}"/>
             </DataTemplate>
 
             
@@ -63,6 +99,9 @@
                     <TextBlock Text="{Binding Title}" TextWrapping="Wrap" MaxHeight="300"/>
                 </Border>
             </DataTemplate>
+
+            
+
         </Grid.Resources>
         
         <Grid.RowDefinitions>

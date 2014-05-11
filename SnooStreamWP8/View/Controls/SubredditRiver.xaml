@@ -17,11 +17,18 @@
 
     <Grid x:Name="LayoutRoot">
         <Grid.Resources>
-            <ResourceDictionary>
-                <ResourceDictionary.MergedDictionaries>
-                    <ResourceDictionary Source="SubredditRiverResources.xaml" />
-                </ResourceDictionary.MergedDictionaries>
-            </ResourceDictionary>
+            <DataTemplate x:Name="normalSubreddit">
+                <Button BorderThickness="0" Tap="listBox_ItemTap">
+                    <localC:SubredditSmallView />
+                </Button>
+            </DataTemplate>
+
+            <DataTemplate x:Name="subredditGroupHeader">
+                <Border BorderBrush="{StaticResource PhoneChromeBrush}" HorizontalAlignment="Stretch" BorderThickness="0,0,0,2" Margin="0,0,18,0" Visibility="{Binding Converter={StaticResource blankVisibilityConverter}}">
+                    <TextBlock Text="{Binding}" Foreground="{StaticResource PhoneForegroundBrush}" FontSize="48" Padding="6" 
+                                    FontFamily="{StaticResource PhoneFontFamilySemiLight}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                </Border>
+            </DataTemplate>
         </Grid.Resources>
 
         <telerikData:RadJumpList
@@ -31,10 +38,10 @@
             HorizontalAlignment="Stretch"
             HorizontalContentAlignment="Stretch"
             Margin="0,0,-12,0" ItemsSource="{Binding CombinedRivers}"
-            ItemTap="listBox_ItemTap"
             GroupDescriptorsSource="{Binding Descriptors, Source={StaticResource subredditGroupDescriptorSource}}"
             ItemTemplate="{StaticResource normalSubreddit}"
-            GroupHeaderTemplate="{StaticResource subredditGroupHeader}">
+            GroupHeaderTemplate="{StaticResource subredditGroupHeader}"
+            ListHeaderDisplayMode="AlwaysVisible">
             <telerikData:RadJumpList.ListHeaderContent>
                 <StackPanel Margin="12,0,0,0" Visibility="Collapsed">
                     <TextBlock TextWrapping="Wrap" FontSize="17" Margin="0,5,0,3">

@@ -32,12 +32,11 @@ namespace SnooStreamWP8.PlatformServices
         public void NavigateToLinkRiver(LinkRiverViewModel viewModel)
         {
             //if the current frame is already the hub just change pages and dont introduce any back stack
-            if (_frame.Content is SnooStreamHub)
+            if (_frame.Content is LinkRiver)
             {
-                var hub = _frame.Content as SnooStreamHub;
+				var hub = _frame.Content as LinkRiver;
                 var ssvm = hub.DataContext as SnooStreamViewModel;
                 ssvm.SubredditRiver.SelectSubreddit(viewModel);
-                hub.FocusLinkRiver();
             }
             else
             {
