@@ -11,13 +11,18 @@ namespace SnooStream.ViewModel
     public class ImageViewModel : ContentViewModel
     {
 
-        public ImageViewModel(ViewModelBase context, string url, string title, ImageSource imageSource) : base(context)
+        public ImageViewModel(ViewModelBase context, string url, string title, ImageSource imageSource, byte[] imageBytes) : base(context)
         {
             Url = url;
             ImageSource = imageSource;
             Title = title;
             Domain = new Uri(url).DnsSafeHost;
             Loaded = imageSource != null;
+
+			if(imageBytes != null && imageBytes.Length > 6) //minimum to identify the image type
+			{
+				IsGif = CheckGif(imageBytes);
+			}
         }
 
         public string Url { get; set; }

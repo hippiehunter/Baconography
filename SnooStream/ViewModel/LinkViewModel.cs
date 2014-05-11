@@ -99,14 +99,14 @@ namespace SnooStream.ViewModel
                         if (imageApiResults != null && imageApiResults.Count() > 1)
                             return new AlbumViewModel(this, Link.Url, imageApiResults, Link.Title);
                         else if (imageApiResults != null && imageApiResults.Count() == 1)
-                            return new ImageViewModel(this, imageApiResults.First().Item2, imageApiResults.First().Item1, null);
+                            return new ImageViewModel(this, imageApiResults.First().Item2, imageApiResults.First().Item1, null, null);
                     }
                     else if (fileName.EndsWith(".jpg") ||
                         fileName.EndsWith(".png") ||
                         fileName.EndsWith(".gif") ||
                         fileName.EndsWith(".jpeg"))
                     {
-                        return new ImageViewModel(this, Link.Url, Link.Title, null);
+                        return new ImageViewModel(this, Link.Url, Link.Title, null, null);
                     }
                     
                     return new WebViewModel(this, true, Link.Url);

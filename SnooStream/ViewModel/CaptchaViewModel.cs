@@ -39,7 +39,7 @@ namespace SnooStream.ViewModel
                 var bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(url, (progress) => LoadPercent = progress, SnooStreamViewModel.UIContextCancellationToken);
                 if (bytes != null) //minimum to identify the image type
                 {
-                    Content = new ImageViewModel(this, url, null, new Common.ImageSource(url, bytes));
+                    Content = new ImageViewModel(this, url, null, new Common.ImageSource(url, bytes), bytes);
                 }
             }
             catch (Exception ex)

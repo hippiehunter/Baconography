@@ -61,7 +61,7 @@ namespace SnooStreamWP8.View.Pages
                         AddLoadingLink(links, linkStream.Current, false);
                     }
 
-                    await Task.Yield();
+                    await Task.Delay(500);
                     var backLinkCount = 0;
                     LinkViewModel currentPrior;
                     while (linkStream.LoadPrior.Value != null && 

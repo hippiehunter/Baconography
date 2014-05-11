@@ -53,7 +53,10 @@ namespace SnooStream.ViewModel
                     if (bytes != null && bytes.Length > 6) //minimum to identify the image type
                     {
                         loadedOne = true;
-                        Images.Add(new ImageViewModel(this, source.ToString(), title, new ImageSource(source.ToString(), bytes)));
+						await Task.Factory.StartNew(() =>
+                        {
+							Images.Add(new ImageViewModel(this, source.ToString(), title, new ImageSource(source.ToString(), bytes), bytes));
+						}, SnooStreamViewModel.UIContextCancellationToken, TaskCreationOptions.None, SnooStreamViewModel.UIScheduler);	
                     }
                 });
             return loadedOne;

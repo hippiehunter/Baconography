@@ -35,6 +35,11 @@ namespace SnooStream.Common
             return () => SnooStreamViewModel.LoadQueue.QueueLoadItem("", LoadContextType.Immediate, operation);
         }
 
+		public static Func<Action<int>, Task> QueueHelper (Func<Action<int>, Task> operation)
+		{
+			return (report) => SnooStreamViewModel.LoadQueue.QueueLoadItem("", LoadContextType.Immediate, () => operation(report));
+		}
+
         private class LoadItem
         {
             public LoadContextType ContextType;
