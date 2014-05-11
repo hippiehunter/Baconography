@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using SnooSharp;
+using SnooStream.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -147,7 +148,7 @@ namespace SnooStream.ViewModel
             CommentShell priorSibling = parent != null ? LastChild(parent) : null;
             foreach (var child in things)
             {
-                if (child.Data is More)
+				if(child.Data is More && ((More)child.Data).Children.Count > 0)
                 {
                     var firstId = ((More)child.Data).Children.First();
                     if (priorSibling == null) //need to attach to parent
@@ -364,7 +365,8 @@ namespace SnooStream.ViewModel
         {
             List<ViewModelBase> flatChilden = new List<ViewModelBase>();
             string moreId = null;
-            await Task.Run<Task>(async () =>
+            await SnooStreamViewModel.NotificationService.Report("loading more comments", 
+				PriorityLoadQueue.QueueHelper( async () =>
                 {
                     var listing = await SnooStreamViewModel.RedditService.GetMoreOnListing(target.Children, Link.Link.Id, Link.Link.Subreddit);
                     lock(this)
@@ -385,7 +387,7 @@ namespace SnooStream.ViewModel
                         moreId = ((Comment)firstChild.Data).Id;
                         InsertIntoFlatList(moreId, flatChilden);
                     }
-                });
+                }));
 
             if (moreId != null)
                 MergeDisplayChildren(flatChilden, moreId);
@@ -405,27 +407,28 @@ namespace SnooStream.ViewModel
 
         public async Task<List<ViewModelBase>> LoadImpl(bool isContext)
         {
-            List<ViewModelBase> flatChildren = new List<ViewModelBase>(); 
-            await await Task.Run<Task>(async () =>
-            {
-                var listing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(Link.Link.Subreddit, BaseUrl, null);
-                lock (this)
-                {
-                    var firstChild = listing.Data.Children.FirstOrDefault(thing => thing.Data is Comment);
-                    if (firstChild == null)
-                        return;
-                    _commentOriginStack.Add(CommentOriginType.New);
-                    MergeComments(null, listing.Data.Children, 0);
-                    InsertIntoFlatList(((Comment)firstChild.Data).Id, flatChildren);
-                }
-            });
+            List<ViewModelBase> flatChildren = new List<ViewModelBase>();
+			await SnooStreamViewModel.NotificationService.Report("loading comments", 
+				PriorityLoadQueue.QueueHelper( async () =>
+			{
+				var listing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(Link.Link.Subreddit, BaseUrl, null);
+				lock(this)
+				{
+					var firstChild = listing.Data.Children.FirstOrDefault(thing => thing.Data is Comment);
+					if(firstChild == null)
+						return;
+					_commentOriginStack.Add(CommentOriginType.New);
+					MergeComments(null, listing.Data.Children, 0);
+					InsertIntoFlatList(((Comment)firstChild.Data).Id, flatChildren);
+				}
+			}));
             return flatChildren;
         }
 
         public async Task<List<ViewModelBase>> LoadStoredImpl(bool isContext)
         {
             List<ViewModelBase> flatChildren = new List<ViewModelBase>();
-            await Task.Run<Task>(async () =>
+            await SnooStreamViewModel.NotificationService.Report("loading stored comments", async () =>
             {
                 var things = await SnooStreamViewModel.OfflineService.RetrieveOrderedThings("comments:" + BaseUrl + "?context=" + ContextTargetID + "&sort=" + Sort, TimeSpan.FromDays(1024));
                 lock (this)

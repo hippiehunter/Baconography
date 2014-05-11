@@ -22,5 +22,7 @@ namespace SnooStream.Services
         void ShowMessage(string title, string text);
         bool IsLowPriorityNetworkOk { get; }
         bool IsHighPriorityNetworkOk { get; }
-    }
+		void ShowProgress(string notificationText, double progressPercent);
+		void HideProgress();
+	}
 }

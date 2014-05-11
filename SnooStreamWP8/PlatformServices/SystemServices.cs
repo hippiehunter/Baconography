@@ -1,4 +1,5 @@
 ﻿using Microsoft.Phone.Net.NetworkInformation;
+using Microsoft.Phone.Shell;
 using Nokia.Graphics.Imaging;
 using Nokia.InteropServices.WindowsRuntime;
 using SnooStream.Services;
@@ -486,5 +487,50 @@ namespace SnooStreamWP8.PlatformServices
                 throw new NotImplementedException();
             }   
         }
-    }
+
+		List<WeakReference<ProgressIndicator>> _activeProgressIdicators = new List<WeakReference<ProgressIndicator>>();
+
+		public void HideProgress ()
+		{
+			_uiDispatcher.BeginInvoke(() =>
+				{
+					if(SystemTray.ProgressIndicator == null)
+					{
+						SystemTray.ProgressIndicator = new ProgressIndicator();
+						_activeProgressIdicators.Add(new WeakReference<ProgressIndicator>(SystemTray.ProgressIndicator));
+					}
+
+					_activeProgressIdicators.RemoveAll(weak =>
+						{
+							ProgressIndicator indicator;
+							if(weak.TryGetTarget(out indicator))
+							{
+								indicator.IsVisible = false;
+								return false;
+							}
+							else
+								return true;
+						});
+
+				});
+		}
+
+		public void ShowProgress (string notificationText, double progressPercent)
+		{
+			_uiDispatcher.BeginInvoke(() =>
+				{
+					if(SystemTray.ProgressIndicator == null)
+					{
+						SystemTray.ProgressIndicator = new ProgressIndicator();
+						_activeProgressIdicators.Add(new WeakReference<ProgressIndicator>(SystemTray.ProgressIndicator));
+					}
+					SystemTray.ProgressIndicator.IsVisible = true;
+					SystemTray.ProgressIndicator.IsIndeterminate = progressPercent <= 0.01;
+					SystemTray.ProgressIndicator.Text = notificationText;
+					
+					if(!SystemTray.ProgressIndicator.IsIndeterminate)
+						SystemTray.ProgressIndicator.Value = progressPercent;
+				});
+		}
+	}
 }
