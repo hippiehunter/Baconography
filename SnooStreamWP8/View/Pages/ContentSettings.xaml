@@ -102,7 +102,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Margin="12,12,12,12"
+        <TextBlock Grid.Row="0" Margin="24,12,12,12"
                    FontWeight="Bold"
                    FontSize="36"
                    Text="CONTENT SETTINGS"

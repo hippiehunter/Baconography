@@ -17,7 +17,7 @@ namespace SnooStream.ViewModel
     {
         static public string SmallGroupNameSelector(LinkRiverViewModel viewModel)
         {
-            return viewModel.IsLocal ? "local" : "subscribed";
+            return viewModel.IsLocal ? "favorites" : "subscribed";
         }
 
         static public string LargeGroupNameSelector(LinkRiverViewModel viewModel)

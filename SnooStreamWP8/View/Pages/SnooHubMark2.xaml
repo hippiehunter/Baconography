@@ -25,14 +25,33 @@
 
                 <Primitives:PanningBackgroundLayer x:Name="BackgroundLayer" Grid.RowSpan="3" HorizontalAlignment="Left">
                     <Grid>
-                        <Image x:Name="background" Source="/Assets/RainbowGlass.jpg" />
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <Image x:Name="background"
+                               Source="/Assets/RainbowGlass.jpg"
+                               Grid.RowSpan="2"
+                               Grid.ColumnSpan="2"/>
                         <!--<Border x:Name="background" Background="{TemplateBinding Background}" />-->
 
-                        <TextBlock Margin="12,12,12,12"
-                           FontWeight="Bold"
-                           FontSize="36"
-                           Text="SNOO STREAM"
-                           Foreground="{StaticResource PhoneSubtleBrush}"/>
+                        <Border Margin="12,18,12,12">
+                            <TextBlock 
+                                   FontWeight="SemiBold"
+                                   FontSize="{StaticResource PhoneFontSizeExtraLarge}"
+                                   Text="snoo stream"
+                                   Foreground="{StaticResource PhoneChromeBrush}">
+                                <TextBlock.RenderTransform>
+                                    <ScaleTransform ScaleY="1" ScaleX="1" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                        </Border>
+                        
                     </Grid>
                 </Primitives:PanningBackgroundLayer>
 
@@ -71,6 +90,25 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="NoHeaderPanoramaItemStyle" TargetType="phone:PanoramaItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="phone:PanoramaItem">
+                        <Grid Margin="12,0,0,0">
+                            <Grid.Background>
+                                <SolidColorBrush Color="Black" Opacity=".75" />
+                            </Grid.Background>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="12,0,12,0" Grid.Row="0" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </phone:PhoneApplicationPage.Resources>
     <phone:PhoneApplicationPage.FontFamily>
         <StaticResource ResourceKey="PhoneFontFamilyNormal"/>
@@ -87,11 +125,11 @@
         <phone:Panorama Title=" " Template="{StaticResource SnooHubTemplate}">
 
             <!--Panorama item one-->
-            <phone:PanoramaItem Header="subreddits" Style="{StaticResource PanoramaItemStyle}">
+            <phone:PanoramaItem Header="subreddits" Style="{StaticResource NoHeaderPanoramaItemStyle}">
                 <local:SubredditRiver DataContext="{Binding SubredditRiver}"/>
             </phone:PanoramaItem>
 
-            <phone:PanoramaItem Header="self" Style="{StaticResource PanoramaItemStyle}">
+            <phone:PanoramaItem Header="self" Style="{StaticResource NoHeaderPanoramaItemStyle}">
                 <Grid>
                     <local:SelfActivityView DataContext="{Binding UserHub.Self}" Visibility="{Binding UserHub.Self.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}"/>
                     <local:LoginView DataContext="{Binding UserHub.Login}" Visibility="{Binding UserHub.Self.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>

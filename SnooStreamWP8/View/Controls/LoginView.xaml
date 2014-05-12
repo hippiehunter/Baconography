@@ -4,30 +4,55 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:telerik="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
+    xmlns:local="clr-namespace:SnooStreamWP8.View.Controls"
+    xmlns:common="clr-namespace:SnooStreamWP8.Common"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     d:DesignHeight="579.524" d:DesignWidth="480">
-    
+
     <Grid x:Name="LayoutRoot">
         <ScrollViewer>
             <StackPanel>
+                <ContentControl x:Name="header"
+                                CharacterSpacing="-10"
+                                FontSize="40" FontFamily="{StaticResource PhoneFontFamilySemiLight}"
+                                HorizontalAlignment="Left" Margin="12,6,0,24"
+                                Content="login">
+                    <ContentControl.RenderTransform>
+                        <TranslateTransform x:Name="headerTransform"/>
+                    </ContentControl.RenderTransform>
+                </ContentControl>
                 <telerik:RadPickerBox Visibility="{Binding HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}" 
-                                      Header="stored logins" Content="{Binding StoredCredentials}">
-                    <ControlTemplate>
-                        <TextBlock Text="{Binding Username}"/>
-                    </ControlTemplate>
+                                      Header="stored logins"
+                                      Content="{Binding SelectedUsername}">
+                    <telerik:RadPickerBox.PopupContent>
+                        <ListBox ItemsSource="{Binding StoredCredentials}"
+                                 SelectedItem="{Binding SelectedCredential, Mode=TwoWay}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="12">
+                                        <TextBlock Text="{Binding Username}"
+                                                   FontSize="{StaticResource PhoneFontSizeExtraLarge}"/>
+                                    </Border>
+                                    
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </telerik:RadPickerBox.PopupContent>
                 </telerik:RadPickerBox>
 
                 <telerik:RadTextBox Header="username" Text="{Binding Username, Mode=TwoWay}"/>
-                <telerik:RadPasswordBox Header="password" Password="{Binding Password, Mode=TwoWay}" />
+                <telerik:RadPasswordBox Header="password"
+                                        Password="{Binding Password, Mode=TwoWay}"
+                                        IsEnabled="{Binding UsingStoredCredential, Converter={StaticResource invertedBooleanConverter}}"/>
                 <CheckBox Margin="0,0,0,0" Content="save this login"
-                                IsChecked="{Binding IsRememberLogin, Mode=TwoWay}" />
+                          IsChecked="{Binding IsRememberLogin, Mode=TwoWay}"/>
                 <CheckBox Margin="0,0,0,0" Content="login automatically"
-                                IsChecked="{Binding IsDefaultLogin, Mode=TwoWay}" />
+                          IsChecked="{Binding IsDefaultLogin, Mode=TwoWay}" />
                 <ProgressBar IsIndeterminate="{Binding Working}"
-                                         Visibility="{Binding Working, Converter={StaticResource booleanVisibilityConverter}}"/>
+                             Visibility="{Binding Working, Converter={StaticResource booleanVisibilityConverter}}"/>
                 <Border Margin="0,20,0,10" Visibility="{Binding HasErrors, Mode=TwoWay, Converter={StaticResource booleanVisibilityConverter}}">
                     <TextBlock Foreground="Red" HorizontalAlignment="Center" Text="Login Failed: incorrect username or password"/>
                 </Border>

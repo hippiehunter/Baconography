@@ -22,8 +22,26 @@
                         CommentActivityTemplate="{StaticResource commentActivityTemplate}" />
             </ResourceDictionary>
         </Grid.Resources>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <telerikPrimitives:RadDataBoundListBox EmptyContent="Loading..." x:Name="listBox"
+        <ContentControl x:Name="header"
+                        Grid.Row="0"
+                        CharacterSpacing="-10"
+                        FontSize="40" FontFamily="{StaticResource PhoneFontFamilySemiLight}"
+                        HorizontalAlignment="Left" Margin="-6,6,0,24"
+                        Content="activity">
+            <ContentControl.RenderTransform>
+                <TranslateTransform x:Name="headerTransform"/>
+            </ContentControl.RenderTransform>
+        </ContentControl>
+
+        <telerikPrimitives:RadDataBoundListBox
+                Grid.Row="1"
+                EmptyContent="Loading..." x:Name="listBox"
                 Margin="0,0,-6,0" ItemsSource="{Binding Activities}"
                 ItemTemplateSelector="{StaticResource activityTemplateSelector}"
                 ItemAnimationMode="PlayAll" IsItemReorderEnabled="False"
