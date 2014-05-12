@@ -16,10 +16,11 @@ using System.Diagnostics;
 using Telerik.Windows.Controls.SlideView;
 using SnooStreamWP8.View.Controls;
 using System.Windows.Media.Imaging;
+using System.ComponentModel;
 
 namespace SnooStreamWP8.View.Pages
 {
-    public partial class LinkStream : SnooApplicationPage
+    public partial class LinkStream : SnooApplicationPage, INotifyPropertyChanged
     {
         public LinkStream()
         {
@@ -45,6 +46,8 @@ namespace SnooStreamWP8.View.Pages
             }
         }
 
+        public ContentViewModel SelectedItem { get; set; }
+
         bool _loading = false;
 
         public async void LoadInitialLinks(ObservableCollection<ContentViewModel> links)
@@ -60,16 +63,25 @@ namespace SnooStreamWP8.View.Pages
                     {
                         AddLoadingLink(links, linkStream.Current, false);
                     }
+                    var first = links[0];
+                    SelectedItem = first;
+                    if (PropertyChanged != null)
+                        PropertyChanged(this, new PropertyChangedEventArgs("SelectedItem"));
 
                     await Task.Delay(500);
                     var backLinkCount = 0;
                     LinkViewModel currentPrior;
-                    while (linkStream.LoadPrior.Value != null && 
-                        (currentPrior = (await linkStream.LoadPrior.Value.Next()) as LinkViewModel) != null && 
+                    while (linkStream.LoadPrior.Value != null &&
+                        (currentPrior = (await linkStream.LoadPrior.Value.Next()) as LinkViewModel) != null &&
                         backLinkCount < 5)
                     {
                         AddLoadingLink(links, currentPrior, true);
                     }
+
+                    SelectedItem = first;
+
+                    if (PropertyChanged != null)
+                        PropertyChanged(this, new PropertyChangedEventArgs("SelectedItem"));
                 }
             }
             finally
@@ -210,5 +222,7 @@ namespace SnooStreamWP8.View.Pages
         {
             ManipulationController.FireManipulationDelta(sender, e);
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

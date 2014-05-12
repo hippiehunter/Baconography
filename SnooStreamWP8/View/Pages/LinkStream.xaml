@@ -77,8 +77,7 @@
             </DataTemplate>
 
             <DataTemplate x:Name="albumTemplate">
-                <telerikPrimitives:RadSlideView ItemsSource="{Binding Images}" Orientation="Vertical" IsLoopingEnabled="False" AdjacentItemsPreviewMode="None" 
-                                                IsPullToRefreshEnabled="False" ItemRealizationMode="ViewportItem" ItemTemplate="{StaticResource imageSelector}"/>
+                <local:AlbumControl HorizontalAlignment="Stretch" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}" ManipulationController="{Binding ManipulationController, ElementName=linkStream}" />
             </DataTemplate>
 
             <DataTemplate x:Name="contentSelector" >
@@ -111,10 +110,10 @@
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Margin="0,0,0,0" Grid.Row="0">
-            <telerikPrimitives:RadSlideView x:Name="radSlideView" ItemsSource="{Binding Links, ElementName=linkStream}" AdjacentItemsPreviewMode="None" IsPullToRefreshEnabled="False" 
+            <telerikPrimitives:RadSlideView x:Name="radSlideView" SelectedItem="{Binding SelectedItem, ElementName=linkStream}" ItemsSource="{Binding Links, ElementName=linkStream}" AdjacentItemsPreviewMode="None" IsPullToRefreshEnabled="False" 
                                             Orientation="Horizontal" IsLoopingEnabled="False" OverlayContentTemplate="{StaticResource overlayTemplate}" IsShowOverlayContentOnTapEnabled="True"
                                             ItemRealizationMode="ViewportItem" ItemTemplate="{StaticResource contentSelector}" DoubleTap="radSlideView_DoubleTap" ManipulationStarted="radSlideView_ManipulationStarted"
-                                            ManipulationCompleted="radSlideView_ManipulationCompleted" ManipulationDelta="radSlideView_ManipulationDelta">
+                                            ManipulationCompleted="radSlideView_ManipulationCompleted" ManipulationDelta="radSlideView_ManipulationDelta" UseOptimizedManipulationRouting="False">
             </telerikPrimitives:RadSlideView>
             
         </Grid>
