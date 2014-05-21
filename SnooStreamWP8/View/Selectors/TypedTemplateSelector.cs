@@ -10,7 +10,7 @@ using Telerik.Windows.Controls;
 namespace SnooStreamWP8.View.Selectors
 {
     //from the blog post at http://www.wiredprairie.us/blog/index.php/archives/1705
-    public class TypedTemplateSelector : DataTemplateSelectorControl
+    public class TypedTemplateSelector : DataTemplateSelector
     {
         private Dictionary<string, DataTemplate> _cachedDataTemplates;
 
@@ -29,7 +29,7 @@ namespace SnooStreamWP8.View.Selectors
             IsCacheEnabled = true;
         }
 
-		protected override DataTemplate SelectTemplateCore (object item, DependencyObject container)
+		public override DataTemplate SelectTemplate (object item, DependencyObject container)
         {
             // grab the Type name. Type will be searched as Type:NAME as shown below
             /*

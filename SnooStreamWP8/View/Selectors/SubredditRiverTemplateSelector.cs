@@ -9,7 +9,7 @@ using Telerik.Windows.Controls;
 
 namespace SnooStreamWP8.View.Selectors
 {
-    public class SubredditRiverTemplateSelector : DataTemplateSelectorControl
+    public class SubredditRiverTemplateSelector : DataTemplateSelector
     {
         public DataTemplate TextTemplate
         {
@@ -43,7 +43,7 @@ namespace SnooStreamWP8.View.Selectors
         public static readonly DependencyProperty MixedTemplateProperty =
             DependencyProperty.Register("MixedTemplate", typeof(DataTemplate), typeof(SubredditRiverTemplateSelector), new PropertyMetadata(null));
 
-        protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             var linkView = item as LinkViewModel;
 

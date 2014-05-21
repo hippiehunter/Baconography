@@ -32,11 +32,13 @@ namespace SnooStream.ViewModel
                 {
                     var imageUri = new Uri(tpl.Item2);
                     //make sure we havent already loaded this image
-                    if (Images.Count <= i)
-                    {
-                        if (await LoadImageImpl(tpl.Item1, imageUri, false))
-                            i++;
-                    }
+					if (Images.Count <= i)
+					{
+						if (await LoadImageImpl(tpl.Item1, imageUri, false))
+							i++;
+					}
+					else
+						i++;
                 }
                 
             }

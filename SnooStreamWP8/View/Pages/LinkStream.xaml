@@ -25,11 +25,6 @@
                     Source="{Binding Url}" />
             </DataTemplate>
 
-            <DataTemplate x:Name="loadingTemplate">
-                <telerikPrimitives:RadBusyIndicator
-                    IsRunning="True"/>
-            </DataTemplate>
-
             <DataTemplate x:Name="gifTemplate">
                 <local:GifControl
                     HorizontalAlignment="Center" VerticalAlignment="Center" Unloaded="GifControl_Unloaded" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"
@@ -81,18 +76,26 @@
             </DataTemplate>
 
             
-            <selectors:ContentTemplateSelector x:Name="contentSelector" 
-                                                ImageContentTemplate="{StaticResource imageTemplate}"
-                                                GifTemplate="{StaticResource gifTemplate}"
-                                                AlbumContentTemplate="{StaticResource albumTemplate}"
-                                                LoadingContentTemplate="{StaticResource loadingTemplate}"
-                                                TextWebContentTemplate="{StaticResource webTemplate}"
-                                                WebContentTemplate="{StaticResource webTemplate}"
-                                                VideoContentTemplate="{StaticResource videoTemplate}"
-                                                SelfContentTemplate="{StaticResource selfTemplate}"/>
             
 
-            
+
+            <DataTemplate x:Name="loadingTemplate">
+                <Grid>
+                    <telerikPrimitives:RadBusyIndicator
+                        IsRunning="{Binding IsInitiallyLoaded}" Visibility="{Binding IsInitiallyLoaded, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>
+                    <selectors:ContentTemplateSelector Content="{Binding Underlying}"
+                                                       Visibility="{Binding IsInitiallyLoaded, Converter={StaticResource booleanVisibilityConverter}}"
+                                                    ImageContentTemplate="{StaticResource imageTemplate}"
+                                                    GifTemplate="{StaticResource gifTemplate}"
+                                                    AlbumContentTemplate="{StaticResource albumTemplate}"
+                                                    TextWebContentTemplate="{StaticResource webTemplate}"
+                                                    WebContentTemplate="{StaticResource webTemplate}"
+                                                    VideoContentTemplate="{StaticResource videoTemplate}"
+                                                    SelfContentTemplate="{StaticResource selfTemplate}"/>
+                </Grid>
+            </DataTemplate>
+
+
 
             <DataTemplate x:Name="overlayTemplate">
                 <Border HorizontalAlignment="Stretch" Margin="0,0,0,15" VerticalAlignment="Top" Height="Auto" Opacity=".75" Background="{StaticResource PhoneChromeBrush}">
@@ -113,7 +116,7 @@
         <Grid x:Name="ContentPanel" Margin="0,0,0,0" Grid.Row="0">
             <telerikPrimitives:RadSlideView x:Name="radSlideView" SelectedItem="{Binding SelectedItem, ElementName=linkStream, Mode=TwoWay}" ItemsSource="{Binding Links, ElementName=linkStream}" AdjacentItemsPreviewMode="None" IsPullToRefreshEnabled="False" 
                                             Orientation="Horizontal" IsLoopingEnabled="False" OverlayContentTemplate="{StaticResource overlayTemplate}" IsShowOverlayContentOnTapEnabled="True"
-                                            ItemRealizationMode="ViewportItem"  ItemTemplateSelector="{StaticResource contentSelector}" DoubleTap="radSlideView_DoubleTap">
+                                            ItemRealizationMode="ViewportItem"  ItemTemplate="{StaticResource loadingTemplate}" DoubleTap="radSlideView_DoubleTap">
                 <!--ManipulationStarted="radSlideView_ManipulationStarted"
                                             ManipulationCompleted="radSlideView_ManipulationCompleted" ManipulationDelta="radSlideView_ManipulationDelta"-->
             </telerikPrimitives:RadSlideView>

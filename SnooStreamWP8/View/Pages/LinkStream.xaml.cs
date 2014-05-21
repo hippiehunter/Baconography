@@ -126,18 +126,6 @@ namespace SnooStreamWP8.View.Pages
             {
                 links.Add(loadingVM);
             }
-
-            fullyLoaded.ContinueWith(tsk =>
-                {
-                    if (link.Content != null && !link.Content.Errored)
-                    {
-                        links[links.IndexOf(loadingVM)] = link.Content;
-                    }
-                    else
-                    {
-                        Debug.WriteLine("failed to add a link after the task should have been finished");
-                    }
-                }, SnooStreamViewModel.UIScheduler);
         }
 
         SlideViewItem currentItem;

@@ -9,7 +9,7 @@ using Telerik.Windows.Controls;
 
 namespace SnooStreamWP8.View.Selectors
 {
-	public class DataTemplateSelectorControl : DataTemplateSelector
+	public class DataTemplateSelectorControl : ContentControl
     {
         public DataTemplateSelectorControl()
             : base()
@@ -17,20 +17,20 @@ namespace SnooStreamWP8.View.Selectors
 
         }
 
-		//protected override void OnContentChanged(object oldContent, object newContent)
-		//{
-		//	base.OnContentChanged(oldContent, newContent);
-		//	if (newContent == null)
-		//	{
-		//		ContentTemplate = null;
-		//	}
-		//	else
-		//	{
-		//		ContentTemplate = SelectTemplate(newContent, this);
-		//	}
-		//}
+		protected override void OnContentChanged (object oldContent, object newContent)
+		{
+			base.OnContentChanged(oldContent, newContent);
+			if (newContent == null)
+			{
+				ContentTemplate = null;
+			}
+			else
+			{
+				ContentTemplate = SelectTemplate(newContent, this);
+			}
+		}
 
-		public override DataTemplate SelectTemplate (object item, DependencyObject container)
+		public DataTemplate SelectTemplate (object item, DependencyObject container)
 		{
 			return SelectTemplateCore(item, container);
 		}
