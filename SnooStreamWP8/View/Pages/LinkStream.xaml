@@ -20,7 +20,7 @@
         <Grid.Resources>
             <DataTemplate x:Name="imageTemplate">
                 <telerikSlideView:PanAndZoomImage 
-                    ZoomMode="Free"
+                    ZoomMode="None" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Unloaded="PanAndZoomImage_Unloaded"
                     Source="{Binding Url}" />
             </DataTemplate>
@@ -32,7 +32,7 @@
 
             <DataTemplate x:Name="gifTemplate">
                 <local:GifControl
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Unloaded="GifControl_Unloaded"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Unloaded="GifControl_Unloaded" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"
                     ImageSource="{Binding ImageSource.ImageData}" ManipulationController="{Binding ManipulationController, ElementName=linkStream}" />
             </DataTemplate>
 
@@ -47,9 +47,9 @@
                 <Image Source="{Binding Url}" Stretch="Uniform" Margin="10"/>
             </DataTemplate>
 
-            <DataTemplate x:Name="articleTemplateSelector" >
-                <selectors:TypedTemplateSelector Content="{Binding}" />
-            </DataTemplate>
+
+            <selectors:TypedTemplateSelector x:Name="articleTemplateSelector" />
+
             
             <DataTemplate x:Name="webTemplate" >
                 <telerikPrimitives:RadDataBoundListBox ItemsSource="{Binding WebParts}"
@@ -58,7 +58,7 @@
                                                        ScrollViewer.VerticalScrollBarVisibility="Auto"
                                                        ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                                                        HorizontalContentAlignment="Stretch"
-                                                       ItemTemplate="{StaticResource articleTemplateSelector}">
+                                                       ItemTemplateSelector="{StaticResource articleTemplateSelector}">
                     <telerikPrimitives:RadDataBoundListBox.ListHeaderContent>
                         <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" FontSize="32" Margin="20" TextWrapping="Wrap"/>
                     </telerikPrimitives:RadDataBoundListBox.ListHeaderContent>
@@ -69,27 +69,28 @@
                 <local:CommentsView/>
             </DataTemplate>
 
-            <DataTemplate x:Name="imageSelector" >
-                <selectors:ImageTemplateSelector 
-                    Content="{Binding}"
+
+            <selectors:ImageTemplateSelector x:Name="imageSelector"
                     StaticTemplate="{StaticResource imageTemplate}"
                     GifTemplate="{StaticResource gifTemplate}"/>
-            </DataTemplate>
 
             <DataTemplate x:Name="albumTemplate">
-                <local:AlbumControl HorizontalAlignment="Stretch" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}" ManipulationController="{Binding ManipulationController, ElementName=linkStream}" />
+                <telerikPrimitives:RadSlideView ItemsSource="{Binding Images}" Orientation="Vertical" IsLoopingEnabled="True" AdjacentItemsPreviewMode="None"
+                                                IsPullToRefreshEnabled="False" ItemRealizationMode="ViewportItem" ItemTemplateSelector="{StaticResource imageSelector}" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"/>
+                <!--<local:AlbumControl HorizontalAlignment="Stretch" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}" ManipulationController="{Binding ManipulationController, ElementName=linkStream}" />-->
             </DataTemplate>
 
-            <DataTemplate x:Name="contentSelector" >
-                <selectors:ContentTemplateSelector Content="{Binding}" 
-                                                   ImageContentTemplate="{StaticResource imageSelector}"
-                                                   AlbumContentTemplate="{StaticResource albumTemplate}"
-                                                   LoadingContentTemplate="{StaticResource loadingTemplate}"
-                                                   TextWebContentTemplate="{StaticResource webTemplate}"
-                                                   WebContentTemplate="{StaticResource webTemplate}"
-                                                   VideoContentTemplate="{StaticResource videoTemplate}"
-                                                   SelfContentTemplate="{StaticResource selfTemplate}"/>
-            </DataTemplate>
+            
+            <selectors:ContentTemplateSelector x:Name="contentSelector" 
+                                                ImageContentTemplate="{StaticResource imageTemplate}"
+                                                GifTemplate="{StaticResource gifTemplate}"
+                                                AlbumContentTemplate="{StaticResource albumTemplate}"
+                                                LoadingContentTemplate="{StaticResource loadingTemplate}"
+                                                TextWebContentTemplate="{StaticResource webTemplate}"
+                                                WebContentTemplate="{StaticResource webTemplate}"
+                                                VideoContentTemplate="{StaticResource videoTemplate}"
+                                                SelfContentTemplate="{StaticResource selfTemplate}"/>
+            
 
             
 
@@ -110,10 +111,11 @@
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Margin="0,0,0,0" Grid.Row="0">
-            <telerikPrimitives:RadSlideView x:Name="radSlideView" SelectedItem="{Binding SelectedItem, ElementName=linkStream}" ItemsSource="{Binding Links, ElementName=linkStream}" AdjacentItemsPreviewMode="None" IsPullToRefreshEnabled="False" 
+            <telerikPrimitives:RadSlideView x:Name="radSlideView" SelectedItem="{Binding SelectedItem, ElementName=linkStream, Mode=TwoWay}" ItemsSource="{Binding Links, ElementName=linkStream}" AdjacentItemsPreviewMode="None" IsPullToRefreshEnabled="False" 
                                             Orientation="Horizontal" IsLoopingEnabled="False" OverlayContentTemplate="{StaticResource overlayTemplate}" IsShowOverlayContentOnTapEnabled="True"
-                                            ItemRealizationMode="ViewportItem" ItemTemplate="{StaticResource contentSelector}" DoubleTap="radSlideView_DoubleTap" ManipulationStarted="radSlideView_ManipulationStarted"
-                                            ManipulationCompleted="radSlideView_ManipulationCompleted" ManipulationDelta="radSlideView_ManipulationDelta" UseOptimizedManipulationRouting="False">
+                                            ItemRealizationMode="ViewportItem"  ItemTemplateSelector="{StaticResource contentSelector}" DoubleTap="radSlideView_DoubleTap">
+                <!--ManipulationStarted="radSlideView_ManipulationStarted"
+                                            ManipulationCompleted="radSlideView_ManipulationCompleted" ManipulationDelta="radSlideView_ManipulationDelta"-->
             </telerikPrimitives:RadSlideView>
             
         </Grid>

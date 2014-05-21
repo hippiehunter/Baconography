@@ -103,6 +103,16 @@ namespace SnooStreamWP8.View.Selectors
         public static readonly DependencyProperty InternalRedditContentTemplateProperty =
             DependencyProperty.Register("InternalRedditContentTemplate", typeof(DataTemplate), typeof(ContentTemplateSelector), new PropertyMetadata(null));
 
+		public DataTemplate GifTemplate
+		{
+			get { return (DataTemplate)GetValue(GifTemplateProperty); }
+			set { SetValue(GifTemplateProperty, value); }
+		}
+
+		// Using a DependencyProperty as the backing store for SelfContentTemplate.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty GifTemplateProperty =
+			DependencyProperty.Register("GifTemplate", typeof(DataTemplate), typeof(ContentTemplateSelector), new PropertyMetadata(null));
+
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
             if (item is ContentViewModel)
@@ -118,21 +128,24 @@ namespace SnooStreamWP8.View.Selectors
                 return SelfContentTemplate;
             else if (item is AlbumViewModel)
                 return AlbumContentTemplate;
-            else if (item is ImageViewModel)
-                return ImageContentTemplate;
-            else if (item is VideoViewModel)
-                return VideoContentTemplate;
-            else if (item is ErrorContentViewModel)
-                return ErrorContentTemplate;
-            else if (item is WebViewModel)
-            {
-                if (((WebViewModel)item).NotText)
-                    return WebContentTemplate;
-                else
-                    return TextWebContentTemplate;
-            }
-            else
-                throw new ArgumentOutOfRangeException();
+			else if(item is ImageViewModel)
+			{
+				var image = item as ImageViewModel;
+				return image.IsGif ? GifTemplate : ImageContentTemplate;
+			}
+			else if(item is VideoViewModel)
+				return VideoContentTemplate;
+			else if(item is ErrorContentViewModel)
+				return ErrorContentTemplate;
+			else if(item is WebViewModel)
+			{
+				if(((WebViewModel)item).NotText)
+					return WebContentTemplate;
+				else
+					return TextWebContentTemplate;
+			}
+			else
+				throw new ArgumentOutOfRangeException();
         }
     }
 }

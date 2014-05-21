@@ -29,13 +29,12 @@
             </DataTemplate>
             <DataTemplate x:Name="imageSelector">
                 <selectors:ImageTemplateSelector 
-                        Content="{Binding}"
                         StaticTemplate="{StaticResource imageTemplate}"
                         GifTemplate="{StaticResource gifTemplate}"/>
             </DataTemplate>
         </Grid.Resources>
 
         <telerikPrimitives:RadSlideView ItemsSource="{Binding Images}" Orientation="Vertical" IsLoopingEnabled="True" AdjacentItemsPreviewMode="None" UseOptimizedManipulationRouting="False"
-                                                IsPullToRefreshEnabled="False" ItemRealizationMode="ViewportItem" ItemTemplate="{StaticResource imageSelector}"/> 
+                                                IsPullToRefreshEnabled="False" ItemRealizationMode="ViewportItem" ItemTemplateSelector="{StaticResource imageSelector}"/> 
     </Grid>
 </UserControl>
