@@ -99,14 +99,36 @@ namespace SnooStream.ViewModel
             {
                 _isMinimized = value;
                 RaisePropertyChanged("IsMinimized");
+				Touch();
             }
         }
+
+		// Cause UI to re-evaluate visibility without changing values
+		public void Touch()
+		{
+			var decendents = _context.Decendents(Id);
+			if (decendents != null)
+			{
+				foreach (var child in decendents)
+				{
+					var comment = child as CommentViewModel;
+					var more = child as MoreViewModel;
+					if (comment != null) comment.TouchImpl();
+					if (more != null) more.TouchImpl();
+				}
+			}
+			RaisePropertyChanged("IsVisible");
+		}
+		internal void TouchImpl()
+		{
+			RaisePropertyChanged("IsVisible");
+		}
 
 		public CommentViewModel Parent
 		{
 			get
 			{
-				var parentId = _comment.ParentId.StartsWith("t1_") ? _comment.ParentId : null;
+				var parentId = _comment.ParentId.StartsWith("t1_") ? _comment.ParentId.Substring(3) : null;
 				if (!string.IsNullOrWhiteSpace(parentId))
 				{
 					return _context.GetById(parentId);

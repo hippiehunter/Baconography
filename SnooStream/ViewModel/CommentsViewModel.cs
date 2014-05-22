@@ -42,7 +42,7 @@ namespace SnooStream.ViewModel
         List<CommentOriginType> _commentOriginStack = new List<CommentOriginType>();
         
         private Dictionary<string, CommentShell> _comments = new Dictionary<string, CommentShell>();
-		private Dictionary<string, Tuple<List<string>, string, int>> _knownUnloaded = new Dictionary<string, Tuple<List<string>, string, int>>();
+		private Dictionary<string, MoreViewModel> _knownUnloaded = new Dictionary<string, MoreViewModel>();
         private string _firstChild;
         private LoadFullCommentsViewModel _loadFullSentinel;
         private ViewModelBase _context;
@@ -169,7 +169,7 @@ namespace SnooStream.ViewModel
                         priorSibling.NextSibling = firstId;
                     }
                     if (!_knownUnloaded.ContainsKey(firstId))
-						_knownUnloaded.Add(firstId, Tuple.Create(((More)child.Data).Children, parent != null ? parent.Id : null, depth));
+						_knownUnloaded.Add(firstId, new MoreViewModel(this, parent != null ? parent.Id : null, firstId, ((More)child.Data).Children, depth ));
 
                     //cant continue after a 'more' element comes through
                     break;
@@ -230,6 +230,7 @@ namespace SnooStream.ViewModel
             var result = new CommentShell
             {
                 Comment = new CommentViewModel(this, comment, comment.LinkId, depth),
+				Id = comment.Id,
                 Parent = comment.ParentId.StartsWith("t1_") ? comment.ParentId : null,
                 PriorSibling = priorSibling != null ? priorSibling.Id : null,
                 InsertionWaveIndex = _commentOriginStack.Count - 1,
@@ -282,8 +283,7 @@ namespace SnooStream.ViewModel
                 }
                 else if(_knownUnloaded.ContainsKey(targetChild)) //if its not in the list check the known unloaded list (more)
                 {
-					var moreTpl = _knownUnloaded[targetChild];
-                    list.Add(new MoreViewModel(this, moreTpl.Item2, targetChild, moreTpl.Item1 ));
+					list.Add(_knownUnloaded[targetChild]);
                     targetChild = null;
                 }
                 else //we must be looking at something missing because on context so we need to put out a 'loadfull' viewmodel
@@ -415,6 +415,59 @@ namespace SnooStream.ViewModel
             return LoadAndMergeFull(IsContext);
         }
 
+		public IEnumerable<ViewModelBase> Decendents(string id)
+		{
+			var result = new List<ViewModelBase>();
+
+			var currentShell = _comments[id];
+			if (currentShell != null && currentShell.FirstChild != null)
+			{
+				CommentShell tmpShell;
+				if (!_comments.TryGetValue(currentShell.FirstChild, out tmpShell))
+				{
+					MoreViewModel moreVm;
+					if (_knownUnloaded.TryGetValue(currentShell.FirstChild, out moreVm))
+					{
+						result.Add(moreVm);
+					}
+					return result;
+				}
+				else
+					currentShell = tmpShell;
+			}
+			else
+				return result;
+
+			result.Add(currentShell.Comment);
+			if (currentShell.FirstChild != null)
+				result.AddRange(Decendents(currentShell.Id));
+
+
+			while (currentShell.NextSibling != null)
+			{
+				
+				CommentShell tmpShell;
+				if (!_comments.TryGetValue(currentShell.NextSibling, out tmpShell))
+				{
+					//this is the end as far as we're concerned
+					MoreViewModel moreValues;
+					if (_knownUnloaded.TryGetValue(currentShell.NextSibling, out moreValues))
+					{
+						result.Add(moreValues);
+					}
+					break;
+				}
+				else
+				{
+					currentShell = tmpShell;
+					result.Add(currentShell.Comment);
+					if (currentShell.FirstChild != null)
+						result.AddRange(Decendents(currentShell.Id));
+				}
+			}
+			return result;
+		}
+
         public async Task<List<ViewModelBase>> LoadImpl(bool isContext)
         {
             List<ViewModelBase> flatChildren = new List<ViewModelBase>();
@@ -457,32 +510,39 @@ namespace SnooStream.ViewModel
         private Listing DumpListing(string firstChild)
         {
             var result = new Listing { Kind = "listing", Data = new ListingData { Children = new List<Thing>() } };
-            var currentShell = _comments[firstChild];
-            while (currentShell.NextSibling != null)
-            {
-                //this is the end as far as we're concerned
-                CommentShell tmpShell;
-                if (!_comments.TryGetValue(currentShell.NextSibling, out tmpShell))
-                {
-                    Tuple<List<string>, string, int> moreValues;
-                    if(_knownUnloaded.TryGetValue(currentShell.NextSibling, out moreValues))
-                    {
-                        result.Data.Children.Add(new Thing { Kind = "more", Data = new More { Children = moreValues.Item1 } });
-                    }
-                    break;
-                }
-                else
-                {
-                    currentShell = tmpShell;
-                    var resultThing = new Thing { Kind = "t1", Data = currentShell.Comment.Thing };
-                    result.Data.Children.Add(resultThing);
+			CommentShell currentShell;
+			currentShell = DumpItem(firstChild, result);
 
-                    if (currentShell.FirstChild != null)
-                        ((Comment)resultThing.Data).Replies = DumpListing(currentShell.FirstChild);
-                }
+
+			while (currentShell != null && currentShell.NextSibling != null)
+            {
+				currentShell = DumpItem(currentShell.NextSibling, result);
             }
             return result;
         }
+
+		private CommentShell DumpItem(string itemId, Listing result)
+		{
+			CommentShell currentShell;
+			if (!_comments.TryGetValue(itemId, out currentShell))
+			{
+				MoreViewModel moreValues;
+				if (_knownUnloaded.TryGetValue(itemId, out moreValues))
+				{
+					result.Data.Children.Add(new Thing { Kind = "more", Data = new More { Children = moreValues.Ids } });
+				}
+				return null;
+			}
+			else
+			{
+				var firstThing = new Thing { Kind = "t1", Data = currentShell.Comment.Thing };
+				result.Data.Children.Add(firstThing);
+
+				if (currentShell.FirstChild != null)
+					((Comment)firstThing.Data).Replies = DumpListing(currentShell.FirstChild);
+			}
+			return currentShell;
+		}
 
         public async Task StoreCurrent()
         {

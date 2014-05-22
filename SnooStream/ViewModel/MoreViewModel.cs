@@ -11,7 +11,6 @@ namespace SnooStream.ViewModel
     {
 		CommentsViewModel _context;
 		string _parentId;
-		List<string> _ids;
 		public MoreViewModel(CommentsViewModel context, string parentId, string id, List<string> ids, int depth = 0)
         {
 			_context = context;
@@ -19,11 +18,12 @@ namespace SnooStream.ViewModel
 			Id = id;
 			_parentId = parentId;
 			Loading = false;
-			_ids = ids;
+			Ids = ids;
 			CountString = ids.Count.ToString();
-			_triggerLoad = new RelayCommand(async () => await _context.LoadMore(new SnooSharp.More{ Children = _ids }));
+			_triggerLoad = new RelayCommand(async () => await _context.LoadMore(new SnooSharp.More{ Children = Ids }));
         }
 
+		public List<string> Ids { get; set; }
         public string Id { get; set; }
 		public bool Loading { get; set; }
 		public int Depth { get; set; }
@@ -32,10 +32,9 @@ namespace SnooStream.ViewModel
 		{
 			get
 			{
-				var parentId = (_parentId ?? "").StartsWith("t1_") ? _parentId : null;
-				if (!string.IsNullOrWhiteSpace(parentId))
+				if (!string.IsNullOrWhiteSpace(_parentId))
 				{
-					return _context.GetById(parentId);
+					return _context.GetById(_parentId);
 				}
 				else
 					return null;
@@ -62,6 +61,11 @@ namespace SnooStream.ViewModel
 			{
 				return _triggerLoad;
 			}
+		}
+
+		internal void TouchImpl()
+		{
+			RaisePropertyChanged("IsVisible");
 		}
     }
 }
