@@ -13,29 +13,20 @@ namespace SnooStream.ViewModel
 {
     public class CommentViewModel : ViewModelBase
     {
-        CommentsViewModel _parent;
+		CommentsViewModel _context;
         Comment _comment;
         VotableViewModel _votable;
         string _linkId;
 
-        public CommentViewModel(Comment comment, string linkId, int depth = 0)
+        public CommentViewModel(CommentsViewModel context, Comment comment, string linkId, int depth = 0)
         {
+			_context = context;
             _isMinimized = false;
             _comment = comment;
             _linkId = linkId;
             Depth = depth;
             AuthorFlair = SnooStreamViewModel.RedditService.GetUsernameModifiers(_comment.Author, _linkId, _comment.Subreddit);
             AuthorFlairText = _comment.AuthorFlairText;
-
-            //_showExtendedView = new RelayCommand(ShowExtendedViewImpl);
-            //_gotoReply = new RelayCommand(GotoReplyImpl);
-            //_save = new RelayCommand(SaveImpl);
-            //_report = new RelayCommand(ReportImpl);
-            //_gotoFullLink = new RelayCommand(GotoFullLinkImpl);
-            //_gotoContext = new RelayCommand(GotoContextImpl);
-            //_gotoUserDetails = new RelayCommand(GotoUserDetailsImpl);
-            //_gotoEdit = new RelayCommand(GotoEditImpl);
-            //_minimizeCommand = new RelayCommand(() => IsMinimized = !IsMinimized);
             Body = _comment.Body;
         }
 
@@ -111,6 +102,33 @@ namespace SnooStream.ViewModel
             }
         }
 
+		public CommentViewModel Parent
+		{
+			get
+			{
+				var parentId = _comment.ParentId.StartsWith("t1_") ? _comment.ParentId : null;
+				if (!string.IsNullOrWhiteSpace(parentId))
+				{
+					return _context.GetById(parentId);
+				}
+				else
+					return null;
+			}
+		}
+
+		public bool IsVisible
+		{
+			get
+			{
+				var parent = Parent;
+				if (parent != null)
+				{
+					return parent.IsVisible ? !parent.IsMinimized : false;
+				}
+				return true;
+			}
+		}
+
         public bool IsEditable
         {
             get
@@ -138,12 +156,12 @@ namespace SnooStream.ViewModel
 
         private void GotoContextImpl()
         {
-            SnooStreamViewModel.CommandDispatcher.GotoCommentContext(_parent, this);
+            SnooStreamViewModel.CommandDispatcher.GotoCommentContext(_context, this);
         }
 
         private void GotoFullLinkImpl()
         {
-            SnooStreamViewModel.CommandDispatcher.GotoFullComments(_parent, this);
+			SnooStreamViewModel.CommandDispatcher.GotoFullComments(_context, this);
         }
 
         private void GotoUserDetailsImpl()
@@ -163,12 +181,12 @@ namespace SnooStream.ViewModel
 
         private void GotoReplyImpl()
         {
-            SnooStreamViewModel.CommandDispatcher.GotoReplyToComment(_parent, this);
+			SnooStreamViewModel.CommandDispatcher.GotoReplyToComment(_context, this);
         }
 
         private void GotoEditImpl()
         {
-            SnooStreamViewModel.CommandDispatcher.GotoEditComment(_parent, this);
+			SnooStreamViewModel.CommandDispatcher.GotoEditComment(_context, this);
         }
 
         public Comment Thing

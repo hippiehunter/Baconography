@@ -49,7 +49,7 @@
 
                         <TextBlock Foreground="Gray" FontSize="15" Text="{Binding Path=Votable.TotalVotes}" Margin="5,2,0,0" />
                         <TextBlock Foreground="Gray" FontSize="15" Text="points" Margin="5,2,0,0" />
-                        <TextBlock Foreground="Gray" FontSize="15" Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="5,2,0,0" />
+                        <TextBlock Foreground="Gray" FontSize="15" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="5,2,0,0" />
                     </StackPanel>
                 </Button.Content>
             </Button>
@@ -71,7 +71,7 @@
                         </Border>
                         <TextBlock FontSize="15" FontStyle="Italic" Text="{Binding Path=Votable.TotalVotes}" Margin="5,2,0,0" />
                         <TextBlock FontSize="15" FontStyle="Italic" Text="points" Margin="5,2,0,0" />
-                        <TextBlock FontSize="15" FontStyle="Italic" Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="5,2,0,0" />
+                        <TextBlock FontSize="15" FontStyle="Italic" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="5,2,0,0" />
                     </StackPanel>
                 </Button.Content>
             </Button>

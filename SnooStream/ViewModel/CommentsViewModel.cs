@@ -42,7 +42,7 @@ namespace SnooStream.ViewModel
         List<CommentOriginType> _commentOriginStack = new List<CommentOriginType>();
         
         private Dictionary<string, CommentShell> _comments = new Dictionary<string, CommentShell>();
-        private Dictionary<string, List<string>> _knownUnloaded = new Dictionary<string, List<string>>();
+		private Dictionary<string, Tuple<List<string>, string, int>> _knownUnloaded = new Dictionary<string, Tuple<List<string>, string, int>>();
         private string _firstChild;
         private LoadFullCommentsViewModel _loadFullSentinel;
         private ViewModelBase _context;
@@ -64,6 +64,15 @@ namespace SnooStream.ViewModel
             FlatComments = new ObservableCollection<ViewModelBase>();
             ProcessUrl(url);
         }
+
+		public CommentViewModel GetById (string id)
+		{
+			CommentShell shell;
+			if (_comments.TryGetValue(id, out shell) && shell != null)
+				return shell.Comment;
+			else
+				return null;
+		}
 
         private void ProcessUrl(string url)
         {
@@ -160,7 +169,7 @@ namespace SnooStream.ViewModel
                         priorSibling.NextSibling = firstId;
                     }
                     if (!_knownUnloaded.ContainsKey(firstId))
-                        _knownUnloaded.Add(firstId, ((More)child.Data).Children);
+						_knownUnloaded.Add(firstId, Tuple.Create(((More)child.Data).Children, parent != null ? parent.Id : null, depth));
 
                     //cant continue after a 'more' element comes through
                     break;
@@ -220,7 +229,7 @@ namespace SnooStream.ViewModel
         {
             var result = new CommentShell
             {
-                Comment = new CommentViewModel(comment, comment.LinkId, depth),
+                Comment = new CommentViewModel(this, comment, comment.LinkId, depth),
                 Parent = comment.ParentId.StartsWith("t1_") ? comment.ParentId : null,
                 PriorSibling = priorSibling != null ? priorSibling.Id : null,
                 InsertionWaveIndex = _commentOriginStack.Count - 1,
@@ -273,7 +282,8 @@ namespace SnooStream.ViewModel
                 }
                 else if(_knownUnloaded.ContainsKey(targetChild)) //if its not in the list check the known unloaded list (more)
                 {
-                    list.Add(new MoreViewModel(this, _knownUnloaded[targetChild]));
+					var moreTpl = _knownUnloaded[targetChild];
+                    list.Add(new MoreViewModel(this, moreTpl.Item2, targetChild, moreTpl.Item1 ));
                     targetChild = null;
                 }
                 else //we must be looking at something missing because on context so we need to put out a 'loadfull' viewmodel
@@ -454,10 +464,10 @@ namespace SnooStream.ViewModel
                 CommentShell tmpShell;
                 if (!_comments.TryGetValue(currentShell.NextSibling, out tmpShell))
                 {
-                    List<string> moreValues;
+                    Tuple<List<string>, string, int> moreValues;
                     if(_knownUnloaded.TryGetValue(currentShell.NextSibling, out moreValues))
                     {
-                        result.Data.Children.Add(new Thing { Kind = "more", Data = new More { Children = moreValues } });
+                        result.Data.Children.Add(new Thing { Kind = "more", Data = new More { Children = moreValues.Item1 } });
                     }
                     break;
                 }

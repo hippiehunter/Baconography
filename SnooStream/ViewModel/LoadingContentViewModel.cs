@@ -19,6 +19,11 @@ namespace SnooStream.ViewModel
         public LoadingContentViewModel(Task<ContentViewModel> underlying, ViewModelBase context)
             : base(context)
         {
+            var linkVm = context as LinkViewModel;
+            if (linkVm != null)
+            {
+
+            }
             underlying.ContinueWith((tsk) =>
                 {
                     if (tsk.Status == TaskStatus.RanToCompletion)

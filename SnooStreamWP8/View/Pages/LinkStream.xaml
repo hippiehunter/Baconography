@@ -70,9 +70,8 @@
                     GifTemplate="{StaticResource gifTemplate}"/>
 
             <DataTemplate x:Name="albumTemplate">
-                <telerikPrimitives:RadSlideView ItemsSource="{Binding Images}" Orientation="Vertical" IsLoopingEnabled="True" AdjacentItemsPreviewMode="None"
+                <telerikPrimitives:RadSlideView ItemsSource="{Binding Images}" Orientation="Vertical" IsLoopingEnabled="True" AdjacentItemsPreviewMode="None" 
                                                 IsPullToRefreshEnabled="False" ItemRealizationMode="ViewportItem" ItemTemplateSelector="{StaticResource imageSelector}" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"/>
-                <!--<local:AlbumControl HorizontalAlignment="Stretch" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}" ManipulationController="{Binding ManipulationController, ElementName=linkStream}" />-->
             </DataTemplate>
 
             
@@ -98,8 +97,8 @@
 
 
             <DataTemplate x:Name="overlayTemplate">
-                <Border HorizontalAlignment="Stretch" Margin="0,0,0,15" VerticalAlignment="Top" Height="Auto" Opacity=".75" Background="{StaticResource PhoneChromeBrush}">
-                    <TextBlock Text="{Binding Title}" TextWrapping="Wrap" MaxHeight="300"/>
+                <Border HorizontalAlignment="Stretch" Margin="0,0,0,15" VerticalAlignment="Top" Height="Auto" Opacity="1" Background="{StaticResource PhoneBackgroundBrush}">
+                    <TextBlock Text="{Binding PreviewText}" TextWrapping="Wrap" MaxHeight="300"/>
                 </Border>
             </DataTemplate>
 
@@ -116,9 +115,8 @@
         <Grid x:Name="ContentPanel" Margin="0,0,0,0" Grid.Row="0">
             <telerikPrimitives:RadSlideView x:Name="radSlideView" SelectedItem="{Binding SelectedItem, ElementName=linkStream, Mode=TwoWay}" ItemsSource="{Binding Links, ElementName=linkStream}" AdjacentItemsPreviewMode="None" IsPullToRefreshEnabled="False" 
                                             Orientation="Horizontal" IsLoopingEnabled="False" OverlayContentTemplate="{StaticResource overlayTemplate}" IsShowOverlayContentOnTapEnabled="True"
-                                            ItemRealizationMode="ViewportItem"  ItemTemplate="{StaticResource loadingTemplate}" DoubleTap="radSlideView_DoubleTap">
-                <!--ManipulationStarted="radSlideView_ManipulationStarted"
-                                            ManipulationCompleted="radSlideView_ManipulationCompleted" ManipulationDelta="radSlideView_ManipulationDelta"-->
+                                            ItemRealizationMode="ViewportItem"  ItemTemplate="{StaticResource loadingTemplate}" DoubleTap="radSlideView_DoubleTap" ManipulationStarted="radSlideView_ManipulationStarted"
+                                            ManipulationCompleted="radSlideView_ManipulationCompleted" ManipulationDelta="radSlideView_ManipulationDelta">
             </telerikPrimitives:RadSlideView>
             
         </Grid>
