@@ -116,8 +116,12 @@ namespace SnooStream.ViewModel
 					if (comment != null) comment.TouchImpl();
 					if (more != null) more.TouchImpl();
 				}
+				
 			}
 			RaisePropertyChanged("IsVisible");
+
+			if (_context.ViewHack != null)
+				_context.ViewHack(this);
 		}
 		internal void TouchImpl()
 		{

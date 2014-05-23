@@ -65,6 +65,8 @@ namespace SnooStream.ViewModel
             ProcessUrl(url);
         }
 
+		public Action<Object> ViewHack {get; set;}
+
 		public CommentViewModel GetById (string id)
 		{
 			CommentShell shell;
@@ -316,7 +318,7 @@ namespace SnooStream.ViewModel
 
             if (mergableComments.Count != FlatComments.Count) //otherwise nothing to do, just add in the above and below
             {
-                for (int flatI = 0, mergableI = 0; flatI < FlatComments.Count; flatI++, mergableI++)
+                for (int flatI = 0, mergableI = 0; flatI < FlatComments.Count && mergableI < mergableComments.Count; flatI++, mergableI++)
                 {
                     if (FlatComments[flatI] != mergableComments[mergableI])
                     {
@@ -347,38 +349,42 @@ namespace SnooStream.ViewModel
                 return "";
         }
 
-        private void MergeDisplayChildren(IEnumerable<ViewModelBase> newChildren, string replaceId)
+        private void MergeDisplayChildren(IEnumerable<ViewModelBase> newChildren, IEnumerable<string> replaceId)
         {
             //the children will be in a contiguous block so we just need to find the existing viewmodel that 
             //matches the afterId then we can add each one in series
-
-            for (int i = 0; i < FlatComments.Count; i++)
+			bool foundFirst = false;
+			for (int i = 0; i < FlatComments.Count; i++)
             {
                 var commentId = GetId(FlatComments[i]);
-                if (commentId == replaceId)
+                if (replaceId.Contains(commentId))
                 {
-                    foreach(var child in newChildren)
-                    {
-                        if ((FlatComments.Count - 1) <= i)
-                            FlatComments.Add(child);
-                        else
-                            FlatComments.Insert(i, child);
+					FlatComments.RemoveAt(i);
+					if (!foundFirst)
+					{
+						foreach (var child in newChildren)
+						{
+							if ((FlatComments.Count - 1) <= i)
+								FlatComments.Add(child);
+							else
+								FlatComments.Insert(i, child);
 
-                        i++;
-                    }
-                    break;
+							i++;
+						}
+					}
+					foundFirst = true; ;
                 }
             }
         }
 
-        public async Task LoadMore(More target)
+        public async Task LoadMore(MoreViewModel target)
         {
             List<ViewModelBase> flatChilden = new List<ViewModelBase>();
             string moreId = null;
             await SnooStreamViewModel.NotificationService.Report("loading more comments", 
 				PriorityLoadQueue.QueueHelper( async () =>
                 {
-                    var listing = await SnooStreamViewModel.RedditService.GetMoreOnListing(target.Children, Link.Link.Id, Link.Link.Subreddit);
+                    var listing = await SnooStreamViewModel.RedditService.GetMoreOnListing(target.Ids, Link.Link.Id, Link.Link.Subreddit);
                     lock(this)
                     {
                         FixupParentage(listing);
@@ -388,19 +394,28 @@ namespace SnooStream.ViewModel
 
                         var parentId = ((Comment)firstChild.Data).ParentId;
                         CommentShell parentShell;
-                        if (!_comments.TryGetValue(parentId, out parentShell))
+                        if (!_comments.TryGetValue(parentId.Replace("t1_", ""), out parentShell))
                         {
                             parentShell = null;
                         }
 
-                        MergeComments(parentShell, listing.Data.Children, parentShell == null ? 0 : parentShell.Comment.Depth);
+
+						
+
+                        MergeComments(parentShell, listing.Data.Children, parentShell == null ? 0 : parentShell.Comment.Depth + 1);
                         moreId = ((Comment)firstChild.Data).Id;
                         InsertIntoFlatList(moreId, flatChilden);
+						foreach (var child in flatChilden)
+						{
+							_knownUnloaded.Remove(GetId(child));
+						}
                     }
                 }));
 
-            if (moreId != null)
-                MergeDisplayChildren(flatChilden, moreId);
+			if (moreId != null)
+				MergeDisplayChildren(flatChilden, target.Ids);
+			else
+				FlatComments.Remove(target);
         }
 
         Lazy<Task> _loadFullTask;
@@ -480,6 +495,7 @@ namespace SnooStream.ViewModel
 					var firstChild = listing.Data.Children.FirstOrDefault(thing => thing.Data is Comment);
 					if(firstChild == null)
 						return;
+
 					_commentOriginStack.Add(CommentOriginType.New);
 					MergeComments(null, listing.Data.Children, 0);
 					InsertIntoFlatList(((Comment)firstChild.Data).Id, flatChildren);
@@ -555,7 +571,7 @@ namespace SnooStream.ViewModel
 
         public async Task LoadAndMergeFull(bool isContext)
         {
-            var flatChildren = await LoadImpl(isContext);
+            var flatChildren = await LoadImpl(isContext, true);
 
             if (flatChildren.Count > 0)
             {

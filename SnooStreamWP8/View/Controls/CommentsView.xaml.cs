@@ -85,5 +85,23 @@ namespace SnooStreamWP8.View.Controls
 			sortPopup.Child = child;
 			sortPopup.IsOpen = true;
 		}
+
+		private void UserControl_Loaded(object sender, RoutedEventArgs e)
+		{
+			var context = DataContext as CommentsViewModel;
+			if (context != null)
+			{
+				context.ViewHack = (item) => commentsList.BringIntoView(item);
+			}
+		}
+
+		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+		{
+			var context = DataContext as CommentsViewModel;
+			if (context != null)
+			{
+				context.ViewHack = null;
+			}
+		}
 	}
 }

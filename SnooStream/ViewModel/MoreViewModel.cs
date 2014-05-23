@@ -20,7 +20,7 @@ namespace SnooStream.ViewModel
 			Loading = false;
 			Ids = ids;
 			CountString = ids.Count.ToString();
-			_triggerLoad = new RelayCommand(async () => await _context.LoadMore(new SnooSharp.More{ Children = Ids }));
+			_triggerLoad = new RelayCommand(async () => await _context.LoadMore(this));
         }
 
 		public List<string> Ids { get; set; }

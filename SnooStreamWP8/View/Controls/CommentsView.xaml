@@ -12,7 +12,7 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
-    d:DesignHeight="480" d:DesignWidth="480">
+    d:DesignHeight="480" d:DesignWidth="480" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
 
     <Grid x:Name="LayoutRoot">
         <Grid.Resources>
@@ -152,10 +152,10 @@
             </Style>
 
             <DataTemplate x:Key="CommentViewTemplate">
-                <local:CommentView />
+                <local:CommentView Visibility="{Binding IsVisible, Converter={StaticResource booleanVisibilityConverter}}"/>
             </DataTemplate>
             <DataTemplate x:Key="MoreViewTemplate">
-                <local:MoreCommentsView />
+                <local:MoreCommentsView Visibility="{Binding IsVisible, Converter={StaticResource booleanVisibilityConverter}}"/>
             </DataTemplate>
             <DataTemplate x:Key="HeaderTemplate">
                 <Grid HorizontalAlignment="Stretch">
@@ -347,11 +347,11 @@
                     MoreTemplate="{StaticResource MoreViewTemplate}" />
         </Grid.Resources>
 
-        <telerikPrimitives:RadDataBoundListBox ListHeaderTemplate="{StaticResource HeaderTemplate}"
+        <telerikPrimitives:RadDataBoundListBox x:Name="commentsList" ListHeaderTemplate="{StaticResource HeaderTemplate}"
                 ItemTemplateSelector="{StaticResource commentTemplateSelector}"
                 DataVirtualizationMode="OnDemandAutomatic" DataRequested="RadDataBoundListBox_DataRequested"
-                ListHeaderDisplayMode="WithDataItems" RefreshRequested="RadDataBoundListBox_RefreshRequested"
-                IsPullToRefreshEnabled="True" IsCheckModeEnabled="False" IsItemReorderEnabled="False"
+                ListHeaderDisplayMode="AlwaysVisible" RefreshRequested="RadDataBoundListBox_RefreshRequested"
+                IsPullToRefreshEnabled="True" IsCheckModeEnabled="False" IsItemReorderEnabled="False" AsyncBalanceMode="FillViewportFirst" IsAsyncBalanceEnabled="True"
                 ItemsSource="{Binding FlatComments}" />
         <Popup x:Name="sortPopup" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>

@@ -11,7 +11,6 @@
     d:DesignHeight="480" d:DesignWidth="480">
 
     <Grid HorizontalAlignment="Left"
-          Visibility="{Binding IsVisible, Converter={StaticResource booleanVisibilityConverter}}"
           Margin="{Binding Path=Depth, Converter={StaticResource commentDepthMarginConverter}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="7" />
