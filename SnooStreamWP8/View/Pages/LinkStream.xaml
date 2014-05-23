@@ -32,7 +32,7 @@
             </DataTemplate>
 
             <DataTemplate x:Name="videoTemplate" >
-                <mmppf:MediaPlayer x:Name="player" Source="{Binding Url}" IsFullScreen="True"/>
+                <mmppf:MediaPlayer x:Name="player" Source="{Binding SelectedStream}" IsFullScreen="True"/>
             </DataTemplate>
 
             <DataTemplate x:Key="Type:ReadableArticleParagraph">

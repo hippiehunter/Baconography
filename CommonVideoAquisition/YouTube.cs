@@ -38,8 +38,13 @@ namespace CommonVideoAquisition
         static string MakeUsableUrl(Dictionary<string, string> raw)
         {
             var rawUrl = Uri.UnescapeDataString(raw["url"]);
-            var rawSig = raw["sig"];
-            return rawUrl + "&signature=" + rawSig;
+			if (!rawUrl.Contains("signature="))
+			{
+				var rawSig = raw["sig"];
+				return rawUrl + "&signature=" + rawSig;
+			}
+			else
+				return rawUrl;
         }
 
         static string MakeQualityString(Dictionary<string, string> raw)
@@ -128,7 +133,11 @@ namespace CommonVideoAquisition
 
                 var parsedStreamMap = temp1
                     .Select(str => MakeUniqueDictionary(SplitAmp(str)))
-                    .Where(elem => elem.ContainsKey("itag") && elem.ContainsKey("type") && elem.ContainsKey("sig") && elem.ContainsKey("url"))
+					.Where(elem => 
+						elem.ContainsKey("itag") && 
+						elem.ContainsKey("type") && 
+						(elem.ContainsKey("sig") || (elem.ContainsKey("url") && elem["url"].Contains("signature="))) && 
+						elem.ContainsKey("url"))
                     //need to take video stream type into account for preference, mp4 is the most playable stream available here
                     .OrderByDescending(elem => scoreFileType(elem["type"]))
                     .ToList();
