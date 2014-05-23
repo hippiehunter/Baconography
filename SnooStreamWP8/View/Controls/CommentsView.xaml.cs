@@ -26,6 +26,7 @@ namespace SnooStreamWP8.View.Controls
 		private async void RadDataBoundListBox_RefreshRequested (object sender, EventArgs e)
 		{
 			await ((CommentsViewModel)DataContext).Refresh();
+			commentsList.StopPullToRefreshLoading(true, true);
 		}
 
 		private void Link_Tap (object sender, System.Windows.Input.GestureEventArgs e)

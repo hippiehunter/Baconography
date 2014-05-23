@@ -316,7 +316,7 @@ namespace SnooStream.ViewModel
             if(isFull)
                 while (FlatComments.Remove(_loadFullSentinel)) { }
 
-            if (mergableComments.Count != FlatComments.Count) //otherwise nothing to do, just add in the above and below
+            if (mergableComments.Count > FlatComments.Count) //otherwise nothing to do, just add in the above and below
             {
                 for (int flatI = 0, mergableI = 0; flatI < FlatComments.Count && mergableI < mergableComments.Count; flatI++, mergableI++)
                 {
@@ -571,7 +571,7 @@ namespace SnooStream.ViewModel
 
         public async Task LoadAndMergeFull(bool isContext)
         {
-            var flatChildren = await LoadImpl(isContext, true);
+            var flatChildren = await LoadImpl(isContext);
 
             if (flatChildren.Count > 0)
             {
