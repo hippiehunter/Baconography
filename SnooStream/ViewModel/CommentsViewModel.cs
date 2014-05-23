@@ -316,8 +316,11 @@ namespace SnooStream.ViewModel
             if(isFull)
                 while (FlatComments.Remove(_loadFullSentinel)) { }
 
-            if (mergableComments.Count > FlatComments.Count) //otherwise nothing to do, just add in the above and below
+            if (mergableComments.Count != FlatComments.Count) //otherwise nothing to do, just add in the above and below
             {
+
+				while (mergableComments.Count < FlatComments.Count && FlatComments.Count > 0)
+					FlatComments.RemoveAt(FlatComments.Count - 1);
                 for (int flatI = 0, mergableI = 0; flatI < FlatComments.Count && mergableI < mergableComments.Count; flatI++, mergableI++)
                 {
                     if (FlatComments[flatI] != mergableComments[mergableI])
