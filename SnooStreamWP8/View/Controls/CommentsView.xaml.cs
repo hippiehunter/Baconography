@@ -26,6 +26,7 @@ namespace SnooStreamWP8.View.Controls
 		private async void RadDataBoundListBox_RefreshRequested (object sender, EventArgs e)
 		{
 			await ((CommentsViewModel)DataContext).Refresh();
+			commentsList.StopPullToRefreshLoading(true, true);
 		}
 
 		private void Link_Tap (object sender, System.Windows.Input.GestureEventArgs e)
@@ -84,6 +85,24 @@ namespace SnooStreamWP8.View.Controls
 
 			sortPopup.Child = child;
 			sortPopup.IsOpen = true;
+		}
+
+		private void UserControl_Loaded(object sender, RoutedEventArgs e)
+		{
+			var context = DataContext as CommentsViewModel;
+			if (context != null)
+			{
+				context.ViewHack = (item) => commentsList.BringIntoView(item);
+			}
+		}
+
+		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+		{
+			var context = DataContext as CommentsViewModel;
+			if (context != null)
+			{
+				context.ViewHack = null;
+			}
 		}
 	}
 }
