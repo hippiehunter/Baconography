@@ -185,11 +185,11 @@ namespace SnooStreamWP8.View.Controls
                 CoerceScale(false);
                 ResizeImage(false);
             }
-            else if (_pinching)
-            {
-                _pinching = false;
-                _originalScale = _scale = _coercedScale;
-            }
+			else if (_pinching)
+			{
+				_pinching = false;
+				_originalScale = _scale = _coercedScale;
+			}
         }
 
         /// <summary> 
@@ -211,8 +211,8 @@ namespace SnooStreamWP8.View.Controls
         {
             if (_coercedScale != 0 && _interop != null)
             {
-                double newWidth = canvas.Width = Math.Round(_interop.Width * _coercedScale);
-                double newHeight = canvas.Height = Math.Round(_interop.Height * _coercedScale);
+                double newWidth = Math.Round(_interop.Width * _coercedScale);
+                double newHeight = Math.Round(_interop.Height * _coercedScale);
 
                 xform.ScaleX = xform.ScaleY = _coercedScale;
 

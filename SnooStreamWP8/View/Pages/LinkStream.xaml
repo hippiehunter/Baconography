@@ -113,7 +113,7 @@
         
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="90"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!--ContentPanel - place additional content here-->

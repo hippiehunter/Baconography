@@ -7,22 +7,13 @@
     d:DesignHeight="480" d:DesignWidth="480" Loaded="UserControl_Loaded">
 
     <Grid x:Name="LayoutRoot" Margin="0,0,0,0">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <ViewportControl x:Name="viewport" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ViewportChanged="viewport_ViewportChanged">
-            <Canvas x:Name="canvas">
-                <DrawingSurface RenderTransformOrigin="0,0"
+        <ViewportControl x:Name="viewport" ViewportChanged="viewport_ViewportChanged">
+            <DrawingSurface RenderTransformOrigin="0,0"
                 x:Name="image">
-                    <DrawingSurface.RenderTransform>
-                        <ScaleTransform x:Name="xform"/>
-                    </DrawingSurface.RenderTransform>
-                </DrawingSurface>
-            </Canvas>
+                <DrawingSurface.RenderTransform>
+                    <ScaleTransform x:Name="xform"/>
+                </DrawingSurface.RenderTransform>
+            </DrawingSurface>
         </ViewportControl>
     </Grid>
 </UserControl>
