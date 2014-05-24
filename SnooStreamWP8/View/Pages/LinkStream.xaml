@@ -125,6 +125,7 @@
             </telerikPrimitives:RadSlideView>
             
         </Grid>
+        <!-- TODO: it seems like sometimes images get rendered under this -->
         <local:ExtendedAppBarControl Name="appBar" Grid.Row="1" DataContext="{Binding SelectedItem.Context, ElementName=radSlideView}" LastButtonSymbol="&#xE118;" LastButtonText="Save"/>
     </Grid>
 
