@@ -23,6 +23,7 @@ namespace SnooStreamWP8.Common
             Foreground = Application.Current.Resources["PhoneForegroundBrush"] as Brush;
             _orientationManager = Application.Current.Resources["orientationManager"] as OrientationManager;
             Messenger.Default.Register<SettingsChangedMessage>(this, OnSettingsChanged);
+			OnSettingsChanged(null);
         }
 
         public virtual bool DefaultSystray { get { return true; } }

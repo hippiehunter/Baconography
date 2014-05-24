@@ -47,6 +47,8 @@ namespace SnooStreamWP8.View.Controls
         public static readonly DependencyProperty ManipulationControllerProperty =
             DependencyProperty.Register("ManipulationController", typeof(ManipulationController), typeof(GifControl), new PropertyMetadata(null, onControllerSet));
 
+		private TaskCompletionSource<bool> _loadedCompletionSource = new TaskCompletionSource<bool>();
+
         private static void onControllerSet(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var value = e.NewValue as ManipulationController;
@@ -99,6 +101,7 @@ namespace SnooStreamWP8.View.Controls
             try
             {
                 var bytes = await asset;
+				await _loadedCompletionSource.Task;
                 _interop = new Direct3DInterop(bytes);
                 // Set native resolution in pixels
                 _interop.WindowBounds = _interop.RenderResolution = _interop.NativeResolution = new Windows.Foundation.Size(_interop.Width, _interop.Height);
@@ -219,8 +222,8 @@ namespace SnooStreamWP8.View.Controls
                 {
                     viewport.SetViewportOrigin(
                         new Point(
-                            Math.Round((newWidth - viewport.ActualWidth) / 2),
-                            Math.Round((newHeight - viewport.ActualHeight) / 2)
+                            Math.Round((newWidth - Height) / 2),
+							Math.Round((newHeight - Width) / 2)
                             ));
                 }
                 else
@@ -243,8 +246,8 @@ namespace SnooStreamWP8.View.Controls
             if (recompute && _interop != null && viewport != null)
             {
                 // Calculate the minimum scale to fit the viewport 
-                double minX = 480.0 / (double)_interop.Width;
-                double minY = 800.0 / (double)_interop.Height;
+                double minX = Width / (double)_interop.Width;
+                double minY = Height / (double)_interop.Height;
 
                 _minScale = Math.Min(minX, minY);
             }
@@ -270,5 +273,14 @@ namespace SnooStreamWP8.View.Controls
 
             ResizeImage(false);
         }
+
+		private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+		{
+			//make sure we're really loaded
+			while(viewport.ActualHeight < 1)
+				await Task.Yield();
+
+			_loadedCompletionSource.TrySetResult(true);
+		}
     }
 }
