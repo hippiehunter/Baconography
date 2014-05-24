@@ -42,6 +42,10 @@ namespace SnooStream.ViewModel
             if (videoResult != null)
             {
                 AvailableStreams = new ObservableCollection<Tuple<string, string>>(videoResult.PlayableStreams);
+				if (AvailableStreams.Count > 0)
+				{
+					SelectedStream = AvailableStreams[0].Item1;
+				}
                 await SnooStreamViewModel.NotificationService.ReportWithProgress("loading from youtube",
                     async (report) =>
                     {

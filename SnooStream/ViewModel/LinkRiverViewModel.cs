@@ -146,7 +146,7 @@ namespace SnooStream.ViewModel
                 {
                     var postListing = LastLinkId != null ? 
                         await SnooStreamViewModel.RedditService.GetAdditionalFromListing(Thing.Url + ".json?sort=" + Sort, LastLinkId) :
-                        await SnooStreamViewModel.RedditService.GetPostsBySubreddit(Thing.Url, Sort);
+						await SnooStreamViewModel.RedditService.GetPostsBySubreddit(Thing.Url, Sort);
 
                     if (postListing != null)
                     {
