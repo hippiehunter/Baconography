@@ -21,14 +21,14 @@
             <DataTemplate x:Name="imageTemplate">
                 <telerikSlideView:PanAndZoomImage 
                     ZoomMode="None" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Unloaded="PanAndZoomImage_Unloaded"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Unloaded="PanAndZoomImage_Unloaded" Loaded="PanAndZoomImage_Loaded"
                     Source="{Binding Url}" />
             </DataTemplate>
 
             <DataTemplate x:Name="gifTemplate">
                 <local:GifControl
                     HorizontalAlignment="Center" VerticalAlignment="Center" Unloaded="GifControl_Unloaded" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"
-                    ImageSource="{Binding ImageSource.ImageData}" ManipulationController="{Binding ManipulationController, ElementName=linkStream}" />
+                    ImageSource="{Binding ImageSource.ImageData}" ManipulationController="{Binding ManipulationController, ElementName=linkStream}" Loaded="GifControl_Loaded" />
             </DataTemplate>
 
             <DataTemplate x:Name="videoTemplate" >
@@ -70,8 +70,13 @@
                     GifTemplate="{StaticResource gifTemplate}"/>
 
             <DataTemplate x:Name="albumTemplate">
-                <telerikPrimitives:RadSlideView ItemsSource="{Binding Images}" Orientation="Vertical" IsLoopingEnabled="True" AdjacentItemsPreviewMode="None" 
-                                                IsPullToRefreshEnabled="False" ItemRealizationMode="ViewportItem" ItemTemplateSelector="{StaticResource imageSelector}" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"/>
+                <Grid>
+                    <!-- TODO: FIX this, its doesnt draw right and its probably not in the right place -->
+                    <telerikPrimitives:RadPaginationControl Grid.Row="0" PageProvider="{Binding ElementName=albumSlideView}" DisplayMode="IndexLabel"/>
+                    <telerikPrimitives:RadSlideView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}" Orientation="Vertical" IsLoopingEnabled="True" AdjacentItemsPreviewMode="None" 
+                                                    IsPullToRefreshEnabled="False" ItemRealizationMode="ViewportItem" ItemTemplateSelector="{StaticResource imageSelector}" 
+                                                    Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"/>
+                </Grid>
             </DataTemplate>
 
             

@@ -183,6 +183,22 @@ namespace SnooStreamWP8.View.Pages
             pZoom.Source = null;
         }
 
+		private void PanAndZoomImage_Loaded(object sender, RoutedEventArgs e)
+		{
+			//rebind the control if we're returning from another page in the back stack,
+			//this should be the only scenario where the image source has been set to null
+			//at the time of this event
+			var pZoom = sender as PanAndZoomImage;
+			if (pZoom.Source == null && pZoom.DataContext != null)
+			{
+				var imageViewModel = pZoom.DataContext as ImageViewModel;
+				if(imageViewModel != null)
+				{
+					pZoom.Source = new BitmapImage(new Uri(imageViewModel.ImageSource.UrlSource));
+				}
+			}
+		}
+
         private void GifControl_Unloaded(object sender, RoutedEventArgs e)
         {
             //gif control also leaks if you dont clear its imagesource and manipulationController
@@ -190,6 +206,23 @@ namespace SnooStreamWP8.View.Pages
             gControl.ImageSource = null;
             gControl.ManipulationController = null;
         }
+
+		private void GifControl_Loaded(object sender, RoutedEventArgs e)
+		{
+			//rebind the control if we're returning from another page in the back stack,
+			//this should be the only scenario where the image source has been set to null
+			//at the time of this event
+			var gControl = sender as GifControl;
+			if (gControl.ImageSource == null && gControl.DataContext != null)
+			{
+				var imageViewModel = gControl.DataContext as ImageViewModel;
+				if (imageViewModel != null)
+				{
+					gControl.ImageSource = imageViewModel.ImageSource.ImageData;
+					gControl.ManipulationController = ManipulationController;
+				}
+			}
+		}
 
         private void radSlideView_DoubleTap(object sender, System.Windows.Input.GestureEventArgs e)
         {
