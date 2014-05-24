@@ -211,27 +211,24 @@ namespace SnooStreamWP8.View.Controls
         {
             if (_coercedScale != 0 && _interop != null)
             {
-                double newWidth = Math.Round(_interop.Width * _coercedScale);
-                double newHeight = Math.Round(_interop.Height * _coercedScale);
+				double newWidth = Math.Round(_interop.Width * _coercedScale);
+				double newHeight = Math.Round(_interop.Height * _coercedScale);
 
                 xform.ScaleX = xform.ScaleY = _coercedScale;
 
                 viewport.Bounds = new Rect(0, 0, newWidth, newHeight);
-
+				Point originPoint;
                 if (center)
                 {
-                    viewport.SetViewportOrigin(
-                        new Point(
-                            Math.Round((newWidth - Height) / 2),
-							Math.Round((newHeight - Width) / 2)
-                            ));
+					originPoint = new Point(Math.Round(newWidth / 2), Math.Round(newHeight / 2));
                 }
                 else
                 {
                     Point newImgMid = new Point(newWidth * _relativeMidpoint.X, newHeight * _relativeMidpoint.Y);
-                    Point origin = new Point(newImgMid.X - _screenMidpoint.X, newImgMid.Y - _screenMidpoint.Y);
-                    viewport.SetViewportOrigin(origin);
+					originPoint = new Point(newImgMid.X - _screenMidpoint.X, newImgMid.Y - _screenMidpoint.Y);
                 }
+
+				viewport.SetViewportOrigin(originPoint);
             }
         }
 
@@ -280,6 +277,7 @@ namespace SnooStreamWP8.View.Controls
 			while(viewport.ActualHeight < 1)
 				await Task.Yield();
 
+			_viewportSize = new Size(viewport.ActualWidth, viewport.ActualHeight);
 			_loadedCompletionSource.TrySetResult(true);
 		}
     }

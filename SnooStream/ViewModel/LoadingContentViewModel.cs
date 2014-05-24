@@ -13,7 +13,13 @@ namespace SnooStream.ViewModel
             : base(underlying.Context)
         {
             Underlying = underlying;
-            IsInitiallyLoaded = true;
+			IsInitiallyLoaded = false;
+			underlying.BeginLoad(true).ContinueWith((tsk) =>
+				{
+					IsInitiallyLoaded = true;
+					RaisePropertyChanged("Underlying");
+					RaisePropertyChanged("IsInitiallyLoaded");
+				}, SnooStreamViewModel.UIScheduler);
         }
 
         public LoadingContentViewModel(Task<ContentViewModel> underlying, ViewModelBase context)
@@ -24,11 +30,12 @@ namespace SnooStream.ViewModel
             {
 
             }
-            underlying.ContinueWith((tsk) =>
+            underlying.ContinueWith(async (tsk) =>
                 {
                     if (tsk.Status == TaskStatus.RanToCompletion)
                     {
-                        Underlying = tsk.Result;
+						Underlying = tsk.Result;
+						await Underlying.BeginLoad(true);
                         IsInitiallyLoaded = true;
                         RaisePropertyChanged("Underlying");
                         RaisePropertyChanged("IsInitiallyLoaded");

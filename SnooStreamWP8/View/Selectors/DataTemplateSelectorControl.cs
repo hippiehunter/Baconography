@@ -17,6 +17,25 @@ namespace SnooStreamWP8.View.Selectors
 
         }
 
+		public bool IsLoaded
+		{
+			get { return (bool)GetValue(IsLoadedProperty); }
+			set { SetValue(IsLoadedProperty, value); }
+		}
+
+		// Using a DependencyProperty as the backing store for IsLoaded.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty IsLoadedProperty =
+			DependencyProperty.Register("IsLoaded", typeof(bool), typeof(DataTemplateSelectorControl), new PropertyMetadata(false, OnLoadedChanged));
+
+		private static void OnLoadedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			var thisp = d as DataTemplateSelectorControl;
+			if (thisp != null)
+			{
+				thisp.ContentTemplate = thisp.SelectTemplate(thisp.Content, thisp);
+			}
+		}
+
 		protected override void OnContentChanged (object oldContent, object newContent)
 		{
 			base.OnContentChanged(oldContent, newContent);
@@ -32,7 +51,11 @@ namespace SnooStreamWP8.View.Selectors
 
 		public DataTemplate SelectTemplate (object item, DependencyObject container)
 		{
-			return SelectTemplateCore(item, container);
+			if (IsLoaded)
+				return SelectTemplateCore(item, container);
+			
+			else
+				return null;
 		}
 
         protected virtual DataTemplate SelectTemplateCore(object item, DependencyObject container)

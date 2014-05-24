@@ -20,14 +20,14 @@
         <Grid.Resources>
             <DataTemplate x:Name="imageTemplate">
                 <telerikSlideView:PanAndZoomImage 
-                    ZoomMode="None" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"
+                    ZoomMode="None" Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Unloaded="PanAndZoomImage_Unloaded" Loaded="PanAndZoomImage_Loaded"
                     Source="{Binding Url}" />
             </DataTemplate>
 
             <DataTemplate x:Name="gifTemplate">
                 <local:GifControl
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Unloaded="GifControl_Unloaded" Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Unloaded="GifControl_Unloaded" Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
                     ImageSource="{Binding ImageSource.ImageData}" ManipulationController="{Binding ManipulationController, ElementName=linkStream}" Loaded="GifControl_Loaded" />
             </DataTemplate>
 
@@ -75,7 +75,7 @@
                     <telerikPrimitives:RadPaginationControl Grid.Row="0" PageProvider="{Binding ElementName=albumSlideView}" DisplayMode="IndexLabel"/>
                     <telerikPrimitives:RadSlideView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}" Orientation="Vertical" IsLoopingEnabled="True" AdjacentItemsPreviewMode="None" 
                                                     IsPullToRefreshEnabled="False" ItemRealizationMode="ViewportItem" ItemTemplateSelector="{StaticResource imageSelector}" 
-                                                    Width="{Binding ActualWidth, ElementName=linkStream}" Height="{Binding ActualHeight, ElementName=linkStream}"/>
+                                                    Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"/>
                 </Grid>
             </DataTemplate>
 
@@ -88,6 +88,7 @@
                     <telerikPrimitives:RadBusyIndicator
                         IsRunning="{Binding IsInitiallyLoaded}" Visibility="{Binding IsInitiallyLoaded, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>
                     <selectors:ContentTemplateSelector Content="{Binding Underlying}"
+                                                       IsLoaded="{Binding IsInitiallyLoaded}"
                                                        Visibility="{Binding IsInitiallyLoaded, Converter={StaticResource booleanVisibilityConverter}}"
                                                     ImageContentTemplate="{StaticResource imageTemplate}"
                                                     GifTemplate="{StaticResource gifTemplate}"
