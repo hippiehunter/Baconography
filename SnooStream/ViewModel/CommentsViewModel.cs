@@ -157,27 +157,37 @@ namespace SnooStream.ViewModel
         private void MergeComments(CommentShell parent, IEnumerable<Thing> things, int depth = 0)
         {
             CommentShell priorSibling = parent != null ? LastChild(parent) : null;
+			MoreViewModel priorMore = null;
             foreach (var child in things)
             {
 				if(child.Data is More && ((More)child.Data).Children.Count > 0)
                 {
-                    var firstId = ((More)child.Data).Children.First();
-                    if (priorSibling == null) //need to attach to parent
-                    {
-                        parent.FirstChild = firstId;
-                    }
-                    else
-                    {
-                        priorSibling.NextSibling = firstId;
-                    }
-                    if (!_knownUnloaded.ContainsKey(firstId))
-						_knownUnloaded.Add(firstId, new MoreViewModel(this, parent != null ? parent.Id : null, firstId, ((More)child.Data).Children, depth ));
-
-                    //cant continue after a 'more' element comes through
-                    break;
+					if(priorMore != null)
+					{
+						priorMore.Ids.AddRange(((More)child.Data).Children);
+						priorMore.Count += ((More)child.Data).Count;
+					}
+					else
+					{
+						var firstId = ((More)child.Data).Children.First();
+						if (priorSibling == null) //need to attach to parent
+						{
+							parent.FirstChild = firstId;
+						}
+						else
+						{
+							priorSibling.NextSibling = firstId;
+						}
+						if (!_knownUnloaded.ContainsKey(firstId))
+						{
+							priorMore = new MoreViewModel(this, parent != null ? parent.Id : null, firstId, ((More)child.Data).Children,((More)child.Data).Count, depth );
+							_knownUnloaded.Add(firstId, priorMore);
+						}
+					}
                 }
                 else if (child.Data is Comment)
                 {
+					priorMore = null;
                     var commentId = ((Comment)child.Data).Id;
 
                     if (priorSibling == null && parent == null)
@@ -247,23 +257,26 @@ namespace SnooStream.ViewModel
             Dictionary<string, Comment> nameMap = new Dictionary<string, Comment>();
             foreach (var item in listing.Data.Children)
             {
-                if (item.Data is Comment)
-                    nameMap.Add(((Comment)item.Data).Name, ((Comment)item.Data));
+				if (item.Data is Comment)
+					nameMap.Add(((Comment)item.Data).Name, ((Comment)item.Data));
             }
 
             foreach (var item in new List<Thing>(listing.Data.Children))
             {
-                if (item.Data is Comment)
-                {
-                    if (nameMap.ContainsKey(((Comment)item.Data).ParentId))
-                    {
-                        var targetParent = nameMap[((Comment)item.Data).ParentId];
-                        if (targetParent.Replies == null)
-                            targetParent.Replies = new Listing { Data = new ListingData { Children = new List<Thing>() } };
+				string parentId = null;
+				if (item.Data is Comment)
+					parentId = ((Comment)item.Data).ParentId;
+				else if (item.Data is More)
+					parentId = ((More)item.Data).ParentId;
 
-                        targetParent.Replies.Data.Children.Add(item);
-                        listing.Data.Children.Remove(item);
-                    }
+				if (parentId != null && nameMap.ContainsKey(parentId))
+                {
+					var targetParent = nameMap[parentId];
+                    if (targetParent.Replies == null)
+                        targetParent.Replies = new Listing { Data = new ListingData { Children = new List<Thing>() } };
+
+                    targetParent.Replies.Data.Children.Add(item);
+                    listing.Data.Children.Remove(item);
                 }
             }
         }
@@ -387,7 +400,7 @@ namespace SnooStream.ViewModel
             await SnooStreamViewModel.NotificationService.Report("loading more comments", 
 				PriorityLoadQueue.QueueHelper( async () =>
                 {
-                    var listing = await SnooStreamViewModel.RedditService.GetMoreOnListing(target.Ids, Link.Link.Id, Link.Link.Subreddit);
+					var listing = await SnooStreamViewModel.RedditService.GetMoreOnListing(new More { Children = target.Ids, ParentId = target.ParentId, Count = target.Count }, Link.Link.Id, Link.Link.Subreddit);
                     lock(this)
                     {
                         FixupParentage(listing);
@@ -401,9 +414,6 @@ namespace SnooStream.ViewModel
                         {
                             parentShell = null;
                         }
-
-
-						
 
                         MergeComments(parentShell, listing.Data.Children, parentShell == null ? 0 : parentShell.Comment.Depth + 1);
                         moreId = ((Comment)firstChild.Data).Id;
@@ -548,7 +558,7 @@ namespace SnooStream.ViewModel
 				MoreViewModel moreValues;
 				if (_knownUnloaded.TryGetValue(itemId, out moreValues))
 				{
-					result.Data.Children.Add(new Thing { Kind = "more", Data = new More { Children = moreValues.Ids } });
+					result.Data.Children.Add(new Thing { Kind = "more", Data = new More { Children = moreValues.Ids, ParentId = moreValues.ParentId, Count = moreValues.Count } });
 				}
 				return null;
 			}

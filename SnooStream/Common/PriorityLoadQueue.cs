@@ -67,8 +67,7 @@ namespace SnooStream.Common
                 {
                     _immediateLoadItems.Add(loadItem);
                 }
-
-                if (_loadItems.ContainsKey(loadContext))
+				else if (_loadItems.ContainsKey(loadContext))
                 {
                     var targetList = _loadItems[loadContext];
                     targetList.Add(loadItem);

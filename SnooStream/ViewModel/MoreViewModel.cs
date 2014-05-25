@@ -10,16 +10,15 @@ namespace SnooStream.ViewModel
     public class MoreViewModel : ViewModelBase
     {
 		CommentsViewModel _context;
-		string _parentId;
-		public MoreViewModel(CommentsViewModel context, string parentId, string id, List<string> ids, int depth = 0)
+		public MoreViewModel(CommentsViewModel context, string parentId, string id, List<string> ids, int count, int depth = 0)
         {
 			_context = context;
 			Depth = depth;
 			Id = id;
-			_parentId = parentId;
+			ParentId = parentId;
 			Loading = false;
 			Ids = ids;
-			CountString = ids.Count.ToString();
+			Count = count == 0 ? ids.Count : count;
 			_triggerLoad = new RelayCommand(async () => await _context.LoadMore(this));
         }
 
@@ -27,14 +26,22 @@ namespace SnooStream.ViewModel
         public string Id { get; set; }
 		public bool Loading { get; set; }
 		public int Depth { get; set; }
-		public string CountString { get; set; }
+		public string CountString
+		{
+			get
+			{
+				return Count.ToString();
+			}
+		}
+		public int Count { get; set; }
+		public string ParentId { get; set; }
 		public CommentViewModel Parent
 		{
 			get
 			{
-				if (!string.IsNullOrWhiteSpace(_parentId))
+				if (!string.IsNullOrWhiteSpace(ParentId))
 				{
-					return _context.GetById(_parentId);
+					return _context.GetById(ParentId);
 				}
 				else
 					return null;
