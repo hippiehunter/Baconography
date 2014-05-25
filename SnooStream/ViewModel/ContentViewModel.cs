@@ -13,7 +13,10 @@ namespace SnooStream.ViewModel
         public ContentViewModel(ViewModelBase context)
         {
             Context = context;
-
+			if (Context is LinkStreamViewModel)
+			{
+				Context = null;
+			}
             var contextLink = Context as LinkViewModel;
             if (contextLink != null)
             {

@@ -3,6 +3,7 @@ using SnooStream.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,7 +58,16 @@ namespace SnooStream.ViewModel
                         loadedOne = true;
 						await Task.Factory.StartNew(() =>
                         {
-							Images.Add(new ImageViewModel(this, source.ToString(), title, new ImageSource(source.ToString(), bytes), bytes));
+							var madeImageVm = new ImageViewModel(this, source.ToString(), title, new ImageSource(source.ToString(), bytes), bytes);
+
+							if (Images.Any(img => ((ImageViewModel)img).Url == source.ToString()))
+							{
+								
+							}
+							else
+							{
+								Images.Add(madeImageVm);
+							}
 						}, SnooStreamViewModel.UIContextCancellationToken, TaskCreationOptions.None, SnooStreamViewModel.UIScheduler);	
                     }
                 });

@@ -106,7 +106,7 @@ namespace SnooStreamWP8.View.Pages
             }
             else
             {
-                loadingVM = new LoadingContentViewModel(link.AsyncContent, DataContext as GalaSoft.MvvmLight.ViewModelBase);
+                loadingVM = new LoadingContentViewModel(link.AsyncContent, link != null ? link : DataContext as GalaSoft.MvvmLight.ViewModelBase);
                 fullyLoaded = link.AsyncContent.ContinueWith(tsk => 
                     {
                         if(tsk.Status == TaskStatus.RanToCompletion)
