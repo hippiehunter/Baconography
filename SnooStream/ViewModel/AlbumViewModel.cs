@@ -13,7 +13,7 @@ namespace SnooStream.ViewModel
     {
         public AlbumViewModel(ViewModelBase context, string originalUrl, IEnumerable<Tuple<string, string>> apiResults, string albumTitle) : base(context)
         {
-            Url = originalUrl;
+			LoadContextToken = Url = originalUrl;
             Domain = new Uri(originalUrl).Host;
             Title = albumTitle;
             Images = new ObservableCollection<ContentViewModel>();

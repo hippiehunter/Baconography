@@ -80,6 +80,7 @@ namespace SnooStream.ViewModel
         public object PreviewImage { get; set; } //might be a url, or might be a previewImageSource
         public string Error { get; set; }
         public bool Errored { get; set; }
+		public string LoadContextToken { get; set; }
 
     }
 }

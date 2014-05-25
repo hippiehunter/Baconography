@@ -140,6 +140,12 @@ namespace SnooStreamWP8.View.Pages
             {
                 currentItem = radSlideView.SelectedItemContainer;
             }
+
+
+			if (SelectedItem != null)
+			{
+			}
+
             if(Links.Count > 0 && !_loading)
             {
                 try

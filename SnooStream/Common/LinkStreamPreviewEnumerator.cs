@@ -64,7 +64,6 @@ namespace SnooStream.Common
         {
             get
             {
-                SnooStreamViewModel.LoadQueue.SetMinorContext(_context.Thing.Url);
                 return this;
             }
         }

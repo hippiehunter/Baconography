@@ -112,8 +112,8 @@ namespace SnooStream.Common
             {
                 if (_immediateLoadItems.Count > 0)
                 {
-                    var result = _immediateLoadItems[_immediateLoadItems.Count - 1];
-                    _immediateLoadItems.RemoveAt(_immediateLoadItems.Count - 1);
+                    var result = _immediateLoadItems[0];
+                    _immediateLoadItems.RemoveAt(0);
                     return result;
                 }
 
@@ -124,8 +124,8 @@ namespace SnooStream.Common
                     {
                         if(itemTpl.Value.Count > 0)
                         { 
-                            var result = itemTpl.Value[itemTpl.Value.Count - 1];
-                            itemTpl.Value.RemoveAt(itemTpl.Value.Count - 1);
+                            var result = itemTpl.Value[0];
+                            itemTpl.Value.RemoveAt(0);
                             return result;
                         }
                     }
@@ -134,8 +134,8 @@ namespace SnooStream.Common
                 {
                     if(items.Count > 0)
                     {
-                        var result = items[items.Count - 1];
-                        items.RemoveAt(items.Count - 1);
+                        var result = items[0];
+                        items.RemoveAt(0);
                         return result;
                     }
                 }
@@ -176,29 +176,75 @@ namespace SnooStream.Common
                 return nextItem;
         }
 
-        async void DrainQueue()
+		IEnumerable<LoadItem> LoadItemStream()
+		{
+			for (; ; )
+			{
+				if (_cancelTokenSource.IsCancellationRequested)
+					yield break;
+				else
+				{
+					var nextLoadItem = GetNextLoadItem();
+					if (nextLoadItem != null)
+						yield return nextLoadItem;
+					else
+						yield break;
+				}
+			}
+		}
+
+		public int LoadConcurrency { get; set; }
+		public int LoadTimout { get; set; }
+
+        void DrainQueue()
         {
+			LoadConcurrency = 4;
+			LoadTimout = 15000;
             try
             {
-                LoadItem currentItem = null;
-                while (!_cancelTokenSource.IsCancellationRequested &&
-                    (currentItem = GetNextLoadItem()) != null)
-                {
-                    try
-                    {
-                        await currentItem.Operation();
-                        currentItem.CompletionSource.SetResult(true);
-                    }
-                    catch (Exception ex)
-                    {
-                        currentItem.CompletionSource.SetException(ex);
-                    }
-                }
+				var currentTasks = new Dictionary<Task, DateTime>();
+				foreach (var currentItem in LoadItemStream())
+				{
+					currentTasks.Add(ProcLoadItem(currentItem), DateTime.Now);
+					if (currentTasks.Count > LoadConcurrency)
+					{
+						var taskArray = currentTasks.Keys.ToArray();
+						var taskIndex = Task.WaitAny(taskArray, LoadTimout, _cancelTokenSource.Token);
+						List<Task> removeTasks = new List<Task>();
+						//scrub for overall aged out items and completed items
+						var now = DateTime.Now;
+						foreach (var taskTpl in currentTasks)
+						{
+							if (taskTpl.Key.IsCompleted || taskTpl.Key.IsFaulted || taskTpl.Key.IsCanceled)
+								removeTasks.Add(taskTpl.Key);
+							if ((now - taskTpl.Value).TotalMilliseconds > LoadTimout)
+							{
+								//let it die elsewhere
+								removeTasks.Add(taskTpl.Key);
+							}
+						}
+						foreach (var task in removeTasks)
+							currentTasks.Remove(task);
+					}
+				}
             }
             finally
             {
                 _isDraining = false;
             }
         }
+
+		private static async Task ProcLoadItem(LoadItem currentItem)
+		{
+			try
+			{
+				await currentItem.Operation();
+				currentItem.CompletionSource.TrySetResult(true);
+			}
+			catch (Exception ex)
+			{
+				currentItem.CompletionSource.TrySetException(ex);
+			}
+		}
     }
 }

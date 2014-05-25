@@ -37,7 +37,6 @@
   <ItemGroup>
     <Compile Include="Common\CacheStore.cs" />
     <Compile Include="Common\CaptchaService.cs" />
-    <Compile Include="Common\EndlessStack.cs" />
     <Compile Include="Common\ImageSource.cs" />
     <Compile Include="Common\LinkStreamPreviewEnumerator.cs" />
     <Compile Include="Common\NeverEndingRedditEnumerator.cs" />
