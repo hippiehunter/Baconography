@@ -34,19 +34,37 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2|AnyCPU'">
+    <OutputPath>bin\Release2\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Deviantart.cs" />
-    <Compile Include="Flickr.cs" />
+    <Compile Include="AsyncAPI\Flickr.cs" />
     <Compile Include="HttpUtility.cs" />
+    <Compile Include="IAquisitionAPI.cs" />
+    <Compile Include="IAsyncAquisitionAPI.cs" />
     <Compile Include="ImageAquisition.cs" />
-    <Compile Include="Imgur.cs" />
+    <Compile Include="AsyncAPI\Imgur.cs" />
     <Compile Include="JpegUtility.cs" />
-    <Compile Include="Livememe.cs" />
-    <Compile Include="Memecrunch.cs" />
-    <Compile Include="Minus.cs" />
-    <Compile Include="Picsarus.cs" />
+    <Compile Include="SimpleAPI\Ctrlv.cs" />
+    <Compile Include="SimpleAPI\Ehost.cs" />
+    <Compile Include="SimpleAPI\Imgflip.cs" />
+    <Compile Include="SimpleAPI\Livememe.cs" />
+    <Compile Include="SimpleAPI\Makeameme.cs" />
+    <Compile Include="SimpleAPI\Memecrunch.cs" />
+    <Compile Include="AsyncAPI\Minus.cs" />
+    <Compile Include="SimpleAPI\Memedad.cs" />
+    <Compile Include="SimpleAPI\Memefive.cs" />
+    <Compile Include="SimpleAPI\Memegen.cs" />
+    <Compile Include="SimpleAPI\Picsarus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Quickmeme.cs" />
+    <Compile Include="SimpleAPI\Picshd.cs" />
+    <Compile Include="SimpleAPI\Quickmeme.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">

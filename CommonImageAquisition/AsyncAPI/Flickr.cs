@@ -8,14 +8,14 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition
+namespace CommonImageAquisition.AsyncAPI
 {
-    class Flickr
+    class Flickr : IAsyncAquisitionAPI
     {
         //Transliterated from Reddit Enhancement Suite https://github.com/honestbleeps/Reddit-Enhancement-Suite/blob/master/lib/reddit_enhancement_suite.user.js
-        private static Regex hashRe = new Regex(@"^http:\/\/(?:\w+)\.?flickr\.com\/(?:.*)\/([\d]{10})\/?(?:.*)?$");
+        private Regex hashRe = new Regex(@"^http:\/\/(?:\w+)\.?flickr\.com\/(?:.*)\/([\d]{10})\/?(?:.*)?$");
 
-        internal static bool IsAPI(Uri uri)
+		public bool IsMatch(Uri uri)
         {
             return hashRe.IsMatch(uri.OriginalString);
         }
@@ -34,7 +34,7 @@ namespace CommonImageAquisition
             public string provider_url;
         }
 
-        internal static async Task<IEnumerable<Tuple<string, string>>> GetImagesFromUri(string title, Uri uri)
+		public async Task<IEnumerable<Tuple<string, string>>> GetImagesFromUri(string title, Uri uri)
         {
             try
             {
@@ -61,5 +61,5 @@ namespace CommonImageAquisition
                 return Enumerable.Empty<Tuple<string, string>>();
             }
         }
-    }
+	}
 }

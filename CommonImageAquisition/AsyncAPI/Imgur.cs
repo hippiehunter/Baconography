@@ -10,16 +10,16 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition
+namespace CommonImageAquisition.AsyncAPI
 {
-    class Imgur
+    class Imgur : IAsyncAquisitionAPI
     {
         //Transliterated from Reddit Enhancement Suite https://github.com/honestbleeps/Reddit-Enhancement-Suite/blob/master/lib/reddit_enhancement_suite.user.js
         private static Regex hashRe = new Regex(@"^https?:\/\/(?:i\.|m\.|edge\.|www\.)*imgur\.com\/(?!gallery)(?!removalrequest)(?!random)(?!memegen)([A-Za-z0-9]{5}|[A-Za-z0-9]{7})[sbtmlh]?(\.(?:jpe?g|gif|png))?(\?.*)?$");
         private static Regex albumHashRe = new Regex(@"https?:\/\/(?:i\.|m\.)?imgur\.com\/(?:a|gallery)\/([\w]+)(\..+)?(?:\/)?(?:#\w*)?$");
 		private static string apiPrefix = "https://api.imgur.com/2/";
 
-        internal static bool IsAPI(Uri uri)
+        public bool IsAPI(Uri uri)
         {
             var href = uri.OriginalString;
 
@@ -37,7 +37,7 @@ namespace CommonImageAquisition
             
         }
 
-        internal static async Task<IEnumerable<Tuple<string, string>>> GetImagesFromUri(string title, Uri uri)
+		public async Task<IEnumerable<Tuple<string, string>>> GetImagesFromUri(string title, Uri uri)
         {
             var href = uri.OriginalString;
             var groups = hashRe.Match(href).Groups;
@@ -117,5 +117,20 @@ namespace CommonImageAquisition
             else
                 return Enumerable.Empty<Tuple<string, string>>();
         }
-    }
+
+		public string Domain
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public bool IsMatch(Uri uri)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<IEnumerable<Tuple<string, string>>> GetImagesFromUri(Uri uri)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

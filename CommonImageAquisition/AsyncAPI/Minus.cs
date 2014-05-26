@@ -9,15 +9,15 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition
+namespace CommonImageAquisition.AsyncAPI
 {
-    class Minus
+	class Minus : IAsyncAquisitionAPI
     {
         
         //Transliterated from Reddit Enhancement Suite https://github.com/honestbleeps/Reddit-Enhancement-Suite/blob/master/lib/reddit_enhancement_suite.user.js
-        private static Regex hashRe = new Regex(@"^http:\/\/min.us\/([\w]+)(?:#[\d+])?$");
+        private Regex hashRe = new Regex(@"^http:\/\/min.us\/([\w]+)(?:#[\d+])?$");
 
-        internal static bool IsAPI(Uri uri)
+        public bool IsMatch(Uri uri)
         {
             var href = uri.OriginalString.Split('?')[0];
             var groups = hashRe.Match(href).Groups;
@@ -31,7 +31,7 @@ namespace CommonImageAquisition
                 return false;
         }
 
-        internal static async Task<IEnumerable<Tuple<string, string>>> GetImagesFromUri(string title, Uri uri)
+        public async Task<IEnumerable<Tuple<string, string>>> GetImagesFromUri(string title, Uri uri)
         {
             var href = uri.OriginalString.Split('?')[0];
             var groups = hashRe.Match(href).Groups;
