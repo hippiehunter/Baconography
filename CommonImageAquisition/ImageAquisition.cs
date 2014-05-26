@@ -11,8 +11,8 @@ namespace CommonImageAquisition
 {
     public class ImageAquisition
     {
-		private static Dictionary<string, IAquisitionAPI> _simpleAPIs;
-		private static Dictionary<string, IAsyncAquisitionAPI> _asyncAPIs;
+		private static Dictionary<string, IAquisitionAPI> _simpleAPIs = new Dictionary<string,IAquisitionAPI>();
+		private static Dictionary<string, IAsyncAquisitionAPI> _asyncAPIs = new Dictionary<string,IAsyncAquisitionAPI>();
 
 
 		static ImageAquisition()

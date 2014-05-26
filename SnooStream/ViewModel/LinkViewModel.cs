@@ -75,24 +75,8 @@ namespace SnooStream.ViewModel
                         return new WebViewModel(this, true, Link.Url);
                     }
                 }
-                else if (targetHost == "www.imgur.com" ||
-                    targetHost == "imgur.com" ||
-                    targetHost == "i.imgur.com" ||
-                    targetHost == "min.us" ||
-                    targetHost == "www.quickmeme.com" ||
-                    targetHost == "www.livememe.com" ||
-                    targetHost == "livememe.com" ||
-                    targetHost == "i.qkme.me" ||
-                    targetHost == "quickmeme.com" ||
-                    targetHost == "qkme.me" ||
-                    targetHost == "memecrunch.com" ||
-                    targetHost == "flickr.com" ||
-                    targetHost == "www.flickr.com" ||
-                    fileName.EndsWith(".jpg") ||
-                    fileName.EndsWith(".gif") ||
-                    fileName.EndsWith(".png") ||
-                    fileName.EndsWith(".jpeg"))
-                {
+                else 
+				{
                     if (ImageAquisition.IsImageAPI(Link.Url))
                     {
                         var imageApiResults = await ImageAquisition.GetImagesFromUrl(Link.Title, Link.Url);
@@ -111,8 +95,6 @@ namespace SnooStream.ViewModel
                     
                     return new WebViewModel(this, true, Link.Url);
                 }
-                else
-                    return new WebViewModel(this, false, Link.Url);
             }
             catch (Exception ex)
             {

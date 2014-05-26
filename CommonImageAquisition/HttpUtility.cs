@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CommonImageAquisition
 {
-	class HttpClientUtility
+	public class HttpClientUtility
 	{
 		private static HttpClient _httpClient = new HttpClient(new HttpClientHandler());
 		public static async Task<string> Get(string uri, bool ignoreErrors = false)

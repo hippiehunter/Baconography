@@ -47,12 +47,14 @@ namespace SnooStream.ViewModel
 				{
 					SelectedStream = AvailableStreams[0].Item1;
 				}
-
-				var bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(videoResult.PreviewUrl, progress, cancelToken);
-                if (bytes != null && bytes.Length > 6) //minimum to identify the image type
-                {
-                    Preview = new ImageSource(videoResult.PreviewUrl, bytes);
-                }
+				if (!string.IsNullOrWhiteSpace(videoResult.PreviewUrl))
+				{
+					var bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(videoResult.PreviewUrl, progress, cancelToken);
+					if (bytes != null && bytes.Length > 6) //minimum to identify the image type
+					{
+						Preview = new ImageSource(videoResult.PreviewUrl, bytes);
+					}
+				}
             }
         }
     }

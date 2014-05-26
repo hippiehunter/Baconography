@@ -19,7 +19,7 @@ namespace CommonImageAquisition.AsyncAPI
         private static Regex albumHashRe = new Regex(@"https?:\/\/(?:i\.|m\.)?imgur\.com\/(?:a|gallery)\/([\w]+)(\..+)?(?:\/)?(?:#\w*)?$");
 		private static string apiPrefix = "https://api.imgur.com/2/";
 
-        public bool IsAPI(Uri uri)
+        public bool IsMatch(Uri uri)
         {
             var href = uri.OriginalString;
 
@@ -117,20 +117,5 @@ namespace CommonImageAquisition.AsyncAPI
             else
                 return Enumerable.Empty<Tuple<string, string>>();
         }
-
-		public string Domain
-		{
-			get { throw new NotImplementedException(); }
-		}
-
-		public bool IsMatch(Uri uri)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<IEnumerable<Tuple<string, string>>> GetImagesFromUri(Uri uri)
-		{
-			throw new NotImplementedException();
-		}
 	}
 }
