@@ -115,11 +115,6 @@ namespace SnooStreamWP8.View.Selectors
 
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
-            if (item is ContentViewModel)
-            {
-                ((ContentViewModel)item).BeginLoad(true);
-            }
-
             if (item is LoadingContentViewModel)
                 return LoadingContentTemplate;
             else if (item is InternalRedditContentViewModel)

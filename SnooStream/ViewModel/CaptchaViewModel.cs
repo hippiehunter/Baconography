@@ -34,18 +34,8 @@ namespace SnooStream.ViewModel
         private async void LoadContent(string iden)
         {
             var url = "http://www.reddit.com/captcha/" + iden;
-            try
-            {
-                var bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(url, (progress) => LoadPercent = progress, SnooStreamViewModel.UIContextCancellationToken);
-                if (bytes != null) //minimum to identify the image type
-                {
-                    Content = new ImageViewModel(this, url, null, new Common.ImageSource(url, bytes), bytes);
-                }
-            }
-            catch (Exception ex)
-            {
-                Content = new ErrorContentViewModel(this, ex);
-            }
+			Content = new ImageViewModel(this, url, null, null, null);
+			await Content.BeginLoad(SnooStreamViewModel.UIContextCancellationToken);   
         }
 
         private ContentViewModel _content;

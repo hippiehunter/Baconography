@@ -3,6 +3,7 @@ using Microsoft.Phone.Shell;
 using Nokia.Graphics.Imaging;
 using Nokia.InteropServices.WindowsRuntime;
 using SnooStream.Services;
+using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -531,6 +532,58 @@ namespace SnooStreamWP8.PlatformServices
 					if(!SystemTray.ProgressIndicator.IsIndeterminate)
 						SystemTray.ProgressIndicator.Value = progressPercent;
 				});
+		}
+
+		bool _isDrainingUIQueue = false;
+		List<Action> _queuedNonCritical = new List<Action>();
+		public void QueueNonCriticalUI(Action action)
+		{
+			lock (_queuedNonCritical)
+			{
+				_queuedNonCritical.Add(action);
+				if (!_isDrainingUIQueue)
+				{
+					_isDrainingUIQueue = true;
+					Task.Run(() => DrainNonCriticalUIQueue());
+				}
+			}
+		}
+
+		DateTime _lastDrained = DateTime.Now;
+		private async void DrainNonCriticalUIQueue()
+		{
+			_lastDrained = DateTime.Now;
+			while ((DateTime.Now - _lastDrained).TotalSeconds < 2 && !SnooStreamViewModel.UIContextCancellationToken.IsCancellationRequested)
+			{
+				bool needToRun = false;
+				lock (_queuedNonCritical)
+				{
+					if (_queuedNonCritical.Count > 0)
+					{
+						needToRun = true;
+					}
+				}
+
+				if (needToRun)
+				{
+					_uiDispatcher.BeginInvoke(() =>
+							{
+								try
+								{
+									lock (_queuedNonCritical)
+									{
+										foreach (var queued in _queuedNonCritical)
+										{
+											queued();
+										}
+										_queuedNonCritical.Clear();
+									}
+								}
+								catch { }
+							});
+				}
+				await Task.Delay(100);
+			}
 		}
 	}
 }

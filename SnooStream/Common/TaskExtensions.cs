@@ -28,5 +28,10 @@ namespace SnooStream.Common
         {
             return task.Status == TaskStatus.RanToCompletion;
         }
+
+		public static bool WasSuccessfull(this Task<Exception> task)
+		{
+			return task.Status == TaskStatus.RanToCompletion && task.Result == null;
+		}
     }
 }

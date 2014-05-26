@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
@@ -14,7 +15,7 @@ namespace SnooStream.ViewModel
         {
             Underlying = underlying;
 			IsInitiallyLoaded = false;
-			underlying.BeginLoad(true).ContinueWith((tsk) =>
+			underlying.BeginLoad(_cancelTokenSource.Token).ContinueWith((tsk) =>
 				{
 					IsInitiallyLoaded = true;
 					RaisePropertyChanged("Underlying");
@@ -26,16 +27,12 @@ namespace SnooStream.ViewModel
             : base(context)
         {
             var linkVm = context as LinkViewModel;
-            if (linkVm != null)
-            {
-
-            }
             underlying.ContinueWith(async (tsk) =>
                 {
                     if (tsk.Status == TaskStatus.RanToCompletion)
                     {
 						Underlying = tsk.Result;
-						await Underlying.BeginLoad(true);
+						await Underlying.BeginLoad(_cancelTokenSource.Token);
                         IsInitiallyLoaded = true;
                         RaisePropertyChanged("Underlying");
                         RaisePropertyChanged("IsInitiallyLoaded");
@@ -43,14 +40,15 @@ namespace SnooStream.ViewModel
                 }, SnooStreamViewModel.UIScheduler);
         }
 
+		private CancellationTokenSource _cancelTokenSource = new CancellationTokenSource();
         public ContentViewModel Underlying { get; set; }
         public bool IsInitiallyLoaded { get; set; }
 
-        internal override Task LoadContent()
+		internal override Task LoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken)
         {
             if (Underlying != null)
             {
-                return Underlying.LoadContent();
+				return Underlying.LoadContent(previewOnly, progress, cancelToken);
             }
             return Task.FromResult<bool>(false);
         }

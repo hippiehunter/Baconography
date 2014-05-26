@@ -105,7 +105,7 @@ namespace SnooStream.Common
             catch(Exception ex)
             {
                 Debug.WriteLine(ex);
-                SnooStream.ViewModel.SnooStreamViewModel.SystemServices.ShowMessage("error", ex.ToString());
+				SnooStream.ViewModel.SnooStreamViewModel.SystemServices.ShowMessage("error", ex.ToString());
             }
             finally
             {
@@ -124,7 +124,7 @@ namespace SnooStream.Common
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                SnooStream.ViewModel.SnooStreamViewModel.SystemServices.ShowMessage("error", ex.ToString());
+				SnooStream.ViewModel.SnooStreamViewModel.SystemServices.ShowMessage("error", ex.ToString());
             }
             finally
             {
@@ -139,19 +139,16 @@ namespace SnooStream.Common
             {
                 AddNotificationInfo(notificationInfo);
                 
-                await PriorityLoadQueue.QueueHelper(() =>
-                    {
-                        return operation((progress) =>
-                        {
-                            notificationInfo.Progress = progress;
-                            ReprocessForProgress();
-                        });
-                    })();
+                await operation((progress) =>
+                {
+                    notificationInfo.Progress = progress;
+                    ReprocessForProgress();
+                });
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                SnooStream.ViewModel.SnooStreamViewModel.SystemServices.ShowMessage("error", ex.ToString());
+				SnooStream.ViewModel.SnooStreamViewModel.SystemServices.ShowMessage("error", ex.ToString());
             }
             finally
             {

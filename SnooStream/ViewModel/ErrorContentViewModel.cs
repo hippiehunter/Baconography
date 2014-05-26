@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
@@ -17,8 +18,7 @@ namespace SnooStream.ViewModel
 
         
         public string Error { get; private set; }
-        public RelayCommand Retry { get { return ((dynamic)Context).ReloadContent; } }
-        internal override async Task LoadContent()
+		internal override async Task LoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken)
         {
             //nothing to load here
         }

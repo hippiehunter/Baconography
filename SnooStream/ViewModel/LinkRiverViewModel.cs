@@ -75,45 +75,18 @@ namespace SnooStream.ViewModel
 				return width ? Thing.HeaderSize[0] : Thing.HeaderSize[1];
 		}
 
-        public LinkRiverViewModel(bool isLocal, Subreddit thing, string sort, IEnumerable<Link> initialLinks)
-        {
-            IsLocal = isLocal;
-            Thing = thing;
-            Sort = sort ?? "hot";
-            Links = new ObservableCollection<LinkViewModel>();
-            if(initialLinks != null)
-            {
-                ProcessLinkThings(initialLinks);
-            }
+		public LinkRiverViewModel(bool isLocal, Subreddit thing, string sort, IEnumerable<Link> initialLinks)
+		{
+			IsLocal = isLocal;
+			Thing = thing;
+			Sort = sort ?? "hot";
+			Links = new ObservableCollection<LinkViewModel>();
+			if (initialLinks != null)
+			{
+				ProcessLinkThings(initialLinks);
+			}
 
-            _previewTask = new Lazy<Task<LinkStreamPreviewEnumerator>>(() =>
-                {
-                    var previewTask = PreviewTaskImpl();
-                    previewTask.ContinueWith(tsk => RaisePropertyChanged("PreviewBinding"), SnooStreamViewModel.UIScheduler);
-                    previewTask.ContinueWith(async tsk =>
-                        {
-                            var tskResult = tsk.TryValue();
-                            if (tskResult != null)
-                                await LinkStreamPreviewEnumerator.FillPreviewEnumerator(tskResult, 6, SnooStreamViewModel.UIContextCancellationToken);
-                        });
-                    return previewTask;
-                });
-        }
-
-        public LinkStreamPreviewEnumerator PreviewBinding
-        {
-            get
-            {
-                return _previewTask.Value.TryValue();
-            }
-        }
-
-        Lazy<Task<LinkStreamPreviewEnumerator>> _previewTask;
-        private async Task<LinkStreamPreviewEnumerator> PreviewTaskImpl()
-        {
-            var enumerator = await LinkStreamPreviewEnumerator.MakePreviewEnumerator(this, new LinkStreamViewModel(this, null));
-            return enumerator;
-        }
+		}
 
         private void ProcessLinkThings(IEnumerable<Link> links)
         {

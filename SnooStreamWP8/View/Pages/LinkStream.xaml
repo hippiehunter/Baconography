@@ -75,7 +75,8 @@
                     <telerikPrimitives:RadPaginationControl Grid.Row="0" PageProvider="{Binding ElementName=albumSlideView}" DisplayMode="IndexLabel"/>
                     <telerikPrimitives:RadSlideView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}" Orientation="Vertical" IsLoopingEnabled="True" AdjacentItemsPreviewMode="None" 
                                                     IsPullToRefreshEnabled="False" ItemRealizationMode="ViewportItem" ItemTemplateSelector="{StaticResource imageSelector}" 
-                                                    Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"/>
+                                                    Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
+                                                    Loaded="albumSlideView_Loaded" Unloaded="albumSlideView_Unloaded"/>
                 </Grid>
             </DataTemplate>
 
@@ -86,7 +87,8 @@
             <DataTemplate x:Name="loadingTemplate">
                 <Grid>
                     <telerikPrimitives:RadBusyIndicator
-                        IsRunning="{Binding IsInitiallyLoaded}" Visibility="{Binding IsInitiallyLoaded, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>
+                        IsRunning="{Binding IsInitiallyLoaded, Converter={StaticResource invertedBooleanConverter}}"
+                        Content="{Binding Underlying.PreviewLoadPercent}"/>
                     <selectors:ContentTemplateSelector Content="{Binding Underlying}"
                                                        IsLoaded="{Binding IsInitiallyLoaded}"
                                                        Visibility="{Binding IsInitiallyLoaded, Converter={StaticResource booleanVisibilityConverter}}"
@@ -122,11 +124,11 @@
             <telerikPrimitives:RadSlideView x:Name="radSlideView" SelectedItem="{Binding SelectedItem, ElementName=linkStream, Mode=TwoWay}" ItemsSource="{Binding Links, ElementName=linkStream}" AdjacentItemsPreviewMode="None" IsPullToRefreshEnabled="False" 
                                             Orientation="Horizontal" IsLoopingEnabled="False" OverlayContentTemplate="{StaticResource overlayTemplate}" IsShowOverlayContentOnTapEnabled="True"
                                             ItemRealizationMode="ViewportItem"  ItemTemplate="{StaticResource loadingTemplate}" DoubleTap="radSlideView_DoubleTap" ManipulationStarted="radSlideView_ManipulationStarted"
-                                            ManipulationCompleted="radSlideView_ManipulationCompleted" ManipulationDelta="radSlideView_ManipulationDelta">
+                                            ManipulationCompleted="radSlideView_ManipulationCompleted" ManipulationDelta="radSlideView_ManipulationDelta" >
             </telerikPrimitives:RadSlideView>
             
         </Grid>
-        <!-- TODO: it seems like sometimes images get rendered under this -->
+        <!-- TODO: change positioning in landscape -->
         <local:ExtendedAppBarControl Name="appBar" Grid.Row="1" DataContext="{Binding SelectedItem.Context, ElementName=radSlideView}" LastButtonSymbol="&#xE118;" LastButtonText="Save"/>
     </Grid>
 

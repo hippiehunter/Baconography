@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
@@ -42,26 +43,22 @@ namespace SnooStream.ViewModel
                 data[5] == 0x61;   // a
         }
 
-       
 
-        private async Task<byte[]> LoadImage()
+
+		private async Task<byte[]> LoadImage(Action<int> progress, CancellationToken cancelToken)
         {
             byte[] bytes = null;
-            await SnooStreamViewModel.NotificationService.ReportWithProgress("loading from " + Domain,
-                async (report) =>
-                {
-                    bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(Url, (progress) => report(PreviewLoadPercent = progress), SnooStreamViewModel.UIContextCancellationToken);
-                    if (bytes != null && bytes.Length > 6) //minimum to identify the image type
-                    {
-                        IsGif = CheckGif(bytes);
-                    }
-                });
+			bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(Url, progress, cancelToken);
+            if (bytes != null && bytes.Length > 6) //minimum to identify the image type
+            {
+                IsGif = CheckGif(bytes);
+            }
             return bytes;
         }
 
-        internal override async Task LoadContent()
+		internal override async Task LoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken)
         {
-            ImageSource = new ImageSource(Url, await LoadImage());
+			ImageSource = new ImageSource(Url, await LoadImage(progress, cancelToken));
             Preview = new PreviewImageSource(ImageSource);
         }
     }

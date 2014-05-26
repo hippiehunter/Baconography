@@ -89,9 +89,12 @@ namespace SnooStream.Common
 
         public void SetMajorContext(string loadContext)
         {
-            _majorContext = loadContext;
-            lock (this)
-                _minorContexts.Clear();
+			if (_majorContext != loadContext)
+			{
+				_majorContext = loadContext;
+				lock (this)
+					_minorContexts.Clear();
+			}
         }
 
         public void SetMinorContext(string loadContext)

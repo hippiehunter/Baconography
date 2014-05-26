@@ -24,5 +24,6 @@ namespace SnooStream.Services
         bool IsHighPriorityNetworkOk { get; }
 		void ShowProgress(string notificationText, double progressPercent);
 		void HideProgress();
+		void QueueNonCriticalUI(Action action);
 	}
 }

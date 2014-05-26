@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SnooStream.Common;
+using System.Threading;
 
 namespace SnooStream.ViewModel
 {
@@ -23,10 +24,12 @@ namespace SnooStream.ViewModel
                 PreviewText = NBoilerpipePortable.Util.HttpUtility.HtmlDecode(contextLink.Title).Replace("\t", "").Replace("\n", "");
                 if (!string.IsNullOrWhiteSpace(contextLink.Thumbnail))
                     PreviewImage = contextLink.Thumbnail;
+
+				LoadContextToken = contextLink.Url;
             }
         }
 
-        public Task BeginLoad(bool highPriority)
+		public Task BeginLoad(CancellationToken cancelToken)
         {
             if (ContentLoadTask == null)
             {
@@ -35,55 +38,115 @@ namespace SnooStream.ViewModel
                     if (ContentLoadTask == null)
                     {
                         Loading = true;
-                        ContentLoadTask = LoadContent().ContinueWith((tsk) => 
-                            {
-                                var tskResult = tsk.WasSuccessfull();
-                                if (tskResult)
-                                {
-                                    Loaded = true;
-                                    Loading = false;
+						ContentLoadTask = SnooStreamViewModel.NotificationService.ReportWithProgress(LoadText, async (report) =>
+							{
+								try
+								{
+									if (HasPreview)
+									{
+										await SnooStreamViewModel.LoadQueue.QueueLoadItem(LoadContextToken, LoadContextType.Minor, async () =>
+											{
+												var error = await ErrorControlledLoadContent(true, (progress) => report(PreviewLoadPercent = progress), cancelToken);
+												if (error != null)
+												{
+													Errored = true;
+													Error = error.ToString();
+												}
+											});
+									}
 
-                                    RaisePropertyChanged("Loaded");
-                                    RaisePropertyChanged("Loading");
-                                    RaisePropertyChanged("Content");
-                                }
-                                else
-                                {
-                                    Errored = true;
-                                    Error = tsk.Exception.ToString();
-                                    RaisePropertyChanged("Errored");
-                                    RaisePropertyChanged("Error");
-                                }
-                            }, SnooStreamViewModel.UIScheduler);
+									var mainLoadTask = SnooStreamViewModel.LoadQueue.QueueLoadItem(LoadContextToken, LoadContextType.Minor, async () =>
+									{
+										var error = await ErrorControlledLoadContent(false, !HasPreview ? report : (progress) => report(PreviewLoadPercent = progress), cancelToken);
+										if (error != null)
+										{
+											Errored = true;
+											Error = error.ToString();
+										}
+									});
+
+									if (!HasPreview)
+										await mainLoadTask;
+
+								}
+								catch (Exception ex)
+								{
+									Errored = true;
+									Error = ex.ToString();
+								}
+							});
+
+						ContentLoadTask.ContinueWith((tsk) =>
+						{
+							var tskResult = tsk.WasSuccessfull() && !Errored;
+							if (tskResult)
+							{
+								Loaded = true;
+								Loading = false;
+
+								RaisePropertyChanged("Loaded");
+								RaisePropertyChanged("Loading");
+								RaisePropertyChanged("Content");
+							}
+							else if (tsk.Exception != null)
+							{
+								Errored = true;
+								Error = tsk.Exception.ToString();
+								RaisePropertyChanged("Errored");
+								RaisePropertyChanged("Error");
+							}
+							else
+							{
+								RaisePropertyChanged("Errored");
+								RaisePropertyChanged("Error");
+							}
+						}, SnooStreamViewModel.UIScheduler);
                     }
                 }
             }
             return ContentLoadTask;
         }
 
-        public async Task BeginPreviewLoad()
-        {
-            if (SnooStreamViewModel.Settings.HeavyPreview)
-            {
-                await BeginLoad(false);
-            }
-            else if (Loaded || Loading)
-            {
-                await ContentLoadTask;
-            }
-        }
-
         Task ContentLoadTask { get; set; }
-        internal abstract Task LoadContent();
+		internal abstract Task LoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken);
+		internal async Task<Exception> ErrorControlledLoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken)
+		{
+			try
+			{
+				cancelToken.ThrowIfCancellationRequested();
+				await LoadContent(previewOnly, progress, cancelToken);
+			}
+			catch (Exception ex)
+			{
+				return ex;
+			}
+			return null;
+		}
+
+		protected virtual bool HasPreview { get { return false; } }
+
         public ViewModelBase Context { get; private set; }
         public bool Loaded { get; set; }
         public bool Loading { get; set; }
-        public int PreviewLoadPercent { get; set; }
+		private int _previewLoadPercent = 0;
+		public int PreviewLoadPercent
+		{
+			get
+			{
+				return _previewLoadPercent;
+			}
+			set
+			{
+				_previewLoadPercent = value;
+				SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() => RaisePropertyChanged("PreviewLoadPercent"));
+			}
+		}
         public string PreviewText { get; set; }
         public object PreviewImage { get; set; } //might be a url, or might be a previewImageSource
         public string Error { get; set; }
         public bool Errored { get; set; }
 		public string LoadContextToken { get; set; }
+		public string LoadText { get; set; }
 
     }
 }

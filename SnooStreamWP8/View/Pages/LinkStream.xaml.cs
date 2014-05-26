@@ -98,24 +98,13 @@ namespace SnooStreamWP8.View.Pages
                 return;
             }
             LoadingContentViewModel loadingVM;
-            Task fullyLoaded;
             if (link.Content != null)
             {
                 loadingVM = new LoadingContentViewModel(link.Content);
-                fullyLoaded = link.Content.BeginLoad(true);
             }
             else
             {
                 loadingVM = new LoadingContentViewModel(link.AsyncContent, link != null ? link : DataContext as GalaSoft.MvvmLight.ViewModelBase);
-                fullyLoaded = link.AsyncContent.ContinueWith(tsk => 
-                    {
-                        if(tsk.Status == TaskStatus.RanToCompletion)
-                        {
-                            return tsk.Result.BeginLoad(true);
-                        }
-                        else
-                            return Task.FromResult<bool>(false);
-                    });
             }
 
             if (first)
@@ -144,6 +133,7 @@ namespace SnooStreamWP8.View.Pages
 
 			if (SelectedItem != null)
 			{
+				SnooStreamViewModel.LoadQueue.SetPrimaryLoadContext(SelectedItem.LoadContextToken);
 			}
 
             if(Links.Count > 0 && !_loading)
@@ -251,5 +241,33 @@ namespace SnooStreamWP8.View.Pages
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+		SlideViewItem currentAlbumItem;
+		private void albumSlideView_Loaded(object sender, RoutedEventArgs e)
+		{
+			((IPageProvider)sender).CurrentIndexChanged += albumSlideViewIndexChanged;
+		}
+
+		private void albumSlideView_Unloaded(object sender, RoutedEventArgs e)
+		{
+			((IPageProvider)sender).CurrentIndexChanged -= albumSlideViewIndexChanged;
+			if (currentAlbumItem != null)
+			{
+				currentAlbumItem.Content = null;
+				currentAlbumItem = null;
+			}
+		}
+
+		private void albumSlideViewIndexChanged(object sender, EventArgs e)
+		{
+			if (currentAlbumItem != null)
+			{
+				currentAlbumItem.Content = null;
+				currentAlbumItem = null;
+			}
+			if (((RadSlideView)sender).SelectedItemContainer != null)
+			{
+				currentAlbumItem = ((RadSlideView)sender).SelectedItemContainer;
+			}
+		}
     }
 }

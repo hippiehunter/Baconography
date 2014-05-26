@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
@@ -36,7 +37,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        internal override async Task LoadContent()
+		internal override async Task LoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken)
         {
             var videoResult = await VideoAquisition.GetPlayableStreams(Url, SnooStreamViewModel.SystemServices.SendGet);
             if (videoResult != null)
@@ -46,15 +47,12 @@ namespace SnooStream.ViewModel
 				{
 					SelectedStream = AvailableStreams[0].Item1;
 				}
-                await SnooStreamViewModel.NotificationService.ReportWithProgress("loading from youtube",
-                    async (report) =>
-                    {
-                        var bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(videoResult.PreviewUrl, (progress) => report(PreviewLoadPercent = progress), SnooStreamViewModel.UIContextCancellationToken);
-                        if (bytes != null && bytes.Length > 6) //minimum to identify the image type
-                        {
-                            Preview = new ImageSource(videoResult.PreviewUrl, bytes);
-                        }
-                    });
+
+				var bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(videoResult.PreviewUrl, progress, cancelToken);
+                if (bytes != null && bytes.Length > 6) //minimum to identify the image type
+                {
+                    Preview = new ImageSource(videoResult.PreviewUrl, bytes);
+                }
             }
         }
     }

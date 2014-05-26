@@ -38,7 +38,6 @@
     <Compile Include="Common\CacheStore.cs" />
     <Compile Include="Common\CaptchaService.cs" />
     <Compile Include="Common\ImageSource.cs" />
-    <Compile Include="Common\LinkStreamPreviewEnumerator.cs" />
     <Compile Include="Common\NeverEndingRedditEnumerator.cs" />
     <Compile Include="Common\NotificationService.cs" />
     <Compile Include="Common\TaskExtensions.cs" />
@@ -65,6 +64,7 @@
     <Compile Include="Services\IUserCredentialService.cs" />
     <Compile Include="ViewModel\AboutUserViewModel.cs" />
     <Compile Include="ViewModel\CaptchaViewModel.cs" />
+    <Compile Include="ViewModel\ErrorContentViewModel.cs" />
     <Compile Include="ViewModel\LoadFullCommentsViewModel.cs" />
     <Compile Include="ViewModel\LoadingContentViewModel.cs" />
     <Compile Include="ViewModel\MoreViewModel.cs" />
@@ -78,7 +78,6 @@
     <Compile Include="ViewModel\CommentViewModel.cs" />
     <Compile Include="ViewModel\ContentSettingsViewModel.cs" />
     <Compile Include="ViewModel\ContentViewModel.cs" />
-    <Compile Include="ViewModel\ErrorContentViewModel.cs" />
     <Compile Include="ViewModel\ImageViewModel.cs" />
     <Compile Include="ViewModel\InternalRedditContentViewModel.cs" />
     <Compile Include="ViewModel\LinkStreamViewModel.cs" />

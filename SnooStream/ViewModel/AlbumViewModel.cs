@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
@@ -24,7 +25,7 @@ namespace SnooStream.ViewModel
                 throw new Exception(string.Format("Invalid Album {0}", originalUrl));
         }
 
-        private async void LoadAlbumImpl()
+		private async Task LoadAlbumImpl(Action<int> progress, CancellationToken cancelToken)
         {
             int i = 0;
             foreach (var tpl in ApiResults)
@@ -35,7 +36,7 @@ namespace SnooStream.ViewModel
                     //make sure we havent already loaded this image
 					if (Images.Count <= i)
 					{
-						if (await LoadImageImpl(tpl.Item1, imageUri, false))
+						if (await LoadImageImpl(tpl.Item1, imageUri, false, progress, cancelToken))
 							i++;
 					}
 					else
@@ -44,33 +45,27 @@ namespace SnooStream.ViewModel
                 
             }
         }
-        private async Task<bool> LoadImageImpl(string title, Uri source, bool isPreview)
+		private async Task<bool> LoadImageImpl(string title, Uri source, bool isPreview, Action<int> progress, CancellationToken cancelToken)
         {
             bool loadedOne = false;
-            await SnooStreamViewModel.NotificationService.ReportWithProgress("loading from " + source.Host,
-                async (report) =>
+			var bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(source.ToString(), progress, cancelToken);
+            if (bytes != null && bytes.Length > 6) //minimum to identify the image type
+            {
+                loadedOne = true;
+				await Task.Factory.StartNew(() =>
                 {
-                    var bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(source.ToString(),
-                        isPreview ? (progress) => report(PreviewLoadPercent = progress) : report, 
-                        SnooStreamViewModel.UIContextCancellationToken);
-                    if (bytes != null && bytes.Length > 6) //minimum to identify the image type
-                    {
-                        loadedOne = true;
-						await Task.Factory.StartNew(() =>
-                        {
-							var madeImageVm = new ImageViewModel(this, source.ToString(), title, new ImageSource(source.ToString(), bytes), bytes);
+					var madeImageVm = new ImageViewModel(this, source.ToString(), title, new ImageSource(source.ToString(), bytes), bytes);
 
-							if (Images.Any(img => ((ImageViewModel)img).Url == source.ToString()))
-							{
-								
-							}
-							else
-							{
-								Images.Add(madeImageVm);
-							}
-						}, SnooStreamViewModel.UIContextCancellationToken, TaskCreationOptions.None, SnooStreamViewModel.UIScheduler);	
-                    }
-                });
+					if (Images.Any(img => ((ImageViewModel)img).Url == source.ToString()))
+					{
+						//ignore duplicates (Shouldnt get here, need to investigate how it happens)		
+					}
+					else
+					{
+						Images.Add(madeImageVm);
+					}
+				}, cancelToken, TaskCreationOptions.None, SnooStreamViewModel.UIScheduler);	
+            }
             return loadedOne;
         }
 
@@ -82,15 +77,23 @@ namespace SnooStream.ViewModel
         public string Title { get; private set; }
         public PreviewImageSource Preview { get; private set; }
 
-        internal override async Task LoadContent()
+		protected override bool HasPreview
+		{
+			get
+			{
+				return ApiResults.Count() > 1;
+			}
+		}
+
+		internal override async Task LoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken)
         {
-            var firstImage = ApiResults.First();
-            var addResult = await LoadImageImpl(firstImage.Item1, new Uri(firstImage.Item2), true);
-            if (addResult)
-            {
-                //Preview = Images.First().Preview;
-            }
-            LoadAlbumImpl();
+			if (previewOnly)
+			{
+				var firstImage = ApiResults.First();
+				var addResult = await LoadImageImpl(firstImage.Item1, new Uri(firstImage.Item2), true, progress, cancelToken);
+			}
+			else
+				await LoadAlbumImpl(progress, cancelToken);
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Net;
+using System.Threading;
 
 namespace SnooStream.ViewModel
 {
@@ -29,7 +30,7 @@ namespace SnooStream.ViewModel
             WebParts = new ObservableCollection<object>();
         }
 
-        internal override async Task LoadContent()
+		internal override async Task LoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken)
         {
             using(var handler = new HttpClientHandler { CookieContainer = new System.Net.CookieContainer() })
             {
@@ -41,73 +42,69 @@ namespace SnooStream.ViewModel
                 using (var client = new HttpClient(handler))
                 {
                     var linkContext = Context as LinkViewModel;
-                    await LoadFully(client, Url, linkContext != null ? linkContext.Link.Name : null);
+                    await LoadFully(progress, cancelToken, client, Url, linkContext != null ? linkContext.Link.Name : null);
                 }
             }
         }
 
-        private async Task LoadFully(HttpClient httpService, string url, string linkId)
+        private async Task LoadFully(Action<int> progress, CancellationToken cancelToken, HttpClient httpService, string url, string linkId)
         {
             var source = new Uri(url);
 
-            await SnooStreamViewModel.NotificationService.ReportWithProgress("loading from " + source.Host,
-                async (report) =>
+            string nextUrl = url;
+
+            int i = 0;
+            //max out at 8 pages so we dont run forever on wierd page designs
+            while (!string.IsNullOrEmpty(nextUrl) && i++ < 8)
+            {
+                List<object> result = new List<object>();
+                var loadResult = await LoadOneImpl(httpService, nextUrl, result);
+
+                //need to do these things on the UI thread since we're trying to trigger a UI response
+                await Task.Factory.StartNew(() =>
                 {
-                    string nextUrl = url;
-
-                    int i = 0;
-                    //max out at 8 pages so we dont run forever on wierd page designs
-                    while (!string.IsNullOrEmpty(nextUrl) && i++ < 8)
+                    if (Title == null)
                     {
-                        List<object> result = new List<object>();
-                        var loadResult = await LoadOneImpl(httpService, nextUrl, result);
-
-                        //need to do these things on the UI thread since we're trying to trigger a UI response
-                        await Task.Factory.StartNew(() =>
-                        {
-                            if (Title == null)
-                            {
-                                Title = loadResult.Item2;
-                                RaisePropertyChanged("Title");
-                            }
-                            bool hasImage = false;
-                            bool hasText = false;
-
-                            foreach (var item in result)
-                            {
-                                if (item is ReadableArticleImage)
-                                    hasImage = true;
-                                else if (item is ReadableArticleParagraph)
-                                    hasText = true;
-
-                                WebParts.Add(item);
-                            }
-
-                            if (i == 0)
-                            {
-                                NoPreview = (!hasImage && !hasText);
-                                TextPreview = (!hasImage && hasText);
-                                ImagePreview = hasImage;
-                                NotText = !hasText;
-
-                                RaisePropertyChanged("NoPreview");
-                                RaisePropertyChanged("TextPreview");
-                                RaisePropertyChanged("ImagePreview");
-                                RaisePropertyChanged("NotText");
-
-                                if (hasText)
-                                    PreviewText = (WebParts.FirstOrDefault(part => part is ReadableArticleParagraph) as ReadableArticleParagraph).Text;
-                                
-                                if (hasImage)
-                                    PreviewImage = (WebParts.FirstOrDefault(part => part is ReadableArticleImage) as ReadableArticleImage).Url;
-                            }
-
-                            report(i * 10);
-                        }, SnooStreamViewModel.UIContextCancellationToken, TaskCreationOptions.None, SnooStreamViewModel.UIScheduler);
-
-                        nextUrl = loadResult.Item1;
+                        Title = loadResult.Item2;
+                        RaisePropertyChanged("Title");
                     }
-                });
+                    bool hasImage = false;
+                    bool hasText = false;
+
+                    foreach (var item in result)
+                    {
+                        if (item is ReadableArticleImage)
+                            hasImage = true;
+                        else if (item is ReadableArticleParagraph)
+                            hasText = true;
+
+                        WebParts.Add(item);
+                    }
+
+                    if (i == 0)
+                    {
+                        NoPreview = (!hasImage && !hasText);
+                        TextPreview = (!hasImage && hasText);
+                        ImagePreview = hasImage;
+                        NotText = !hasText;
+
+                        RaisePropertyChanged("NoPreview");
+                        RaisePropertyChanged("TextPreview");
+                        RaisePropertyChanged("ImagePreview");
+                        RaisePropertyChanged("NotText");
+
+                        if (hasText)
+                            PreviewText = (WebParts.FirstOrDefault(part => part is ReadableArticleParagraph) as ReadableArticleParagraph).Text;
+                                
+                        if (hasImage)
+                            PreviewImage = (WebParts.FirstOrDefault(part => part is ReadableArticleImage) as ReadableArticleImage).Url;
+                    }
+
+					progress(i * 10);
+                }, SnooStreamViewModel.UIContextCancellationToken, TaskCreationOptions.None, SnooStreamViewModel.UIScheduler);
+
+                nextUrl = loadResult.Item1;
+            }
         }
 
         private static async Task<Tuple<string, string>> LoadOneImpl(HttpClient httpClient, string url, IList<Object> target)
