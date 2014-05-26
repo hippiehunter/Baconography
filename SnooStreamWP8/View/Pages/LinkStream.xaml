@@ -22,7 +22,7 @@
                 <telerikSlideView:PanAndZoomImage 
                     ZoomMode="None" Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Unloaded="PanAndZoomImage_Unloaded" Loaded="PanAndZoomImage_Loaded"
-                    Source="{Binding Url}" />
+                    Source="{Binding ImageSource, Converter={StaticResource asyncImageSourceConverter}}" />
             </DataTemplate>
 
             <DataTemplate x:Name="gifTemplate">
