@@ -113,12 +113,18 @@ namespace SnooStreamWP8
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+			SnooStreamViewModel.NavigationService = new SnooStreamWP8.PlatformServices.NavigationService(RootFrame, null);
         }
 
         // Code to execute when the application is activated (brought to foreground)
         // This code will not execute when the application is first launched
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
+			var snooStream = Resources["SnooStream"] as SnooStreamViewModel;
+			if (snooStream != null)
+			{
+				SnooStreamViewModel.NavigationService = new SnooStreamWP8.PlatformServices.NavigationService(RootFrame, snooStream.GetNavigationBlob());
+			}
         }
 
         // Code to execute when the application is deactivated (sent to background)
@@ -126,7 +132,7 @@ namespace SnooStreamWP8
         private void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
             var snooStream = Resources["SnooStream"] as SnooStreamViewModel;
-            snooStream.DumpInitBlob();
+			snooStream.DumpInitBlob(((SnooStreamWP8.PlatformServices.NavigationService)SnooStreamViewModel.NavigationService).DumpState());
         }
 
         // Code to execute when the application is closing (eg, user hit Back)
@@ -192,7 +198,6 @@ namespace SnooStreamWP8
 
             // Ensure we don't initialize again
             phoneApplicationInitialized = true;
-            SnooStreamViewModel.NavigationService = new SnooStreamWP8.PlatformServices.NavigationService(RootFrame, null);
         }
 
         // Do not add any additional code to this method

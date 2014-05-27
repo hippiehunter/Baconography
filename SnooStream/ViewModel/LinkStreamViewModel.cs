@@ -47,7 +47,7 @@ namespace SnooStream.ViewModel
 
         public Lazy<NeverEndingRedditEnumerator> LoadPrior { get; private set; }
 
-
+		public ContentViewModel Visible { get; set; }
         public LinkViewModel Current { get; private set; }
 
         public async Task<bool> MoveNext()

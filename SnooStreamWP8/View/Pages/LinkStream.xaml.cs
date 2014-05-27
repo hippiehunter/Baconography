@@ -46,7 +46,11 @@ namespace SnooStreamWP8.View.Pages
             }
         }
 
-        public ContentViewModel SelectedItem { get; set; }
+		public ContentViewModel SelectedItem
+		{
+			get { return ((LinkStreamViewModel)DataContext).Visible; }
+			set { ((LinkStreamViewModel)DataContext).Visible = value; }
+		}
 
         bool _loading = false;
 

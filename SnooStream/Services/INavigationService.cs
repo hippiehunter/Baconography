@@ -25,7 +25,7 @@ namespace SnooStream.Services
         Task<bool> ShowPopup(ViewModelBase viewModel);
         void GoBack();
 
-        object GetState(String guid);
+        ViewModelBase GetState(String guid);
         void RemoveState(String guid);
 
         

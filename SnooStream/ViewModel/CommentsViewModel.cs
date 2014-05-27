@@ -65,6 +65,17 @@ namespace SnooStream.ViewModel
             ProcessUrl(url);
         }
 
+		public CommentsViewModel(ViewModelBase context, Listing comments, string url)
+		{
+			_context = context;
+			Link = _context as LinkViewModel;
+			_loadFullSentinel = new LoadFullCommentsViewModel(this);
+			FlatComments = new ObservableCollection<ViewModelBase>();
+			ProcessUrl(url);
+			_loadFullTask = new Lazy<Task>(() => Task.FromResult(true));
+			LoadDump(comments);
+		}
+
 		public Action<Object> ViewHack {get; set;}
 
 		public CommentViewModel GetById (string id)
@@ -535,6 +546,23 @@ namespace SnooStream.ViewModel
             });
             return flatChildren;
         }
+
+		public Listing DumpListing()
+		{
+			return DumpListing(_firstChild);
+		}
+
+		public void LoadDump(Listing comments)
+		{
+			List<ViewModelBase> flatChildren = new List<ViewModelBase>();
+			var firstChild = comments.Data.Children.FirstOrDefault(thing => thing.Data is Comment);
+			if (firstChild == null)
+				return;
+			_commentOriginStack.Add(CommentOriginType.New);
+			MergeComments(null, comments.Data.Children, 0);
+			InsertIntoFlatList(((Comment)firstChild.Data).Id, flatChildren);
+			FlatComments = new ObservableCollection<ViewModelBase>(flatChildren);
+		}
 
         private Listing DumpListing(string firstChild)
         {

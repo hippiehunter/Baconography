@@ -17,6 +17,7 @@ namespace SnooStream.Common
         //original linkid, url, date first seen
         public List<Tuple<string, string, DateTime>> LockscreenImages { get; set; }
         public List<Tuple<string, string, DateTime>> LiveTileImages { get; set; }
+		public string NavigationBlob { get; set; }
     }
 
     public class SelfInit

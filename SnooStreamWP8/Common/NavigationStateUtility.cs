@@ -12,24 +12,28 @@ namespace SnooStreamWP8.Common
 {
     class NavigationStateUtility
     {
-        Dictionary<string, object> _navState;
+		Dictionary<string, ViewModelBase> _navState;
+		Stack<string> _navStateInsertionOrder;
         
         public NavigationStateUtility(string existingState)
         {
-            _navState = new Dictionary<string, object>();
-            
+			_navState = new Dictionary<string, ViewModelBase>();
+			_navStateInsertionOrder = new Stack<string>();
             if (!string.IsNullOrEmpty(existingState))
             {
                 var serializedItems = JsonConvert.DeserializeObject<Dictionary<string, string>>(existingState);
+				ViewModelBase context = null;
                 foreach (var item in serializedItems)
                 {
-                    _navState.Add(item.Key, RestoreStateItem(item.Value));
+					context = RestoreStateItem(item.Value, context) as ViewModelBase;
+					_navState.Add(item.Key, context);
+					_navStateInsertionOrder.Push(item.Key);
                 }
             }
             
         }
 
-        public string AddState(object state)
+        public string AddState(ViewModelBase state)
         {
             var guid = Uri.EscapeDataString(Guid.NewGuid().ToString());
             _navState.Add(guid, state);
@@ -52,12 +56,12 @@ namespace SnooStreamWP8.Common
             return ViewModelDumpUtility.Dump(state as ViewModelBase);
         }
 
-        private object RestoreStateItem(string state)
+		private ViewModelBase RestoreStateItem(string state, ViewModelBase context)
         {
-            return ViewModelDumpUtility.LoadFromDump(state);
+			return ViewModelDumpUtility.LoadFromDump(state, context);
         }
 
-        public object this[string guid]
+        public ViewModelBase this[string guid]
         {
             get
             {
@@ -65,7 +69,7 @@ namespace SnooStreamWP8.Common
             }
         }
 
-        public static object GetDataContext(string query, out string stateGuid)
+		public static ViewModelBase GetDataContext(string query, out string stateGuid)
         {
             stateGuid = null;
 

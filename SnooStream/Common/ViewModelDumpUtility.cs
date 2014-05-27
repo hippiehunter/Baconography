@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using Newtonsoft.Json;
+using SnooSharp;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace SnooStream.Common
 {
     public class ViewModelDumpUtility
     {
-        public static ViewModelBase LoadFromDump(string dump)
+        public static ViewModelBase LoadFromDump(string dump, ViewModelBase context)
         {
             var stateItem = JsonConvert.DeserializeObject<Tuple<string, string>>(dump);
             switch (stateItem.Item1)
@@ -21,6 +22,15 @@ namespace SnooStream.Common
                         var dumpArgs = JsonConvert.DeserializeObject<Tuple<bool, SnooSharp.Subreddit, string, List<SnooSharp.Link>>>(stateItem.Item2);
                         return new LinkRiverViewModel(dumpArgs.Item1, dumpArgs.Item2, dumpArgs.Item3, dumpArgs.Item4);
                     }
+				case "LinkStreamViewModel":
+					{
+						return new LinkStreamViewModel(context, stateItem.Item2);
+					}
+				case "CommentsViewModel":
+					{
+						var dumpArgs = JsonConvert.DeserializeObject<Tuple<Listing, string>>(stateItem.Item2);
+						return new CommentsViewModel(context, dumpArgs.Item1, dumpArgs.Item2);
+					}
                 default:
                     throw new InvalidOperationException();
             }
@@ -34,8 +44,18 @@ namespace SnooStream.Common
                 var serialized = JsonConvert.SerializeObject(Tuple.Create(linkRiver.IsLocal, linkRiver.Thing, linkRiver.Sort, linkRiver.Select(vm => vm.Link).ToList()));
                 return JsonConvert.SerializeObject(Tuple.Create("LinkRiverViewModel", serialized));
             }
-            else
-                throw new InvalidOperationException();
+			else if (viewModel is LinkStreamViewModel)
+			{
+				var linkStream = viewModel as LinkStreamViewModel;
+				return JsonConvert.SerializeObject(Tuple.Create("LinkStreamViewModel", ((LinkViewModel)linkStream.Visible.Context).Link.Id));
+			}
+			else if (viewModel is CommentsViewModel)
+			{
+				var comments = viewModel as CommentsViewModel;
+				return JsonConvert.SerializeObject(Tuple.Create("CommentsViewModel", JsonConvert.SerializeObject(Tuple.Create(comments.DumpListing(), comments.Link.Url))));
+			}
+			else
+				throw new InvalidOperationException();
         }
     }
 }

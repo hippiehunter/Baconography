@@ -106,7 +106,7 @@ namespace SnooStreamWP8.PlatformServices
         }
 
 
-        public object GetState(string guid)
+        public GalaSoft.MvvmLight.ViewModelBase GetState(string guid)
         {
             return _navState[guid];
         }

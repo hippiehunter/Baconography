@@ -132,12 +132,15 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public void DumpInitBlob()
+        public void DumpInitBlob(string navigationBlob = null)
         {
             _initializationBlob.Settings = Settings.Dump();
             _initializationBlob.Self = UserHub.Self.Dump();
+			_initializationBlob.NavigationBlob = navigationBlob;
             OfflineService.StoreInitializationBlob(_initializationBlob);
         }
+
+		public string GetNavigationBlob() {  return _initializationBlob.NavigationBlob; }
 
         public static TaskScheduler UIScheduler { get; set; }
     }
