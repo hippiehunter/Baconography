@@ -29,7 +29,7 @@ namespace SnooStream.Common
 				case "CommentsViewModel":
 					{
 						var dumpArgs = JsonConvert.DeserializeObject<Tuple<Listing, string>>(stateItem.Item2);
-						return new CommentsViewModel(context, dumpArgs.Item1, dumpArgs.Item2);
+						return new CommentsViewModel(context is LinkStreamViewModel ? ((LinkStreamViewModel)context).Current : null, dumpArgs.Item1, dumpArgs.Item2);
 					}
                 default:
                     throw new InvalidOperationException();

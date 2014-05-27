@@ -4,6 +4,7 @@ using SnooStream.Common;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,13 +22,13 @@ namespace SnooStreamWP8.Common
 			_navStateInsertionOrder = new Stack<string>();
             if (!string.IsNullOrEmpty(existingState))
             {
-                var serializedItems = JsonConvert.DeserializeObject<Dictionary<string, string>>(existingState);
+                var serializedItems = JsonConvert.DeserializeObject<Tuple<IEnumerable<string>, Dictionary<string, string>>>(existingState);
 				ViewModelBase context = null;
-                foreach (var item in serializedItems)
+                foreach (var item in serializedItems.Item1.Reverse())
                 {
-					context = RestoreStateItem(item.Value, context) as ViewModelBase;
-					_navState.Add(item.Key, context);
-					_navStateInsertionOrder.Push(item.Key);
+					context = RestoreStateItem(serializedItems.Item2[item], context) as ViewModelBase;
+					_navState.Add(item, context);
+					_navStateInsertionOrder.Push(item);
                 }
             }
             
@@ -37,18 +38,21 @@ namespace SnooStreamWP8.Common
         {
             var guid = Uri.EscapeDataString(Guid.NewGuid().ToString());
             _navState.Add(guid, state);
+			_navStateInsertionOrder.Push(guid);
             return guid;
         }
 
         public void RemoveState(string guid)
         {
             _navState.Remove(guid);
+			Debug.Assert(_navStateInsertionOrder.Peek() == guid);
+			_navStateInsertionOrder.Pop();
         }
 
         public string DumpState()
         {
             var dictionary = _navState.Select(kvp => new KeyValuePair<string, string>(kvp.Key, DumpStateItem(kvp.Value))).ToDictionary(kvp=> kvp.Key, kvp => kvp.Value);
-            return JsonConvert.SerializeObject(dictionary);
+            return JsonConvert.SerializeObject(Tuple.Create((IEnumerable<string>)_navStateInsertionOrder, dictionary));
         }
 
         private string DumpStateItem(object state)
