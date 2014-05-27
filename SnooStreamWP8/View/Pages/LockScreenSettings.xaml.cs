@@ -16,6 +16,32 @@ namespace SnooStreamWP8.View.Pages
 		public LockScreenSettings()
 		{
 			InitializeComponent();
+
 		}
+
+        public static readonly DependencyProperty IsLockScreenProviderProperty =
+            DependencyProperty.Register(
+                "IsLockScreenProvider", typeof(bool),
+                typeof(LockScreenSettings),
+                new PropertyMetadata(false)
+            );
+
+        public bool IsLockScreenProvider
+        {
+            get
+            {
+                return Windows.Phone.System.UserProfile.LockScreenManager.IsProvidedByCurrentApplication;
+            }
+            set { SetValue(IsLockScreenProviderProperty, value); }
+        }
+
+
+        public bool IsLockScreenProvider1
+        {
+            get
+            {
+                return Windows.Phone.System.UserProfile.LockScreenManager.IsProvidedByCurrentApplication;
+            }
+        }
 	}
 }

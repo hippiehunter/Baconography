@@ -1,37 +1,153 @@
 ﻿<common:SnooApplicationPage
-    x:Class="SnooStreamWP8.View.Pages.LockScreenSettings"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
     xmlns:local="clr-namespace:SnooStreamWP8.View.Controls"
     xmlns:common="clr-namespace:SnooStreamWP8.Common"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
+    xmlns:Primitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone"
+    x:Class="SnooStreamWP8.View.Pages.LockScreenSettings"
     SupportedOrientations="Portrait" Orientation="Portrait"
     mc:Ignorable="d"
     shell:SystemTray.IsVisible="True">
+    <common:SnooApplicationPage.Resources>
+        <DataTemplate x:Key="RadToggleContent">
+            <Grid>
+                <TextBlock Margin="0,0,0,0"
+                           Text="{Binding Converter={StaticResource stringToUpperConverter}}"
+                           FontSize="{StaticResource PhoneFontSizeLarge}"
+                           FontFamily="{StaticResource PhoneFontFamilySemiBold}">
+                    
+                </TextBlock>
+            </Grid>
+        </DataTemplate>
+    </common:SnooApplicationPage.Resources>
 
-    <!--LayoutRoot is the root grid where all page content is placed-->
+    <common:SnooApplicationPage.FontFamily>
+        <StaticResource ResourceKey="PhoneFontFamilyNormal"/>
+    </common:SnooApplicationPage.FontFamily>
+    <common:SnooApplicationPage.FontSize>
+        <StaticResource ResourceKey="PhoneFontSizeNormal"/>
+    </common:SnooApplicationPage.FontSize>
+    <common:SnooApplicationPage.Foreground>
+        <StaticResource ResourceKey="PhoneForegroundBrush"/>
+    </common:SnooApplicationPage.Foreground>
     <Grid x:Name="LayoutRoot" Background="Transparent">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+
+        <phone:Pivot Title="LOCK SCREEN">
+            <phone:Pivot.HeaderTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <TextBlock
+                            Text="{Binding}" FontSize="{StaticResource PhoneFontSizeLarge}"
+                                   FontFamily="{StaticResource PhoneFontFamilyBold}"/>
+                    </Grid>
+                </DataTemplate>
+            </phone:Pivot.HeaderTemplate>
+            <phone:Pivot.TitleTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <TextBlock
+                            Text="{Binding}" FontSize="{StaticResource PhoneFontSizeSmall}"
+                            FontFamily="{StaticResource PhoneFontFamilySemiBold}"
+                            Margin="-3,0,0,2"/>
+                    </Grid>
+                </DataTemplate>
+            </phone:Pivot.TitleTemplate>
+            <phone:PivotItem Margin="0,0,0,24"
+				Header="SETTINGS">
+                <ScrollViewer Grid.Row="1" Margin="0,0,0,0" DataContext="{Binding Settings}">
+                    <StackPanel Margin="10,0,12,0">
+                        <Button BorderThickness="0"
+                                HorizontalContentAlignment="Left"
+                                Padding="0,0,0,0"
+                                Margin="0,0,0,0"
+                                Visibility="{Binding IsLockScreenProvider, ElementName=LayoutRoot, Converter={StaticResource invertedBooleanVisibilityConverter}}">
+                            <StackPanel>
+                                <TextBlock FontWeight="Bold"
+                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                                    SET LOCK SCREEN PROVIDER
+                                </TextBlock>
+                                <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                                    Let us take care of providing awesome lock screens
+                                </TextBlock>
+                            </StackPanel>
+                        </Button>
+                        <Button BorderThickness="0"
+                                HorizontalContentAlignment="Left"
+                                Padding="0,0,0,0"
+                                Margin="0,0,0,0"
+                                Visibility="{Binding IsLockScreenProvider, ElementName=LayoutRoot, Converter={StaticResource booleanVisibilityConverter}}">
+                            <StackPanel>
+                                <TextBlock FontWeight="Bold"
+                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                                    REFRESH
+                                </TextBlock>
+                                <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                                    Load up a new batch of lock screens on demand
+                                </TextBlock>
+                            </StackPanel>
+                        </Button>
+                        <telerikPrimitives:RadToggleSwitch Header="Allow NSFW (over 18) content"
+					        IsChecked="{Binding FredPlaceholder, Mode=TwoWay}" ContentTemplate="{StaticResource RadToggleContent}" />
+                        <telerikPrimitives:RadToggleSwitch Header="Only flipview unvisited content"
+					        IsChecked="{Binding OnlyFlipViewUnread, Mode=TwoWay}" ContentTemplate="{StaticResource RadToggleContent}" />
+                        <telerikPrimitives:RadToggleSwitch Header="Only flipview through images"
+					        IsChecked="{Binding OnlyFlipViewImages, Mode=TwoWay}" ContentTemplate="{StaticResource RadToggleContent}" />
+                        <telerikPrimitives:RadToggleSwitch Header="Visit web links in app"
+					        IsChecked="{Binding OptimizeWebContent, Mode=TwoWay}" ContentTemplate="{StaticResource RadToggleContent}" />
+
+                        <TextBlock FontWeight="SemiBold" Text="LAYOUT"/>
+                        <telerikPrimitives:RadToggleSwitch Header="Left-handed thumbnail layout"
+					        IsChecked="{Binding LeftHandedMode, Mode=TwoWay}" ContentTemplate="{StaticResource RadToggleContent}" />
+                        <telerikPrimitives:RadToggleSwitch Header="Use single-reddit layout"
+					        IsChecked="{Binding SimpleLayoutMode, Mode=TwoWay}" ContentTemplate="{StaticResource RadToggleContent}" />
+                        <telerikPrimitives:RadToggleSwitch Header="Enable one-touch voting"
+					        IsChecked="{Binding OneTouchVoteMode, Mode=TwoWay}" ContentTemplate="{StaticResource RadToggleContent}" />
+                        <telerikPrimitives:RadToggleSwitch Header="Tap title for comments"
+					        IsChecked="{Binding TapForComments, Mode=TwoWay}" ContentTemplate="{StaticResource RadToggleContent}" />
+                        <telerikPrimitives:RadToggleSwitch Header="Invert system theme"
+					        IsChecked="{Binding InvertSystemTheme, Mode=TwoWay}" ContentTemplate="{StaticResource RadToggleContent}" />
+                        <telerikPrimitives:RadToggleSwitch Header="Use multi-color comment margins"
+					        IsChecked="{Binding MultiColorCommentMargins, Mode=TwoWay}" ContentTemplate="{StaticResource RadToggleContent}" />
+
+
+                        <TextBlock FontWeight="SemiBold" Text="BACKGROUND"/>
+                        <telerikPrimitives:RadToggleSwitch Header="Disable background activity"
+					        IsChecked="{Binding DisableBackground, Mode=TwoWay}" />
+
+                        <telerikPrimitives:RadToggleSwitch Header="Predictive offline caching"
+					        IsChecked="{Binding AllowPredictiveOfflining, Mode=TwoWay}" />
+                        <telerikPrimitives:RadToggleSwitch Header="Overnight offline caching"
+					        IsChecked="{Binding EnableOvernightUpdates, Mode=TwoWay}" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="12,0,0,0" Text="Cleanup data every"/>
+                            <TextBlock Margin="6,0,0,0" Text="{Binding OfflineCacheDays}" />
+                            <TextBlock Margin="6,0,0,0" Text="days" />
+                        </StackPanel>
+                        <Slider Margin="0,0,0,0" Minimum="1" Maximum="7" Value="{Binding OfflineCacheDays, Mode=TwoWay}"/>
+                        <Button Margin="0,-12,0,0" Content="Clear Offline Data" Command="{Binding ClearOffline}"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </phone:PivotItem>
+            <phone:PivotItem Margin="24,12,12,12"
+				Header="PREVIEW">
+
+            </phone:PivotItem>
+        </phone:Pivot>
+
+        <!--<TextBlock Grid.Row="0" Margin="24,470,12,12"
+			FontWeight="Bold"
+			FontSize="36"
+			Text="LOCK SCREEN"
+			Foreground="{StaticResource PhoneSubtleBrush}"/>-->
+
 
         <!--TitlePanel contains the name of the application and page title-->
-        <StackPanel Grid.Row="0" Margin="12,17,0,28">
-            <TextBlock Text="MY APPLICATION" Style="{StaticResource PhoneTextNormalStyle}"/>
-            <TextBlock Text="page name" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
-        </StackPanel>
-
-        <!--ContentPanel - place additional content here-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-
-        </Grid>
     </Grid>
 
 </common:SnooApplicationPage>

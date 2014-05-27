@@ -10,11 +10,11 @@ namespace SnooStream.ViewModel
 {
     public class SettingsViewModel : ViewModelBase
     {
-        public PrimaryLiveTileViewModel PrimaryLiveTile { get; private set; }
-        public SecondaryLiveTileHubViewModel SecondaryLiveTileHub { get; private set; }
-        public LockScreenViewModel LockScreen { get; private set; }
-        public AppearanceSettingsViewModel LayoutSettings { get; private set; }
-        public ContentSettingsViewModel ContentSettings { get; private set; }
-        public Settings Settings { get; private set; }
+        public PrimaryLiveTileViewModel PrimaryLiveTile { get; set; }
+        public SecondaryLiveTileHubViewModel SecondaryLiveTileHub { get; set; }
+        public LockScreenViewModel LockScreen { get; set; }
+        public AppearanceSettingsViewModel LayoutSettings { get; set; }
+        public ContentSettingsViewModel ContentSettings { get; set; }
+        public Settings Settings { get; set; }
     }
 }

@@ -84,7 +84,8 @@ namespace SnooStreamWP8.PlatformServices
 
 		public void NavigateToLockScreenSettings(SettingsViewModel viewModel)
 		{
-			throw new NotImplementedException();
+            var url = string.Format("/View/Pages/LockScreenSettings.xaml?state={0}", _navState.AddState(viewModel));
+            _frame.Navigate(new Uri(url, UriKind.Relative));
 		}
 
         public Task<bool> ShowPopup(GalaSoft.MvvmLight.ViewModelBase viewModel)

@@ -33,6 +33,8 @@
         <converters:AsyncImageSourceConverter x:Key="asyncImageSourceConverter" />
         <common:SubredditGroupDescriptorSource x:Key="subredditGroupDescriptorSource" />
         <converters:BlankVisibilityConverter x:Key="blankVisibilityConverter" />
+        <converters:StringToUpperConverter x:Key="stringToUpperConverter" />
+        <converters:StringToLowerConverter x:Key="stringToLowerConverter" />
     </Application.Resources>
 
     <Application.ApplicationLifetimeObjects>

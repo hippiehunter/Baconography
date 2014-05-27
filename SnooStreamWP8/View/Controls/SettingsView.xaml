@@ -20,7 +20,7 @@
                         Tap="Content_Tap">
                     <StackPanel>
                         <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeLarge}">
+                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
                             CONTENT
                         </TextBlock>
                         <TextBlock Margin="0,-2,0,0"
@@ -36,7 +36,7 @@
                         Margin="0,0,0,-8">
                     <StackPanel>
                         <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeLarge}">
+                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
                             LAYOUT
                         </TextBlock>
                         <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
@@ -48,10 +48,11 @@
                 <Button BorderThickness="0"
                         HorizontalContentAlignment="Left"
                         Padding="0,0,0,0"
-                        Margin="0,0,0,-8">
+                        Margin="0,0,0,-8"
+                        Tap="LockScreen_Tap">
                     <StackPanel>
                         <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeLarge}">
+                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
                             LOCK SCREEN
                         </TextBlock>
                         <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
@@ -66,7 +67,7 @@
                         Margin="0,0,0,-8">
                     <StackPanel>
                         <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeLarge}">
+                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
                             LIVE TILE
                         </TextBlock>
                         <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
@@ -81,7 +82,7 @@
                         Margin="0,0,0,-8">
                     <StackPanel>
                         <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeLarge}">
+                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
                             OFFLINE DATA
                         </TextBlock>
                         <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
@@ -94,10 +95,29 @@
                         HorizontalContentAlignment="Left"
                         Padding="0,0,0,0"
                         Margin="0,0,0,-8"
-                        IsEnabled="False">
+                        Visibility="{Binding Settings.AllowAdvertising, Mode=TwoWay, Converter={StaticResource booleanVisibilityConverter}}"
+                        Tap="AdFreeUpgrade_Tap">
                     <StackPanel>
                         <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeLarge}">
+                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                            DISABLE ADS
+                        </TextBlock>
+                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}"
+                                   Foreground="{StaticResource PhoneSubtleBrush}">
+                            Remove the Ads for good
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+
+                <Button BorderThickness="0"
+                        HorizontalContentAlignment="Left"
+                        Padding="0,0,0,0"
+                        Margin="0,0,0,-8"
+                        IsEnabled="False"
+                        Visibility="{Binding Settings.AllowAdvertising, Mode=TwoWay, Converter={StaticResource invertedBooleanVisibilityConverter}}">
+                    <StackPanel>
+                        <TextBlock FontWeight="Bold"
+                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
                             THANK YOU!
                         </TextBlock>
                         <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}"

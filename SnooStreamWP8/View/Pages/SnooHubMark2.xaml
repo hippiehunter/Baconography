@@ -138,7 +138,7 @@
 
             <!--Panorama item two-->
             <phone:PanoramaItem Header="settings" Style="{StaticResource PanoramaItemStyle}"
-                                DataContext="{Binding Settings}">
+                                DataContext="{Binding SettingsHub}">
                 <Grid>
                     <local:SettingsView />
                 </Grid>

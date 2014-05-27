@@ -44,6 +44,7 @@ namespace SnooStream.ViewModel
             UserHub = new UserHubViewModel(_initializationBlob.Self);
             ModeratorHub = new ModeratorHubViewModel();
             SettingsHub = new SettingsViewModel();
+            SettingsHub.Settings = Settings;
             SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
             if (!IsInDesignMode)
             {
