@@ -215,8 +215,8 @@
     <Compile Include="View\Controls\SelfActivityView.xaml.cs">
       <DependentUpon>SelfActivityView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Controls\SettingsView.xaml.cs">
-      <DependentUpon>SettingsView.xaml</DependentUpon>
+    <Compile Include="View\Controls\HubSettingsView.xaml.cs">
+      <DependentUpon>HubSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Controls\SimpleLinkView.xaml.cs">
       <DependentUpon>SimpleLinkView.xaml</DependentUpon>
@@ -333,7 +333,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Controls\SettingsView.xaml">
+    <Page Include="View\Controls\HubSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -440,6 +440,10 @@
     <ProjectReference Include="..\SnooSharp\SnooSharp.csproj">
       <Project>{D9BAA749-5BBE-4DAE-B5EA-4D70DEF266FC}</Project>
       <Name>SnooSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SnooStreamWP8.BackgroundControls\SnooStreamWP8.BackgroundControls.csproj">
+      <Project>{01bbdfd9-2aef-4311-ad82-6be1e5ad1626}</Project>
+      <Name>SnooStreamWP8.BackgroundControls</Name>
     </ProjectReference>
     <ProjectReference Include="..\SnooStream\SnooStream.csproj">
       <Project>{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}</Project>
