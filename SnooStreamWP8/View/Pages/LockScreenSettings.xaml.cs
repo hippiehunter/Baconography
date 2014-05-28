@@ -51,5 +51,10 @@ namespace SnooStreamWP8.View.Pages
                 return Windows.Phone.System.UserProfile.LockScreenManager.IsProvidedByCurrentApplication;
             }
         }
+
+        private void SetLockScreenProvider_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+
+        }
 	}
 }

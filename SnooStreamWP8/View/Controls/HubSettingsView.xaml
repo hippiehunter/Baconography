@@ -4,6 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
+    xmlns:local="clr-namespace:SnooStreamWP8.View.Controls"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -13,115 +14,91 @@
     <Grid x:Name="LayoutRoot">
         <ScrollViewer>
             <StackPanel Margin="0,0,0,0">
-                <Button BorderThickness="0"
-                        HorizontalContentAlignment="Left"
-                        Padding="0,0,0,0"
+                <Button Style="{StaticResource SubtextButton}"
                         Margin="0,0,0,-8"
                         Tap="Content_Tap">
                     <StackPanel>
-                        <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             CONTENT
                         </TextBlock>
-                        <TextBlock Margin="0,-2,0,0"
-                            FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                             Choose what you see and when you see it
                         </TextBlock>
                     </StackPanel>
                 </Button>
 
-                <Button BorderThickness="0"
-                        HorizontalContentAlignment="Left"
-                        Padding="0,0,0,0"
+                <Button Style="{StaticResource SubtextButton}"
                         Margin="0,0,0,-8">
                     <StackPanel>
-                        <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             LAYOUT
                         </TextBlock>
-                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                             Change the way the app looks
                         </TextBlock>
                     </StackPanel>
                 </Button>
 
-                <Button BorderThickness="0"
-                        HorizontalContentAlignment="Left"
-                        Padding="0,0,0,0"
+                <Button Style="{StaticResource SubtextButton}"
                         Margin="0,0,0,-8"
                         Tap="LockScreen_Tap">
                     <StackPanel>
-                        <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             LOCK SCREEN
                         </TextBlock>
-                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                             Customize your reddit lock screen
                         </TextBlock>
                     </StackPanel>
                 </Button>
 
-                <Button BorderThickness="0"
-                        HorizontalContentAlignment="Left"
-                        Padding="0,0,0,0"
+                <Button Style="{StaticResource SubtextButton}"
                         Margin="0,0,0,-8">
                     <StackPanel>
-                        <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             LIVE TILE
                         </TextBlock>
-                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                             Have the live tile your way
                         </TextBlock>
                     </StackPanel>
                 </Button>
 
-                <Button BorderThickness="0"
-                        HorizontalContentAlignment="Left"
-                        Padding="0,0,0,0"
+                <Button Style="{StaticResource SubtextButton}"
                         Margin="0,0,0,-8">
                     <StackPanel>
-                        <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             OFFLINE DATA
                         </TextBlock>
-                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                             Decide what gets stored or clear your cache
                         </TextBlock>
                     </StackPanel>
                 </Button>
 
-                <Button BorderThickness="0"
-                        HorizontalContentAlignment="Left"
-                        Padding="0,0,0,0"
+                <Button Style="{StaticResource SubtextButton}"
                         Margin="0,0,0,-8"
                         Visibility="{Binding Settings.AllowAdvertising, Mode=TwoWay, Converter={StaticResource booleanVisibilityConverter}}"
                         Tap="AdFreeUpgrade_Tap">
                     <StackPanel>
-                        <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             DISABLE ADS
                         </TextBlock>
-                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}"
-                                   Foreground="{StaticResource PhoneSubtleBrush}">
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                             Remove the Ads for good
                         </TextBlock>
                     </StackPanel>
                 </Button>
 
-                <Button BorderThickness="0"
-                        HorizontalContentAlignment="Left"
-                        Padding="0,0,0,0"
+                <Button Style="{StaticResource SubtextButton}"
                         Margin="0,0,0,-8"
                         IsEnabled="False"
                         Visibility="{Binding Settings.AllowAdvertising, Mode=TwoWay, Converter={StaticResource invertedBooleanVisibilityConverter}}">
                     <StackPanel>
-                        <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             THANK YOU!
                         </TextBlock>
-                        <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}"
-                                   Foreground="{StaticResource PhoneSubtleBrush}">
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                             Enjoy your Ad-Free experience
                         </TextBlock>
                     </StackPanel>

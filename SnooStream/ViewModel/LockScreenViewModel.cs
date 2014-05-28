@@ -24,5 +24,18 @@ namespace SnooStream.ViewModel
             }
         }
 
+        bool _showOverlay;
+        public bool ShowOverlay
+        {
+            get
+            {
+                return _showOverlay;
+            }
+            set
+            {
+                _showOverlay = value;
+                RaisePropertyChanged("ShowOverlay");
+            }
+        }
     }
 }

@@ -14,20 +14,8 @@
     SupportedOrientations="Portrait" Orientation="Portrait"
     mc:Ignorable="d"
     shell:SystemTray.IsVisible="True"
-    x:Name="LayoutRoot">
-    <common:SnooApplicationPage.Resources>
-        <DataTemplate x:Key="RadToggleContent">
-            <Grid>
-                <TextBlock Margin="0,0,0,0"
-                           Text="{Binding Converter={StaticResource stringToUpperConverter}}"
-                           FontSize="{StaticResource PhoneFontSizeLarge}"
-                           FontFamily="{StaticResource PhoneFontFamilySemiBold}">
-                    
-                </TextBlock>
-            </Grid>
-        </DataTemplate>
-    </common:SnooApplicationPage.Resources>
-
+    x:Name="LayoutRoot"
+    d:DesignHeight="1600">
     <common:SnooApplicationPage.FontFamily>
         <StaticResource ResourceKey="PhoneFontFamilyNormal"/>
     </common:SnooApplicationPage.FontFamily>
@@ -39,98 +27,61 @@
     </common:SnooApplicationPage.Foreground>
     <Grid Background="Transparent">
 
-        <phone:Pivot Title="LOCK SCREEN">
-            <phone:Pivot.HeaderTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <TextBlock
-                            Text="{Binding}" FontSize="{StaticResource PhoneFontSizeLarge}"
-                                   FontFamily="{StaticResource PhoneFontFamilyBold}"/>
-                    </Grid>
-                </DataTemplate>
-            </phone:Pivot.HeaderTemplate>
-            <phone:Pivot.TitleTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <TextBlock
-                            Text="{Binding}" FontSize="{StaticResource PhoneFontSizeSmall}"
-                            FontFamily="{StaticResource PhoneFontFamilySemiBold}"
-                            Margin="-3,0,0,2"/>
-                    </Grid>
-                </DataTemplate>
-            </phone:Pivot.TitleTemplate>
+        <phone:Pivot Title="LOCK SCREEN" Style="{StaticResource SettingsPivot}">
             <phone:PivotItem Margin="0,0,0,24"
 				Header="SETTINGS">
-                <ScrollViewer Grid.Row="1" Margin="0,0,0,0" DataContext="{Binding Settings}">
+                <ScrollViewer Grid.Row="1" Margin="0,0,0,0" DataContext="{Binding Settings}"
+                              Padding="0,0,0,0">
                     <StackPanel Margin="10,0,12,0">
-                        <Button BorderThickness="0"
-                                HorizontalContentAlignment="Left"
-                                Padding="0,0,0,0"
-                                Margin="0,0,0,0">
+                        <Button Style="{StaticResource SubtextButton}">
                             <StackPanel>
-                                <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                                <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                                     SYSTEM SETTINGS
                                 </TextBlock>
-                                <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                                <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                                     Change your phone's lock screen settings
                                 </TextBlock>
                             </StackPanel>
                         </Button>
-                        <Button BorderThickness="0"
-                                HorizontalContentAlignment="Left"
-                                Padding="0,0,0,0"
-                                Margin="0,0,0,0"
-                                Visibility="{Binding IsLockScreenProvider, ElementName=LayoutRoot, Converter={StaticResource invertedBooleanVisibilityConverter}}">
+                        <Button Style="{StaticResource SubtextButton}"
+                                Visibility="{Binding IsLockScreenProvider, ElementName=LayoutRoot, Converter={StaticResource invertedBooleanVisibilityConverter}}"
+                                Tap="SetLockScreenProvider_Tap">
                             <StackPanel>
-                                <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                                <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                                     LOCK SCREEN PROVIDER
                                 </TextBlock>
-                                <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                                <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                                     Let us take care of providing awesome lock screens
                                 </TextBlock>
                             </StackPanel>
                         </Button>
-                        <Button BorderThickness="0"
-                                HorizontalContentAlignment="Left"
-                                Padding="0,0,0,0"
-                                Margin="0,0,0,0"
+                        <Button Style="{StaticResource SubtextButton}"
                                 Visibility="{Binding IsLockScreenProvider, ElementName=LayoutRoot, Converter={StaticResource booleanVisibilityConverter}}">
                             <StackPanel>
-                                <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                                <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                                     REFRESH
                                 </TextBlock>
-                                <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                                <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                                     Load up a new batch of lock screen images now
                                 </TextBlock>
                             </StackPanel>
                         </Button>
-                        <Button BorderThickness="0"
-                                HorizontalContentAlignment="Left"
-                                Padding="0,0,0,0"
-                                Margin="0,0,0,0">
+                        <Button Style="{StaticResource SubtextButton}">
                             <StackPanel>
-                                <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                                <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                                     IMAGE SUBREDDIT
                                 </TextBlock>
-                                <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                                <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                                     Customize which subreddits give you lock screens
                                 </TextBlock>
                             </StackPanel>
                         </Button>
-                        <Button BorderThickness="0"
-                                HorizontalContentAlignment="Left"
-                                Padding="0,0,0,0"
-                                Margin="0,0,0,0">
+                        <Button Style="{StaticResource SubtextButton}">
                             <StackPanel>
-                                <TextBlock FontWeight="Bold"
-                                   FontSize="{StaticResource PhoneFontSizeMediumLarge}">
+                                <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                                     POST SUBREDDIT
                                 </TextBlock>
-                                <TextBlock FontSize="{StaticResource PhoneFontSizeSmall}" Foreground="{StaticResource PhoneSubtleBrush}">
+                                <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                                     Pick which subreddits give you lock screens
                                 </TextBlock>
                             </StackPanel>
@@ -151,8 +102,53 @@
                     <Grid.Background>
                         <ImageBrush Stretch="UniformToFill" ImageSource="{Binding LockScreen.SelectedImage}"/>
                     </Grid.Background>
-                    
-                </Grid>                                
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <ScrollViewer Grid.Row="1" Margin="0,0,0,0" Padding="0,12,0,12">
+                        <!--
+                            Rounded edges
+                            Show Unread Messages
+                            Show Top Posts
+                            Number of Items
+                            Opacity
+                        -->
+                        <StackPanel>
+                            <StackPanel.Background>
+                                <SolidColorBrush Color="Black" Opacity="0.75" />
+                            </StackPanel.Background>
+                            <telerikPrimitives:RadToggleSwitch Header="Show overlay"
+                                        IsChecked="{Binding LockScreen.ShowOverlay, Mode=TwoWay}"
+                                        ContentTemplate="{StaticResource RadToggleContent}"/>
+                            <telerikPrimitives:RadToggleSwitch Header="Show unread messages"
+                                        IsChecked="{Binding MessagesInLockScreenOverlay, Mode=TwoWay}"
+                                        ContentTemplate="{StaticResource RadToggleContent}"/>
+                            <telerikPrimitives:RadToggleSwitch Header="Show top posts"
+                                        IsChecked="{Binding PostsInLockScreenOverlay, Mode=TwoWay}"
+                                        ContentTemplate="{StaticResource RadToggleContent}"/>
+                            <telerikPrimitives:RadToggleSwitch Header="Watermark the subreddit name"
+                                        IsChecked="{Binding ToDoBinding, Mode=TwoWay}"
+                                        ContentTemplate="{StaticResource RadToggleContent}"/>
+                            <telerikPrimitives:RadPickerBox
+                                    Content="Number of items to display"
+                                    BorderThickness="0.5" IsFullScreen="False"
+                                    PopupSizeMode="FitToPlacementTarget">
+                                <ListBox>
+                                    <ListBoxItem Content="0" />
+                                    <ListBoxItem Content="1" />
+                                    <ListBoxItem Content="2" />
+                                    <ListBoxItem Content="3" />
+                                    <ListBoxItem Content="4" />
+                                    <ListBoxItem IsSelected="True" Content="5" />
+                                    <ListBoxItem Content="6" />
+                                </ListBox>
+
+                            </telerikPrimitives:RadPickerBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
             </phone:PivotItem>
         </phone:Pivot>
     </Grid>
