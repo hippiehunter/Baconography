@@ -12,11 +12,10 @@
                 Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}}">
             <Border VerticalAlignment="Stretch" MinHeight="0" BorderThickness="3, 0, 0, 0"
                     BorderBrush="{StaticResource PhoneAccentBrush}" />
-            <telerikPrimitives:RadDataBoundListBox Grid.Column="0" MinHeight="0"
-                    ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemsSource="{Binding Activities}">
-                <telerikPrimitives:RadDataBoundListBox.ItemTemplate>
+            <ListBox ItemsSource="{Binding Activities}" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid Margin="8, 8, 0, 12" MinHeight="70">
+                        <Grid Margin="8, 8, 0, 12" Height="120">
                             <Grid.RowDefinitions>
                                 <RowDefinition />
                                 <RowDefinition />
@@ -33,107 +32,28 @@
                                     Text="{Binding CreatedUTC, Converter={StaticResource unixTimeConverter}}" />
                         </Grid>
                     </DataTemplate>
-                </telerikPrimitives:RadDataBoundListBox.ItemTemplate>
-            </telerikPrimitives:RadDataBoundListBox>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
     </DataTemplate>
 
-    <DataTemplate x:Name="messageActivityTemplate">
+    <DataTemplate x:Name="activityTemplate">
         <telerikPrimitives:RadExpanderControl Content="{Binding}" ExpandableContent="{Binding}"
                 ExpandableContentTemplate="{StaticResource plainExpandableContentTemplate}"
-                Foreground="{StaticResource PhoneForegroundBrush}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
-            <telerikPrimitives:RadExpanderControl.AnimatedIndicatorContentTemplate>
-                <DataTemplate />
-            </telerikPrimitives:RadExpanderControl.AnimatedIndicatorContentTemplate>
+                Foreground="{StaticResource PhoneForegroundBrush}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}" AnimatedIndicatorContentTemplate="{x:Null}">
             <telerikPrimitives:RadExpanderControl.ContentTemplate>
                 <DataTemplate>
-                    <StackPanel Margin="0,0,0,18">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="6" />
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="40" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.ColumnSpan="3" Text="{Binding FirstActivity.Subject}"
-                                    FontSize="{StaticResource PhoneFontSizeLarge}" FontFamily="Segoe WP SemiLight" />
-                            <Border
-                                    Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}}"
-                                    Margin="24, 0, 8, 0" Grid.Row="0" BorderThickness="3, 0, 0, 0"
-                                    BorderBrush="{StaticResource PhoneAccentBrush}" />
-                            <StackPanel Grid.Column="1" Grid.Row="1">
-                                <TextBlock Grid.Row="0"
-                                        Foreground="{StaticResource PhoneSubtleBrush}"
+                    <StackPanel Height="120">
+                        <TextBlock Text="{Binding FirstActivity.PreviewTitle}"
+                                    FontSize="{StaticResource PhoneFontSizeExtraLarge}" FontFamily="Segoe WP SemiLight" />
+                        <TextBlock Foreground="{StaticResource PhoneSubtleBrush}"
                                         Text="{Binding FirstActivity.Author}"
-                                        FontSize="{StaticResource PhoneFontSizeNormal}" />
-                                <TextBlock Grid.Row="1"
-                                        Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}}"
-                                        Text="{Binding Converter={StaticResource activityGroupCountConverter}}" />
-                                <TextBlock Grid.Row="2"
-                                        Visibility="{Binding IsConversation, Converter={StaticResource invertedBooleanVisibilityConverter}}"
-                                        Text="{Binding FirstActivity.Body}" MaxHeight="52"/>
-                            </StackPanel>
-                            <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1"
-                                    Text="{Binding FirstActivity.CreatedUTC, Converter={StaticResource unixTimeConverter}}" />
-                        </Grid>
+                                        FontSize="{StaticResource PhoneFontSizeLarge}" />
                     </StackPanel>
                 </DataTemplate>
             </telerikPrimitives:RadExpanderControl.ContentTemplate>
         </telerikPrimitives:RadExpanderControl>
     </DataTemplate>
-
-    <DataTemplate x:Name="commentActivityTemplate">
-        <telerikPrimitives:RadExpanderControl Content="{Binding}" ExpandableContent="{Binding}"
-                ExpandableContentTemplate="{StaticResource plainExpandableContentTemplate}"
-                Foreground="{StaticResource PhoneForegroundBrush}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
-            <telerikPrimitives:RadExpanderControl.AnimatedIndicatorContentTemplate>
-                <DataTemplate />
-            </telerikPrimitives:RadExpanderControl.AnimatedIndicatorContentTemplate>
-            <telerikPrimitives:RadExpanderControl.ContentTemplate>
-                <DataTemplate>
-                    <StackPanel Margin="0,0,0,18">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="6" />
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="40" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.ColumnSpan="3" Text="{Binding FirstActivity.Subject}"
-                                    FontSize="{StaticResource PhoneFontSizeLarge}" FontFamily="Segoe WP SemiLight"
-                                    TextWrapping="Wrap" />
-                            <Border
-                                    Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}}"
-                                    Margin="24, 0, 8, 0" Grid.Row="1" BorderThickness="3, 0, 0, 0"
-                                    BorderBrush="{StaticResource PhoneAccentBrush}" />
-                            <StackPanel Grid.Column="1" Grid.Row="1">
-                                <TextBlock Grid.Row="0"
-                                        Foreground="{StaticResource PhoneSubtleBrush}"
-                                        Text="{Binding FirstActivity.Subreddit}"
-                                        FontSize="{StaticResource PhoneFontSizeNormal}" />
-                                <TextBlock Grid.Row="1"
-                                        Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}}"
-                                        Text="{Binding Converter={StaticResource activityGroupCountConverter}}" />
-                                <TextBlock Grid.Row="2"
-                                        Visibility="{Binding IsConversation, Converter={StaticResource invertedBooleanVisibilityConverter}}"
-                                        Text="{Binding FirstActivity.Body}" TextWrapping="NoWrap" />
-                            </StackPanel>
-
-                            <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1"
-                                    Text="{Binding FirstActivity.CreatedUTC, Converter={StaticResource unixTimeConverter}}" />
-                        </Grid>
-                    </StackPanel>
-                </DataTemplate>
-            </telerikPrimitives:RadExpanderControl.ContentTemplate>
-        </telerikPrimitives:RadExpanderControl>
-    </DataTemplate>
-
     <Style x:Key="RoundButtonStyle" TargetType="Button">
         <Setter Property="Template">
             <Setter.Value>

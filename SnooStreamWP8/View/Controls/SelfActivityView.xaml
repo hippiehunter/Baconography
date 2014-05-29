@@ -12,15 +12,7 @@
 
     <Grid x:Name="LayoutRoot" Margin="12,0,12,0">
         <Grid.Resources>
-            <ResourceDictionary>
-                <ResourceDictionary.MergedDictionaries>
-                    <ResourceDictionary Source="ActivitiesResources.xaml" />
-                </ResourceDictionary.MergedDictionaries>
-
-                <selectors:UserActivityTemplateSelector x:Key="activityTemplateSelector"
-                        MessageActivityTemplate="{StaticResource messageActivityTemplate}"
-                        CommentActivityTemplate="{StaticResource commentActivityTemplate}" />
-            </ResourceDictionary>
+            <ResourceDictionary Source="ActivitiesResources.xaml"/>
         </Grid.Resources>
         
         <Grid.RowDefinitions>
@@ -41,10 +33,9 @@
 
         <telerikPrimitives:RadDataBoundListBox
                 Grid.Row="1"
-                EmptyContent="Loading..." x:Name="listBox"
-                Margin="0,0,-6,0" ItemsSource="{Binding Activities}"
-                ItemTemplateSelector="{StaticResource activityTemplateSelector}"
-                ItemAnimationMode="PlayAll" IsItemReorderEnabled="False"
+                EmptyContent="Loading..." x:Name="listBox" ItemsSource="{Binding Activities}"
+                ItemTemplate="{StaticResource activityTemplate}" IsAsyncBalanceEnabled="True"
+                AsyncBalanceMode="FillViewportFirst" IsItemReorderEnabled="False"
                 DataVirtualizationMode="OnDemandAutomatic" DataRequested="listBox_DataRequested">
         </telerikPrimitives:RadDataBoundListBox>
     </Grid>
