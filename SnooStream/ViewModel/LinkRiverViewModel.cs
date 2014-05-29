@@ -207,5 +207,7 @@ namespace SnooStream.ViewModel
                 Links.CollectionChanged -= value;
             }
         }
+
+		public LinkViewModel CurrentSelected { get; set; }
     }
 }

@@ -28,8 +28,14 @@ namespace SnooStream.Common
 					}
 				case "CommentsViewModel":
 					{
-						var dumpArgs = JsonConvert.DeserializeObject<Tuple<Listing, string>>(stateItem.Item2);
-						return new CommentsViewModel(context is LinkStreamViewModel ? ((LinkStreamViewModel)context).Current : context, dumpArgs.Item1, dumpArgs.Item2);
+						var dumpArgs = JsonConvert.DeserializeObject<Tuple<Listing, string, string>>(stateItem.Item2);
+						LinkViewModel targetContext = null;
+						if (context is LinkStreamViewModel)
+							targetContext = ((LinkStreamViewModel)context).Current;
+						else if (context is LinkRiverViewModel)
+							targetContext = ((LinkRiverViewModel)context).Links.FirstOrDefault(link => link.Link.Id == dumpArgs.Item3);
+
+						return new CommentsViewModel(targetContext, dumpArgs.Item1, dumpArgs.Item2);
 					}
                 default:
                     throw new InvalidOperationException();
@@ -52,7 +58,7 @@ namespace SnooStream.Common
 			else if (viewModel is CommentsViewModel)
 			{
 				var comments = viewModel as CommentsViewModel;
-				return JsonConvert.SerializeObject(Tuple.Create("CommentsViewModel", JsonConvert.SerializeObject(Tuple.Create(comments.DumpListing(), comments.Link.Url))));
+				return JsonConvert.SerializeObject(Tuple.Create("CommentsViewModel", JsonConvert.SerializeObject(Tuple.Create(comments.DumpListing(), comments.Link.Url, comments.Link.Link.Id))));
 			}
 			else
 				throw new InvalidOperationException();

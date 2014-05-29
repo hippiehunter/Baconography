@@ -51,7 +51,13 @@ namespace SnooStreamWP8.Common
 
         public string DumpState()
         {
-            var dictionary = _navState.Select(kvp => new KeyValuePair<string, string>(kvp.Key, DumpStateItem(kvp.Value))).ToDictionary(kvp=> kvp.Key, kvp => kvp.Value);
+			var dictionary = new Dictionary<string, string>();
+
+			foreach (var kvp in _navState)
+			{
+				if (!dictionary.ContainsKey(kvp.Key))
+					dictionary.Add(kvp.Key, DumpStateItem(kvp.Value));
+			}
             return JsonConvert.SerializeObject(Tuple.Create((IEnumerable<string>)_navStateInsertionOrder, dictionary));
         }
 
