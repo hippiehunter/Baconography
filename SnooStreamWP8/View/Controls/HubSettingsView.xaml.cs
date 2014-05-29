@@ -14,9 +14,9 @@ using System.IO;
 
 namespace SnooStreamWP8.View.Controls
 {
-    public partial class SettingsView : UserControl
+    public partial class HubSettingsView : UserControl
     {
-        public SettingsView()
+        public HubSettingsView()
         {
             InitializeComponent();
         }

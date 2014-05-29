@@ -9,5 +9,33 @@ namespace SnooStream.ViewModel
 {
     public class LockScreenViewModel : ViewModelBase
     {
+
+        string _selectedImage;
+        public string SelectedImage
+        {
+            get
+            {
+                return _selectedImage;
+            }
+            set
+            {
+                _selectedImage = value;
+                RaisePropertyChanged("SelectedImage");
+            }
+        }
+
+        bool _showOverlay;
+        public bool ShowOverlay
+        {
+            get
+            {
+                return _showOverlay;
+            }
+            set
+            {
+                _showOverlay = value;
+                RaisePropertyChanged("ShowOverlay");
+            }
+        }
     }
 }
