@@ -16,11 +16,13 @@ namespace SnooStreamWP8.PlatformServices
     {
         Frame _frame;
         NavigationStateUtility _navState;
+		SnooStreamViewModel _rootContext;
 
-        public NavigationService(Frame frame, string existingState)
+        public NavigationService(Frame frame, string existingState, SnooStreamViewModel rootContext)
         {
+			_rootContext = rootContext;
             _frame = frame;
-            _navState = new NavigationStateUtility(existingState);
+			_navState = new NavigationStateUtility(existingState, _rootContext);
         }
 
         public void NavigateToComments(CommentsViewModel viewModel)

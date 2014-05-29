@@ -91,6 +91,12 @@ namespace SnooStream.ViewModel
         {
             if (!required)
             {
+				if (SnooStreamViewModel.SystemServices == null)
+					await Task.Delay(1000);
+				//dump out something is very wrong
+				if (SnooStreamViewModel.SystemServices == null)
+					return;
+
                 if (!SnooStreamViewModel.SystemServices.IsLowPriorityNetworkOk)
                     return;
                 else
@@ -99,11 +105,56 @@ namespace SnooStream.ViewModel
 
             var subscribedListing = await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing();
 
-            foreach (var river in subscribedListing.Data.Children.Select(thing => new LinkRiverViewModel(false, thing.Data as Subreddit, "hot", null)))
-            {
-                //TODO dont touch things that are already there only add/remove
-                CombinedRivers.Add(river);
-            }
+			var newRivers = new Dictionary<string, Subreddit>();
+			foreach (var subreddit in subscribedListing.Data.Children)
+			{
+				if(subreddit.Data is Subreddit && !newRivers.ContainsKey(((Subreddit)subreddit.Data).Id))
+					newRivers.Add(((Subreddit)subreddit.Data).Id, ((Subreddit)subreddit.Data));
+			}
+
+			var missingRivers = new List<LinkRiverViewModel>();
+			var existingRivers = new Dictionary<string, LinkRiverViewModel>();
+			foreach (var river in CombinedRivers)
+			{
+				//ignore the frontpage
+				if (string.IsNullOrWhiteSpace(river.Thing.Id))
+					continue;
+
+				if (!existingRivers.ContainsKey(river.Thing.Id))
+					existingRivers.Add(river.Thing.Id, river);
+
+				if(!river.IsLocal && !newRivers.ContainsKey(river.Thing.Id))
+					missingRivers.Add(river);
+				else if(newRivers.ContainsKey(river.Thing.Id))
+					river.Thing = newRivers[river.Thing.Id];
+			}
+
+			
+			foreach (var subredditTpl in newRivers)
+			{
+				if(!existingRivers.ContainsKey(subredditTpl.Key))
+					CombinedRivers.Add(new LinkRiverViewModel(false, subredditTpl.Value,  "hot", null));
+			}
+
+			foreach (var missingRiver in missingRivers)
+			{
+				CombinedRivers.Remove(missingRiver);
+			}
         }
-    }
+
+		internal SubredditRiverInit Dump()
+		{
+			return new SubredditRiverInit
+			{
+				Pinned = CombinedRivers
+					.Where(vm => vm.IsLocal)
+					.Select(vm => vm.Dump())
+					.ToList(),
+				Subscribed = CombinedRivers
+					.Where(vm => !vm.IsLocal)
+					.Select(vm => vm.Dump())
+					.ToList(),
+			};
+		}
+	}
 }

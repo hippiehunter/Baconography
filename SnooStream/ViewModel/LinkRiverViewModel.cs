@@ -15,7 +15,7 @@ namespace SnooStream.ViewModel
     public class LinkRiverViewModel : ViewModelBase, ICollection<LinkViewModel>, INotifyCollectionChanged
     {
         //need to come up with an init blob setup for this, meaining a per river blob
-        public Subreddit Thing { get; private set; }
+        public Subreddit Thing { get; internal set; }
 		public int HeaderImageWidth { get { return GetHeaderSizeOrDefault(true); } }
 		public int HeaderImageHeight { get { return GetHeaderSizeOrDefault(false); } }
         public string Sort { get; private set; }
@@ -209,5 +209,15 @@ namespace SnooStream.ViewModel
         }
 
 		public LinkViewModel CurrentSelected { get; set; }
-    }
+
+		internal SubredditInit Dump()
+		{
+			return new SubredditInit
+			{
+				DefaultSort = Sort,
+				Thing = Thing,
+				Links = Links.Select(vm => vm.Link).ToList()
+			};
+		}
+	}
 }

@@ -16,14 +16,14 @@ namespace SnooStreamWP8.Common
 		Dictionary<string, ViewModelBase> _navState;
 		Stack<string> _navStateInsertionOrder;
         
-        public NavigationStateUtility(string existingState)
+        public NavigationStateUtility(string existingState, SnooStreamViewModel rootContext)
         {
 			_navState = new Dictionary<string, ViewModelBase>();
 			_navStateInsertionOrder = new Stack<string>();
             if (!string.IsNullOrEmpty(existingState))
             {
                 var serializedItems = JsonConvert.DeserializeObject<Tuple<IEnumerable<string>, Dictionary<string, string>>>(existingState);
-				ViewModelBase context = null;
+				ViewModelBase context = rootContext;
                 foreach (var item in serializedItems.Item1.Reverse())
                 {
 					context = RestoreStateItem(serializedItems.Item2[item], context) as ViewModelBase;

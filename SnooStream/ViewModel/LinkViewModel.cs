@@ -120,7 +120,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public CommentsViewModel Comments { get; private set; }
+        public CommentsViewModel Comments { get; internal set; }
         public Link Link { get; private set; }
         public int CommentsLastViewed { get; private set; }
         //need to add load helpers here for kicking off preview loads when we get near things

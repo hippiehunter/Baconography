@@ -4,6 +4,7 @@ using SnooSharp;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,8 +20,10 @@ namespace SnooStream.Common
             {
                 case "LinkRiverViewModel":
                     {
-                        var dumpArgs = JsonConvert.DeserializeObject<Tuple<bool, SnooSharp.Subreddit, string, List<SnooSharp.Link>>>(stateItem.Item2);
-                        return new LinkRiverViewModel(dumpArgs.Item1, dumpArgs.Item2, dumpArgs.Item3, dumpArgs.Item4);
+						Debug.Assert(context is SnooStreamViewModel);
+						var snooStreamViewModel = (SnooStreamViewModel)context;
+						var subredditThing = JsonConvert.DeserializeObject<Subreddit>(stateItem.Item2);
+						return snooStreamViewModel.SubredditRiver.CombinedRivers.FirstOrDefault(vm => vm.Thing.Id == subredditThing.Id);
                     }
 				case "LinkStreamViewModel":
 					{
@@ -35,7 +38,11 @@ namespace SnooStream.Common
 						else if (context is LinkRiverViewModel)
 							targetContext = ((LinkRiverViewModel)context).Links.FirstOrDefault(link => link.Link.Id == dumpArgs.Item3);
 
-						return new CommentsViewModel(targetContext, dumpArgs.Item1, dumpArgs.Item2);
+						var comments = new CommentsViewModel(targetContext, dumpArgs.Item1, dumpArgs.Item2);
+						if (targetContext != null)
+							targetContext.Comments = comments;
+
+						return comments;
 					}
                 default:
                     throw new InvalidOperationException();
@@ -47,7 +54,7 @@ namespace SnooStream.Common
             if (viewModel is LinkRiverViewModel)
             {
                 var linkRiver = viewModel as LinkRiverViewModel;
-                var serialized = JsonConvert.SerializeObject(Tuple.Create(linkRiver.IsLocal, linkRiver.Thing, linkRiver.Sort, linkRiver.Select(vm => vm.Link).ToList()));
+                var serialized = JsonConvert.SerializeObject(linkRiver.Thing);
                 return JsonConvert.SerializeObject(Tuple.Create("LinkRiverViewModel", serialized));
             }
 			else if (viewModel is LinkStreamViewModel)

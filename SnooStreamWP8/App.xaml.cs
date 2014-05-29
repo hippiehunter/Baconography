@@ -113,7 +113,7 @@ namespace SnooStreamWP8
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
-			SnooStreamViewModel.NavigationService = new SnooStreamWP8.PlatformServices.NavigationService(RootFrame, null);
+			SnooStreamViewModel.NavigationService = new SnooStreamWP8.PlatformServices.NavigationService(RootFrame, null, null);
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -123,7 +123,7 @@ namespace SnooStreamWP8
 			var snooStream = Resources["SnooStream"] as SnooStreamViewModel;
 			if (snooStream != null)
 			{
-				SnooStreamViewModel.NavigationService = new SnooStreamWP8.PlatformServices.NavigationService(RootFrame, snooStream.GetNavigationBlob());
+				SnooStreamViewModel.NavigationService = new SnooStreamWP8.PlatformServices.NavigationService(RootFrame, snooStream.GetNavigationBlob(), snooStream);
 			}
         }
 
