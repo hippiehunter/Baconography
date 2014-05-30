@@ -9,6 +9,15 @@ namespace SnooStream.Model
 {
     public class LinkGlyphUtility
     {
+        public const string NavRightGlyph = "\uE0AD";
+        public const string PhotoGlyph = "\uE114";
+        public const string VideoGlyph = "\uE116";
+        public const string WebGlyph = "\uE128";
+        public const string DetailsGlyph = "\uE14C";
+        public const string MultiredditGlyph = "\uE17D";
+        public const string UserGlyph = "\uE136";
+        public const string CommentGlyph = "\uE14C";
+
         //Subreddit:
         public static Regex SubredditRegex = new Regex("(?:^|\\s|reddit.com)/r/[a-zA-Z0-9_.]+/?$");
 

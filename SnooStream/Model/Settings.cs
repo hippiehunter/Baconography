@@ -74,6 +74,7 @@ namespace SnooStream.Model
             MessagesInLockScreenOverlay = init.DefaultGet("MessagesInLockScreenOverlay", true);
             PostsInLockScreenOverlay = init.DefaultGet("PostsInLockScreenOverlay", true);
             ImagesSubreddit = init.DefaultGet("ImagesSubreddit", "/r/earthporn+InfrastructurePorn+MachinePorn");
+            LockScreenOverlay = init.DefaultGet("LockScreenOverlay", true);
             OverlayOpacity = init.DefaultGet("OverlayOpacity", 35);
             OverlayItemCount = init.DefaultGet("OverlayItemCount", 5);
             LockScreenReddit = init.DefaultGet("LockScreenReddit", "/");
@@ -120,6 +121,7 @@ namespace SnooStream.Model
         public string LiveTileReddit { get; set; }
         public int OfflineCacheDays { get; set; }
         public bool TapForComments { get; set; }
+        public bool LockScreenOverlay { get; set; }
         public bool RoundedLockScreen { get; set; }
         public bool MultiColorCommentMargins { get; set; }
         public bool InvertSystemTheme { get; set; }
@@ -155,6 +157,7 @@ namespace SnooStream.Model
             result.Add("MessagesInLockScreenOverlay", MessagesInLockScreenOverlay.ToString());
             result.Add("PostsInLockScreenOverlay", PostsInLockScreenOverlay.ToString());
             result.Add("ImagesSubreddit", ImagesSubreddit.ToString());
+            result.Add("LockScreenOverlay", LockScreenOverlay.ToString());
             result.Add("OverlayOpacity", OverlayOpacity.ToString());
             result.Add("OverlayItemCount", OverlayItemCount.ToString());
             result.Add("LockScreenReddit", LockScreenReddit.ToString());

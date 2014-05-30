@@ -10,6 +10,12 @@ namespace SnooStream.ViewModel
 {
     public class SettingsViewModel : ViewModelBase
     {
+        public SettingsViewModel(Settings settings)
+        {
+            this.Settings = settings;
+            LockScreen = new LockScreenViewModel(settings);
+        }
+
         public PrimaryLiveTileViewModel PrimaryLiveTile { get; set; }
         public SecondaryLiveTileHubViewModel SecondaryLiveTileHub { get; set; }
         public LockScreenViewModel LockScreen { get; set; }

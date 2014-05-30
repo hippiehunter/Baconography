@@ -43,8 +43,7 @@ namespace SnooStream.ViewModel
             CommandDispatcher = new CommandDispatcher();
             UserHub = new UserHubViewModel(_initializationBlob.Self);
             ModeratorHub = new ModeratorHubViewModel();
-            SettingsHub = new SettingsViewModel();
-            SettingsHub.Settings = Settings;
+            SettingsHub = new SettingsViewModel(Settings);
             SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
             if (!IsInDesignMode)
             {
