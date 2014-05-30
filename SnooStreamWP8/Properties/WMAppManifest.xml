@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Deployment xmlns="http://schemas.microsoft.com/windowsphone/2012/deployment" AppPlatformVersion="8.0">
   <DefaultLanguage xmlns="" code="en-US" />
-  <App xmlns="" ProductID="{b3281a95-de17-4eab-adfb-1989ae583a8c}" Title="SnooStream" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Synergex International Corp" Description="A Reddit client with a focus on blasting content into your eyes with optimal efficiancy" Publisher="Synergex International Corp" PublisherID="{7a806691-8c17-4d52-ad58-39fb90466ae6}">
+  <App xmlns="" ProductID="{b3281a95-de17-4eab-adfb-1989ae583a8c}" Title="SnooStream2" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Synergex International Corp" Description="A Reddit client with a focus on blasting content into your eyes with optimal efficiancy" Publisher="Synergex International Corp" PublisherID="{7a806691-8c17-4d52-ad58-39fb90466ae6}">
     <IconPath IsRelative="true" IsResource="false">Assets\ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />

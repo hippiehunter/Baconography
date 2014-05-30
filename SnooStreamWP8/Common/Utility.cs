@@ -28,7 +28,7 @@ namespace SnooStreamWP8.Common
 
         private static bool loadingActiveLockScreen = false;
 
-        private static string CleanRedditLink(string userInput, string username)
+        public static string CleanRedditLink(string userInput, string username)
         {
             if (userInput == "/")
                 return userInput;

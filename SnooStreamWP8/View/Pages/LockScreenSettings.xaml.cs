@@ -13,6 +13,7 @@ using GalaSoft.MvvmLight;
 using SnooStreamWP8.BackgroundControls.ViewModel;
 using SnooStream.Model;
 using System.ComponentModel;
+using SnooStream.TaskSettings;
 
 namespace SnooStreamWP8.View.Pages
 {
@@ -23,20 +24,26 @@ namespace SnooStreamWP8.View.Pages
 			InitializeComponent();
 		}
 
+        
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
-            // If we have lockscreens, do nothing
-
-            // If we don't, and have access to network, fetch one
-
-            // If we have nothing, use default
+            var taskSettings = TaskSettingsLoader.LoadTaskSettings();
 
             var vm = this.DataContext as SettingsViewModel;
             if (vm != null)
             {
-                vm.LockScreen.SelectedImage = "/Assets/RainbowGlass.jpg";
+                if (taskSettings.LockScreenImageURIs.Count >= 1)
+                    vm.LockScreen.SelectedImage = taskSettings.LockScreenImageURIs.First();
+                else
+                {
+                    vm.LockScreen.SelectedImage = "/Assets/RainbowGlass.jpg";
+                    var backgroundTaskMan = BackgroundTaskManager.GetInstance();
+                    backgroundTaskMan.UpdateLockScreenImages();
+                }
+                
                 _previewLockScreenViewModel = new PreviewLockScreenViewModel(vm.LockScreen);
                 SetValue(PreviewLockScreenVMProperty, _previewLockScreenViewModel);
             }
@@ -73,9 +80,10 @@ namespace SnooStreamWP8.View.Pages
             }
         }
 
-        private void SetLockScreenProvider_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        private async void SetLockScreenProvider_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-
+            var backgroundTaskMan = BackgroundTaskManager.GetInstance();
+            await backgroundTaskMan.StartLockScreenProvider();
         }
 
         public class PreviewLockScreenViewModel : ViewModelBase
