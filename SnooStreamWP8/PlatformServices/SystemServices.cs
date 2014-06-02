@@ -493,6 +493,7 @@ namespace SnooStreamWP8.PlatformServices
 
 		public void HideProgress ()
 		{
+            return;
 			_uiDispatcher.BeginInvoke(() =>
 				{
 					if(SystemTray.ProgressIndicator == null)
@@ -518,6 +519,7 @@ namespace SnooStreamWP8.PlatformServices
 
 		public void ShowProgress (string notificationText, double progressPercent)
 		{
+            return;
 			_uiDispatcher.BeginInvoke(() =>
 				{
 					if(SystemTray.ProgressIndicator == null)
