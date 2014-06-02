@@ -44,6 +44,10 @@ namespace SnooStream.Common
 
 						return comments;
 					}
+                case "SettingsViewModel":
+                    {
+                        return new SettingsViewModel(SnooStreamViewModel.Settings);
+                    }
                 default:
                     throw new InvalidOperationException();
             }
@@ -67,6 +71,11 @@ namespace SnooStream.Common
 				var comments = viewModel as CommentsViewModel;
 				return JsonConvert.SerializeObject(Tuple.Create("CommentsViewModel", JsonConvert.SerializeObject(Tuple.Create(comments.DumpListing(), comments.Link.Url, comments.Link.Link.Id))));
 			}
+            else if (viewModel is LockScreenViewModel
+                || viewModel is SettingsViewModel)
+            {
+                return JsonConvert.SerializeObject(Tuple.Create("SettingsViewModel", ""));
+            }
 			else
 				throw new InvalidOperationException();
         }
