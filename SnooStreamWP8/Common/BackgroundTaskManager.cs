@@ -38,11 +38,11 @@ namespace SnooStreamWP8.Common
         }
 
 
-        public async Task StartLockScreenProvider()
+        public static async Task<bool> StartLockScreenProvider()
         {
             var granted = await RequestLockAccess();
             if (!granted)
-                return;
+                return false;
 
             if (SnooStreamViewModel.Settings.EnableUpdates)
                 StartPeriodicAgent();
@@ -53,10 +53,12 @@ namespace SnooStreamWP8.Common
             var taskSettings = TaskSettingsLoader.LoadTaskSettings();
             if (!_imageLoadInProgress && taskSettings.LockScreenImageURIs.Count <= 1)
                 await UpdateLockScreenImages();
+
+            return true;
         }
 
-        bool _imageLoadInProgress = false;
-        public async Task UpdateLockScreenImages(int limit = 10)
+        static bool _imageLoadInProgress = false;
+        public static async Task UpdateLockScreenImages(int limit = 10)
         {
             if (_imageLoadInProgress)
             {
@@ -168,7 +170,7 @@ namespace SnooStreamWP8.Common
             }
         }
 
-        public bool IsLockScreenProvider
+        public static bool IsLockScreenProvider
         {
             get
             {
@@ -176,7 +178,7 @@ namespace SnooStreamWP8.Common
             }
         }
 
-        public bool CanDownload
+        public static bool CanDownload
         {
             get
             {
@@ -207,7 +209,7 @@ namespace SnooStreamWP8.Common
         public static readonly string periodicTaskName = "LockScreen_Updater";
         public static readonly string intensiveTaskName = "Intensive_Baconography_Updater";
 
-        public void RemoveAgent(string name)
+        public static void RemoveAgent(string name)
         {
             try
             {
@@ -218,7 +220,7 @@ namespace SnooStreamWP8.Common
             }
         }
 
-        public void StartPeriodicAgent()
+        public static void StartPeriodicAgent()
         {
             // Obtain a reference to the period task, if one exists
             var periodicTask = ScheduledActionService.Find(periodicTaskName) as PeriodicTask;
@@ -271,7 +273,7 @@ namespace SnooStreamWP8.Common
             }
         }
 
-        public void StartIntensiveAgent()
+        public static void StartIntensiveAgent()
         {
             // Obtain a reference to the period task, if one exists
             var intensiveTask = ScheduledActionService.Find(intensiveTaskName) as ResourceIntensiveTask;
@@ -316,7 +318,7 @@ namespace SnooStreamWP8.Common
             }
         }
 
-        public async Task<bool> RequestLockAccess()
+        public static async Task<bool> RequestLockAccess()
         {
             try
             {
@@ -562,7 +564,7 @@ namespace SnooStreamWP8.Common
             return results;
         }
 
-        public void MakeSingleLockScreenFromImage(int pos, BitmapImage imageSource)
+        public static void MakeSingleLockScreenFromImage(int pos, BitmapImage imageSource)
         {
             Image lockScreenView = new Image();
             lockScreenView.Width = 480;
@@ -616,7 +618,7 @@ namespace SnooStreamWP8.Common
             return vml;
         }
 
-        public void Shuffle<T>(IList<T> list)
+        public static void Shuffle<T>(IList<T> list)
         {
             Random rng = new Random();
             int n = list.Count;

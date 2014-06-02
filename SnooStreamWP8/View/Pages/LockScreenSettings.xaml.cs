@@ -24,8 +24,6 @@ namespace SnooStreamWP8.View.Pages
 			InitializeComponent();
 		}
 
-        
-
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -40,8 +38,8 @@ namespace SnooStreamWP8.View.Pages
                 else
                 {
                     vm.LockScreen.SelectedImage = "/Assets/RainbowGlass.jpg";
-                    var backgroundTaskMan = BackgroundTaskManager.GetInstance();
-                    backgroundTaskMan.UpdateLockScreenImages();
+                    if (BackgroundTaskManager.IsLockScreenProvider)
+                        BackgroundTaskManager.UpdateLockScreenImages();
                 }
                 
                 _previewLockScreenViewModel = new PreviewLockScreenViewModel(vm.LockScreen);
@@ -82,8 +80,9 @@ namespace SnooStreamWP8.View.Pages
 
         private async void SetLockScreenProvider_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            var backgroundTaskMan = BackgroundTaskManager.GetInstance();
-            await backgroundTaskMan.StartLockScreenProvider();
+            var access = await BackgroundTaskManager.RequestLockAccess();
+            if (access)
+                await BackgroundTaskManager.StartLockScreenProvider();
         }
 
         public class PreviewLockScreenViewModel : ViewModelBase
@@ -263,6 +262,11 @@ namespace SnooStreamWP8.View.Pages
                     return _lockScreenVM.OverlayOpacity;
                 }
             }
+        }
+
+        private async void SystemLockScreenSettings_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings-lock:"));
         }
 	}
 }
