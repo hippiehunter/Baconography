@@ -1,4 +1,4 @@
-﻿using CommonImageAquisition;
+﻿using CommonImageAcquisition;
 using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Phone.Scheduler;
 using SnooSharp;
@@ -82,7 +82,7 @@ namespace SnooStreamWP8.Common
 
                 var imageLinks = imagesSubredditResult.Data.Children;
 
-                imageLinks.Select(thing => thing.Data is Link && ImageAquisition.IsImage(((Link)thing.Data).Url)).ToList();
+                imageLinks.Select(thing => thing.Data is Link && ImageAcquisition.IsImage(((Link)thing.Data).Url)).ToList();
 
                 if (imageLinks.Count <= 0)
                     // Couldn't load images error
@@ -101,7 +101,7 @@ namespace SnooStreamWP8.Common
                         BitmapImage imageSource = new BitmapImage();
                         imageSource.CreateOptions = BitmapCreateOptions.None;
 
-                        var imagesList = await ImageAquisition.GetImagesFromUrl("", url);
+                        var imagesList = await ImageAcquisition.GetImagesFromUrl("", url);
                         if (imagesList == null || imagesList.Count() == 0)
                             continue;
 
@@ -482,7 +482,7 @@ namespace SnooStreamWP8.Common
                 "hot", 100);
             var imageLinks = imagesSubredditResult.Data.Children;
 
-            imageLinks.Select(thing => thing.Data is Link && ImageAquisition.IsImage(((Link)thing.Data).Url)).ToList();
+            imageLinks.Select(thing => thing.Data is Link && ImageAcquisition.IsImage(((Link)thing.Data).Url)).ToList();
             if (imageLinks.Count > 0)
             {
                 //download images one at a time, check resolution
@@ -501,7 +501,7 @@ namespace SnooStreamWP8.Common
                         imageSource = new BitmapImage();
                         imageSource.CreateOptions = BitmapCreateOptions.None;
 
-                        var imagesList = await ImageAquisition.GetImagesFromUrl("", url);
+                        var imagesList = await ImageAcquisition.GetImagesFromUrl("", url);
                         if (imagesList == null || imagesList.Count() == 0)
                             continue;
 

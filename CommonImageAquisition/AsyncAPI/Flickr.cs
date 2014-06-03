@@ -8,9 +8,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition.AsyncAPI
+namespace CommonImageAcquisition.AsyncAPI
 {
-    class Flickr : IAsyncAquisitionAPI
+    class Flickr : IAsyncAcquisitionAPI
     {
         //Transliterated from Reddit Enhancement Suite https://github.com/honestbleeps/Reddit-Enhancement-Suite/blob/master/lib/reddit_enhancement_suite.user.js
         private Regex hashRe = new Regex(@"^http:\/\/(?:\w+)\.?flickr\.com\/(?:.*)\/([\d]{10})\/?(?:.*)?$");

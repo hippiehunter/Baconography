@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition.SimpleAPI
+namespace CommonImageAcquisition.SimpleAPI
 {
-	class Imgflip : IAquisitionAPI
+	class Imgflip : IAcquisitionAPI
 	{
 		private static Regex hashRe = new Regex(@"^https?:\/\/imgflip\.com\/(i|gif)\/[a-z0-9]+");
 

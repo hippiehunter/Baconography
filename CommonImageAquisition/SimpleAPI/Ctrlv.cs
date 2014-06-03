@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition.SimpleAPI
+namespace CommonImageAcquisition.SimpleAPI
 {
-	class Ctrlv : IAquisitionAPI
+	class Ctrlv : IAcquisitionAPI
 	{
 		private static Regex hashRe = new Regex(@"^http:\/\/((m|www)\.)?ctrlv\.in\/([0-9]+)");
 

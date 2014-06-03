@@ -1,4 +1,4 @@
-﻿using CommonImageAquisition;
+﻿using CommonImageAcquisition;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;

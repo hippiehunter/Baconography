@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition.SimpleAPI
+namespace CommonImageAcquisition.SimpleAPI
 {
-	class Makeameme : IAquisitionAPI
+	class Makeameme : IAcquisitionAPI
 	{
 		private static Regex hashRe = new Regex(@"^http:\/\/makeameme\.org\/meme\/([\w-]+)\/?");
 

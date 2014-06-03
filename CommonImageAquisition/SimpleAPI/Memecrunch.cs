@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition.SimpleAPI
+namespace CommonImageAcquisition.SimpleAPI
 {
-    class Memecrunch : IAquisitionAPI
+    class Memecrunch : IAcquisitionAPI
     {
         private static Regex hashRe = new Regex(@"^http:\/\/memecrunch.com\/meme\/([0-9A-Z]+)\/([\w\-]+)(\/image\.(png|jpg))?");
 

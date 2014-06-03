@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition.SimpleAPI
+namespace CommonImageAcquisition.SimpleAPI
 {
-	class Ehost : IAquisitionAPI
+	class Ehost : IAcquisitionAPI
 	{
 		private static Regex hashRe = new Regex(@"^http:\/\/(?:i\.)?(?:\d+\.)?eho\.st\/(\w+)\/?");
 

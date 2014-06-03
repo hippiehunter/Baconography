@@ -9,9 +9,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition.AsyncAPI
+namespace CommonImageAcquisition.AsyncAPI
 {
-	class Minus : IAsyncAquisitionAPI
+	class Minus : IAsyncAcquisitionAPI
     {
         
         //Transliterated from Reddit Enhancement Suite https://github.com/honestbleeps/Reddit-Enhancement-Suite/blob/master/lib/reddit_enhancement_suite.user.js

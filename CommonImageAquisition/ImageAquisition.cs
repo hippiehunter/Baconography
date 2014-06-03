@@ -1,5 +1,5 @@
-﻿using CommonImageAquisition.AsyncAPI;
-using CommonImageAquisition.SimpleAPI;
+﻿using CommonImageAcquisition.AsyncAPI;
+using CommonImageAcquisition.SimpleAPI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,15 +8,15 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition
+namespace CommonImageAcquisition
 {
-    public class ImageAquisition
+    public class ImageAcquisition
     {
-		private static Dictionary<string, IAquisitionAPI> _simpleAPIs = new Dictionary<string,IAquisitionAPI>();
-		private static Dictionary<string, IAsyncAquisitionAPI> _asyncAPIs = new Dictionary<string,IAsyncAquisitionAPI>();
+		private static Dictionary<string, IAcquisitionAPI> _simpleAPIs = new Dictionary<string,IAcquisitionAPI>();
+		private static Dictionary<string, IAsyncAcquisitionAPI> _asyncAPIs = new Dictionary<string,IAsyncAcquisitionAPI>();
 
 
-		static ImageAquisition()
+		static ImageAcquisition()
 		{
 			var quickmeme = new Quickmeme();
 			var picsarus = new Picsarus();
@@ -76,8 +76,8 @@ namespace CommonImageAquisition
                 else
                 {
 					var domain = HttpClientUtility.GetDomainFromUrl(url).ToLower();
-					IAsyncAquisitionAPI asyncApi = null;
-					IAquisitionAPI simpleApi = null;
+					IAsyncAcquisitionAPI asyncApi = null;
+					IAcquisitionAPI simpleApi = null;
 					if (_simpleAPIs.TryGetValue(domain, out simpleApi))
 					{
 						return new Tuple<string, string>[] { Tuple.Create(title, simpleApi.GetImageFromUri(uri)) };
@@ -127,8 +127,8 @@ namespace CommonImageAquisition
                 else
                 {
 					var domain = HttpClientUtility.GetDomainFromUrl(url).ToLower();
-					IAsyncAquisitionAPI asyncApi = null;
-					IAquisitionAPI simpleApi = null;
+					IAsyncAcquisitionAPI asyncApi = null;
+					IAcquisitionAPI simpleApi = null;
 					if (_simpleAPIs.TryGetValue(domain, out simpleApi))
 					{
 						return true;

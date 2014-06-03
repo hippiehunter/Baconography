@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition.SimpleAPI
+namespace CommonImageAcquisition.SimpleAPI
 {
-	class Memefive : IAquisitionAPI
+	class Memefive : IAcquisitionAPI
 	{
 		private static Regex hashRe = new Regex(@"^http:\/\/(?:www\.)?(?:memefive\.com)\/meme\/([\w]+)\/?");
 		private static Regex altHashRe = new Regex(@"^http:\/\/(?:www\.)?(?:memefive\.com)\/([\w]+)\/?");

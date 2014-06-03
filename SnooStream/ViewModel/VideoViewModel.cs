@@ -1,4 +1,4 @@
-﻿using CommonVideoAquisition;
+﻿using CommonVideoAcquisition;
 using GalaSoft.MvvmLight;
 using SnooStream.Common;
 using System;
@@ -39,7 +39,7 @@ namespace SnooStream.ViewModel
 
 		internal override async Task LoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken)
         {
-            var videoResult = await VideoAquisition.GetPlayableStreams(Url, SnooStreamViewModel.SystemServices.SendGet);
+            var videoResult = await VideoAcquisition.GetPlayableStreams(Url, SnooStreamViewModel.SystemServices.SendGet);
             if (videoResult != null)
             {
                 AvailableStreams = new ObservableCollection<Tuple<string, string>>(videoResult.PlayableStreams);

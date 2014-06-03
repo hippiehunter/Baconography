@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition
+namespace CommonImageAcquisition
 {
-	interface IAquisitionAPI
+	interface IAcquisitionAPI
 	{
 		string GetImageFromUri(Uri uri);
 	}

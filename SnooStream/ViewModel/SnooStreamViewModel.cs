@@ -1,4 +1,4 @@
-﻿using CommonImageAquisition;
+﻿using CommonImageAcquisition;
 using GalaSoft.MvvmLight;
 using SnooSharp;
 using SnooStream.Common;
@@ -77,7 +77,7 @@ namespace SnooStream.ViewModel
                     }
 
 
-                    //var loadedContent = await targetRiver.PreloadContent((link) => ImageAquisition.MightHaveImagesFromUrl(link.Link.Url) && !link.Link.Url.EndsWith(".gif"), 12, BackgroundCancellationToken);
+                    //var loadedContent = await targetRiver.PreloadContent((link) => ImageAcquisition.MightHaveImagesFromUrl(link.Link.Url) && !link.Link.Url.EndsWith(".gif"), 12, BackgroundCancellationToken);
                     //foreach (var content in loadedContent.OfType<ImageViewModel>())
                     //{
                     //    if (content.ImageSource.Dimensions != null)

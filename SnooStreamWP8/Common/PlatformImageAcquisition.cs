@@ -1,4 +1,4 @@
-﻿using CommonImageAquisition;
+﻿using CommonImageAcquisition;
 using SnooStreamWP8.PlatformServices;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SnooStreamWP8.Common
 {
-    class PlatformImageAcquisition : ImageAquisition
+    class PlatformImageAcquisition : ImageAcquisition
     {
         public static async Task<byte[]> ImageBytesFromUrl(string url, bool isRetry)
         {
@@ -48,7 +48,7 @@ namespace SnooStreamWP8.Common
             string targetUrl = url;
             if (IsImage(url) && IsImageAPI(url))
             {
-                var imageApiResults = await ImageAquisition.GetImagesFromUrl("", url);
+                var imageApiResults = await ImageAcquisition.GetImagesFromUrl("", url);
                 if (imageApiResults != null && imageApiResults.Count() > 1)
                 {
                     targetUrl = imageApiResults.First().Item2;

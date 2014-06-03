@@ -1,5 +1,5 @@
-﻿using CommonImageAquisition;
-using CommonVideoAquisition;
+﻿using CommonImageAcquisition;
+using CommonVideoAcquisition;
 using GalaSoft.MvvmLight;
 using SnooSharp;
 using SnooStream.ViewModel;

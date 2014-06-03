@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonVideoAquisition
+namespace CommonVideoAcquisition
 {
-    public class VideoAquisition
+    public class VideoAcquisition
     {
         
         //someday we will support other video providers

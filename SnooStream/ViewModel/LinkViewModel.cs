@@ -1,5 +1,5 @@
-﻿using CommonImageAquisition;
-using CommonVideoAquisition;
+﻿using CommonImageAcquisition;
+using CommonVideoAcquisition;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using SnooSharp;
@@ -66,7 +66,7 @@ namespace SnooStream.ViewModel
                     targetHost == "liveleak.com" ||
                     targetHost == "www.liveleak.com")
                 {
-                    if (VideoAquisition.IsAPI(Link.Url))
+                    if (VideoAcquisition.IsAPI(Link.Url))
                     {
                         return new VideoViewModel(this, Link.Url);
                     }
@@ -77,9 +77,9 @@ namespace SnooStream.ViewModel
                 }
                 else 
 				{
-                    if (ImageAquisition.IsImageAPI(Link.Url))
+                    if (ImageAcquisition.IsImageAPI(Link.Url))
                     {
-                        var imageApiResults = await ImageAquisition.GetImagesFromUrl(Link.Title, Link.Url);
+                        var imageApiResults = await ImageAcquisition.GetImagesFromUrl(Link.Title, Link.Url);
                         if (imageApiResults != null && imageApiResults.Count() > 1)
                             return new AlbumViewModel(this, Link.Url, imageApiResults, Link.Title);
                         else if (imageApiResults != null && imageApiResults.Count() == 1)

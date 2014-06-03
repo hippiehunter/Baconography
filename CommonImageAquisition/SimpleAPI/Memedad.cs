@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CommonImageAquisition.SimpleAPI
+namespace CommonImageAcquisition.SimpleAPI
 {
-	class Memedad : IAquisitionAPI
+	class Memedad : IAcquisitionAPI
 	{
 		private static Regex hashRe = new Regex(@"^http:\/\/memedad.com\/meme\/([0-9]+)");
 
