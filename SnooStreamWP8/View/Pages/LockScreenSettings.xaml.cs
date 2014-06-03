@@ -24,26 +24,33 @@ namespace SnooStreamWP8.View.Pages
 			InitializeComponent();
 		}
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
+            IsLockScreenProvider = BackgroundTaskManager.IsLockScreenProvider;
             var taskSettings = TaskSettingsLoader.LoadTaskSettings();
 
             var vm = this.DataContext as SettingsViewModel;
             if (vm != null)
             {
+                _previewLockScreenViewModel = new PreviewLockScreenViewModel(vm.LockScreen);
+                SetValue(PreviewLockScreenVMProperty, _previewLockScreenViewModel);
+
                 if (taskSettings.LockScreenImageURIs.Count >= 1)
-                    vm.LockScreen.SelectedImage = taskSettings.LockScreenImageURIs.First();
+                {
+                    BackgroundTaskManager.Shuffle(taskSettings.LockScreenImageURIs);
+                    vm.LockScreen.SelectedImage = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + taskSettings.LockScreenImageURIs.First();
+                }
                 else
                 {
                     vm.LockScreen.SelectedImage = "/Assets/RainbowGlass.jpg";
                     if (BackgroundTaskManager.IsLockScreenProvider)
-                        BackgroundTaskManager.UpdateLockScreenImages();
+                    {
+                        ImagesLoading = true;
+                        ImagesLoading = await BackgroundTaskManager.UpdateLockScreenImages();
+                    }
                 }
-                
-                _previewLockScreenViewModel = new PreviewLockScreenViewModel(vm.LockScreen);
-                SetValue(PreviewLockScreenVMProperty, _previewLockScreenViewModel);
             }
         }
 
@@ -63,26 +70,79 @@ namespace SnooStreamWP8.View.Pages
             }
         }
 
-        public static readonly DependencyProperty IsLockScreenProviderProperty =
-            DependencyProperty.Register(
-                "IsLockScreenProvider", typeof(bool),
-                typeof(LockScreenSettings),
-                new PropertyMetadata(false)
-            );
-
+        bool _isLockScreenProvider;
         public bool IsLockScreenProvider
         {
             get
             {
-                return Windows.Phone.System.UserProfile.LockScreenManager.IsProvidedByCurrentApplication;
+                return _isLockScreenProvider;
+            }
+            set
+            {
+                _isLockScreenProvider = value;
+                UpdateVisualState();
             }
         }
 
+        bool _imagesLoading;
+        public bool ImagesLoading
+        {
+            get
+            {
+                return _imagesLoading;
+            }
+            set
+            {
+                _imagesLoading = value;
+                UpdateVisualState();
+            }
+        }
+
+        private void UpdateVisualState()
+        {
+            SetValue(ShowSetProviderProperty, !IsLockScreenProvider);
+            SetValue(ShowRefreshProperty, IsLockScreenProvider && !ImagesLoading);
+            SetValue(ShowLoadingProperty, IsLockScreenProvider && ImagesLoading);
+        }
+
+        public static readonly DependencyProperty ShowRefreshProperty =
+            DependencyProperty.Register(
+                "ShowRefresh", typeof(bool),
+                typeof(LockScreenSettings),
+                new PropertyMetadata(false)
+            );
+
+        public static readonly DependencyProperty ShowLoadingProperty =
+            DependencyProperty.Register(
+                "ShowLoading", typeof(bool),
+                typeof(LockScreenSettings),
+                new PropertyMetadata(false)
+            );
+
+        public static readonly DependencyProperty ShowSetProviderProperty =
+            DependencyProperty.Register(
+                "ShowSetProvider", typeof(bool),
+                typeof(LockScreenSettings),
+                new PropertyMetadata(false)
+            );
+
         private async void SetLockScreenProvider_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            var access = await BackgroundTaskManager.RequestLockAccess();
-            if (access)
-                await BackgroundTaskManager.StartLockScreenProvider();
+            IsLockScreenProvider = await BackgroundTaskManager.StartLockScreenProvider();
+            if (IsLockScreenProvider)
+            {
+                ImagesLoading = true;
+                ImagesLoading = await BackgroundTaskManager.MaybeUpdateLockScreenImages();
+            }
+        }
+
+        private async void Refresh_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            if (IsLockScreenProvider)
+            {
+                ImagesLoading = true;
+                ImagesLoading = await BackgroundTaskManager.UpdateLockScreenImages();
+            }
         }
 
         public class PreviewLockScreenViewModel : ViewModelBase

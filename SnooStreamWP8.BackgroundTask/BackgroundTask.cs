@@ -68,8 +68,8 @@ namespace SnooStreamWP8.BackgroundTask
 
 			return WebGlyph;
 		}
-		public static readonly string periodicTaskName = "LockScreen_Updater";
-		public static readonly string intensiveTaskName = "Intensive_Baconography_Updater";
+        public static readonly string periodicTaskName = "SnooStream_LockScreen_Updater";
+        public static readonly string intensiveTaskName = "SnooStream_Intensive_Updater";
 
 		private TaskSettings settings;
 

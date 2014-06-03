@@ -25,19 +25,6 @@ namespace SnooStreamWP8.Common
 {
     class BackgroundTaskManager
     {
-        private static BackgroundTaskManager _instance;
-        public static BackgroundTaskManager GetInstance()
-        {
-            if (_instance == null)
-                _instance = new BackgroundTaskManager();
-            return _instance;
-        }
-
-        private BackgroundTaskManager()
-        {
-        }
-
-
         public static async Task<bool> StartLockScreenProvider()
         {
             var granted = await RequestLockAccess();
@@ -50,26 +37,32 @@ namespace SnooStreamWP8.Common
             if (SnooStreamViewModel.Settings.EnableOvernightUpdates)
                 StartIntensiveAgent();
 
-            var taskSettings = TaskSettingsLoader.LoadTaskSettings();
-            if (!_imageLoadInProgress && taskSettings.LockScreenImageURIs.Count <= 1)
-                await UpdateLockScreenImages();
+            SetRandomLockScreen();
 
             return true;
         }
 
+        public static async Task<bool> MaybeUpdateLockScreenImages()
+        {
+            var taskSettings = TaskSettingsLoader.LoadTaskSettings();
+            if (!_imageLoadInProgress && taskSettings.LockScreenImageURIs.Count <= 1)
+                return await UpdateLockScreenImages();
+            return false;
+        }
+
         static bool _imageLoadInProgress = false;
-        public static async Task UpdateLockScreenImages(int limit = 10)
+        public static async Task<bool> UpdateLockScreenImages(int limit = 10)
         {
             if (_imageLoadInProgress)
             {
                 while (_imageLoadInProgress)
                     await Task.Yield();
 
-                return;
+                return _imageLoadInProgress;
             }
 
             if (!CanDownload)
-                return;
+                return _imageLoadInProgress;
 
             _imageLoadInProgress = true;
 
@@ -86,7 +79,7 @@ namespace SnooStreamWP8.Common
 
                 if (imageLinks.Count <= 0)
                     // Couldn't load images error
-                    return;
+                    return _imageLoadInProgress;
 
                 Shuffle(imageLinks);
 
@@ -158,6 +151,8 @@ namespace SnooStreamWP8.Common
                 var taskSettings = TaskSettingsLoader.LoadTaskSettings();
                 taskSettings.LockScreenImageURIs = results;
                 taskSettings.SaveTaskSettings();
+
+                SetRandomLockScreen();
             }
             catch
             {
@@ -166,6 +161,33 @@ namespace SnooStreamWP8.Common
             finally
             {
                 _imageLoadInProgress = false;
+            }
+
+            return _imageLoadInProgress;
+        }
+
+        public static void SetRandomLockScreen()
+        {
+            if (IsLockScreenProvider)
+            {
+                TaskSettings settings = TaskSettingsLoader.LoadTaskSettings();
+                string imageUrl = "";
+                // ms-appx points to the Local app install folder, to reference resources bundled in the XAP package.
+                // ms-appdata points to the root of the local app data folder.
+                if (settings.LockScreenImageURIs.Count <= 0)
+                {
+                    imageUrl = "ms-appx:///Assets/RainbowGlass.jpg";
+                }
+                else
+                {
+                    Shuffle(settings.LockScreenImageURIs);
+                    imageUrl = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + settings.LockScreenImageURIs.First();
+                }
+                
+                var uri = new Uri(imageUrl, UriKind.Absolute);
+
+                // Set the lock screen background image.
+                Windows.Phone.System.UserProfile.LockScreen.SetImageUri(uri);
             }
         }
 
@@ -191,7 +213,7 @@ namespace SnooStreamWP8.Common
             }
         }
 
-        public bool DownloadOptimal
+        public static bool DownloadOptimal
         {
             get
             {
@@ -340,227 +362,6 @@ namespace SnooStreamWP8.Common
             }
 
             return false;
-        }
-
-        private bool _loadingActiveLockScreen = false;
-        public async Task DoActiveLockScreen()
-        {
-            try
-            {
-                if (_loadingActiveLockScreen)
-                {
-                    while (_loadingActiveLockScreen)
-                        await Task.Yield();
-
-                    return;
-                }
-
-                var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
-                var connectionCostType = connectionProfile.GetConnectionCost().NetworkCostType;
-                var taskSettings = TaskSettingsLoader.LoadTaskSettings();
-
-                _loadingActiveLockScreen = true;
-                //Messenger.Default.Send<LoadingMessage>(new LoadingMessage { Loading = true });
-
-                var user = SnooStreamViewModel.RedditUserState;
-                var loginCookie = user.LoginCookie;
-                IEnumerable<string> lockScreenImages = new string[0];
-
-                if ((SnooStreamViewModel.Settings.UpdateImagesOnlyOnWifi && Microsoft.Phone.Net.NetworkInformation.DeviceNetworkInformation.IsWiFiEnabled)
-                    || (!SnooStreamViewModel.Settings.UpdateImagesOnlyOnWifi && connectionCostType != NetworkCostType.Variable))
-                {
-                    if (!SnooStreamViewModel.Settings.UseImagePickerForLockScreen)
-                    {
-                        lockScreenImages = await MakeLockScreenImages(10);
-                    }
-                    else
-                    {
-                        throw new NotSupportedException();
-                    }
-                }
-                else
-                {
-                    //find the images we used last time
-                    if (taskSettings != null)
-                    {
-                        if (!SnooStreamViewModel.Settings.UseImagePickerForLockScreen)
-                        {
-                            if (taskSettings.LockScreenImageURIs.Count == 0
-                                && connectionCostType == NetworkCostType.Unrestricted)
-                            {
-                                lockScreenImages = await MakeLockScreenImages(1);
-                            }
-                            else
-                                lockScreenImages = taskSettings.LockScreenImageURIs;
-                        }
-                    }
-                }
-
-                if (SnooStreamViewModel.Settings.UseImagePickerForLockScreen)
-                {
-                    lockScreenImages = new string[] { Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\lockScreenCache0.jpg" };
-                }
-
-                taskSettings.SaveTaskSettings();
-
-                //this can happen when the user is still trying to use the application so dont lock up the UI thread with this work
-                await Task.Yield();
-
-                var lockScreenViewModel = await MakeLockScreenControl(lockScreenImages);
-
-                //nasty nasty hack for stupid platform limitation, no data binding if you're not in the visual tree
-                var lockScreenView = new LockScreenViewControl(lockScreenViewModel);
-                lockScreenView.Width = SnooStreamViewModel.Settings.ScreenWidth;
-                lockScreenView.Height = SnooStreamViewModel.Settings.ScreenHeight;
-                lockScreenView.UpdateLayout();
-                lockScreenView.Measure(new Size(SnooStreamViewModel.Settings.ScreenWidth, SnooStreamViewModel.Settings.ScreenHeight));
-                lockScreenView.Arrange(new Rect(0, 0, SnooStreamViewModel.Settings.ScreenWidth, SnooStreamViewModel.Settings.ScreenHeight));
-                WriteableBitmap bitmap = new WriteableBitmap(SnooStreamViewModel.Settings.ScreenWidth, SnooStreamViewModel.Settings.ScreenHeight);
-                bitmap.Render(lockScreenView, new ScaleTransform() { ScaleX = 1, ScaleY = 1 });
-                bitmap.Invalidate();
-                string targetFilePath = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\lockscreen.jpg";
-                if (File.Exists(targetFilePath))
-                {
-                    targetFilePath = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\lockscreenAlt.jpg";
-                }
-
-                using (var lockscreenJpg = File.Create(targetFilePath))
-                {
-                    bitmap.SaveJpeg(lockscreenJpg, SnooStreamViewModel.Settings.ScreenWidth, SnooStreamViewModel.Settings.ScreenHeight, 0, 100);
-                    lockscreenJpg.Flush(true);
-                    lockscreenJpg.Close();
-                }
-
-                //this can happen when the user is still trying to use the application so dont lock up the UI thread with this work
-                await Task.Yield();
-
-                //LockHelper(Path.GetFileName(targetFilePath), false, supressInit);
-
-                if (targetFilePath.EndsWith("lockscreenAlt.jpg") && File.Exists(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\lockscreen.jpg"))
-                {
-                    File.Delete(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\lockscreen.jpg");
-                }
-                else if (targetFilePath.EndsWith("lockscreen.jpg") && File.Exists(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\lockscreenAlt.jpg"))
-                {
-                    File.Delete(Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\lockscreenAlt.jpg");
-                }
-
-                if (SnooStreamViewModel.Settings.EnableUpdates)
-                    StartPeriodicAgent();
-
-                if (SnooStreamViewModel.Settings.EnableOvernightUpdates)
-                    StartIntensiveAgent();
-
-
-            }
-            catch
-            {
-                //notificationService.CreateNotification("There was an error while setting the lock screen");
-            }
-            finally
-            {
-                _loadingActiveLockScreen = false;
-                //Messenger.Default.Send<LoadingMessage>(new LoadingMessage { Loading = false });
-            }
-        }
-
-        public async Task<IEnumerable<string>> MakeLockScreenImages(int limiter = 10)
-        {
-            try
-            {
-                //find the images we used last time
-                var taskSettings = TaskSettingsLoader.LoadTaskSettings();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.ToString());
-            }
-
-            List<string> results = new List<string>();
-            var imagesSubredditResult = await SnooStreamViewModel.RedditService.GetPostsBySubreddit(
-                Utility.CleanRedditLink(SnooStreamViewModel.Settings.ImagesSubreddit, SnooStreamViewModel.RedditUserState.Username),
-                "hot", 100);
-            var imageLinks = imagesSubredditResult.Data.Children;
-
-            imageLinks.Select(thing => thing.Data is Link && ImageAcquisition.IsImage(((Link)thing.Data).Url)).ToList();
-            if (imageLinks.Count > 0)
-            {
-                //download images one at a time, check resolution
-                //set LockScreenViewModel properties
-                //render to bitmap
-                //save bitmap
-                BitmapImage imageSource = null;
-                for (int i = 0; i < imageLinks.Count; i++)
-                {
-                    if (!(imageLinks[i].Data is Link))
-                        continue;
-
-                    try
-                    {
-                        var url = ((Link)imageLinks[i].Data).Url;
-                        imageSource = new BitmapImage();
-                        imageSource.CreateOptions = BitmapCreateOptions.None;
-
-                        var imagesList = await ImageAcquisition.GetImagesFromUrl("", url);
-                        if (imagesList == null || imagesList.Count() == 0)
-                            continue;
-
-                        url = imagesList.First().Item2;
-
-                        using (var stream = await PlatformImageAcquisition.ImageStreamFromUrl(url))
-                        {
-                            try
-                            {
-                                if (url.EndsWith(".jpg") || url.EndsWith(".jpeg"))
-                                {
-                                    var dimensions = JpegUtility.GetJpegDimensions(stream);
-                                    stream.Seek(0, SeekOrigin.Begin);
-                                    //bigger than 16 megs when loaded means we need to chuck it
-                                    if (dimensions == null || (dimensions.Height * dimensions.Width * 4) > 16 * 1024 * 1024)
-                                        continue;
-                                }
-                                else if (stream.Length > 1024 * 1024) //its too big drop it
-                                {
-                                    continue;
-                                }
-                            }
-                            catch
-                            {
-                                if (stream.Length > 1024 * 1024) //its too big drop it
-                                {
-                                    continue;
-                                }
-                            }
-
-                            imageSource.SetSource(stream);
-                        }
-                        if (imageSource.PixelHeight == 0 || imageSource.PixelWidth == 0)
-                            continue;
-
-                        if (imageSource.PixelHeight < 800
-                                || imageSource.PixelWidth < 480)
-                            continue;
-
-                        MakeSingleLockScreenFromImage(results.Count, imageSource);
-                        //this can happen when the user is still trying to use the application so dont lock up the UI thread with this work
-                        await Task.Yield();
-                        results.Add(string.Format("lockScreenCache{0}.jpg", results.Count.ToString()));
-
-                        if (results.Count >= limiter)
-                            break;
-                    }
-                    catch (OutOfMemoryException oom)
-                    {
-                        //we're done here
-                        break;
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-                }
-            }
-            return results;
         }
 
         public static void MakeSingleLockScreenFromImage(int pos, BitmapImage imageSource)

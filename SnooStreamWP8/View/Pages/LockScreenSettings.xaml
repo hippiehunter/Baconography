@@ -45,7 +45,7 @@
                             </StackPanel>
                         </Button>
                         <Button Style="{StaticResource SubtextButton}"
-                                Visibility="{Binding IsLockScreenProvider, ElementName=LayoutRoot, Converter={StaticResource invertedBooleanVisibilityConverter}}"
+                                Visibility="{Binding ShowSetProvider, ElementName=LayoutRoot, Converter={StaticResource booleanVisibilityConverter}}"
                                 Tap="SetLockScreenProvider_Tap">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
@@ -57,13 +57,25 @@
                             </StackPanel>
                         </Button>
                         <Button Style="{StaticResource SubtextButton}"
-                                Visibility="{Binding IsLockScreenProvider, ElementName=LayoutRoot, Converter={StaticResource booleanVisibilityConverter}}">
+                                Visibility="{Binding ShowRefresh, ElementName=LayoutRoot, Converter={StaticResource booleanVisibilityConverter}}"
+                                Tap="Refresh_Tap">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                                     REFRESH
                                 </TextBlock>
                                 <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                                     Load up a new batch of lock screen images now
+                                </TextBlock>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource SubtextButton}"
+                                Visibility="{Binding ShowLoading, ElementName=LayoutRoot, Converter={StaticResource booleanVisibilityConverter}}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}" Foreground="{StaticResource PhoneDisabledBrush}">
+                                    UPDATING IMAGES
+                                </TextBlock>
+                                <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}" Foreground="{StaticResource PhoneDisabledBrush}">
+                                    Feel free to navigate away, this could take a while
                                 </TextBlock>
                             </StackPanel>
                         </Button>
