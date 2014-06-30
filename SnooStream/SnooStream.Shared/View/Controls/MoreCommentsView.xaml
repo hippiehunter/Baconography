@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="SnooStreamWP8.View.Controls.MoreCommentsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d"
+        FontFamily="{StaticResource PhoneFontFamilyNormal}" FontSize="{StaticResource PhoneFontSizeNormal}"
+        Foreground="{StaticResource PhoneForegroundBrush}" d:DesignHeight="480" d:DesignWidth="480">
+
+    <Grid HorizontalAlignment="Stretch" MinWidth="430" MinHeight="40"
+            Margin="{Binding Path=Depth, Converter={StaticResource commentDepthMarginConverter}}"
+            Visibility="{Binding IsVisible, Converter={StaticResource booleanVisibilityConverter}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="7" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" Background="{Binding Path=Depth, Converter={StaticResource commentDepthColorConverter}}" />
+        <Grid Grid.Column="1">
+            <Button Visibility="{Binding Loading, Converter={StaticResource invertedBooleanVisibilityConverter}}"
+                    BorderThickness="0" Padding="0" Margin="0,0,0,0" VerticalAlignment="Top"
+                    Command="{Binding TriggerLoad}" HorizontalContentAlignment="Left" HorizontalAlignment="Stretch">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource PhoneTextAccentStyle}" Text="Load more comments" Margin="0,0,0,0" />
+                    <TextBlock Style="{StaticResource PhoneTextAccentStyle}" Text="{Binding CountString}"
+                            Margin="5,0,0,0" />
+                </StackPanel>
+            </Button>
+            <TextBlock Visibility="{Binding Loading, Converter={StaticResource booleanVisibilityConverter}}"
+                    Text="Loading..." Margin="12, 12, 0, 12" HorizontalAlignment="Stretch" Grid.Column="1"
+                    Style="{StaticResource PhoneTextAccentStyle}" />
+        </Grid>
+    </Grid>
+</UserControl>

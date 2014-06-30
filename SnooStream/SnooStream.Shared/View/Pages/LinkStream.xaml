@@ -1,0 +1,135 @@
+﻿<common:SnooApplicationPage
+    x:Class="SnooStreamWP8.View.Pages.LinkStream"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:SnooStreamWP8.View.Controls"
+    xmlns:selectors="clr-namespace:SnooStreamWP8.View.Selectors"
+    xmlns:common="clr-namespace:SnooStreamWP8.Common"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
+    xmlns:telerikSlideView="clr-namespace:Telerik.Windows.Controls.SlideView;assembly=Telerik.Windows.Controls.Primitives"
+    xmlns:mmppf="clr-namespace:Microsoft.PlayerFramework;assembly=Microsoft.PlayerFramework"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    x:Name="linkStream">
+
+    <!--LayoutRoot is the root grid where all page content is placed-->
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.Resources>
+            <DataTemplate x:Name="imageTemplate">
+                <telerikSlideView:PanAndZoomImage 
+                    ZoomMode="None" Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Unloaded="PanAndZoomImage_Unloaded" Loaded="PanAndZoomImage_Loaded"
+                    Source="{Binding ImageSource, Converter={StaticResource asyncImageSourceConverter}}" />
+            </DataTemplate>
+
+            <DataTemplate x:Name="gifTemplate">
+                <local:GifControl
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Unloaded="GifControl_Unloaded" Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
+                    ImageSource="{Binding ImageSource.ImageData}" ManipulationController="{Binding ManipulationController, ElementName=linkStream}" Loaded="GifControl_Loaded" />
+            </DataTemplate>
+
+            <DataTemplate x:Name="videoTemplate" >
+                <mmppf:MediaPlayer x:Name="player" Source="{Binding SelectedStream}" IsFullScreen="True"/>
+            </DataTemplate>
+
+            <DataTemplate x:Key="Type:ReadableArticleParagraph">
+                <TextBlock HorizontalAlignment="Left" FontSize="20" Padding="0" Margin="10" Text="{Binding Text}" TextWrapping="Wrap"/>
+            </DataTemplate>
+            <DataTemplate x:Key="Type:ReadableArticleImage">
+                <Image Source="{Binding Url}" Stretch="Uniform" Margin="10"/>
+            </DataTemplate>
+
+
+            <selectors:TypedTemplateSelector x:Name="articleTemplateSelector" />
+
+            
+            <DataTemplate x:Name="webTemplate" >
+                <telerikPrimitives:RadDataBoundListBox ItemsSource="{Binding WebParts}"
+                                                       Margin="0" Padding="0"
+                                                       BorderThickness="0" VerticalAlignment="Stretch" 
+                                                       ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                       ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                                                       HorizontalContentAlignment="Stretch"
+                                                       ItemTemplateSelector="{StaticResource articleTemplateSelector}">
+                    <telerikPrimitives:RadDataBoundListBox.ListHeaderContent>
+                        <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" FontSize="32" Margin="20" TextWrapping="Wrap"/>
+                    </telerikPrimitives:RadDataBoundListBox.ListHeaderContent>
+                </telerikPrimitives:RadDataBoundListBox>
+            </DataTemplate>
+            
+            <DataTemplate x:Name="selfTemplate">
+                <local:CommentsView/>
+            </DataTemplate>
+
+
+            <selectors:ImageTemplateSelector x:Name="imageSelector"
+                    StaticTemplate="{StaticResource imageTemplate}"
+                    GifTemplate="{StaticResource gifTemplate}"/>
+
+            <DataTemplate x:Name="albumTemplate">
+                <Grid>
+                    <!-- TODO: FIX this, its doesnt draw right and its probably not in the right place -->
+                    <telerikPrimitives:RadPaginationControl Grid.Row="0" PageProvider="{Binding ElementName=albumSlideView}" DisplayMode="IndexLabel"/>
+                    <telerikPrimitives:RadSlideView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}" Orientation="Vertical" IsLoopingEnabled="True" AdjacentItemsPreviewMode="None" 
+                                                    IsPullToRefreshEnabled="False" ItemRealizationMode="ViewportItem" ItemTemplateSelector="{StaticResource imageSelector}" 
+                                                    Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
+                                                    Loaded="albumSlideView_Loaded" Unloaded="albumSlideView_Unloaded"/>
+                </Grid>
+            </DataTemplate>
+
+            
+            
+
+
+            <DataTemplate x:Name="loadingTemplate">
+                <Grid>
+                    <telerikPrimitives:RadBusyIndicator
+                        IsRunning="{Binding IsInitiallyLoaded, Converter={StaticResource invertedBooleanConverter}}"
+                        Content="{Binding Underlying.PreviewLoadPercent}"/>
+                    <selectors:ContentTemplateSelector Content="{Binding Underlying}"
+                                                       IsLoaded="{Binding IsInitiallyLoaded}"
+                                                       Visibility="{Binding IsInitiallyLoaded, Converter={StaticResource booleanVisibilityConverter}}"
+                                                    ImageContentTemplate="{StaticResource imageTemplate}"
+                                                    GifTemplate="{StaticResource gifTemplate}"
+                                                    AlbumContentTemplate="{StaticResource albumTemplate}"
+                                                    TextWebContentTemplate="{StaticResource webTemplate}"
+                                                    WebContentTemplate="{StaticResource webTemplate}"
+                                                    VideoContentTemplate="{StaticResource videoTemplate}"
+                                                    SelfContentTemplate="{StaticResource selfTemplate}"/>
+                </Grid>
+            </DataTemplate>
+
+
+
+            <DataTemplate x:Name="overlayTemplate">
+                <Border HorizontalAlignment="Stretch" Margin="0,0,0,15" VerticalAlignment="Top" Height="Auto" Opacity="1" Background="{StaticResource PhoneBackgroundBrush}">
+                    <TextBlock Text="{Binding PreviewText}" TextWrapping="Wrap" MaxHeight="300"/>
+                </Border>
+            </DataTemplate>
+
+            
+
+        </Grid.Resources>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!--ContentPanel - place additional content here-->
+        <Grid x:Name="ContentPanel" Margin="0,0,0,0" Grid.Row="0">
+            <telerikPrimitives:RadSlideView x:Name="radSlideView" SelectedItem="{Binding SelectedItem, ElementName=linkStream, Mode=TwoWay}" ItemsSource="{Binding Links, ElementName=linkStream}" AdjacentItemsPreviewMode="None" IsPullToRefreshEnabled="False" 
+                                            Orientation="Horizontal" IsLoopingEnabled="False" OverlayContentTemplate="{StaticResource overlayTemplate}" IsShowOverlayContentOnTapEnabled="True"
+                                            ItemRealizationMode="ViewportItem"  ItemTemplate="{StaticResource loadingTemplate}" DoubleTap="radSlideView_DoubleTap" ManipulationStarted="radSlideView_ManipulationStarted"
+                                            ManipulationCompleted="radSlideView_ManipulationCompleted" ManipulationDelta="radSlideView_ManipulationDelta" >
+            </telerikPrimitives:RadSlideView>
+            
+        </Grid>
+        <!-- TODO: change positioning in landscape -->
+        <local:ExtendedAppBarControl Name="appBar" Grid.Row="1" DataContext="{Binding SelectedItem.Context, ElementName=radSlideView}" LastButtonSymbol="&#xE118;" LastButtonText="Save"/>
+    </Grid>
+
+</common:SnooApplicationPage>

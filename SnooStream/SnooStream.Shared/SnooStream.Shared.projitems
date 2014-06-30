@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>6c8373cd-ebf7-455d-ad4a-a26fd89a479d</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SnooStream</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="$(MSBuildThisFileDirectory)App.xaml">
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Background\BackgroundUpdater.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\BackgroundTaskManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\LinkViewLayoutManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\ManipulationController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\NavigationStateUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\OrientationManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\PlatformImageAcquisition.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\SnooApplicationPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\Utility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\ActivityGroupCountConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\AsyncImageSourceConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\AuthorFlairKindConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\BoolToAccentBrushConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\CommentDepthColorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\CommentDepthMarginConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\DomainConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\InvertedBooleanConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\LinkGlyphConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\StringCaseConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeRelationConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\UnixTimeConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\VisibilityConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\VisitedLinkConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\VoteColorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\VoteIndicatorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlatformServices\MarkdownProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlatformServices\NavigationService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlatformServices\SystemServices.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)View\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Resources\StyleResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+</Project>
