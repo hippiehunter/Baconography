@@ -6,16 +6,17 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenItemView.xaml.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenViewControl.xaml.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SimpleRedditService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenSettings.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)ServicingTask.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)UpdateTask.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenItemView.xaml.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenViewControl.xaml.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SimpleRedditService.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)LockScreenItemView.xaml" />
