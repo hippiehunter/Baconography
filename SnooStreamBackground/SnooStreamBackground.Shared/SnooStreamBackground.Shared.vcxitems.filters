@@ -7,6 +7,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenViewControl.xaml.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SimpleRedditService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenSettings.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenHistory.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
@@ -17,6 +18,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenViewControl.xaml.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SimpleRedditService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenSettings.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenHistory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)LockScreenItemView.xaml" />
