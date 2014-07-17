@@ -4,8 +4,6 @@ using SnooSharp;
 using SnooStream.Model;
 using SnooStream.TaskSettings;
 using SnooStream.ViewModel;
-using SnooStream.BackgroundControls.View;
-using SnooStream.BackgroundControls.ViewModel;
 using SnooStream.Converters;
 using System;
 using System.Collections.Generic;
@@ -20,12 +18,19 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.Foundation;
+using SnooStreamBackground;
+using Windows.UI.Popups;
+using Windows.ApplicationModel.Background;
 
 namespace SnooStream.Common
 {
     class BackgroundTaskManager
     {
-        public static async Task<bool> StartLockScreenProvider()
+        static bool _imageLoadInProgress = false;
+        
+#if WINDOWS_PHONE_APP
+
+		public static async Task<bool> StartLockScreenProvider()
         {
             var granted = await RequestLockAccess();
             if (!granted)
@@ -44,14 +49,13 @@ namespace SnooStream.Common
 
         public static async Task<bool> MaybeUpdateLockScreenImages()
         {
-            var taskSettings = TaskSettingsLoader.LoadTaskSettings();
+			var taskSettings = new LockScreenSettings();
             if (!_imageLoadInProgress && taskSettings.LockScreenImageURIs.Count <= 1)
                 return await UpdateLockScreenImages();
             return false;
         }
 
-        static bool _imageLoadInProgress = false;
-        public static async Task<bool> UpdateLockScreenImages(int limit = 10)
+		public static async Task<bool> UpdateLockScreenImages(int limit = 10)
         {
             if (_imageLoadInProgress)
             {
@@ -68,7 +72,8 @@ namespace SnooStream.Common
 
             try
             {
-                List<string> results = new List<string>();
+				var taskSettings = new LockScreenSettings();
+				taskSettings.LockScreenImageURIs.Clear();
                 var imagesSubredditResult = await SnooStreamViewModel.RedditService.GetPostsBySubreddit(
                     Utility.CleanRedditLink(SnooStreamViewModel.Settings.ImagesSubreddit, SnooStreamViewModel.RedditUserState.Username),
                     "hot", 100);
@@ -135,12 +140,11 @@ namespace SnooStream.Common
                                 || imageSource.PixelWidth < 480)
                             continue;
 
-                        MakeSingleLockScreenFromImage(results.Count, imageSource);
+                        MakeSingleLockScreenFromImage(taskSettings.LockScreenImageURIs.Count, imageSource);
                         //this can happen when the user is still trying to use the application so dont lock up the UI thread with this work
                         await Task.Yield();
-                        results.Add(string.Format("lockScreenCache{0}.jpg", results.Count.ToString()));
-
-                        if (results.Count >= limit)
+						taskSettings.LockScreenImageURIs.Add(url, string.Format("lockScreenCache{0}.jpg", taskSettings.LockScreenImageURIs.Count.ToString()));
+						if (taskSettings.LockScreenImageURIs.Count >= limit)
                             break;
                     }
                     catch (OutOfMemoryException oom)
@@ -148,9 +152,7 @@ namespace SnooStream.Common
                         // Ouch
                     }
                 }
-                var taskSettings = TaskSettingsLoader.LoadTaskSettings();
-                taskSettings.LockScreenImageURIs = results;
-                taskSettings.SaveTaskSettings();
+                taskSettings.WriteSettings();
 
                 SetRandomLockScreen();
             }
@@ -166,22 +168,23 @@ namespace SnooStream.Common
             return _imageLoadInProgress;
         }
 
+
         public static void SetRandomLockScreen()
         {
             if (IsLockScreenProvider)
             {
-                TaskSettings settings = TaskSettingsLoader.LoadTaskSettings();
+				var taskSettings = new LockScreenSettings();
                 string imageUrl = "";
                 // ms-appx points to the Local app install folder, to reference resources bundled in the XAP package.
                 // ms-appdata points to the root of the local app data folder.
-                if (settings.LockScreenImageURIs.Count <= 0)
+				if (taskSettings.LockScreenImageURIs.Count <= 0)
                 {
                     imageUrl = "ms-appx:///Assets/RainbowGlass.jpg";
                 }
                 else
                 {
-                    Shuffle(settings.LockScreenImageURIs);
-                    imageUrl = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + settings.LockScreenImageURIs.First();
+					//TODO improve shuffle here
+					imageUrl = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + taskSettings.LockScreenImageURIs.First().Value;
                 }
                 
                 var uri = new Uri(imageUrl, UriKind.Absolute);
@@ -199,147 +202,7 @@ namespace SnooStream.Common
             }
         }
 
-        public static bool CanDownload
-        {
-            get
-            {
-                var connectionCostType = NetworkInformation.GetInternetConnectionProfile().GetConnectionCost().NetworkCostType;
-
-                if ((SnooStreamViewModel.Settings.UpdateImagesOnlyOnWifi && Microsoft.Phone.Net.NetworkInformation.DeviceNetworkInformation.IsWiFiEnabled)
-                    || (!SnooStreamViewModel.Settings.UpdateImagesOnlyOnWifi && connectionCostType != NetworkCostType.Variable))
-                    return true;
-
-                return false;
-            }
-        }
-
-        public static bool DownloadOptimal
-        {
-            get
-            {
-                var connectionCostType = NetworkInformation.GetInternetConnectionProfile().GetConnectionCost().NetworkCostType;
-
-                if ((SnooStreamViewModel.Settings.UpdateImagesOnlyOnWifi && Microsoft.Phone.Net.NetworkInformation.DeviceNetworkInformation.IsWiFiEnabled)
-                    || (!SnooStreamViewModel.Settings.UpdateImagesOnlyOnWifi && connectionCostType == NetworkCostType.Unrestricted))
-                    return true;
-
-                return false;
-            }
-        }
-
-        public static readonly string periodicTaskName = "SnooStream_LockScreen_Updater";
-        public static readonly string intensiveTaskName = "SnooStream_Intensive_Updater";
-
-        public static void RemoveAgent(string name)
-        {
-            try
-            {
-                ScheduledActionService.Remove(name);
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        public static void StartPeriodicAgent()
-        {
-            // Obtain a reference to the period task, if one exists
-            var periodicTask = ScheduledActionService.Find(periodicTaskName) as PeriodicTask;
-
-            // If the task already exists and background agents are enabled for the
-            // application, you must remove the task and then add it again to update 
-            // the schedule
-
-            var disableBackground = SnooStreamViewModel.Settings.DisableBackground;
-
-            if (periodicTask != null)
-            {
-                if (periodicTask.LastExitReason == AgentExitReason.None && periodicTask.IsScheduled && !disableBackground)
-                {
-                    return;
-                }
-
-                RemoveAgent(periodicTaskName);
-            }
-
-            if (disableBackground)
-                return;
-
-            periodicTask = new PeriodicTask(periodicTaskName);
-            // The description is required for periodic agents. This is the string that the user
-            // will see in the background services Settings page on the device.
-            periodicTask.Description = "Keeps your lockscreen up to date with the latest redditing";
-
-            // Place the call to Add in a try block in case the user has disabled agents.
-            try
-            {
-                ScheduledActionService.Add(periodicTask);
-                //ScheduledActionService.LaunchForTest(periodicTaskName, TimeSpan.FromSeconds(20));
-            }
-            catch (InvalidOperationException exception)
-            {
-                if (exception.Message.Contains("BNS Error: The action is disabled"))
-                {
-                    MessageBox.Show("Background agents for this application have been disabled by the user.");
-                }
-
-                if (exception.Message.Contains("BNS Error: The maximum number of ScheduledActions of this type have already been added."))
-                {
-                    // No user action required. The system prompts the user when the hard limit of periodic tasks has been reached.
-
-                }
-            }
-            catch (SchedulerServiceException)
-            {
-            }
-        }
-
-        public static void StartIntensiveAgent()
-        {
-            // Obtain a reference to the period task, if one exists
-            var intensiveTask = ScheduledActionService.Find(intensiveTaskName) as ResourceIntensiveTask;
-
-            // If the task already exists and background agents are enabled for the
-            // application, you must remove the task and then add it again to update 
-            // the schedule
-            if (intensiveTask != null)
-            {
-                RemoveAgent(intensiveTaskName);
-            }
-
-            if (SnooStreamViewModel.Settings.DisableBackground)
-                return;
-
-            intensiveTask = new ResourceIntensiveTask(intensiveTaskName);
-            // The description is required for periodic agents. This is the string that the user
-            // will see in the background services Settings page on the device.
-            intensiveTask.Description = "This task does all of the heavy lifting for the lock screen updater and overnight offlining support";
-
-            // Place the call to Add in a try block in case the user has disabled agents.
-            try
-            {
-                ScheduledActionService.Add(intensiveTask);
-                //ScheduledActionService.LaunchForTest(intensiveTaskName, TimeSpan.FromSeconds(60));
-            }
-            catch (InvalidOperationException exception)
-            {
-                if (exception.Message.Contains("BNS Error: The action is disabled"))
-                {
-                    MessageBox.Show("Background agents for this application have been disabled by the user.");
-                }
-
-                if (exception.Message.Contains("BNS Error: The maximum number of ScheduledActions of this type have already been added."))
-                {
-                    // No user action required. The system prompts the user when the hard limit of periodic tasks has been reached.
-
-                }
-            }
-            catch (SchedulerServiceException)
-            {
-            }
-        }
-
-        public static async Task<bool> RequestLockAccess()
+		public static async Task<bool> RequestLockAccess()
         {
             try
             {
@@ -364,7 +227,7 @@ namespace SnooStream.Common
             return false;
         }
 
-        public static void MakeSingleLockScreenFromImage(int pos, BitmapImage imageSource)
+		public static void MakeSingleLockScreenFromImage(int pos, BitmapImage imageSource)
         {
             Image lockScreenView = new Image();
             lockScreenView.Width = 480;
@@ -386,7 +249,7 @@ namespace SnooStream.Common
             }
         }
 
-        public async Task<SnooStream.BackgroundControls.ViewModel.LockScreenViewModel> MakeLockScreenControl(IEnumerable<string> lockScreenImages)
+		public async Task<SnooStream.BackgroundControls.ViewModel.LockScreenViewModel> MakeLockScreenControl(IEnumerable<string> lockScreenImages)
         {
             var user = SnooStreamViewModel.RedditUserState;
 
@@ -416,6 +279,112 @@ namespace SnooStream.Common
             vml.NumberOfItems = SnooStreamViewModel.Settings.OverlayItemCount;
             vml.RoundedCorners = SnooStreamViewModel.Settings.RoundedLockScreen;
             return vml;
+        }
+
+#endif
+
+		public static bool CanDownload
+        {
+            get
+            {
+				var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
+				var connectionCostType = connectionProfile.GetConnectionCost().NetworkCostType;
+				var connectionStrength = connectionProfile.GetSignalBars() ?? 5;
+				if ((SnooStreamViewModel.Settings.UpdateImagesOnlyOnWifi && connectionProfile.IsWlanConnectionProfile)
+					|| (!SnooStreamViewModel.Settings.UpdateImagesOnlyOnWifi && connectionCostType != NetworkCostType.Variable && connectionStrength > 1))
+                    return true;
+
+                return false;
+            }
+        }
+
+        public static bool DownloadOptimal
+        {
+            get
+            {
+				var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
+				var connectionCostType = connectionProfile.GetConnectionCost().NetworkCostType;
+				var connectionStrength = connectionProfile.GetSignalBars() ?? 5;
+
+				if ((SnooStreamViewModel.Settings.UpdateImagesOnlyOnWifi && connectionProfile.IsWlanConnectionProfile)
+					|| (!SnooStreamViewModel.Settings.UpdateImagesOnlyOnWifi && connectionCostType == NetworkCostType.Unrestricted && connectionStrength > 3))
+                    return true;
+
+                return false;
+            }
+        }
+
+        public static readonly string periodicTaskName = "SnooStream_LockScreen_Updater";
+
+        public static void RemoveAgent(string name)
+        {
+            try
+            {
+				var periodicTask = BackgroundTaskRegistration.AllTasks.FirstOrDefault(task => task.Value.Name == name);
+				// Obtain a reference to the period task, if one exists
+
+				if (periodicTask.Value != null)
+				{
+					// If the task already exists and background agents are enabled for the
+					// application, you must remove the task and then add it again to update 
+					// the schedule
+					periodicTask.Value.Unregister(false);
+				}
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public static async void StartPeriodicAgent()
+        {
+			// Place the call to Add in a try block in case the user has disabled agents.
+			try
+			{
+				var periodicTask = BackgroundTaskRegistration.AllTasks.FirstOrDefault(task => task.Value.Name == periodicTaskName);
+				// Obtain a reference to the period task, if one exists
+
+				if (periodicTask.Value != null)
+				{
+					// If the task already exists and background agents are enabled for the
+					// application, you must remove the task and then add it again to update 
+					// the schedule
+					periodicTask.Value.Unregister(false);
+				}
+
+
+				var disableBackground = SnooStreamViewModel.Settings.DisableBackground;
+				if (!disableBackground)
+				{
+					var access = await BackgroundExecutionManager.RequestAccessAsync();
+					if (access != BackgroundAccessStatus.Denied && access != BackgroundAccessStatus.Unspecified)
+					{
+						var builder = new BackgroundTaskBuilder();
+
+						builder.Name = periodicTaskName;
+
+						builder.TaskEntryPoint = "SnooStreamBackground.UpdateBackgroundTask";
+						builder.SetTrigger(new TimeTrigger(30, false));
+						builder.AddCondition(new SystemCondition(SystemConditionType.BackgroundWorkCostNotHigh));
+						builder.AddCondition(new SystemCondition(SystemConditionType.InternetAvailable));
+						var taskRegistration = builder.Register();
+					}
+				}
+			}
+			catch (InvalidOperationException exception)
+			{
+				if (exception.Message.Contains("BNS Error: The action is disabled"))
+				{
+					var dialog = new MessageDialog("Background agents for this application have been disabled by the user.");
+					var asyncOp = dialog.ShowAsync(); //just continue it doesnt matter at this point anyway
+				}
+
+				if (exception.Message.Contains("BNS Error: The maximum number of ScheduledActions of this type have already been added."))
+				{
+					// No user action required. The system prompts the user when the hard limit of periodic tasks has been reached.
+
+				}
+			}
         }
 
         public static void Shuffle<T>(IList<T> list)

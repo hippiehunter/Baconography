@@ -30,5 +30,10 @@ namespace SnooStream.Converters
             string original = (string)value;
             return original.ToLower();
         }
-    }
+
+		public object ConvertBack(object value, Type targetType, object parameter, string language)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

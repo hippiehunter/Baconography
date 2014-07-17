@@ -164,6 +164,10 @@
       <Project>{17272736-fe78-416b-96c4-90fcf0bea45b}</Project>
       <Name>NBoilerpipePortable</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\SnooStreamBackground\SnooStreamBackground.WindowsPhone\SnooStreamBackground.WindowsPhone.vcxproj">
+      <Project>{d065417f-148c-4421-9034-580a4796d5d8}</Project>
+      <Name>SnooStreamBackground.WindowsPhone</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\SnooStreamCore\SnooStreamCore.csproj">
       <Project>{daf4d2b8-e906-422a-b53a-c57dba2ae94d}</Project>
       <Name>SnooStreamCore</Name>

@@ -16,6 +16,7 @@ using Windows.Networking.Connectivity;
 using Windows.Storage.Streams;
 using Windows.System.Threading;
 using Windows.UI.Core;
+using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.Web.Http;
@@ -342,45 +343,51 @@ namespace SnooStream.PlatformServices
 
         public void ShowMessage(string title, string text)
         {
-            RadMessageBox.Show(title, MessageBoxButtons.OK, text);
+			var dialog = new MessageDialog(text, title);
+			var asyncOp = dialog.ShowAsync(); //just continue it doesnt matter at this point anyway
         }
 
         private static bool LowPriorityNetworkOkImpl()
         {
-            if (DeviceNetworkInformation.IsNetworkAvailable && DeviceNetworkInformation.IsWiFiEnabled)
-                return true;
-
             var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
+			if (connectionProfile.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.InternetAccess)
+				return false;
+
             var connectionCost = connectionProfile.GetConnectionCost();
             var connectionCostType = connectionCost.NetworkCostType;
+			var connectionStrength = connectionProfile.GetSignalBars() ?? 5;
             if (connectionCostType != NetworkCostType.Unrestricted && connectionCostType != NetworkCostType.Unknown)
                 return false;
 
-            var interfaces = new NetworkInterfaceList();
-            var targetInterface = interfaces.FirstOrDefault(net => net.InterfaceState == ConnectState.Connected);
-            if (targetInterface == null)
-                return false;
+			if (connectionProfile.IsWwanConnectionProfile)
+			{
+				var connectionClass = connectionProfile.WwanConnectionProfileDetails.GetCurrentDataClass();
+				switch (connectionClass)
+				{
+					case WwanDataClass.Hsdpa:
+					case WwanDataClass.Hsupa:
+					case WwanDataClass.LteAdvanced:
+					case WwanDataClass.Umts:
+						break;
+					default:
+						return false;
+				}
 
-            if (targetInterface.Bandwidth < 1024 && targetInterface.Bandwidth > 0) //less then 1 meg means its a pretty shitty connection
-                return false;
-
-            var interfaceType = targetInterface.InterfaceSubtype;
-            if (!(interfaceType == NetworkInterfaceSubType.Cellular_HSPA || interfaceType == NetworkInterfaceSubType.Cellular_LTE ||
-                interfaceType == NetworkInterfaceSubType.Desktop_PassThru || interfaceType == NetworkInterfaceSubType.Cellular_EHRPD ||
-                interfaceType == NetworkInterfaceSubType.WiFi || interfaceType == NetworkInterfaceSubType.Unknown))
-                return false;
+				if (connectionStrength < 3)
+					return false;
+			}
 
             return !(connectionCost.ApproachingDataLimit || connectionCost.OverDataLimit || connectionCost.Roaming);
         }
 
         private static bool IsHighPriorityNetworkOkImpl()
         {
-            if (DeviceNetworkInformation.IsNetworkAvailable && DeviceNetworkInformation.IsWiFiEnabled)
-                return true;
+			var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
+			if (connectionProfile.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.InternetAccess)
+				return false;
 
-            var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
-
-            return DeviceNetworkInformation.IsNetworkAvailable && !connectionProfile.GetConnectionCost().OverDataLimit;
+			var connectionCost = connectionProfile.GetConnectionCost();
+			return !connectionCost.OverDataLimit;
         }
 
         Lazy<bool> _lowPriorityNetworkOk;

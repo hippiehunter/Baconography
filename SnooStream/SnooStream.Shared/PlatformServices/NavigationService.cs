@@ -136,11 +136,7 @@ namespace SnooStream.PlatformServices
             {
                 await Launcher.LaunchUriAsync(new Uri(url));
             }
-            catch (AccessViolationException)
-            {
-                //this is platform sillyness when somehow someone triggers this twice it crashes the app
-            }
-            catch(UriFormatException)
+			catch(Exception)
             { 
                 //TODO message box this?
             }
