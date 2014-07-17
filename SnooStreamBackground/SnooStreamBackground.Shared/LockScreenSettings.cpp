@@ -110,6 +110,7 @@ void LockScreenSettings::Store()
 
     liveTileSettings->Append(liveTileObject);
   }
+  serializedObject->Insert("LiveTileSettings", liveTileSettings);
 
   auto serializedString = serializedObject->Stringify();
   wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
