@@ -22,7 +22,7 @@ using boost::lexical_cast;
 LockScreenHistory::LockScreenHistory()
 {
   wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
-  localPath += L"bgtaskSettings.txt";
+  localPath += L"bgtaskHistory.txt";
   wifstream settingsFile(localPath);
   wstringstream fileContents;
   wstring fileLine;
@@ -123,7 +123,7 @@ void LockScreenHistory::Store()
 
   auto serializedString = serializedObject->Stringify();
   wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
-  localPath += L"bgtaskSettings.txt";
+  localPath += L"bgtaskHistory.txt";
   wofstream settingsFile(localPath);
   wstring settingsFileString(serializedString->Data(), serializedString->Length());
   settingsFile << settingsFileString;

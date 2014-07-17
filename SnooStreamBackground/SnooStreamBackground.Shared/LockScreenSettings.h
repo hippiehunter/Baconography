@@ -8,23 +8,24 @@ namespace SnooStreamBackground
 		Off,
 		Cycle,
 		Default,
-		Blergh
+    Text,
+    TextImage
 	};
 
-	// DO NOT REUSE THESE VALUES,
-	// THERE ARE PLENTY FOR EXPANSION
-	public enum class SettingIdentifiers
-	{
-		RedditCookie = 0x001,
+  public enum class LockScreenStyle
+  {
+    Off,
+    Image,
+    Cycle
+  };
 
-		LockScreenOverlayRoundedEdges = 0xA01,
-		LockScreenOverlayOpacity = 0xA02,
-		LockScreenOverlayItemsCount = 0xA03,
-		LockScreenOverlayItemsReddit = 0xA04,
-
-		LiveTileStyle = 0xB01,
-		LiveTileItemsReddit = 0xB02,
-	};
+  public ref class LiveTileSettings sealed
+  {
+  public:
+    property LiveTileStyle LiveTileStyle;
+    property Platform::String^ LiveTileItemsReddit;
+    property Windows::Foundation::Collections::IVector<Platform::String^>^ CurrentImages;
+  };
 
 	public ref class LockScreenSettings sealed
 	{
@@ -34,14 +35,13 @@ namespace SnooStreamBackground
 		property int LockScreenOverlayOpacity;
 		property int LockScreenOverlayItemsCount;
 		property Platform::String^ LockScreenOverlayItemsReddit;
-		
+    property LockScreenStyle LockScreenStyle;
 		//Live Tile settings
-		property LiveTileStyle LiveTileStyle;
-		property Platform::String^ LiveTileItemsReddit;
+    property Windows::Foundation::Collections::IVector<LiveTileSettings^>^ LiveTileSettings;
 		
 		property Platform::String^ RedditCookie;
 
 		LockScreenSettings();
-		void WriteSettings();
+		void Store();
 	};
 }

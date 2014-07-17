@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SimpleRedditService.h"
 #include "LockScreenSettings.h"
+#include "LockScreenHistory.h"
 #include <vector>
 #include <tuple>
 #include <iostream>
@@ -32,13 +33,6 @@ namespace SnooStreamBackground
 		public IBackgroundTask
 #endif
 	{
-
-	private:
-		vector<tuple<String^, String^>> currentTileImages;
-		vector<tuple<String^, String^>> tileHistory;
-		String^ lastLockScreenUpdate;
-		vector<String^> lockScreenImages;
-
 #ifdef WINDOWS_PHONE
 	protected:
 		void OnRun(IBackgroundTaskInstance^ taskInstance) override
@@ -49,22 +43,23 @@ namespace SnooStreamBackground
 		{
 			auto deferral = taskInstance->GetDeferral();
       auto lockScreenSettings = ref new LockScreenSettings();
-			auto tileUpdateTask = RunTileUpdater().then([]()
+      auto lockScreenHistory = ref new LockScreenHistory();
+      auto tileUpdateTask = RunTileUpdater(lockScreenSettings, lockScreenHistory).then([]()
 			{
 
 			});
 
-			if (lastLockScreenUpdate)
+      if (lockScreenSettings->LockScreenStyle != SnooStreamBackground::LockScreenStyle::Off)
 			{
         tileUpdateTask.then([&]()
         {
-          return RunLockscreenUpdater();
+          return RunLockscreenUpdater(lockScreenSettings, lockScreenHistory);
         }).then([&]()
 				{
 					deferral->Complete();
 				});
 			}
-			else
+      else
 			{
 				tileUpdateTask.then([&]()
 				{
@@ -78,15 +73,15 @@ namespace SnooStreamBackground
 
 		}
 	private:
-		task<void> RunTileUpdater()
+    task<void> RunTileUpdater(LockScreenSettings^ settings, LockScreenHistory^ history)
 		{
-
+      return task<void>();
 		}
 
 
-		task<void> RunLockscreenUpdater()
+    task<void> RunLockscreenUpdater(LockScreenSettings^ settings, LockScreenHistory^ history)
 		{
-
+      return task<void>();
 		}
 	};
 }
