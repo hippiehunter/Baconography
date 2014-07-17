@@ -46,36 +46,14 @@ LockScreenSettings::LockScreenSettings()
 	LockScreenOverlayOpacity = parsedFileObject->GetNamedNumber(toString(SettingIdentifiers::LockScreenOverlayOpacity), LockScreenOverlayOpacity);
 	LockScreenOverlayItemsCount = parsedFileObject->GetNamedNumber(toString(SettingIdentifiers::LockScreenOverlayItemsCount), LockScreenOverlayItemsCount);
 	LockScreenOverlayItemsReddit = parsedFileObject->GetNamedString(toString(SettingIdentifiers::LockScreenOverlayItemsReddit), LockScreenOverlayItemsReddit);
-	auto lockScreenImageUris = parsedFileObject->GetNamedArray(toString(SettingIdentifiers::LockScreenImageURIs));
 	auto liveTileStyle = parsedFileObject->GetNamedString(toString(SettingIdentifiers::LiveTileStyle));
 	LiveTileItemsReddit = parsedFileObject->GetNamedString(toString(SettingIdentifiers::LiveTileItemsReddit), LiveTileItemsReddit);
-	auto liveTileImageUris = parsedFileObject->GetNamedArray(toString(SettingIdentifiers::LiveTileImageURIs));
-
-	LockScreenImageURIs = ref new Platform::Collections::Map<String^, String^>();
-	if (lockScreenImageUris != nullptr)
-	{
-		for (auto&& lockScreenImageUri : lockScreenImageUris)
-		{
-			auto imageUriObject = lockScreenImageUri->GetObject();
-			LockScreenImageURIs->Insert(imageUriObject->GetNamedString("filePath"), imageUriObject->GetNamedString("originalUri"));
-		}
-	}
-
-	LiveTileImageURIs = ref new Platform::Collections::Map<String^, String^>();
-	if (liveTileImageUris != nullptr)
-	{
-		for (auto&& liveTileImageUri : liveTileImageUris)
-		{
-			auto imageUriObject = liveTileImageUri->GetObject();
-			LiveTileImageURIs->Insert(imageUriObject->GetNamedString("filePath"), imageUriObject->GetNamedString("originalUri"));
-		}
-	}
 
 	if (liveTileStyle != nullptr)
 	{
 		if (liveTileStyle == L"Off")
 		{
-			LiveTileStyle = LiveTileStyle::Off;
+			LiveTileStyle = SnooStreamBackground::LiveTileStyle::Off;
 		}
 	}
 

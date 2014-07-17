@@ -14,6 +14,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenHistory.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenItemView.xaml.h">
       <DependentUpon>$(MSBuildThisFileDirectory)LockScreenItemView.xaml</DependentUpon>
     </ClInclude>
@@ -26,6 +27,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)SimpleRedditService.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenHistory.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenItemView.xaml.cpp">
       <DependentUpon>$(MSBuildThisFileDirectory)LockScreenItemView.xaml</DependentUpon>
     </ClCompile>

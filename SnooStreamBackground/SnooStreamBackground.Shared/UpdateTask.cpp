@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SimpleRedditService.h"
+#include "LockScreenSettings.h"
 #include <vector>
 #include <tuple>
 #include <iostream>
@@ -47,11 +48,7 @@ namespace SnooStreamBackground
 #endif
 		{
 			auto deferral = taskInstance->GetDeferral();
-
-
-
-
-
+      auto lockScreenSettings = ref new LockScreenSettings();
 			auto tileUpdateTask = RunTileUpdater().then([]()
 			{
 
@@ -59,7 +56,10 @@ namespace SnooStreamBackground
 
 			if (lastLockScreenUpdate)
 			{
-				return tileUpdateTask.then(RunLockscreenUpdater).then([&]()
+        tileUpdateTask.then([&]()
+        {
+          return RunLockscreenUpdater();
+        }).then([&]()
 				{
 					deferral->Complete();
 				});
@@ -72,6 +72,7 @@ namespace SnooStreamBackground
 				});
 			}
 		}
+  public:
 		UpdateBackgroundTask()
 		{
 
