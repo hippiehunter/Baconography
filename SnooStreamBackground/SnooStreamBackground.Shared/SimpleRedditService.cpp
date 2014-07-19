@@ -21,12 +21,21 @@ using std::wifstream;
 using std::wofstream;
 using std::getline;
 
+concurrency::task<Platform::String^> SendGet(String^ url)
+{
+  auto httpClient = ref new HttpClient();
+  httpClient->DefaultRequestHeaders->Cookie->Append(ref new Windows::Web::Http::Headers::HttpCookiePairHeaderValue("reddit_session", _cookie);
+  return task<String^>(httpClient->GetStringAsync(ref new Uri(url)));
+}
+SimpleRedditService::SimpleRedditService(String^ loginCookie)
+{
+  _cookie = loginCookie;
+}
 
 task<bool> SimpleRedditService::HasMail()
 {
-	auto httpClient = ref new HttpClient();
-	task<String^> getResult(httpClient->GetStringAsync(ref new Uri("https://www.reddit.com/api/me.json")));
-	return getResult.then([](String^ meResponse)
+  return SendGet("https://www.reddit.com/api/me.json")
+    .then([](String^ meResponse)
 	{
 		auto meObject = JsonObject::Parse(meResponse);
 		auto dataObject = meObject->GetNamedObject("data");
@@ -37,10 +46,8 @@ task<bool> SimpleRedditService::HasMail()
 
 task<vector<String^>> SimpleRedditService::GetNewMessages()
 {
-	
-	auto httpClient = ref new HttpClient();
-	task<String^> getResult(httpClient->GetStringAsync(ref new Uri("https://www.reddit.com/message/unread/.json")));
-	return getResult.then([&](String^ unreadResponse)
+  return SendGet("https://www.reddit.com/message/unread/.json")
+    .then([&](String^ unreadResponse)
 	{
 		vector<String^> existingMessages;
 		vector<String^> newMessages;
@@ -106,8 +113,8 @@ task<vector<tuple<String^, String^>>> SimpleRedditService::GetPostsBySubreddit(S
 {
 	auto httpClient = ref new HttpClient();
 	auto targetUrl = (boost::wformat(L"http://www.reddit.com%1%.json?limit=%2%") % subreddit->Data() % limit).str();
-	task<String^> getResult(httpClient->GetStringAsync(ref new Uri(ref new String(targetUrl.data(), targetUrl.size()))));
-	return getResult.then([&](String^ postsResponse)
+  return SendGet(ref new String(targetUrl.data(), targetUrl.size()))
+    .then([&](String^ postsResponse)
 	{
 		vector<tuple<String^, String^>> result;
 

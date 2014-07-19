@@ -8,7 +8,7 @@
 #include "LockScreenViewControl.g.h"
 #include "LockScreenViewModel.h"
 
-namespace SnooDomBackground
+namespace SnooStreamBackground
 {
 	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class LockScreenViewControl sealed
