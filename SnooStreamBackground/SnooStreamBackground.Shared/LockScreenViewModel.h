@@ -2,12 +2,18 @@
 
 #include "boost\algorithm\string.hpp"
 
-namespace SnooDomBackground
+namespace SnooStreamBackground
 {
 	public ref class LockScreenMessage sealed
 	{
 		Platform::String^ _displayText;
 	public:
+    LockScreenMessage(Platform::String^ displayText, Platform::String^ glyph)
+    {
+      DisplayText = displayText;
+      Glyph = glyph;
+    }
+
 		property Platform::String^ DisplayText
 		{
 			Platform::String^ get()

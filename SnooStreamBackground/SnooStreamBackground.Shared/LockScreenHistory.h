@@ -23,6 +23,7 @@ namespace SnooStreamBackground
   {
   private:
     Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _history;
+    Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _toastedMessages;
   public:
     property Windows::Foundation::Collections::IVector<LockScreenImageInfo^>^ CurrentTileImages;
     property Windows::Foundation::Collections::IVector<LockScreenImageInfo^>^ LockScreenImages;
@@ -30,6 +31,7 @@ namespace SnooStreamBackground
 
 
     bool HasHistory(Platform::String^ url);
+    bool Toast(Platform::String^ messageId, Platform::String^ message);
     LockScreenHistory();
     void Store();
   };

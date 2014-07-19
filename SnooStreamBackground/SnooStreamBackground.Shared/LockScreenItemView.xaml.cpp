@@ -6,7 +6,7 @@
 #include "pch.h"
 #include "LockScreenItemView.xaml.h"
 
-using namespace SnooDomBackground;
+using namespace SnooStreamBackground;
 
 using namespace Platform;
 using namespace Windows::Foundation;
