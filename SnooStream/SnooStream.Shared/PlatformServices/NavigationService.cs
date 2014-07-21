@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.System;
 using Windows.UI.Xaml.Controls;
+using SnooStreamWP8.View.Pages;
+using SnooStreamWP8.View.Controls;
 
 namespace SnooStream.PlatformServices
 {
@@ -26,7 +28,7 @@ namespace SnooStream.PlatformServices
 
         public void NavigateToComments(CommentsViewModel viewModel)
         {
-            _frame.Navigate(typeof(CommentsPage), _navState.AddState(viewModel));
+            _frame.Navigate(typeof(Comments), _navState.AddState(viewModel));
         }
 
         public void NavigateToLinkRiver(LinkRiverViewModel viewModel)
@@ -40,15 +42,13 @@ namespace SnooStream.PlatformServices
             }
             else
             {
-                var url = string.Format("/View/Pages/LinkRiver.xaml?state={0}", _navState.AddState(viewModel));
-                _frame.Navigate(new Uri(url, UriKind.Relative));
+                _frame.Navigate(typeof(LinkRiver), _navState.AddState(viewModel));
             }
         }
 
         public void NavigateToLinkStream(LinkStreamViewModel viewModel)
         {
-            var url = string.Format("/View/Pages/LinkStream.xaml?state={0}", _navState.AddState(viewModel));
-            _frame.Navigate(new Uri(url, UriKind.Relative));
+            _frame.Navigate(typeof(LinkStream), _navState.AddState(viewModel));
         }
 
         public void NavigateToMessageReply(CreateMessageViewModel viewModel)
@@ -78,14 +78,12 @@ namespace SnooStream.PlatformServices
 
 		public void NavigateToContentSettings(SettingsViewModel viewModel)
 		{
-			var url = string.Format("/View/Pages/ContentSettings.xaml?state={0}", _navState.AddState(viewModel));
-			_frame.Navigate(new Uri(url, UriKind.Relative));
+			_frame.Navigate(typeof(ContentSettings), _navState.AddState(viewModel));
 		}
 
 		public void NavigateToLockScreenSettings(SettingsViewModel viewModel)
 		{
-            var url = string.Format("/View/Pages/LockScreenSettings.xaml?state={0}", _navState.AddState(viewModel));
-            _frame.Navigate(new Uri(url, UriKind.Relative));
+			_frame.Navigate(typeof(LockScreenSettings), _navState.AddState(viewModel));
 		}
 
         public Task<bool> ShowPopup(GalaSoft.MvvmLight.ViewModelBase viewModel)
@@ -125,8 +123,7 @@ namespace SnooStream.PlatformServices
 
         public void NavigateToAboutUser(AboutUserViewModel viewModel)
         {
-            var url = string.Format("/View/Pages/User.xaml?state={0}", _navState.AddState(viewModel));
-            _frame.Navigate(new Uri(url, UriKind.Relative));
+			throw new NotImplementedException();
         }
 
 

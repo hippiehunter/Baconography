@@ -6,8 +6,6 @@
 #include <string>
 #include <sstream>
 
-#include <boost/lexical_cast.hpp>
-
 
 using namespace SnooStreamBackground;
 using std::wstring;
@@ -18,7 +16,6 @@ using Windows::Data::Json::JsonObject;
 using Windows::Data::Json::JsonValue;
 using Windows::Data::Json::JsonArray;
 using Platform::String;
-using boost::lexical_cast;
 
 LockScreenSettings::LockScreenSettings()
 {

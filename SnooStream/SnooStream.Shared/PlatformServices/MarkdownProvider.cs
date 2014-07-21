@@ -10,16 +10,15 @@ namespace SnooStream.PlatformServices
 {
     class MarkdownProvider : IMarkdownProcessor
     {
-        public SnooDom.SnooDom Process(string markdown)
+        public MarkdownData Process(string markdown)
         {
             var processed = SnooDom.SnooDom.MarkdownToDOM(System.Net.WebUtility.HtmlDecode(markdown));
-			return processed;
+			return new MarkdownData { MarkdownDom = processed };
         }
 
-
-		public IEnumerable<KeyValuePair<string, string>> GetLinks(SnooDom.SnooDom mkd)
+		public IEnumerable<KeyValuePair<string, string>> GetLinks(MarkdownData mkd)
         {
-			return mkd.GetLinks();
+			return ((SnooDom.SnooDom)mkd.MarkdownDom).GetLinks();
         }
     }
 }

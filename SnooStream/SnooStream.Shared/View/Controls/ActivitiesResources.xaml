@@ -2,7 +2,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:SnooStreamWP8.View.Controls"
-    xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
     xmlns:converters="clr-namespace:SnooStreamWP8.Converters">
 
     <converters:ActivityGroupCountConverter x:Name="activityGroupCountConverter" />

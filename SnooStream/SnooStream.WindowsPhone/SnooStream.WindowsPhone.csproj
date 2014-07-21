@@ -17,7 +17,7 @@
     <SynthesizeLinkMetadata>true</SynthesizeLinkMetadata>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>1ef739f3</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>2bb318be</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -92,13 +92,6 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModel\LockScreenViewModel.cs" />
-    <Compile Include="View\LockScreenOverlayItem.xaml.cs">
-      <DependentUpon>LockScreenOverlayItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\LockScreenViewControl.xaml.cs">
-      <DependentUpon>LockScreenViewControl.xaml</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -115,14 +108,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="View\LockScreenOverlayItem.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="View\LockScreenViewControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -160,6 +145,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\winrtxamltoolkit\WinRTXamlToolkit\WinRTXamlToolkit.WindowsPhone\WinRTXamlToolkit.WindowsPhone.csproj">
+      <Project>{1af78321-7d45-487b-bcfb-ce6b92389eb2}</Project>
+      <Name>WinRTXamlToolkit.WindowsPhone</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\NBoilerpipePortable\NBoilerpipePortable.csproj">
       <Project>{17272736-fe78-416b-96c4-90fcf0bea45b}</Project>
       <Name>NBoilerpipePortable</Name>
@@ -173,6 +162,7 @@
       <Name>SnooStreamCore</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
@@ -191,6 +181,7 @@
     <Error Condition="!Exists('..\..\packages\KitaroDB.2.2.0.0\build\wpa81\KitaroDB.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\KitaroDB.2.2.0.0\build\wpa81\KitaroDB.targets'))" />
     <Error Condition="!Exists('..\..\packages\SnooDom.1.0.0.0\build\wpa81\SnooDom.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SnooDom.1.0.0.0\build\wpa81\SnooDom.targets'))" />
     <Error Condition="!Exists('..\..\packages\NokiaImagingSDK.1.2.115\build\wpa81\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NokiaImagingSDK.1.2.115\build\wpa81\NokiaImagingSDK.targets'))" />
+    <Error Condition="!Exists('..\..\packages\SnooDom.1.0.1\build\wpa81\SnooDom.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SnooDom.1.0.1\build\wpa81\SnooDom.targets'))" />
   </Target>
   <Import Project="..\..\packages\GifRenderer.1.0.0.0\build\wpa81\GifRenderer.targets" Condition="Exists('..\..\packages\GifRenderer.1.0.0.0\build\wpa81\GifRenderer.targets')" />
   <Import Project="..\..\packages\KitaroDB.2.2.0.0\build\wpa81\KitaroDB.targets" Condition="Exists('..\..\packages\KitaroDB.2.2.0.0\build\wpa81\KitaroDB.targets')" />
@@ -201,6 +192,7 @@
   </Target>
   <Import Project="..\..\packages\SnooDom.1.0.0.0\build\wpa81\SnooDom.targets" Condition="Exists('..\..\packages\SnooDom.1.0.0.0\build\wpa81\SnooDom.targets')" />
   <Import Project="..\..\packages\NokiaImagingSDK.1.2.115\build\wpa81\NokiaImagingSDK.targets" Condition="Exists('..\..\packages\NokiaImagingSDK.1.2.115\build\wpa81\NokiaImagingSDK.targets')" />
+  <Import Project="..\..\packages\SnooDom.1.0.1\build\wpa81\SnooDom.targets" Condition="Exists('..\..\packages\SnooDom.1.0.1\build\wpa81\SnooDom.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

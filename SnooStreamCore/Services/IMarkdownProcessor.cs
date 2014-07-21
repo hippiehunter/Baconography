@@ -9,7 +9,7 @@ namespace SnooStream.Services
     public interface IMarkdownProcessor
     {
         MarkdownData Process(string markdown);
-        IEnumerable<Tuple<string, string>> GetLinks(MarkdownData mkd);
+		IEnumerable<KeyValuePair<string, string>> GetLinks(MarkdownData mkd);
     }
     public class MarkdownData
     {

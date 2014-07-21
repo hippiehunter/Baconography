@@ -281,7 +281,6 @@ namespace SnooStream.PlatformServices
                 request.AllowReadStreamBuffering = true;
                 request.Headers[HttpRequestHeader.IfModifiedSince] = DateTime.UtcNow.ToString();
                 request.Method = "GET";
-                request.UserAgent = "Baconography_Windows_Phone_8_Client/1.0";
                 var cookieContainer = new CookieContainer();
                 request.CookieContainer = cookieContainer;
 
@@ -302,7 +301,7 @@ namespace SnooStream.PlatformServices
                 return await SendGet(uri, true);
             }
 
-            if (getResult != null && getResult.StatusCode == HttpStatusCode.OK)
+            if (getResult != null && getResult.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 try
                 {
@@ -544,7 +543,7 @@ namespace SnooStream.PlatformServices
 
 				if (needToRun)
 				{
-					await _uiDispatcher.RunIdleAsync(() =>
+					await _uiDispatcher.RunIdleAsync((args) =>
 							{
 								try
 								{

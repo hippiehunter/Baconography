@@ -74,10 +74,10 @@ namespace SnooStream.Common
                     foreach(var commentLinkTpl in SnooStreamViewModel.MarkdownProcessor.GetLinks(commentVm.BodyMD as MarkdownData))
                     {
                         //need to be -1 even though we havent accounted for the add of the current target, because movenext does a ++ before it gets the current
-                        if (currentLinkPos != null && commentLinkTpl.Item1 == currentLinkPos)
+                        if (currentLinkPos != null && commentLinkTpl.Key == currentLinkPos)
                             _currentLinkPos = _links.Count - 1;
 
-                        _links.Add(Tuple.Create(commentLinkTpl.Item1, commentLinkTpl.Item2, commentVm));
+						_links.Add(Tuple.Create(commentLinkTpl.Key, commentLinkTpl.Value, commentVm));
                     }
                 }
             }

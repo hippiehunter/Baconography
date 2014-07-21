@@ -13,7 +13,7 @@ namespace SnooStreamBackground
 	public:
 		SimpleRedditService(Platform::String^ loginCookie);
 		concurrency::task<bool> HasMail();
-    concurrency::task<std::vector<std::tuple<Platform::String^, Platform::String^>>> GetNewMessages();
+    concurrency::task<std::vector<Platform::String^>> GetNewMessages();
 		concurrency::task<std::vector<std::tuple<Platform::String^, Platform::String^>>> GetPostsBySubreddit(Platform::String^ subreddit, int limit);
 	
 	};

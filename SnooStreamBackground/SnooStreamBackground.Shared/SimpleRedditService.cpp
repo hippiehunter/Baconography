@@ -21,10 +21,10 @@ using std::wifstream;
 using std::wofstream;
 using std::getline;
 
-concurrency::task<Platform::String^> SendGet(String^ url)
+concurrency::task<Platform::String^> SimpleRedditService::SendGet(String^ url)
 {
   auto httpClient = ref new HttpClient();
-  httpClient->DefaultRequestHeaders->Cookie->Append(ref new Windows::Web::Http::Headers::HttpCookiePairHeaderValue("reddit_session", _cookie);
+  httpClient->DefaultRequestHeaders->Cookie->Append(ref new Windows::Web::Http::Headers::HttpCookiePairHeaderValue("reddit_session", _cookie));
   return task<String^>(httpClient->GetStringAsync(ref new Uri(url)));
 }
 SimpleRedditService::SimpleRedditService(String^ loginCookie)

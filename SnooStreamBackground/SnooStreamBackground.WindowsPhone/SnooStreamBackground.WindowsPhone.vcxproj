@@ -32,7 +32,7 @@
     <ConvergedProjectType>CodeSharingWindowsRuntimeComponent</ConvergedProjectType>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>7623c8e4</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>3e48e631</NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

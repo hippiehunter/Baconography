@@ -21,6 +21,9 @@ using Windows.Foundation;
 using SnooStreamBackground;
 using Windows.UI.Popups;
 using Windows.ApplicationModel.Background;
+using Windows.Storage;
+using Windows.Graphics.Imaging;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace SnooStream.Common
 {
@@ -28,7 +31,7 @@ namespace SnooStream.Common
     {
         static bool _imageLoadInProgress = false;
         
-#if WINDOWS_PHONE_APP
+#if WINDOWS_PHONE_APP_XAP
 
 		public static async Task<bool> StartLockScreenProvider()
         {
@@ -39,9 +42,6 @@ namespace SnooStream.Common
             if (SnooStreamViewModel.Settings.EnableUpdates)
                 StartPeriodicAgent();
 
-            if (SnooStreamViewModel.Settings.EnableOvernightUpdates)
-                StartIntensiveAgent();
-
             SetRandomLockScreen();
 
             return true;
@@ -49,8 +49,8 @@ namespace SnooStream.Common
 
         public static async Task<bool> MaybeUpdateLockScreenImages()
         {
-			var taskSettings = new LockScreenSettings();
-            if (!_imageLoadInProgress && taskSettings.LockScreenImageURIs.Count <= 1)
+			var taskHistory = new LockScreenHistory();
+			if (!_imageLoadInProgress && taskHistory.LockScreenImages.Count <= 1)
                 return await UpdateLockScreenImages();
             return false;
         }
@@ -72,8 +72,9 @@ namespace SnooStream.Common
 
             try
             {
+				var taskHistory = new LockScreenHistory();
 				var taskSettings = new LockScreenSettings();
-				taskSettings.LockScreenImageURIs.Clear();
+				taskHistory.LockScreenImages.Clear();
                 var imagesSubredditResult = await SnooStreamViewModel.RedditService.GetPostsBySubreddit(
                     Utility.CleanRedditLink(SnooStreamViewModel.Settings.ImagesSubreddit, SnooStreamViewModel.RedditUserState.Username),
                     "hot", 100);
@@ -140,11 +141,11 @@ namespace SnooStream.Common
                                 || imageSource.PixelWidth < 480)
                             continue;
 
-                        MakeSingleLockScreenFromImage(taskSettings.LockScreenImageURIs.Count, imageSource);
+						MakeSingleLockScreenFromImage(taskHistory.LockScreenImages.Count, imageSource);
                         //this can happen when the user is still trying to use the application so dont lock up the UI thread with this work
                         await Task.Yield();
-						taskSettings.LockScreenImageURIs.Add(url, string.Format("lockScreenCache{0}.jpg", taskSettings.LockScreenImageURIs.Count.ToString()));
-						if (taskSettings.LockScreenImageURIs.Count >= limit)
+						taskHistory.LockScreenImages.Add(new LockScreenImageInfo(url, string.Format("lockScreenCache{0}.jpg", taskHistory.LockScreenImages.Count.ToString()), null));
+						if (taskHistory.LockScreenImages.Count >= limit)
                             break;
                     }
                     catch (OutOfMemoryException oom)
@@ -152,8 +153,7 @@ namespace SnooStream.Common
                         // Ouch
                     }
                 }
-                taskSettings.WriteSettings();
-
+				taskSettings.Store();
                 SetRandomLockScreen();
             }
             catch
@@ -227,7 +227,7 @@ namespace SnooStream.Common
             return false;
         }
 
-		public static void MakeSingleLockScreenFromImage(int pos, BitmapImage imageSource)
+		public static async Task MakeSingleLockScreenFromImage(int pos, BitmapImage imageSource)
         {
             Image lockScreenView = new Image();
             lockScreenView.Width = 480;
@@ -237,19 +237,24 @@ namespace SnooStream.Common
             lockScreenView.UpdateLayout();
             lockScreenView.Measure(new Size(480, 800));
             lockScreenView.Arrange(new Rect(0, 0, 480, 800));
-            WriteableBitmap bitmap = new WriteableBitmap(480, 800);
-            bitmap.Render(lockScreenView, new ScaleTransform() { ScaleX = 1, ScaleY = 1 });
-            bitmap.Invalidate();
+			var renderTargetBitmap = new RenderTargetBitmap();
+			await renderTargetBitmap.RenderAsync(lockScreenView);
+			var pixels = await renderTargetBitmap.GetPixelsAsync();
+			var file = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(string.Format("lockScreenCache{0}.jpg", pos.ToString()), CreationCollisionOption.ReplaceExisting);
+			using (var stream = await file.OpenAsync(FileAccessMode.ReadWrite))
+			{
+				var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, stream);
+				byte[] bytes = pixels.ToArray();
+				encoder.SetPixelData(BitmapPixelFormat.Bgra8,
+									 BitmapAlphaMode.Ignore,
+									 (uint)400, (uint)800,
+									 96, 96, bytes);
 
-            using (var theFile = File.Create(Windows.Storage.ApplicationData.Current.LocalFolder.Path + string.Format("\\lockScreenCache{0}.jpg", pos.ToString())))
-            {
-                bitmap.SaveJpeg(theFile, 480, 800, 0, 100);
-                theFile.Flush(true);
-                theFile.Close();
-            }
+				await encoder.FlushAsync();
+			}
         }
 
-		public async Task<SnooStream.BackgroundControls.ViewModel.LockScreenViewModel> MakeLockScreenControl(IEnumerable<string> lockScreenImages)
+		public async Task<SnooStreamBackground.LockScreenViewModel> MakeLockScreenControl(IEnumerable<string> lockScreenImages)
         {
             var user = SnooStreamViewModel.RedditUserState;
 
@@ -262,17 +267,16 @@ namespace SnooStream.Common
                 var frontPageResult = new List<Thing>((await SnooStreamViewModel.RedditService.GetPostsBySubreddit(
                     Utility.CleanRedditLink(SnooStreamViewModel.Settings.LockScreenReddit, user.Username), "hot", 10)).Data.Children);
                 Shuffle(frontPageResult);
-                lockScreenMessages.AddRange(frontPageResult.Where(thing => thing.Data is Link)
-                    .Take(SnooStreamViewModel.Settings.OverlayItemCount - lockScreenMessages.Count).Select(thing => new LockScreenMessage 
-                        { DisplayText = ((Link)thing.Data).Title, Glyph = linkGlyphConverter != null ? (string)linkGlyphConverter.Convert(((Link)thing.Data), typeof(String), null, System.Globalization.CultureInfo.CurrentCulture) : "" }
-                     )
-                );
+				lockScreenMessages.AddRange(frontPageResult.Where(thing => thing.Data is Link)
+					.Take(SnooStreamViewModel.Settings.OverlayItemCount - lockScreenMessages.Count)
+					.Select(thing =>
+						new LockScreenMessage(((Link)thing.Data).Title, linkGlyphConverter != null ? (string)linkGlyphConverter.Convert(((Link)thing.Data), typeof(String), null, null) : "")));
             }
 
             List<string> shuffledLockScreenImages = new List<string>(lockScreenImages);
             Shuffle(shuffledLockScreenImages);
 
-            var vml = new SnooStream.BackgroundControls.ViewModel.LockScreenViewModel();
+			var vml = new SnooStreamBackground.LockScreenViewModel();
             vml.ImageSource = shuffledLockScreenImages.FirstOrDefault();
             vml.OverlayItems = lockScreenMessages;
             vml.OverlayOpacity = SnooStreamViewModel.Settings.OverlayOpacity;

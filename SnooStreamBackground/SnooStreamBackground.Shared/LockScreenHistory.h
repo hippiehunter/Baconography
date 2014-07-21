@@ -22,6 +22,7 @@ namespace SnooStreamBackground
   public ref class LockScreenHistory sealed
   {
   private:
+    Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _toasted;
     Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _history;
     Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _toastedMessages;
   public:
@@ -31,7 +32,6 @@ namespace SnooStreamBackground
 
 
     bool HasHistory(Platform::String^ url);
-    bool Toast(Platform::String^ messageId, Platform::String^ message);
     LockScreenHistory();
     void Store();
   };
