@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using System.Windows.Data;
 using SnooStream.ViewModel;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml;
+using Windows.UI.Core;
+using SnooStream.Common;
 
-namespace SnooStreamWP8.View.Controls
+namespace SnooStream.View.Controls
 {
     public partial class ComposeMessageView : UserControl
     {
@@ -19,7 +19,7 @@ namespace SnooStreamWP8.View.Controls
             InitializeComponent();
         }
 
-        private void TextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        private void TextBox_KeyUp(object sender, KeyEventArgs e)
         {
             BindingExpression bindingExpression = ((TextBox)sender).GetBindingExpression(TextBox.TextProperty);
             if (bindingExpression != null)
@@ -37,9 +37,9 @@ namespace SnooStreamWP8.View.Controls
             }
         }
 
-        private void Cancel_Click(object sender, EventArgs e)
+        private async void Cancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Cancel this new message?", "confirm", MessageBoxButton.OKCancel);
+            var result = await MessageBox.ShowAsync("Cancel this new message?", "confirm", MessageBoxButton.OKCancel);
             if (result == MessageBoxResult.OK)
             {
                 SnooStreamViewModel.NavigationService.GoBack();

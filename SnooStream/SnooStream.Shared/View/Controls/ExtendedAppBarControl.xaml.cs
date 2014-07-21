@@ -12,7 +12,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media;
 using System.Windows.Input;
 
-namespace SnooStreamWP8.View.Controls
+namespace SnooStream.View.Controls
 {
     public enum ExtendedAppMenuState
     {

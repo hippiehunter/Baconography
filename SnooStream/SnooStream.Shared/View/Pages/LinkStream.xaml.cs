@@ -3,22 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
 using SnooStream.ViewModel;
 using System.Collections.ObjectModel;
-using Telerik.Windows.Controls;
-using SnooStreamWP8.Common;
+using SnooStream.Common;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using Telerik.Windows.Controls.SlideView;
-using SnooStreamWP8.View.Controls;
-using System.Windows.Media.Imaging;
+using SnooStream.View.Controls;
 using System.ComponentModel;
+using Windows.UI.Input;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Imaging;
 
-namespace SnooStreamWP8.View.Pages
+namespace SnooStream.View.Pages
 {
     public partial class LinkStream : SnooApplicationPage, INotifyPropertyChanged
     {
@@ -38,7 +36,7 @@ namespace SnooStreamWP8.View.Pages
             {
                 if (_links == null)
                 {
-                    ((IPageProvider)radSlideView).CurrentIndexChanged += radSlideViewIndexChanged;
+                    flipView.CurrentIndexChanged += flipViewIndexChanged;
                     _links = new ObservableCollection<ContentViewModel>();
                     LoadInitialLinks(_links);
                 }
@@ -98,7 +96,7 @@ namespace SnooStreamWP8.View.Pages
         {
             if (link == null)
             {
-                Debug.WriteLine("something tried to add a null link for loading content {0}", new StackTrace().ToString());
+				Debug.WriteLine("something tried to add a null link for loading content");
                 return;
             }
             LoadingContentViewModel loadingVM;
@@ -121,17 +119,17 @@ namespace SnooStreamWP8.View.Pages
             }
         }
 
-        SlideViewItem currentItem;
-        private async void radSlideViewIndexChanged(object sender, EventArgs e)
+        FlipViewItem currentItem;
+        private async void flipViewIndexChanged(object sender, EventArgs e)
         {
             if (currentItem != null)
             {
                 currentItem.Content = null;
                 currentItem = null;
             }
-            if (radSlideView.SelectedItemContainer != null)
+            if (flipView.SelectedItemContainer != null)
             {
-                currentItem = radSlideView.SelectedItemContainer;
+                currentItem = flipView.SelectedItemContainer;
             }
 
 
@@ -146,7 +144,7 @@ namespace SnooStreamWP8.View.Pages
                 {
                     _loading = true;
                     //preload distance
-                    if (!_noMoreLoad && ((IPageProvider)radSlideView).CurrentIndex > (Links.Count - 5))
+                    if (!_noMoreLoad && flipView.SelectedIndex > (Links.Count - 5))
                     {
                         _noMoreLoad = !(await ((LinkStreamViewModel)DataContext).MoveNext());
                         if (!_noMoreLoad)
@@ -154,7 +152,7 @@ namespace SnooStreamWP8.View.Pages
                             AddLoadingLink(Links, ((LinkStreamViewModel)DataContext).Current, false);
                         }
                     }
-                    if (!_noMoreLoadBack && ((IPageProvider)radSlideView).CurrentIndex <= 5)
+					if (!_noMoreLoadBack && flipView.SelectedIndex <= 5)
                     {
                         var backEnum = ((LinkStreamViewModel)DataContext).LoadPrior.Value;
                         var currentPrior = await backEnum.Next() as LinkViewModel;
@@ -175,7 +173,7 @@ namespace SnooStreamWP8.View.Pages
         private void PanAndZoomImage_Unloaded(object sender, RoutedEventArgs e)
         {
             //image controls leak 100% of their memory if you dont explicitly clear the UriSource on them when they are detached from the visual hierarchy
-            var pZoom = sender as PanAndZoomImage;
+            var pZoom = sender as Image;
             if (pZoom.Source is BitmapImage)
             {
                 ((BitmapImage)pZoom.Source).UriSource = null;
@@ -188,7 +186,7 @@ namespace SnooStreamWP8.View.Pages
 			//rebind the control if we're returning from another page in the back stack,
 			//this should be the only scenario where the image source has been set to null
 			//at the time of this event
-			var pZoom = sender as PanAndZoomImage;
+			var pZoom = sender as Image;
 			if (pZoom.Source == null && pZoom.DataContext != null)
 			{
 				var imageViewModel = pZoom.DataContext as ImageViewModel;
@@ -202,7 +200,7 @@ namespace SnooStreamWP8.View.Pages
         private void GifControl_Unloaded(object sender, RoutedEventArgs e)
         {
             //gif control also leaks if you dont clear its imagesource and manipulationController
-            var gControl = sender as GifControl;
+			var gControl = sender as GifControl;
             gControl.ImageSource = null;
             gControl.ManipulationController = null;
         }
@@ -224,36 +222,36 @@ namespace SnooStreamWP8.View.Pages
 			}
 		}
 
-        private void radSlideView_DoubleTap(object sender, System.Windows.Input.GestureEventArgs e)
+		private void flipView_DoubleTap(object sender, DoubleTappedRoutedEventArgs e)
         {
             ManipulationController.FireDoubleTap(sender, e);
         }
 
-        private void radSlideView_ManipulationStarted(object sender, System.Windows.Input.ManipulationStartedEventArgs e)
+		private void flipView_ManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
         {
             ManipulationController.FireManipulationStarted(sender, e);
         }
 
-        private void radSlideView_ManipulationCompleted(object sender, System.Windows.Input.ManipulationCompletedEventArgs e)
+        private void flipView_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
             ManipulationController.FireManipulationCompleted(sender, e);
         }
 
-        private void radSlideView_ManipulationDelta(object sender, System.Windows.Input.ManipulationDeltaEventArgs e)
+        private void flipView_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
             ManipulationController.FireManipulationDelta(sender, e);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-		SlideViewItem currentAlbumItem;
+		FlipViewItem currentAlbumItem;
 		private void albumSlideView_Loaded(object sender, RoutedEventArgs e)
 		{
-			((IPageProvider)sender).CurrentIndexChanged += albumSlideViewIndexChanged;
+			((FlipView)sender).SelectionChanged += albumSlideViewIndexChanged 
 		}
 
 		private void albumSlideView_Unloaded(object sender, RoutedEventArgs e)
 		{
-			((IPageProvider)sender).CurrentIndexChanged -= albumSlideViewIndexChanged;
+			((FlipView)sender).SelectionChanged -= albumSlideViewIndexChanged;
 			if (currentAlbumItem != null)
 			{
 				currentAlbumItem.Content = null;
@@ -261,16 +259,16 @@ namespace SnooStreamWP8.View.Pages
 			}
 		}
 
-		private void albumSlideViewIndexChanged(object sender, EventArgs e)
+		private void albumSlideViewIndexChanged(object sender, SelectionChangedEventArgs e)
 		{
 			if (currentAlbumItem != null)
 			{
 				currentAlbumItem.Content = null;
 				currentAlbumItem = null;
 			}
-			if (((RadSlideView)sender).SelectedItemContainer != null)
+			if (((FlipView)sender).SelectedItem != null)
 			{
-				currentAlbumItem = ((RadSlideView)sender).SelectedItemContainer;
+				currentAlbumItem = ((FlipView)sender).SelectedItem as FlipViewItem;
 			}
 		}
     }

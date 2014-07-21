@@ -1,8 +1,8 @@
 ﻿<ResourceDictionary 
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:SnooStreamWP8.View.Controls"
-    xmlns:converters="clr-namespace:SnooStreamWP8.Converters">
+    xmlns:local="using:SnooStream.View.Controls"
+    xmlns:converters="using:SnooStream.Converters">
 
     <converters:ActivityGroupCountConverter x:Name="activityGroupCountConverter" />
 
@@ -37,10 +37,10 @@
     </DataTemplate>
 
     <DataTemplate x:Name="activityTemplate">
-        <telerikPrimitives:RadExpanderControl Content="{Binding}" ExpandableContent="{Binding}"
-                ExpandableContentTemplate="{StaticResource plainExpandableContentTemplate}"
-                Foreground="{StaticResource PhoneForegroundBrush}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}" AnimatedIndicatorContentTemplate="{x:Null}">
-            <telerikPrimitives:RadExpanderControl.ContentTemplate>
+        <local:ExpanderView Header="{Binding}" ItemsSource="{Binding}"
+                ItemTemplate="{StaticResource plainExpandableContentTemplate}"
+                Foreground="{StaticResource PhoneForegroundBrush}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+            <local:ExpanderView.HeaderTemplate>
                 <DataTemplate>
                     <StackPanel Height="120">
                         <TextBlock Text="{Binding FirstActivity.PreviewTitle}"
@@ -50,7 +50,7 @@
                                         FontSize="{StaticResource PhoneFontSizeLarge}" />
                     </StackPanel>
                 </DataTemplate>
-            </telerikPrimitives:RadExpanderControl.ContentTemplate>
-        </telerikPrimitives:RadExpanderControl>
+            </local:ExpanderView.HeaderTemplate>
+        </local:ExpanderView>
     </DataTemplate>
 </ResourceDictionary>

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
-using Telerik.Windows.Controls;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
-namespace SnooStreamWP8.View.Selectors
+namespace SnooStream.View.Selectors
 {
     //from the blog post at http://www.wiredprairie.us/blog/index.php/archives/1705
     public class TypedTemplateSelector : DataTemplateSelector
@@ -120,8 +121,8 @@ namespace SnooStreamWP8.View.Selectors
 
             var fe = source as FrameworkElement;
             object obj;
-            ResourceDictionary rd = fe != null ? fe.Resources : App.StaticResources;
-            if (rd.Contains(key))
+            ResourceDictionary rd = fe != null ? fe.Resources : App.Current.Resources;
+            if (rd.ContainsKey(key))
             {
                 obj = rd[key];
                 DataTemplate dt = obj as DataTemplate;

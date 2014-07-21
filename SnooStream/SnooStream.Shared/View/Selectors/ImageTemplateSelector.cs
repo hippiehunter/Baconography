@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Telerik.Windows.Controls;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
-namespace SnooStreamWP8.View.Selectors
+namespace SnooStream.View.Selectors
 {
-    public class ImageTemplateSelector : DataTemplateSelector
+    public class ImageTemplateSelector : DependencyObject
     {
         public DataTemplate GifTemplate
         {
@@ -32,13 +33,26 @@ namespace SnooStreamWP8.View.Selectors
         public static readonly DependencyProperty StaticTemplateProperty =
             DependencyProperty.Register("StaticTemplate", typeof(DataTemplate), typeof(ImageTemplateSelector), new PropertyMetadata(null));
 
+		public DataTemplateSelector Selector { get; set; }
 
+		public ImageTemplateSelector()
+		{
+			Selector = new ImageTemplateSelectorImpl(this);
+		}
+	}
+	class ImageTemplateSelectorImpl : DataTemplateSelector
+	{
+		private ImageTemplateSelector _selector;
+		public ImageTemplateSelectorImpl(ImageTemplateSelector selector)
+		{
+			_selector = selector;
+		}
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             var image = item as ImageViewModel;
             if (image != null)
             {
-               return image.IsGif ? GifTemplate : StaticTemplate;
+				return image.IsGif ? _selector.GifTemplate : _selector.StaticTemplate;
             }
             else
                 return null;

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="SnooStreamWP8.View.Controls.SimpleLinkView"
+﻿<UserControl x:Class="SnooStream.View.Controls.SimpleLinkView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
@@ -95,7 +95,7 @@
             <Button BorderThickness="0" VerticalContentAlignment="Center"
                     HorizontalAlignment="Center" VerticalAlignment="Center"
                     Height="100" Width="100" Padding="5,5,5,5" Margin="0"
-                    Tap="Button_Tap" HorizontalContentAlignment="Center">
+                    Tapped="Button_Tap" HorizontalContentAlignment="Center">
                 <Button.Content>
                     <Grid Margin="0,0,0,0" VerticalAlignment="Stretch">
                         <Border BorderThickness="0" Height="70" Width="70"

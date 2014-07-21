@@ -1,14 +1,14 @@
-﻿<UserControl x:Class="SnooStreamWP8.View.Controls.SubredditRiver"
+﻿<UserControl x:Class="SnooStream.View.Controls.SubredditRiver"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:telerikPrimitives="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
-    xmlns:telerikJumpList="clr-namespace:Telerik.Windows.Controls.JumpList;assembly=Telerik.Windows.Controls.Data"
-    xmlns:telerikData="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Data"
-    xmlns:localC="clr-namespace:SnooStreamWP8.View.Controls"
-    xmlns:selectors="clr-namespace:SnooStreamWP8.View.Selectors"
-    xmlns:s="clr-namespace:System;assembly=mscorlib"
+    xmlns:telerikPrimitives="using:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
+    xmlns:telerikJumpList="using:Telerik.Windows.Controls.JumpList;assembly=Telerik.Windows.Controls.Data"
+    xmlns:telerikData="using:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Data"
+    xmlns:localC="using:SnooStream.View.Controls"
+    xmlns:selectors="using:SnooStream.View.Selectors"
+    xmlns:s="using:System;assembly=mscorlib"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -19,7 +19,7 @@
         <Grid.Resources>
             <DataTemplate x:Name="normalSubreddit">
                 <Button Margin="0,0,0,-18"
-                    BorderThickness="0" Tap="listBox_ItemTap">
+                    BorderThickness="0" Tapped="listBox_ItemTap">
                     <localC:SubredditSmallView />
                 </Button>
             </DataTemplate>

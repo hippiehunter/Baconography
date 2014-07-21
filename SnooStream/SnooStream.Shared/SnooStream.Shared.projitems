@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Common\BackgroundTaskManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\LinkViewLayoutManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\ManipulationController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\MessageBoxHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\NavigationStateUtility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\OrientationManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\PlatformImageAcquisition.cs" />
@@ -62,9 +63,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\ExtendedAppBarControl.xaml.cs">
       <DependentUpon>ExtendedAppBarControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\GifControl.xaml.cs">
-      <DependentUpon>GifControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\HubSettingsView.xaml.cs">
       <DependentUpon>HubSettingsView.xaml</DependentUpon>
     </Compile>
@@ -74,22 +72,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\LoadMoreControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\MarkdownControl.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\Markdown\MarkdownButton.xaml.cs">
-      <DependentUpon>MarkdownButton.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\Markdown\MarkdownList.xaml.cs">
-      <DependentUpon>MarkdownList.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\Markdown\MarkdownQuote.xaml.cs">
-      <DependentUpon>MarkdownQuote.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\Markdown\MarkdownTable.xaml.cs">
-      <DependentUpon>MarkdownTable.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\Markdown\RichMarkdownButton.xaml.cs">
-      <DependentUpon>RichMarkdownButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml.cs">
       <DependentUpon>MoreCommentsView.xaml</DependentUpon>
@@ -164,9 +146,6 @@
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\ExtendedAppBarControl.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\GifControl.xaml">
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\HubSettingsView.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -174,21 +153,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\LoginView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\Markdown\MarkdownButton.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\Markdown\MarkdownList.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\Markdown\MarkdownQuote.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\Markdown\MarkdownTable.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\Markdown\RichMarkdownButton.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml">

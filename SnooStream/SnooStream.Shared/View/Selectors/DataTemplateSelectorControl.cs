@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using Telerik.Windows.Controls;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
-namespace SnooStreamWP8.View.Selectors
+namespace SnooStream.View.Selectors
 {
 	public class DataTemplateSelectorControl : ContentControl
     {

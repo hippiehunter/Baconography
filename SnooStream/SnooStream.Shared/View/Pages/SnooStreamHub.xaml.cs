@@ -3,14 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using SnooStreamWP8.Common;
+using SnooStream.Common;
 using SnooStream.ViewModel;
 
-namespace SnooStreamWP8.View.Pages
+namespace SnooStream.View.Pages
 {
     public partial class SnooStreamHub : SnooApplicationPage
     {

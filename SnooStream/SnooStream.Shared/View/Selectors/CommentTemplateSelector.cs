@@ -5,12 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Telerik.Windows.Controls;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
-namespace SnooStreamWP8.View.Selectors
+namespace SnooStream.View.Selectors
 {
-    public class CommentTemplateSelector : DataTemplateSelector
+    public class CommentTemplateSelector : DependencyObject
     {
+		public CommentTemplateSelector()
+		{
+			Selector = new CommentTemplateSelectorImpl(this);
+		}
         public DataTemplate CommentTemplate
         {
             get { return (DataTemplate)GetValue(CommentTemplateProperty); }
@@ -43,15 +48,26 @@ namespace SnooStreamWP8.View.Selectors
             DependencyProperty.Register("LoadFullyTemplate", typeof(DataTemplate), typeof(CommentTemplateSelector), new PropertyMetadata(null));
 
 
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
-        {
-            if (item is CommentViewModel)
-                return CommentTemplate;
-            else if (item is MoreViewModel)
-                return MoreTemplate;
-            else if (item is LoadFullCommentsViewModel)
-                return LoadFullyTemplate;
-            else throw new NotImplementedException();
-        }
+		public DataTemplateSelector Selector { get; set; }
+
+		
     }
+	class CommentTemplateSelectorImpl : DataTemplateSelector
+	{
+		private CommentTemplateSelector _selector;
+		public CommentTemplateSelectorImpl(CommentTemplateSelector selector)
+		{
+			_selector = selector;
+		}
+		public override DataTemplate SelectTemplate(object item, DependencyObject container)
+		{
+			if (item is CommentViewModel)
+				return _selector.CommentTemplate;
+			else if (item is MoreViewModel)
+				return _selector.MoreTemplate;
+			else if (item is LoadFullCommentsViewModel)
+				return _selector.LoadFullyTemplate;
+			else throw new NotImplementedException();
+		}
+	}
 }

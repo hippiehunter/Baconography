@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
 using SnooStream.ViewModel;
 using GalaSoft.MvvmLight;
-using System.Windows.Data;
+using Windows.UI.Input;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Core;
 
-namespace SnooStreamWP8.View.Controls
+namespace SnooStream.View.Controls
 {
     public partial class SubredditRiver : UserControl
     {
@@ -20,11 +20,11 @@ namespace SnooStreamWP8.View.Controls
             InitializeComponent();
         }
 
-        private void manualBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void manualBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.Enter)
+            if (e.VirtualKey == Windows.System.VirtualKey.Enter)
             {
-                this.Focus();
+                this.Focus(FocusState.Programmatic);
                 var textBox = sender as TextBox;
                 var searchText = textBox.Text;
                 textBox.Text = "";
@@ -55,13 +55,13 @@ namespace SnooStreamWP8.View.Controls
             }
         }
 
-        private void manualBox_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+		private void manualBox_MouseLeave(object sender, TappedEventArgs e)
         {
             _disableFocusHack = true;
             _needToHackFocus = false;
         }
 
-		private void listBox_ItemTap (object sender, System.Windows.Input.GestureEventArgs e)
+		private void listBox_ItemTap(object sender, TappedEventArgs e)
 		{
 			var linkRiver = ((Button)sender).DataContext as LinkRiverViewModel;
 			if(linkRiver != null)

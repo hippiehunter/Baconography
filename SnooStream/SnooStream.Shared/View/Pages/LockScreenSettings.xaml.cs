@@ -7,15 +7,15 @@ using System.Windows.Controls;
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using SnooStreamWP8.Common;
+using SnooStream.Common;
 using SnooStream.ViewModel;
 using GalaSoft.MvvmLight;
-using SnooStreamWP8.BackgroundControls.ViewModel;
+using SnooStream.BackgroundControls.ViewModel;
 using SnooStream.Model;
 using System.ComponentModel;
 using SnooStream.TaskSettings;
 
-namespace SnooStreamWP8.View.Pages
+namespace SnooStream.View.Pages
 {
 	public partial class LockScreenSettings : SnooApplicationPage
 	{

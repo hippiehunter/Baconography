@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using SnooStreamWP8.View.Controls;
-using Telerik.Windows.Controls;
+using SnooStream.View.Controls;
 using Windows.ApplicationModel.Store;
 using SnooStream.ViewModel;
-using SnooStreamWP8.Common;
+using SnooStream.Common;
+using Windows.UI.Xaml;
+using Windows.UI.Input;
+using Windows.UI.Xaml.Controls;
 
-namespace SnooStreamWP8.View.Pages
+namespace SnooStream.View.Pages
 {
 	public partial class ContentSettings : SnooApplicationPage
 	{
@@ -256,8 +254,8 @@ namespace SnooStreamWP8.View.Pages
 			//picker.Show();
 		}
 
-		async void picker_Completed(object sender, Microsoft.Phone.Tasks.PhotoResult e)
-		{
+		//async void picker_Completed(object sender, PhotoResult e)
+		//{
 			//var settingsService = ServiceLocator.Current.GetInstance<ISettingsService>();
 			//var userService = ServiceLocator.Current.GetInstance<IUserService>();
 			//var locator = new ViewModelLocator();
@@ -281,11 +279,11 @@ namespace SnooStreamWP8.View.Pages
 			//{
 			//    subredditRadioButton.IsChecked = true;
 			//}
-		}
+		//}
 
 
 
-		private void HelpOfflineButton_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+		private void HelpOfflineButton_Tap(object sender, TappedEventArgs e)
 		{
 			OpenHelp(
 				"OFFLINE CONTENT",
@@ -297,32 +295,32 @@ namespace SnooStreamWP8.View.Pages
 
 		private async void AdFreeUpgrade_Click(object sender, RoutedEventArgs e)
 		{
-			var toggleSwitch = sender as RadToggleSwitch;
+			var toggleSwitch = sender as ToggleSwitch;
 			try
 			{
-				ListingInformation products = await CurrentApp.LoadListingInformationByProductIdsAsync(new[] { "SnooStreamWP8Upgrade" });
+				ListingInformation products = await CurrentApp.LoadListingInformationByProductIdsAsync(new[] { "SnooStreamUpgrade" });
 
 				// get specific in-app product by ID
 				ProductListing productListing = null;
-				if (!products.ProductListings.TryGetValue("SnooStreamWP8Upgrade", out productListing))
+				if (!products.ProductListings.TryGetValue("SnooStreamUpgrade", out productListing))
 				{
-					MessageBox.Show("Could not find product information");
+					await MessageBox.ShowAsync("Could not find product information", "", MessageBoxButton.OK);
 					if (toggleSwitch != null)
-						toggleSwitch.IsChecked = false;
+						toggleSwitch.IsOn = false;
 					return;
 				}
 
 				// start product purchase
 				await CurrentApp.RequestProductPurchaseAsync(productListing.ProductId, false);
-				var enabledAds = !(CurrentApp.LicenseInformation != null && CurrentApp.LicenseInformation.ProductLicenses.ContainsKey("SnooStreamWP8Upgrade"));
+				var enabledAds = !(CurrentApp.LicenseInformation != null && CurrentApp.LicenseInformation.ProductLicenses.ContainsKey("SnooStreamUpgrade"));
 				((Button)sender).IsEnabled = enabledAds;
 				SnooStreamViewModel.Settings.AllowAdvertising = enabledAds;
 			}
 			catch (Exception)
 			{
-				MessageBox.Show("Could not complete in app purchase");
+				var result = MessageBox.ShowAsync("Could not complete in app purchase", "", MessageBoxButton.OK);
 				if (toggleSwitch != null)
-					toggleSwitch.IsChecked = false;
+					toggleSwitch.IsOn = false;
 			}
 
 		}

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Telerik.Windows.Controls.Primitives;
+using Windows.UI.Xaml.Controls;
 
-namespace SnooStreamWP8.View.Controls
+namespace SnooStream.View.Controls
 {
-    public class LoadMoreControl : RadContentControl
+    public class LoadMoreControl : ContentControl
     {
         public LoadMoreControl()
         {

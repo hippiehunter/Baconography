@@ -8,8 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.System;
 using Windows.UI.Xaml.Controls;
-using SnooStreamWP8.View.Pages;
-using SnooStreamWP8.View.Controls;
+using SnooStream.View.Pages;
+using SnooStream.View.Controls;
 
 namespace SnooStream.PlatformServices
 {

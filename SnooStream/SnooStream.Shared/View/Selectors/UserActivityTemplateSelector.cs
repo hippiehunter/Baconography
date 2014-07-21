@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using Telerik.Windows.Controls;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
-namespace SnooStreamWP8.View.Selectors
+namespace SnooStream.View.Selectors
 {
-    public class UserActivityTemplateSelector : DataTemplateSelector
+    public class UserActivityTemplateSelector : DependencyObject
     {
         public DataTemplate CommentActivityTemplate
         {
@@ -42,6 +42,20 @@ namespace SnooStreamWP8.View.Selectors
         public static readonly DependencyProperty MessageActivityTemplateProperty =
             DependencyProperty.Register("MessageActivityTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
 
+		public DataTemplateSelector Selector { get; set; }
+
+		public UserActivityTemplateSelector()
+		{
+			Selector = new UserActivityTemplateSelectorImpl(this);
+		}
+	}
+	class UserActivityTemplateSelectorImpl : DataTemplateSelector
+	{
+		private UserActivityTemplateSelector _selector;
+		public UserActivityTemplateSelectorImpl(UserActivityTemplateSelector selector)
+		{
+			_selector = selector;
+		}
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             //decide if its a group or a single
@@ -52,15 +66,15 @@ namespace SnooStreamWP8.View.Selectors
                 firstActivity is RecivedCommentReplyActivityViewModel ||
                 firstActivity is PostedLinkActivityViewModel)
             {
-                return CommentActivityTemplate;
+				return _selector.CommentActivityTemplate;
             }
             else if (firstActivity is ModeratorActivityViewModel)
             {
-                return ModeratorActivityTemplate;
+				return _selector.ModeratorActivityTemplate;
             }
             else if (firstActivity is ModeratorMessageActivityViewModel || firstActivity is MessageActivityViewModel)
             {
-                return MessageActivityTemplate;
+				return _selector.MessageActivityTemplate;
             }
             else
                 throw new ArgumentOutOfRangeException();

@@ -8,7 +8,7 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 
-namespace SnooStreamWP8.View.Controls
+namespace SnooStream.View.Controls
 {
     public partial class MoreCommentsView : UserControl
     {

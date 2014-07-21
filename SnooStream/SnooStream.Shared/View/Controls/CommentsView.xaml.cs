@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
 using SnooStream.ViewModel;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Input;
+using Windows.UI.Xaml;
 
-namespace SnooStreamWP8.View.Controls
+namespace SnooStream.View.Controls
 {
 	public partial class CommentsView : UserControl
 	{
@@ -29,21 +28,21 @@ namespace SnooStreamWP8.View.Controls
 			commentsList.StopPullToRefreshLoading(true, true);
 		}
 
-		private void Link_Tap (object sender, System.Windows.Input.GestureEventArgs e)
+		private void Link_Tap (object sender, TappedEventArgs e)
 		{
 			var vm = this.DataContext as CommentsViewModel;
 			if(vm != null)
 				vm.GotoLink.Execute(null);
 		}
 
-		private void ReplyButton_Tap (object sender, System.Windows.Input.GestureEventArgs e)
+		private void ReplyButton_Tap(object sender, TappedEventArgs e)
 		{
 			var vm = this.DataContext as CommentsViewModel;
 			if(vm != null)
 				vm.GotoReply.Execute(null);
 		}
 
-		private void EditPostButton_Tap (object sender, System.Windows.Input.GestureEventArgs e)
+		private void EditPostButton_Tap(object sender, TappedEventArgs e)
 		{
 			var vm = this.DataContext as CommentsViewModel;
 			if(vm != null)
