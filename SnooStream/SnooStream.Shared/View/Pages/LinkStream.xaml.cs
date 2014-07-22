@@ -36,7 +36,7 @@ namespace SnooStream.View.Pages
             {
                 if (_links == null)
                 {
-                    flipView.CurrentIndexChanged += flipViewIndexChanged;
+                    flipView.SelectionChanged += flipViewIndexChanged;
                     _links = new ObservableCollection<ContentViewModel>();
                     LoadInitialLinks(_links);
                 }
@@ -120,16 +120,16 @@ namespace SnooStream.View.Pages
         }
 
         FlipViewItem currentItem;
-        private async void flipViewIndexChanged(object sender, EventArgs e)
+        private async void flipViewIndexChanged(object sender, SelectionChangedEventArgs e)
         {
             if (currentItem != null)
             {
                 currentItem.Content = null;
                 currentItem = null;
             }
-            if (flipView.SelectedItemContainer != null)
+            if (flipView.SelectedItem != null)
             {
-                currentItem = flipView.SelectedItemContainer;
+				currentItem = flipView.SelectedItem as FlipViewItem;
             }
 
 
@@ -200,9 +200,8 @@ namespace SnooStream.View.Pages
         private void GifControl_Unloaded(object sender, RoutedEventArgs e)
         {
             //gif control also leaks if you dont clear its imagesource and manipulationController
-			var gControl = sender as GifControl;
-            gControl.ImageSource = null;
-            gControl.ManipulationController = null;
+			var gControl = sender as Image;
+			gControl.Source = null;
         }
 
 		private void GifControl_Loaded(object sender, RoutedEventArgs e)
@@ -210,14 +209,13 @@ namespace SnooStream.View.Pages
 			//rebind the control if we're returning from another page in the back stack,
 			//this should be the only scenario where the image source has been set to null
 			//at the time of this event
-			var gControl = sender as GifControl;
-			if (gControl.ImageSource == null && gControl.DataContext != null)
+			var gControl = sender as Image;
+			if (gControl.Source == null && gControl.DataContext != null)
 			{
 				var imageViewModel = gControl.DataContext as ImageViewModel;
 				if (imageViewModel != null)
 				{
-					gControl.ImageSource = imageViewModel.ImageSource.ImageData;
-					gControl.ManipulationController = ManipulationController;
+					//gControl.Source = imageViewModel.ImageSource.ImageData;
 				}
 			}
 		}
@@ -246,7 +244,7 @@ namespace SnooStream.View.Pages
 		FlipViewItem currentAlbumItem;
 		private void albumSlideView_Loaded(object sender, RoutedEventArgs e)
 		{
-			((FlipView)sender).SelectionChanged += albumSlideViewIndexChanged 
+			((FlipView)sender).SelectionChanged += albumSlideViewIndexChanged;
 		}
 
 		private void albumSlideView_Unloaded(object sender, RoutedEventArgs e)

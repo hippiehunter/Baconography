@@ -9,6 +9,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml;
 using Windows.UI.Core;
 using SnooStream.Common;
+using Windows.UI.Xaml.Input;
 
 namespace SnooStream.View.Controls
 {
@@ -19,7 +20,7 @@ namespace SnooStream.View.Controls
             InitializeComponent();
         }
 
-        private void TextBox_KeyUp(object sender, KeyEventArgs e)
+		private void TextBox_KeyUp(object sender, KeyRoutedEventArgs e)
         {
             BindingExpression bindingExpression = ((TextBox)sender).GetBindingExpression(TextBox.TextProperty);
             if (bindingExpression != null)

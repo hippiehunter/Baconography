@@ -3,16 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:telerikPrimitives="using:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
         xmlns:localC="using:SnooStream.View.Controls"
         xmlns:selectors="using:SnooStream.View.Selectors" xmlns:s="using:System;assembly=mscorlib"
-        mc:Ignorable="d" FontFamily="{StaticResource PhoneFontFamilyNormal}"
-        FontSize="{StaticResource PhoneFontSizeNormal}" Foreground="{StaticResource PhoneForegroundBrush}"
-        d:DesignHeight="480" d:DesignWidth="480">
+        mc:Ignorable="d" d:DesignHeight="480" d:DesignWidth="480">
 
     <Grid x:Name="LayoutRoot" Margin="12,0,12,0">
         <Grid.Resources>
-            <ResourceDictionary Source="ActivitiesResources.xaml"/>
+            <!--ResourceDictionary Source="ActivitiesResources.xaml"/-->
         </Grid.Resources>
         
         <Grid.RowDefinitions>
@@ -23,7 +20,7 @@
         <ContentControl x:Name="header"
                         Grid.Row="0"
                         CharacterSpacing="-10"
-                        FontSize="40" FontFamily="{StaticResource PhoneFontFamilySemiLight}"
+                        FontSize="40"
                         HorizontalAlignment="Left" Margin="-6,6,0,24"
                         Content="activity">
             <ContentControl.RenderTransform>
@@ -31,12 +28,8 @@
             </ContentControl.RenderTransform>
         </ContentControl>
 
-        <telerikPrimitives:RadDataBoundListBox
-                Grid.Row="1"
-                EmptyContent="Loading..." x:Name="listBox" ItemsSource="{Binding Activities}"
-                ItemTemplate="{StaticResource activityTemplate}" IsAsyncBalanceEnabled="True"
-                AsyncBalanceMode="FillViewportFirst" IsItemReorderEnabled="False"
-                DataVirtualizationMode="OnDemandAutomatic" DataRequested="listBox_DataRequested">
-        </telerikPrimitives:RadDataBoundListBox>
+        <ListView Grid.Row="1" x:Name="listBox" ItemsSource="{Binding Activities}"
+                ItemTemplate="{StaticResource activityTemplate}" >
+        </ListView>
     </Grid>
 </UserControl>

@@ -10,6 +10,7 @@ using SnooStream.Common;
 using Windows.UI.Xaml;
 using Windows.UI.Input;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 
 namespace SnooStream.View.Pages
 {
@@ -283,7 +284,7 @@ namespace SnooStream.View.Pages
 
 
 
-		private void HelpOfflineButton_Tap(object sender, TappedEventArgs e)
+		private void HelpOfflineButton_Tap(object sender, TappedRoutedEventArgs e)
 		{
 			OpenHelp(
 				"OFFLINE CONTENT",
@@ -298,7 +299,7 @@ namespace SnooStream.View.Pages
 			var toggleSwitch = sender as ToggleSwitch;
 			try
 			{
-				ListingInformation products = await CurrentApp.LoadListingInformationByProductIdsAsync(new[] { "SnooStreamUpgrade" });
+				ListingInformation products = await CurrentApp.LoadListingInformationAsync();
 
 				// get specific in-app product by ID
 				ProductListing productListing = null;

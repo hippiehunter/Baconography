@@ -6,6 +6,7 @@ using System.Windows;
 using SnooStream.ViewModel;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Input;
+using Windows.UI.Xaml.Input;
 
 namespace SnooStream.View.Controls
 {
@@ -26,7 +27,7 @@ namespace SnooStream.View.Controls
 					await ((SelfViewModel)DataContext).PullOlder();
 			}
         }
-		private void ctrLoadMore_Tap(object sender, TappedEventArgs e)
+		private void ctrLoadMore_Tap(object sender, TappedRoutedEventArgs e)
         {
         }
     }

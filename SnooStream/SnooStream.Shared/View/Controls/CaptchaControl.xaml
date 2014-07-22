@@ -27,8 +27,7 @@
                MinWidth="400"/>
 
         <Grid Grid.Row="2" VerticalAlignment="Bottom">
-            <TextBox Text="{Binding CaptchaResponse, Mode=TwoWay}"
-                     KeyUp="TextBox_KeyUp"/>
+            <TextBox Text="{Binding CaptchaResponse, Mode=TwoWay}"/>
         </Grid>
     </Grid>
 </UserControl>

@@ -11,23 +11,23 @@
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <Grid x:Name="LayoutRoot">
-        <phone:Pivot x:Name="pivot">
-            <phone:PivotItem Header="subreddits">
+        <local:TabbedContainer x:Name="pivot">
+            <local:TabItem Header="subreddits">
                 <local:SubredditRiver DataContext="{Binding SubredditRiver}"/>
-            </phone:PivotItem>
-            <phone:PivotItem Header="self">
+            </local:TabItem>
+            <local:TabItem Header="self">
                 <Grid>
                     <local:SelfActivityView DataContext="{Binding UserHub.Self}" Visibility="{Binding UserHub.Self.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}"/>
                     <local:LoginView DataContext="{Binding UserHub.Login}" Visibility="{Binding UserHub.Self.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>
                 </Grid>
-            </phone:PivotItem>
-            <phone:PivotItem Header="settings" DataContext="{Binding Settings}">
+            </local:TabItem>
+            <local:TabItem Header="settings" DataContext="{Binding Settings}">
                 <local:HubSettingsView />
-            </phone:PivotItem>
-            <phone:PivotItem Header="moderator" DataContext="{Binding ModeratorHub}" Visibility="{Binding IsUserModerator, Converter={StaticResource booleanVisibilityConverter}}">
+            </local:TabItem>
+            <local:TabItem Header="moderator" DataContext="{Binding ModeratorHub}" Visibility="{Binding IsUserModerator, Converter={StaticResource booleanVisibilityConverter}}">
                 <Grid/>
-            </phone:PivotItem>
-        </phone:Pivot>
+            </local:TabItem>
+        </local:TabbedContainer>
     </Grid>
 
 </common:SnooApplicationPage>

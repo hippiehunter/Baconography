@@ -56,7 +56,7 @@ namespace SnooStream.View.Selectors
 		{
 			_selector = selector;
 		}
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+		protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
             //decide if its a group or a single
             var group = item as ActivityGroupViewModel;

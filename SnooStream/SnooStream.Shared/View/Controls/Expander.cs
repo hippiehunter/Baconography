@@ -377,7 +377,7 @@ namespace SnooStream.View.Controls
 		/// <summary>
 		/// Gets the template parts and sets event handlers.
 		/// </summary>
-		public override void OnApplyTemplate()
+		protected override void OnApplyTemplate()
 		{
 			if (_expanderPanel != null)
 			{
@@ -608,11 +608,7 @@ namespace SnooStream.View.Controls
 
 		#region ItemsControl overriden methods
 
-		/// <summary>
-		/// Updates the HasItems property.
-		/// </summary>
-		/// <param name="e">The event information.</param>
-		protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
+		protected override void OnItemsChanged(object e)
 		{
 			base.OnItemsChanged(e);
 			HasItems = Items.Count > 0;

@@ -5,6 +5,7 @@ using System.Net;
 using System.Windows;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 
 namespace SnooStream.View.Controls
 {
@@ -14,8 +15,7 @@ namespace SnooStream.View.Controls
         {
             InitializeComponent();
         }
-
-        private void TextBox_KeyUp(object sender, KeyEventArgs e)
+		private void TextBox_KeyUp(object sender, KeyRoutedEventArgs e)
         {
 
         }

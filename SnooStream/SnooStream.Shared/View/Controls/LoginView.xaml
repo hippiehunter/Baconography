@@ -3,7 +3,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:telerik="using:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
     xmlns:local="using:SnooStream.View.Controls"
     xmlns:common="using:SnooStream.Common"
     mc:Ignorable="d"
@@ -24,29 +23,15 @@
                         <TranslateTransform x:Name="headerTransform"/>
                     </ContentControl.RenderTransform>
                 </ContentControl>
-                <telerik:RadPickerBox Visibility="{Binding HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}" 
-                                      Header="stored logins"
-                                      Content="{Binding SelectedUsername}">
-                    <telerik:RadPickerBox.PopupContent>
-                        <ListBox ItemsSource="{Binding StoredCredentials}"
-                                 SelectedItem="{Binding SelectedCredential, Mode=TwoWay}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Padding="12">
-                                        <TextBlock Text="{Binding Username}"
-                                                   FontSize="{StaticResource PhoneFontSizeExtraLarge}"/>
-                                    </Border>
-                                    
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </telerik:RadPickerBox.PopupContent>
-                </telerik:RadPickerBox>
-
-                <telerik:RadTextBox Header="username" Text="{Binding Username, Mode=TwoWay}"/>
-                <telerik:RadPasswordBox Header="password"
-                                        Password="{Binding Password, Mode=TwoWay}"
-                                        IsEnabled="{Binding UsingStoredCredential, Converter={StaticResource invertedBooleanConverter}}"/>
+                <local:ComboBoxOrPicker Visibility="{Binding HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}" 
+                                  Header="stored logins" 
+                                  ItemsSource="{Binding StoredCredentials}"
+                                  SelectedItem="{Binding SelectedCredential, Mode=TwoWay}"/>
+                
+                <TextBox Header="username" Text="{Binding Username, Mode=TwoWay}"/>
+                <PasswordBox Header="password" 
+                             Password="{Binding Password, Mode=TwoWay}"
+                             IsEnabled="{Binding UsingStoredCredential, Converter={StaticResource invertedBooleanConverter}}"/>
                 <CheckBox Margin="0,0,0,0" Content="save this login"
                           IsChecked="{Binding IsRememberLogin, Mode=TwoWay}"/>
                 <CheckBox Margin="0,0,0,0" Content="login automatically"

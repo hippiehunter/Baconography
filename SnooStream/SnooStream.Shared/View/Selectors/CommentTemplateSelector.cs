@@ -59,7 +59,7 @@ namespace SnooStream.View.Selectors
 		{
 			_selector = selector;
 		}
-		public override DataTemplate SelectTemplate(object item, DependencyObject container)
+		protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
 		{
 			if (item is CommentViewModel)
 				return _selector.CommentTemplate;

@@ -10,7 +10,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace SnooStream.View.Selectors
 {
-	public class ContentTemplateSelector : DependencyObject
+	public class ContentTemplateSelector : ContentControl
 	{
 		public DataTemplate SelfContentTemplate
 		{
@@ -114,11 +114,23 @@ namespace SnooStream.View.Selectors
 		public static readonly DependencyProperty GifTemplateProperty =
 			DependencyProperty.Register("GifTemplate", typeof(DataTemplate), typeof(ContentTemplateSelector), new PropertyMetadata(null));
 
-		public DataTemplateSelector Selector { get; set; }
+
+
+		public bool IsLoaded
+		{
+			get { return (bool)GetValue(IsLoadedProperty); }
+			set { SetValue(IsLoadedProperty, value); }
+		}
+
+		// Using a DependencyProperty as the backing store for IsLoaded.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty IsLoadedProperty =
+			DependencyProperty.Register("IsLoaded", typeof(bool), typeof(ContentTemplateSelector), new PropertyMetadata(false));
+
+		
 
 		public ContentTemplateSelector()
 		{
-			Selector = new ContentTemplateSelectorImpl(this);
+			ContentTemplateSelector = new ContentTemplateSelectorImpl(this);
 		}
 	}
 	class ContentTemplateSelectorImpl : DataTemplateSelector
@@ -128,7 +140,7 @@ namespace SnooStream.View.Selectors
 		{
 			_selector = selector;
 		}
-        public override DataTemplate SelectTemplateCore(object item, DependencyObject container)
+		protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
             if (item is LoadingContentViewModel)
 				return _selector.LoadingContentTemplate;

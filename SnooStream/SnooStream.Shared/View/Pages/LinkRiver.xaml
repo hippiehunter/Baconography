@@ -4,9 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream.View.Controls"
     xmlns:common="using:SnooStream.Common"
-    xmlns:phone="using:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
-    xmlns:shell="using:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
-    xmlns:telerikPrimitives="using:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -26,16 +23,14 @@
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <telerikPrimitives:RadDataBoundListBox
-                ItemsSource="{Binding Links}"
-                DataVirtualizationMode="OnDemandAutomatic"
-                DataRequested="RadDataBoundListBox_DataRequested">
-                <telerikPrimitives:RadDataBoundListBox.ItemTemplate>
+            <ListView
+                ItemsSource="{Binding Links}">
+                <ListView.ItemTemplate>
                     <DataTemplate>
                         <local:SimpleLinkView HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
                     </DataTemplate>
-                </telerikPrimitives:RadDataBoundListBox.ItemTemplate>
-            </telerikPrimitives:RadDataBoundListBox>
+                </ListView.ItemTemplate>
+            </ListView>
         </Grid>
     </Grid>
 

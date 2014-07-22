@@ -7,6 +7,7 @@ using SnooStream.ViewModel;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Input;
 
 namespace SnooStream.View.Controls
 {
@@ -17,39 +18,28 @@ namespace SnooStream.View.Controls
 			InitializeComponent();
 		}
 
-		private async void RadDataBoundListBox_DataRequested (object sender, EventArgs e)
-		{
-			await ((CommentsViewModel)DataContext).LoadFull();
-		}
-
-		private async void RadDataBoundListBox_RefreshRequested (object sender, EventArgs e)
-		{
-			await ((CommentsViewModel)DataContext).Refresh();
-			commentsList.StopPullToRefreshLoading(true, true);
-		}
-
-		private void Link_Tap (object sender, TappedEventArgs e)
+		private void Link_Tap (object sender, TappedRoutedEventArgs e)
 		{
 			var vm = this.DataContext as CommentsViewModel;
 			if(vm != null)
 				vm.GotoLink.Execute(null);
 		}
 
-		private void ReplyButton_Tap(object sender, TappedEventArgs e)
+		private void ReplyButton_Tap(object sender, TappedRoutedEventArgs e)
 		{
 			var vm = this.DataContext as CommentsViewModel;
 			if(vm != null)
 				vm.GotoReply.Execute(null);
 		}
 
-		private void EditPostButton_Tap(object sender, TappedEventArgs e)
+		private void EditPostButton_Tap(object sender, TappedRoutedEventArgs e)
 		{
 			var vm = this.DataContext as CommentsViewModel;
 			if(vm != null)
 				vm.GotoEditPost.Execute(null);
 		}
 
-		private void MenuSort_Click (object sender, EventArgs e)
+		private void MenuSort_Click (object sender, RoutedEventArgs e)
 		{
 			double height = 480;
 			double width = 325;
@@ -71,16 +61,16 @@ namespace SnooStream.View.Controls
 			child.SortOrder = commentsViewModel.Sort;
 			child.Height = height;
 			child.Width = width;
-			child.button_ok.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
-			{
-				sortPopup.IsOpen = false;
-				commentsViewModel.Sort = child.SortOrder;
-			};
+			//child.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
+			//{
+			//	sortPopup.IsOpen = false;
+			//	commentsViewModel.Sort = child.SortOrder;
+			//};
 
-			child.button_cancel.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
-			{
-				sortPopup.IsOpen = false;
-			};
+			//child.button_cancel.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
+			//{
+			//	sortPopup.IsOpen = false;
+			//};
 
 			sortPopup.Child = child;
 			sortPopup.IsOpen = true;
@@ -88,20 +78,20 @@ namespace SnooStream.View.Controls
 
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
-			var context = DataContext as CommentsViewModel;
-			if (context != null)
-			{
-				context.ViewHack = (item) => commentsList.BringIntoView(item);
-			}
+			//var context = DataContext as CommentsViewModel;
+			//if (context != null)
+			//{
+			//	context.ViewHack = (item) => commentsList.BringIntoView(item);
+			//}
 		}
 
 		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
 		{
-			var context = DataContext as CommentsViewModel;
-			if (context != null)
-			{
-				context.ViewHack = null;
-			}
+			//var context = DataContext as CommentsViewModel;
+			//if (context != null)
+			//{
+			//	context.ViewHack = null;
+			//}
 		}
 	}
 }

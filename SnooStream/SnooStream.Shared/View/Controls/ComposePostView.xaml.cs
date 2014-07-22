@@ -9,6 +9,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml;
 using SnooStream.Common;
+using Windows.UI.Xaml.Input;
 
 namespace SnooStream.View.Controls
 {
@@ -19,7 +20,7 @@ namespace SnooStream.View.Controls
             InitializeComponent();
         }
 
-        private void TextBox_KeyUp(object sender, KeyEventArgs e)
+		private void TextBox_KeyUp(object sender, KeyRoutedEventArgs e)
         {
             BindingExpression bindingExpression = ((TextBox)sender).GetBindingExpression(TextBox.TextProperty);
             if (bindingExpression != null)
@@ -33,7 +34,7 @@ namespace SnooStream.View.Controls
             var vm = this.DataContext as PostViewModel;
             if (vm != null)
             {
-                var pivotItem = pivot.SelectedItem as PivotItem;
+                var pivotItem = pivot.SelectedItem as TabItem;
                 if (pivotItem != null)
                 {
                     vm.Kind = pivotItem.Header as string;

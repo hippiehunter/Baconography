@@ -9,6 +9,7 @@ using System.IO;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Input;
 using SnooStream.Common;
+using Windows.UI.Xaml.Input;
 
 namespace SnooStream.View.Controls
 {
@@ -19,23 +20,23 @@ namespace SnooStream.View.Controls
             InitializeComponent();
         }
 
-		private void Content_Tap(object sender, TappedEventArgs e)
+		private void Content_Tap(object sender, TappedRoutedEventArgs e)
 		{
 			var settingsViewModel = this.DataContext as SettingsViewModel;
 			SnooStreamViewModel.NavigationService.NavigateToContentSettings(settingsViewModel);
 		}
 
-		private void LockScreen_Tap(object sender, TappedEventArgs e)
+		private void LockScreen_Tap(object sender, TappedRoutedEventArgs e)
         {
             var settingsViewModel = this.DataContext as SettingsViewModel;
             SnooStreamViewModel.NavigationService.NavigateToLockScreenSettings(settingsViewModel);
         }
 
-		private async void AdFreeUpgrade_Tap(object sender, TappedEventArgs e)
+		private async void AdFreeUpgrade_Tap(object sender, TappedRoutedEventArgs e)
         {
             try
             {
-                ListingInformation products = await CurrentApp.LoadListingInformationByProductIdsAsync(new[] { "SnooStreamUpgrade" });
+                ListingInformation products = await CurrentApp.LoadListingInformationAsync();
 
                 // get specific in-app product by ID
                 ProductListing productListing = null;

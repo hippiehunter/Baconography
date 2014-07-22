@@ -2,71 +2,61 @@
     x:Class="SnooStream.View.Pages.ContentSettings"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:phone="using:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
-    xmlns:shell="using:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:telerikPrimitives="using:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
     xmlns:local="using:SnooStream.View.Controls"
     xmlns:common="using:SnooStream.Common"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
-    SupportedOrientations="Portrait" Orientation="Portrait"
-    mc:Ignorable="d"
-    shell:SystemTray.IsVisible="True">
+    mc:Ignorable="d">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
-        <phone:Pivot Title="CONTENT" Style="{StaticResource SettingsPivot}">
-            <phone:PivotItem Margin="0,0,0,24"
+        <local:TabbedContainer Title="CONTENT" Style="{StaticResource SettingsPivot}">
+            <local:TabItem Margin="0,0,0,24"
 				Header="SETTINGS">
 
                 <ScrollViewer Grid.Row="1" Margin="0,0,0,0" DataContext="{Binding Settings}">
                     <StackPanel Margin="12,12,12,0">
-                        <telerikPrimitives:RadToggleSwitch Header="Allow NSFW (over 18) content"
-                                        IsChecked="{Binding AllowNSFWContent, Mode=TwoWay}"
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Only flipview unvisited content"
-                                        IsChecked="{Binding OnlyFlipViewUnread, Mode=TwoWay}"
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Only flipview through images"
-                                        IsChecked="{Binding OnlyFlipViewImages, Mode=TwoWay}"
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Visit web links in app"
-                                        IsChecked="{Binding OptimizeWebContent, Mode=TwoWay}"
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Allow NSFW (over 18) content"
+                                        IsOn="{Binding AllowNSFWContent, Mode=TwoWay}"
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Only flipview unvisited content"
+                                        IsOn="{Binding OnlyFlipViewUnread, Mode=TwoWay}"
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Only flipview through images"
+                                        IsOn="{Binding OnlyFlipViewImages, Mode=TwoWay}"
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Visit web links in app"
+                                        IsOn="{Binding OptimizeWebContent, Mode=TwoWay}"
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
 
                         <TextBlock FontWeight="SemiBold" Text="LAYOUT"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Left-handed thumbnail layout"
-                                        IsChecked="{Binding LeftHandedMode, Mode=TwoWay}"
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Use single-reddit layout"
-                                        IsChecked="{Binding SimpleLayoutMode, Mode=TwoWay}"
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Enable one-touch voting"
-                                        IsChecked="{Binding OneTouchVoteMode, Mode=TwoWay}"
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Lock current orientation"
-                                        IsChecked="{Binding OrientationLock, Mode=TwoWay}"
-                                        Checked="OrientationLock_Checked"
-                                        Unchecked="OrientationLock_Unchecked"
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Tap title for comments"
-                                        IsChecked="{Binding TapForComments, Mode=TwoWay}" 
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Invert system theme"
-                                        IsChecked="{Binding InvertSystemTheme, Mode=TwoWay}" 
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Use multi-color comment margins"
-                                        IsChecked="{Binding MultiColorCommentMargins, Mode=TwoWay}" 
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Left-handed thumbnail layout"
+                                        IsOn="{Binding LeftHandedMode, Mode=TwoWay}"
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Use single-reddit layout"
+                                        IsOn="{Binding SimpleLayoutMode, Mode=TwoWay}"
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Enable one-touch voting"
+                                        IsOn="{Binding OneTouchVoteMode, Mode=TwoWay}"
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Lock current orientation"
+                                        IsOn="{Binding OrientationLock, Mode=TwoWay}"
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Tap title for comments"
+                                        IsOn="{Binding TapForComments, Mode=TwoWay}" 
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Invert system theme"
+                                        IsOn="{Binding InvertSystemTheme, Mode=TwoWay}" 
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Use multi-color comment margins"
+                                        IsOn="{Binding MultiColorCommentMargins, Mode=TwoWay}" 
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
 
 
                         <TextBlock FontWeight="SemiBold" Text="BACKGROUND"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Disable background activity"
-                                        IsChecked="{Binding DisableBackground, Mode=TwoWay}" 
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Disable background activity"
+                                        IsOn="{Binding DisableBackground, Mode=TwoWay}" 
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock HorizontalAlignment="Left" FontWeight="SemiBold" Text="OFFLINE CONTENT"/>
                             <Button 
@@ -77,12 +67,12 @@
                                             Content="&#xE11B;" Style="{StaticResource RoundButtonStyle}"/>
                         </StackPanel>
 
-                        <telerikPrimitives:RadToggleSwitch Header="Predictive offline caching"
-                                        IsChecked="{Binding AllowPredictiveOfflining, Mode=TwoWay}" 
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
-                        <telerikPrimitives:RadToggleSwitch Header="Overnight offline caching"
-                                        IsChecked="{Binding EnableOvernightUpdates, Mode=TwoWay}" 
-                                        ContentTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Predictive offline caching"
+                                        IsOn="{Binding AllowPredictiveOfflining, Mode=TwoWay}" 
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Overnight offline caching"
+                                        IsOn="{Binding EnableOvernightUpdates, Mode=TwoWay}" 
+                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Margin="12,0,0,0" Text="Cleanup data every"/>
                             <TextBlock Margin="6,0,0,0" Text="{Binding OfflineCacheDays}" />
@@ -93,8 +83,8 @@
 
                     </StackPanel>
                 </ScrollViewer>
-            </phone:PivotItem>
-        </phone:Pivot>
+            </local:TabItem>
+        </local:TabbedContainer>
     </Grid>
 
 </common:SnooApplicationPage>

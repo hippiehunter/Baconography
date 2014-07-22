@@ -5,9 +5,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:SnooStream.View.Controls" 
     mc:Ignorable="d"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
     d:DesignHeight="480" d:DesignWidth="480">
     <UserControl.Resources>
         <Style x:Key="MessageTextBox" TargetType="TextBox">
@@ -16,8 +13,6 @@
             <Setter Property="Background" Value="{StaticResource PhoneBackgroundBrush}" />
             <Setter Property="Foreground" Value="{StaticResource PhoneForegroundBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource PhoneTextBoxBrush}" />
-            <Setter Property="SelectionBackground" Value="{StaticResource PhoneAccentBrush}" />
-            <Setter Property="SelectionForeground" Value="{StaticResource PhoneTextBoxSelectionForegroundBrush}" />
             <Setter Property="BorderThickness" Value="{StaticResource PhoneBorderThickness}" />
             <Setter Property="AcceptsReturn" Value="True" />
             <Setter Property="Padding" Value="2" />
@@ -174,7 +169,7 @@
                     <TextBlock Text="From:" Foreground="{StaticResource PhoneForegroundBrush}" Margin="0,12,0,0" />
                     <TextBox Margin="60,0,0,0" Height="40" Style="{StaticResource MessageTextBox}" BorderThickness="0"
                             Padding="0" IsReadOnly="True" Text="{Binding Path=Compose.CommentingAs}"
-                            KeyUp="TextBox_KeyUp" CaretBrush="{StaticResource PhoneAccentBrush}" FontSize="22" />
+                            KeyUp="TextBox_KeyUp" FontSize="22" />
                     <Button Margin="0,0,0,0" HorizontalAlignment="Right" FontFamily="Segoe UI Symbol" FontSize="16"
                             Width="30" Height="30" Style="{StaticResource MessageButtonStyle}" Click="ChangeUser_Click"
                             Content="&#xE14A;" />
@@ -185,7 +180,7 @@
                     <TextBlock Text="To:" Foreground="{StaticResource PhoneForegroundBrush}" Margin="0,12,0,0" />
                     <TextBox Margin="35,-1,0,0" Height="40" Style="{StaticResource MessageTextBox}" BorderThickness="0"
                             Padding="0" FontSize="22" Text="{Binding Path=Compose.Recipient, Mode=TwoWay}"
-                            KeyUp="TextBox_KeyUp" CaretBrush="{StaticResource PhoneAccentBrush}"
+                            KeyUp="TextBox_KeyUp"
                             IsEnabled="{Binding Path=Compose.IsReply, Converter={StaticResource invertedBooleanConverter}}" />
                     <Border HorizontalAlignment="Stretch" Height="1" BorderBrush="{StaticResource PhoneForegroundBrush}"
                             BorderThickness=".5" Margin="0,50,0,0" />
@@ -194,7 +189,6 @@
                     <TextBlock Text="Subject:" Foreground="{StaticResource PhoneForegroundBrush}" Margin="0,12,0,0" />
                     <TextBox Margin="80,-2,0,0" Height="40" Style="{StaticResource MessageTextBox}" BorderThickness="0"
                             Padding="0" FontSize="22" KeyUp="TextBox_KeyUp"
-                            CaretBrush="{StaticResource PhoneAccentBrush}"
                             Text="{Binding Path=Compose.Subject, Mode=TwoWay}" />
                     <Border HorizontalAlignment="Stretch" Height="1" BorderBrush="{StaticResource PhoneForegroundBrush}"
                             BorderThickness=".5" Margin="0,50,0,0" />

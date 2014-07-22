@@ -3,16 +3,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:telerikPrimitives="using:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
-    xmlns:telerikJumpList="using:Telerik.Windows.Controls.JumpList;assembly=Telerik.Windows.Controls.Data"
-    xmlns:telerikData="using:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Data"
     xmlns:localC="using:SnooStream.View.Controls"
     xmlns:selectors="using:SnooStream.View.Selectors"
     xmlns:s="using:System;assembly=mscorlib"
     mc:Ignorable="d"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
     d:DesignHeight="480" d:DesignWidth="480">
 
     <Grid x:Name="LayoutRoot">
@@ -50,49 +44,42 @@
             </DataTemplate>
         </Grid.Resources>
 
-        <telerikData:RadJumpList
-            EmptyContent="Loading..."
-            IsAsyncBalanceEnabled="False"
+        <ListView 
             x:Name="listBox" 
             HorizontalAlignment="Stretch"
             HorizontalContentAlignment="Stretch"
             Margin="-12,0,-12,0" ItemsSource="{Binding CombinedRivers}"
-            GroupDescriptorsSource="{Binding Descriptors, Source={StaticResource subredditGroupDescriptorSource}}"
-            ItemTemplate="{StaticResource normalSubreddit}"
-            GroupHeaderTemplate="{StaticResource subredditGroupHeader}"
-            StickyHeaderTemplate="{StaticResource stickyGroupHeader}"
-            ListHeaderDisplayMode="AlwaysVisible"
-            IsStickyHeaderEnabled="True">
-            <telerikData:RadJumpList.ListHeaderTemplate>
-                <DataTemplate>
-                    <StackPanel Margin="12,0,12,0">
-                        <ContentControl x:Name="header"
+            ItemTemplate="{StaticResource normalSubreddit}">
+            <ListView.Header>
+                <StackPanel Margin="12,0,12,0">
+                    <ContentControl x:Name="header"
                                 CharacterSpacing="-10"
-                                FontSize="{StaticResource PhoneFontSizeExtraLarge}" FontFamily="{StaticResource PhoneFontFamilySemiLight}"
                                 HorizontalAlignment="Left" Margin="0,0,0,16"
                                 Content="subreddits"
                                 Padding="6">
-                            <ContentControl.RenderTransform>
-                                <TranslateTransform x:Name="headerTransform"/>
-                            </ContentControl.RenderTransform>
-                        </ContentControl>
-                        <StackPanel Margin="24,0,0,0" Visibility="Collapsed">
-                            <TextBlock TextWrapping="Wrap" FontSize="17" Margin="0,5,0,3">
+                        <ContentControl.RenderTransform>
+                            <TranslateTransform x:Name="headerTransform"/>
+                        </ContentControl.RenderTransform>
+                    </ContentControl>
+                    <StackPanel Margin="24,0,0,0" Visibility="Collapsed">
+                        <TextBlock TextWrapping="Wrap" FontSize="17" Margin="0,5,0,3">
                                             Enter a subreddit:
-                            </TextBlock>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBox HorizontalAlignment="Stretch" MinHeight="25" Width="320"
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox HorizontalAlignment="Stretch" MinHeight="25" Width="320"
                                                  Margin="-13,0,0,0"
                                                  x:Name="manualBox" Text="{Binding SearchString, Mode=TwoWay}"
                                                      KeyUp="manualBox_KeyDown"
-                                                     LostFocus="manualBox_LostFocus"
-                                                     MouseLeave="manualBox_MouseLeave"/>
-                            </StackPanel>
-                            <TextBlock TextWrapping="Wrap" FontSize="17" Margin="0,5,0,7" Text="Or select a subreddit from below"/>
+                                                     LostFocus="manualBox_LostFocus"/>
                         </StackPanel>
+                        <TextBlock TextWrapping="Wrap" FontSize="17" Margin="0,5,0,7" Text="Or select a subreddit from below"/>
                     </StackPanel>
-                </DataTemplate>
-            </telerikData:RadJumpList.ListHeaderTemplate>
-        </telerikData:RadJumpList>
+                </StackPanel>
+            </ListView.Header>
+            <ListView.GroupStyle>
+                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource subredditGroupHeader}">
+                </GroupStyle>
+            </ListView.GroupStyle>
+        </ListView>
     </Grid>
 </UserControl>

@@ -5,13 +5,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:SnooStream.View.Controls"
     xmlns:common="using:SnooStream.Common"
-    xmlns:phone="using:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
-    xmlns:telerikPrimitives="using:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
+    xmlns:snoodom="using:SnooDom"
     xmlns:selectors="using:SnooStream.View.Selectors"
     mc:Ignorable="d"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
     d:DesignHeight="480" d:DesignWidth="480" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
 
     <Grid x:Name="LayoutRoot">
@@ -337,7 +333,7 @@
                     </Grid>
                     <Border Grid.Row="2" BorderBrush="White" BorderThickness=".5" CornerRadius="3" Margin="5,5,5,10"
                             Visibility="{Binding ElementName=controlRoot, Path=DataContext.IsSelf, Converter={StaticResource booleanVisibilityConverter}}">
-                        <local:MarkdownControl Margin="5,5,5,5"
+                        <snoodom:MarkdownControl Margin="5,5,5,5"
                                 Markdown="{Binding Link.SelfText}" />
                     </Border>
                 </Grid>
@@ -346,13 +342,9 @@
                     CommentTemplate="{StaticResource CommentViewTemplate}"
                     MoreTemplate="{StaticResource MoreViewTemplate}" />
         </Grid.Resources>
-
-        <telerikPrimitives:RadDataBoundListBox x:Name="commentsList" ListHeaderTemplate="{StaticResource HeaderTemplate}"
-                ItemTemplateSelector="{StaticResource commentTemplateSelector}"
-                DataVirtualizationMode="OnDemandAutomatic" DataRequested="RadDataBoundListBox_DataRequested"
-                ListHeaderDisplayMode="AlwaysVisible" RefreshRequested="RadDataBoundListBox_RefreshRequested"
-                IsPullToRefreshEnabled="True" IsCheckModeEnabled="False" IsItemReorderEnabled="False" AsyncBalanceMode="FillViewportFirst" IsAsyncBalanceEnabled="True"
-                ItemsSource="{Binding FlatComments}" />
+        <ListView x:Name="commentsList" HeaderTemplate="{StaticResource HeaderTemplate}"
+                  ItemTemplateSelector="{StaticResource commentTemplateSelector}"
+                  ItemsSource="{Binding FlatComments}"/>
         <Popup x:Name="sortPopup" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </UserControl>

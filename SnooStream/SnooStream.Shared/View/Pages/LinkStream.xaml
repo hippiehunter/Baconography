@@ -5,11 +5,7 @@
     xmlns:local="using:SnooStream.View.Controls"
     xmlns:selectors="using:SnooStream.View.Selectors"
     xmlns:common="using:SnooStream.Common"
-    xmlns:phone="using:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
-    xmlns:shell="using:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
-    xmlns:telerikPrimitives="using:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Primitives"
-    xmlns:telerikSlideView="using:Telerik.Windows.Controls.SlideView;assembly=Telerik.Windows.Controls.Primitives"
-    xmlns:mmppf="using:Microsoft.PlayerFramework;assembly=Microsoft.PlayerFramework"
+    xmlns:mmppf="using:Microsoft.PlayerFramework"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -19,16 +15,15 @@
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid.Resources>
             <DataTemplate x:Name="imageTemplate">
-                <telerikSlideView:PanAndZoomImage 
-                    ZoomMode="None" Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
+                <Image Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Unloaded="PanAndZoomImage_Unloaded" Loaded="PanAndZoomImage_Loaded"
                     Source="{Binding ImageSource, Converter={StaticResource asyncImageSourceConverter}}" />
             </DataTemplate>
 
             <DataTemplate x:Name="gifTemplate">
-                <local:GifControl
+                <Image
                     HorizontalAlignment="Center" VerticalAlignment="Center" Unloaded="GifControl_Unloaded" Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
-                    ImageSource="{Binding ImageSource.ImageData}" ManipulationController="{Binding ManipulationController, ElementName=linkStream}" Loaded="GifControl_Loaded" />
+                    Source="{Binding ImageSource.ImageData}" Loaded="GifControl_Loaded" />
             </DataTemplate>
 
             <DataTemplate x:Name="videoTemplate" >
@@ -47,17 +42,17 @@
 
             
             <DataTemplate x:Name="webTemplate" >
-                <telerikPrimitives:RadDataBoundListBox ItemsSource="{Binding WebParts}"
+                <ListView ItemsSource="{Binding WebParts}"
                                                        Margin="0" Padding="0"
                                                        BorderThickness="0" VerticalAlignment="Stretch" 
                                                        ScrollViewer.VerticalScrollBarVisibility="Auto"
                                                        ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                                                        HorizontalContentAlignment="Stretch"
                                                        ItemTemplateSelector="{StaticResource articleTemplateSelector}">
-                    <telerikPrimitives:RadDataBoundListBox.ListHeaderContent>
+                    <ListView.Header>
                         <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" FontSize="32" Margin="20" TextWrapping="Wrap"/>
-                    </telerikPrimitives:RadDataBoundListBox.ListHeaderContent>
-                </telerikPrimitives:RadDataBoundListBox>
+                    </ListView.Header>
+                </ListView>
             </DataTemplate>
             
             <DataTemplate x:Name="selfTemplate">
@@ -72,9 +67,8 @@
             <DataTemplate x:Name="albumTemplate">
                 <Grid>
                     <!-- TODO: FIX this, its doesnt draw right and its probably not in the right place -->
-                    <telerikPrimitives:RadPaginationControl Grid.Row="0" PageProvider="{Binding ElementName=albumSlideView}" DisplayMode="IndexLabel"/>
-                    <telerikPrimitives:RadSlideView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}" Orientation="Vertical" IsLoopingEnabled="True" AdjacentItemsPreviewMode="None" 
-                                                    IsPullToRefreshEnabled="False" ItemRealizationMode="ViewportItem" ItemTemplateSelector="{StaticResource imageSelector}" 
+                    <!--<telerikPrimitives:RadPaginationControl Grid.Row="0" PageProvider="{Binding ElementName=albumSlideView}" DisplayMode="IndexLabel"/>-->
+                    <FlipView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}" ItemTemplateSelector="{StaticResource imageSelector}" 
                                                     Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
                                                     Loaded="albumSlideView_Loaded" Unloaded="albumSlideView_Unloaded"/>
                 </Grid>
@@ -86,9 +80,7 @@
 
             <DataTemplate x:Name="loadingTemplate">
                 <Grid>
-                    <telerikPrimitives:RadBusyIndicator
-                        IsRunning="{Binding IsInitiallyLoaded, Converter={StaticResource invertedBooleanConverter}}"
-                        Content="{Binding Underlying.PreviewLoadPercent}"/>
+                    <ProgressRing IsActive="{Binding IsInitiallyLoaded, Converter={StaticResource invertedBooleanConverter}}"/>
                     <selectors:ContentTemplateSelector Content="{Binding Underlying}"
                                                        IsLoaded="{Binding IsInitiallyLoaded}"
                                                        Visibility="{Binding IsInitiallyLoaded, Converter={StaticResource booleanVisibilityConverter}}"
@@ -121,15 +113,13 @@
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Margin="0,0,0,0" Grid.Row="0">
-            <telerikPrimitives:RadSlideView x:Name="radSlideView" SelectedItem="{Binding SelectedItem, ElementName=linkStream, Mode=TwoWay}" ItemsSource="{Binding Links, ElementName=linkStream}" AdjacentItemsPreviewMode="None" IsPullToRefreshEnabled="False" 
-                                            Orientation="Horizontal" IsLoopingEnabled="False" OverlayContentTemplate="{StaticResource overlayTemplate}" IsShowOverlayContentOnTapEnabled="True"
-                                            ItemRealizationMode="ViewportItem"  ItemTemplate="{StaticResource loadingTemplate}" DoubleTapped="radSlideView_DoubleTap" ManipulationStarted="radSlideView_ManipulationStarted"
-                                            ManipulationCompleted="radSlideView_ManipulationCompleted" ManipulationDelta="radSlideView_ManipulationDelta" >
-            </telerikPrimitives:RadSlideView>
+            <FlipView x:Name="flipView" SelectedItem="{Binding SelectedItem, ElementName=linkStream, Mode=TwoWay}" ItemsSource="{Binding Links, ElementName=linkStream}"
+                                            ItemTemplate="{StaticResource loadingTemplate}">
+            </FlipView>
             
         </Grid>
         <!-- TODO: change positioning in landscape -->
-        <local:ExtendedAppBarControl Name="appBar" Grid.Row="1" DataContext="{Binding SelectedItem.Context, ElementName=radSlideView}" LastButtonSymbol="&#xE118;" LastButtonText="Save"/>
+        <!--local:ExtendedAppBarControl Name="appBar" Grid.Row="1" DataContext="{Binding SelectedItem.Context, ElementName=radSlideView}" LastButtonSymbol="&#xE118;" LastButtonText="Save"/-->
     </Grid>
 
 </common:SnooApplicationPage>

@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
 using SnooStream.Common;
 using SnooStream.ViewModel;
 using GalaSoft.MvvmLight;
-using SnooStream.BackgroundControls.ViewModel;
 using SnooStream.Model;
 using System.ComponentModel;
 using SnooStream.TaskSettings;
+using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml;
+using Windows.UI.Input;
+using SnooStreamBackground;
+using Windows.UI.Xaml.Input;
 
 namespace SnooStream.View.Pages
 {
@@ -28,8 +28,9 @@ namespace SnooStream.View.Pages
         {
             base.OnNavigatedTo(e);
 
-            IsLockScreenProvider = BackgroundTaskManager.IsLockScreenProvider;
-            var taskSettings = TaskSettingsLoader.LoadTaskSettings();
+			IsLockScreenProvider = false;//BackgroundTaskManager.IsLockScreenProvider;
+			var taskSettings = new SnooStreamBackground.LockScreenSettings();
+			var taskHistory = new SnooStreamBackground.LockScreenHistory();
 
             var vm = this.DataContext as SettingsViewModel;
             if (vm != null)
@@ -37,19 +38,19 @@ namespace SnooStream.View.Pages
                 _previewLockScreenViewModel = new PreviewLockScreenViewModel(vm.LockScreen);
                 SetValue(PreviewLockScreenVMProperty, _previewLockScreenViewModel);
 
-                if (taskSettings.LockScreenImageURIs.Count >= 1)
+				if (taskHistory.LockScreenImages.Count >= 1)
                 {
-                    BackgroundTaskManager.Shuffle(taskSettings.LockScreenImageURIs);
-                    vm.LockScreen.SelectedImage = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + taskSettings.LockScreenImageURIs.First();
+					BackgroundTaskManager.Shuffle(taskHistory.LockScreenImages);
+					vm.LockScreen.SelectedImage = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + taskHistory.LockScreenImages.First().LocalUrl;
                 }
                 else
                 {
                     vm.LockScreen.SelectedImage = "/Assets/RainbowGlass.jpg";
-                    if (BackgroundTaskManager.IsLockScreenProvider)
-                    {
-                        ImagesLoading = true;
-                        ImagesLoading = await BackgroundTaskManager.UpdateLockScreenImages();
-                    }
+					//if (BackgroundTaskManager.IsLockScreenProvider)
+					//{
+					//	ImagesLoading = true;
+					//	ImagesLoading = await BackgroundTaskManager.UpdateLockScreenImages();
+					//}
                 }
             }
         }
@@ -126,23 +127,23 @@ namespace SnooStream.View.Pages
                 new PropertyMetadata(false)
             );
 
-        private async void SetLockScreenProvider_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        private async void SetLockScreenProvider_Tap(object sender, TappedRoutedEventArgs e)
         {
-            IsLockScreenProvider = await BackgroundTaskManager.StartLockScreenProvider();
-            if (IsLockScreenProvider)
-            {
-                ImagesLoading = true;
-                ImagesLoading = await BackgroundTaskManager.MaybeUpdateLockScreenImages();
-            }
+			//IsLockScreenProvider = await BackgroundTaskManager.StartLockScreenProvider();
+			//if (IsLockScreenProvider)
+			//{
+			//	ImagesLoading = true;
+			//	ImagesLoading = await BackgroundTaskManager.MaybeUpdateLockScreenImages();
+			//}
         }
 
-        private async void Refresh_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+		private async void Refresh_Tap(object sender, TappedRoutedEventArgs e)
         {
-            if (IsLockScreenProvider)
-            {
-                ImagesLoading = true;
-                ImagesLoading = await BackgroundTaskManager.UpdateLockScreenImages();
-            }
+			//if (IsLockScreenProvider)
+			//{
+			//	ImagesLoading = true;
+			//	ImagesLoading = await BackgroundTaskManager.UpdateLockScreenImages();
+			//}
         }
 
         public class PreviewLockScreenViewModel : ViewModelBase
@@ -158,16 +159,16 @@ namespace SnooStream.View.Pages
                 if (_overlayItems.Count == 0 ||
                     (_overlayItems.Count > 0 && _overlayItems.First().Glyph != Utility.UnreadMailGlyph))
                 {
-                    this._overlayItems.Insert(0, new LockScreenMessage { Glyph = Utility.UnreadMailGlyph, DisplayText = "Sample unread message" });
+                    this._overlayItems.Insert(0, new LockScreenMessage(Utility.UnreadMailGlyph, "Sample unread message" ));
                 }
 
                 var SampleCollection = new List<LockScreenMessage> {
-                    new LockScreenMessage { Glyph = LinkGlyphUtility.PhotoGlyph, DisplayText = "The funniest picture on the front page" },
-                    new LockScreenMessage { Glyph = LinkGlyphUtility.WebGlyph, DisplayText = "Very interesting article about cats" },
-                    new LockScreenMessage { Glyph = LinkGlyphUtility.DetailsGlyph, DisplayText = "I am the walrus, AMA" },
-                    new LockScreenMessage { Glyph = LinkGlyphUtility.VideoGlyph, DisplayText = "I am proud to present a short film about film critics" },
-                    new LockScreenMessage { Glyph = LinkGlyphUtility.MultiredditGlyph, DisplayText = "A multireddit of all of the best stuff that reddit has to offer" },
-                    new LockScreenMessage { Glyph = LinkGlyphUtility.PhotoGlyph, DisplayText = "Breathtaking vista of a massive canyon" }
+                    new LockScreenMessage(LinkGlyphUtility.PhotoGlyph, "The funniest picture on the front page" ),
+                    new LockScreenMessage(LinkGlyphUtility.WebGlyph, "Very interesting article about cats" ),
+                    new LockScreenMessage(LinkGlyphUtility.DetailsGlyph, "I am the walrus, AMA" ),
+                    new LockScreenMessage(LinkGlyphUtility.VideoGlyph, "I am proud to present a short film about film critics" ),
+                    new LockScreenMessage(LinkGlyphUtility.MultiredditGlyph,  "A multireddit of all of the best stuff that reddit has to offer" ),
+                    new LockScreenMessage(LinkGlyphUtility.PhotoGlyph,  "Breathtaking vista of a massive canyon" )
                 };
 
                 this._overlayItems.AddRange(SampleCollection);
@@ -324,7 +325,7 @@ namespace SnooStream.View.Pages
             }
         }
 
-        private async void SystemLockScreenSettings_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        private async void SystemLockScreenSettings_Tap(object sender, TappedRoutedEventArgs e)
         {
             await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings-lock:"));
         }

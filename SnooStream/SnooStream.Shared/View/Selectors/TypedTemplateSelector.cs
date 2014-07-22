@@ -30,7 +30,7 @@ namespace SnooStream.View.Selectors
             IsCacheEnabled = true;
         }
 
-		public override DataTemplate SelectTemplate (object item, DependencyObject container)
+		protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
             // grab the Type name. Type will be searched as Type:NAME as shown below
             /*

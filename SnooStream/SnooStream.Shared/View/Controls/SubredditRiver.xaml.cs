@@ -10,6 +10,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Core;
+using Windows.UI.Xaml.Input;
 
 namespace SnooStream.View.Controls
 {
@@ -20,9 +21,9 @@ namespace SnooStream.View.Controls
             InitializeComponent();
         }
 
-        private void manualBox_KeyDown(object sender, KeyEventArgs e)
+        private void manualBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-            if (e.VirtualKey == Windows.System.VirtualKey.Enter)
+            if (e.Key == Windows.System.VirtualKey.Enter)
             {
                 this.Focus(FocusState.Programmatic);
                 var textBox = sender as TextBox;
@@ -55,13 +56,13 @@ namespace SnooStream.View.Controls
             }
         }
 
-		private void manualBox_MouseLeave(object sender, TappedEventArgs e)
+		private void manualBox_MouseLeave(object sender, TappedRoutedEventArgs e)
         {
             _disableFocusHack = true;
             _needToHackFocus = false;
         }
 
-		private void listBox_ItemTap(object sender, TappedEventArgs e)
+		private void listBox_ItemTap(object sender, TappedRoutedEventArgs e)
 		{
 			var linkRiver = ((Button)sender).DataContext as LinkRiverViewModel;
 			if(linkRiver != null)
