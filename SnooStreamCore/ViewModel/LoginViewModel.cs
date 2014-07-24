@@ -6,6 +6,7 @@ using SnooStream.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -25,20 +26,27 @@ namespace SnooStream.ViewModel
 
         private async void LoadStoredCredentials()
         {
-            var storedCredentials = await SnooStreamViewModel.UserCredentialService.StoredCredentials();
-            foreach (var credential in storedCredentials)
-            {
-                StoredCredentials.Add(credential);
-            }
+			try
+			{
+				var storedCredentials = await SnooStreamViewModel.UserCredentialService.StoredCredentials();
+				foreach (var credential in storedCredentials)
+				{
+					StoredCredentials.Add(credential);
+				}
 
-            if (StoredCredentials.Count > 0)
-            {
-                _selectedCredential = StoredCredentials.First();
-                StoredCredentials.Add(new UserCredential { Username = UnselectedUsername, IsDefault = false });
-            }
-            RaisePropertyChanged("StoredCredentials");
-            RaisePropertyChanged("HasStoredLogins");
-            RaisePropertyChanged("SelectedCredential");
+				if (StoredCredentials.Count > 0)
+				{
+					_selectedCredential = StoredCredentials.First();
+					StoredCredentials.Add(new UserCredential { Username = UnselectedUsername, IsDefault = false });
+				}
+				RaisePropertyChanged("StoredCredentials");
+				RaisePropertyChanged("HasStoredLogins");
+				RaisePropertyChanged("SelectedCredential");
+			}
+			catch(Exception ex)
+			{
+				Debug.WriteLine(ex.ToString());
+			}
         }
 
         public ObservableCollection<UserCredential> StoredCredentials

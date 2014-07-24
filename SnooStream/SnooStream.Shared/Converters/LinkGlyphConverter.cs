@@ -92,12 +92,16 @@ namespace SnooStream.Converters
                     filename.EndsWith(".jpeg"))
                     return PhotoGlyph;
 
-                if (LinkGlyphUtility.UserMultiredditRegex.IsMatch(uri.AbsoluteUri) || LinkGlyphUtility.SubredditRegex.IsMatch(uri.AbsoluteUri))
-                    return MultiredditGlyph;
-                else if (LinkGlyphUtility.UserRegex.IsMatch(uri.AbsoluteUri))
-                    return UserGlyph;
-                else if (LinkGlyphUtility.CommentRegex.IsMatch(uri.AbsoluteUri) || LinkGlyphUtility.CommentsPageRegex.IsMatch(uri.AbsoluteUri))
-                    return CommentGlyph;
+				if (uri != null)
+				{
+
+					if (LinkGlyphUtility.UserMultiredditRegex.IsMatch(uri.AbsoluteUri) || LinkGlyphUtility.SubredditRegex.IsMatch(uri.AbsoluteUri))
+						return MultiredditGlyph;
+					else if (LinkGlyphUtility.UserRegex.IsMatch(uri.AbsoluteUri))
+						return UserGlyph;
+					else if (LinkGlyphUtility.CommentRegex.IsMatch(uri.AbsoluteUri) || LinkGlyphUtility.CommentsPageRegex.IsMatch(uri.AbsoluteUri))
+						return CommentGlyph;
+				}
 
             }
             catch { }

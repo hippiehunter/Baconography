@@ -33,6 +33,21 @@ namespace SnooStream.Common
             
         }
 
+		public static T Remove<T>(Stack<T> stack, T element)
+		{
+			T obj = stack.Pop();
+			if (obj.Equals(element))
+			{
+				return obj;
+			}
+			else
+			{
+				T toReturn = Remove(stack, element);
+				stack.Push(obj);
+				return toReturn;
+			}
+		}
+
         public object AddState(ViewModelBase state)
         {
             var guid = Uri.EscapeDataString(Guid.NewGuid().ToString());
@@ -44,8 +59,7 @@ namespace SnooStream.Common
         public void RemoveState(string guid)
         {
             _navState.Remove(guid);
-			Debug.Assert(_navStateInsertionOrder.Peek() == guid);
-			_navStateInsertionOrder.Pop();
+			Remove(_navStateInsertionOrder, guid);
         }
 
         public string DumpState()
@@ -78,18 +92,9 @@ namespace SnooStream.Common
             }
         }
 
-		public static ViewModelBase GetDataContext(string query, out string stateGuid)
+		public static ViewModelBase GetDataContext(string stateGuid)
         {
-            stateGuid = null;
-
-            if (!string.IsNullOrWhiteSpace(query) && query.StartsWith("state"))
-            {
-                var splitQuery = query.Split('=');
-                stateGuid = splitQuery[1];
-                return SnooStreamViewModel.NavigationService.GetState(splitQuery[1]);
-            }
-            else
-                return null;
+			return SnooStreamViewModel.NavigationService.GetState(stateGuid);
         }
 
         public void ValidateParameters(HashSet<string> validParameters)

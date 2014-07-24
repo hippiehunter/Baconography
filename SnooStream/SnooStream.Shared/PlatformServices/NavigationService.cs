@@ -28,7 +28,7 @@ namespace SnooStream.PlatformServices
 
         public void NavigateToComments(CommentsViewModel viewModel)
         {
-            _frame.Navigate(typeof(Comments), _navState.AddState(viewModel));
+            _frame.Navigate(typeof(Comments), "state=" + _navState.AddState(viewModel));
         }
 
         public void NavigateToLinkRiver(LinkRiverViewModel viewModel)
@@ -42,13 +42,13 @@ namespace SnooStream.PlatformServices
             }
             else
             {
-                _frame.Navigate(typeof(LinkRiver), _navState.AddState(viewModel));
+				_frame.Navigate(typeof(LinkRiver), "state=" + _navState.AddState(viewModel));
             }
         }
 
         public void NavigateToLinkStream(LinkStreamViewModel viewModel)
         {
-            _frame.Navigate(typeof(LinkStream), _navState.AddState(viewModel));
+			_frame.Navigate(typeof(LinkStream), "state=" + _navState.AddState(viewModel));
         }
 
         public void NavigateToMessageReply(CreateMessageViewModel viewModel)
@@ -78,12 +78,12 @@ namespace SnooStream.PlatformServices
 
 		public void NavigateToContentSettings(SettingsViewModel viewModel)
 		{
-			_frame.Navigate(typeof(ContentSettings), _navState.AddState(viewModel));
+			_frame.Navigate(typeof(ContentSettings), "state=" + _navState.AddState(viewModel));
 		}
 
 		public void NavigateToLockScreenSettings(SettingsViewModel viewModel)
 		{
-			_frame.Navigate(typeof(LockScreenSettings), _navState.AddState(viewModel));
+			_frame.Navigate(typeof(LockScreenSettings), "state=" + _navState.AddState(viewModel));
 		}
 
         public Task<bool> ShowPopup(GalaSoft.MvvmLight.ViewModelBase viewModel)

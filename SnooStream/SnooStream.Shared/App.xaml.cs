@@ -1,4 +1,8 @@
-﻿using System;
+﻿using SnooStream.PlatformServices;
+using SnooStream.Services;
+using SnooStream.View.Pages;
+using SnooStream.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,6 +34,11 @@ namespace SnooStream
         /// </summary>
         public App()
         {
+			SnooStreamViewModel.SystemServices = new SystemServices();
+			SnooStreamViewModel.CWD = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+			SnooStreamViewModel.UserCredentialService = new DefaultUserCredentialService();
+			SnooStreamViewModel.MarkdownProcessor = new MarkdownProvider();
+
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
         }
@@ -85,12 +94,15 @@ namespace SnooStream
 
                 rootFrame.ContentTransitions = null;
                 rootFrame.Navigated += this.RootFrame_FirstNavigated;
+				Windows.Phone.UI.Input.HardwareButtons.BackPressed += HardwareButtons_BackPressed;
 #endif
-
+				((SystemServices)SnooStreamViewModel.SystemServices).FinishInitialization(rootFrame.Dispatcher);
+				var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
+				SnooStreamViewModel.NavigationService = new NavigationService(rootFrame, null, snooStreamViewModel);
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                if (!rootFrame.Navigate(typeof(MainPage), e.Arguments))
+                if (!rootFrame.Navigate(typeof(SnooHubMark2), e.Arguments))
                 {
                     throw new Exception("Failed to create initial page");
                 }
@@ -112,9 +124,20 @@ namespace SnooStream
             rootFrame.ContentTransitions = this.transitions ?? new TransitionCollection() { new NavigationThemeTransition() };
             rootFrame.Navigated -= this.RootFrame_FirstNavigated;
         }
+
+		void HardwareButtons_BackPressed(object sender, Windows.Phone.UI.Input.BackPressedEventArgs e)
+		{
+			var rootFrame = Window.Current.Content as Frame;
+			if (rootFrame.CanGoBack)
+			{
+				rootFrame.GoBack();
+				//Indicate the back button press is handled so the app does not exit
+				e.Handled = true;
+			}
+		}
 #endif
 
-        /// <summary>
+		/// <summary>
         /// Invoked when application execution is being suspended.  Application state is saved
         /// without knowing whether the application will be terminated or resumed with the contents
         /// of memory still intact.

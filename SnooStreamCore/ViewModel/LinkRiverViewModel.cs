@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-    public class LinkRiverViewModel : ViewModelBase, ICollection<LinkViewModel>, INotifyCollectionChanged
+    public class LinkRiverViewModel : ViewModelBase
     {
         //need to come up with an init blob setup for this, meaining a per river blob
         public Subreddit Thing { get; internal set; }
@@ -80,7 +80,7 @@ namespace SnooStream.ViewModel
 			IsLocal = isLocal;
 			Thing = thing;
 			Sort = sort ?? "hot";
-			Links = new ObservableCollection<LinkViewModel>();
+			Links = new PortableObservableCollection<LinkViewModel>(LoadMore);
 			if (initialLinks != null)
 			{
 				ProcessLinkThings(initialLinks);
@@ -96,7 +96,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public ObservableCollection<LinkViewModel> Links { get; set; }
+        public PortableObservableCollection<LinkViewModel> Links { get; set; }
         private Task _loadingTask;
         public Task LoadMore()
         {
@@ -149,63 +149,6 @@ namespace SnooStream.ViewModel
             
             //clear the loading task when we're done
             _loadingTask = null;
-        }
-
-        public void Add(LinkViewModel item)
-        {
-            Links.Add(item);
-        }
-
-        public void Clear()
-        {
-            Links.Clear();
-        }
-
-        public bool Contains(LinkViewModel item)
-        {
-            return Links.Contains(item);
-        }
-
-        public void CopyTo(LinkViewModel[] array, int arrayIndex)
-        {
-            Links.CopyTo(array, arrayIndex);
-        }
-
-        public int Count
-        {
-            get { return Links.Count; }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-
-        public bool Remove(LinkViewModel item)
-        {
-            return Links.Remove(item);
-        }
-
-        public IEnumerator<LinkViewModel> GetEnumerator()
-        {
-            return Links.GetEnumerator();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return Links.GetEnumerator();
-        }
-
-        public event NotifyCollectionChangedEventHandler CollectionChanged
-        {
-            add
-            {
-                Links.CollectionChanged += value;
-            }
-            remove
-            {
-                Links.CollectionChanged -= value;
-            }
         }
 
 		public LinkViewModel CurrentSelected { get; set; }

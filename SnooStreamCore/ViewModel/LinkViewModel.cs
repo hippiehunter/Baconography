@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
@@ -83,14 +84,21 @@ namespace SnooStream.ViewModel
                         if (imageApiResults != null && imageApiResults.Count() > 1)
                             return new AlbumViewModel(this, Link.Url, imageApiResults, Link.Title);
                         else if (imageApiResults != null && imageApiResults.Count() == 1)
-                            return new ImageViewModel(this, imageApiResults.First().Item2, imageApiResults.First().Item1, null, null);
+						{
+							CancellationTokenSource tokenSource = new CancellationTokenSource();
+							var imageLoader = await SnooStreamViewModel.SystemServices.DownloadImageWithProgress(imageApiResults.First().Item2, (progress) => { }, tokenSource.Token);
+							return new ImageViewModel(this, imageApiResults.First().Item2, imageApiResults.First().Item1, imageLoader);
+						}
+                            
                     }
                     else if (fileName.EndsWith(".jpg") ||
                         fileName.EndsWith(".png") ||
                         fileName.EndsWith(".gif") ||
                         fileName.EndsWith(".jpeg"))
                     {
-                        return new ImageViewModel(this, Link.Url, Link.Title, null, null);
+						CancellationTokenSource tokenSource = new CancellationTokenSource();
+						var imageLoader = await SnooStreamViewModel.SystemServices.DownloadImageWithProgress(Link.Url, (progress) => { }, tokenSource.Token);
+						return new ImageViewModel(this, Link.Url, Link.Title, imageLoader);
                     }
                     
                     return new WebViewModel(this, true, Link.Url);

@@ -19,19 +19,26 @@ using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.Web.Http;
 
 namespace SnooStream.PlatformServices
 {
     class SystemServices : ISystemServices
     {
-        private CoreDispatcher _uiDispatcher;
-        public SystemServices(CoreDispatcher uiDispatcher)
+        private Task<CoreDispatcher> _uiDispatcher;
+		private TaskCompletionSource<CoreDispatcher> _uiDispatcherSource = new TaskCompletionSource<CoreDispatcher>();
+        public SystemServices()
         {
-            _uiDispatcher = uiDispatcher;
+			_uiDispatcher = _uiDispatcherSource.Task;
             NetworkInformation.NetworkStatusChanged += networkStatusChanged;
             networkStatusChanged(null);
         }
+
+		public void FinishInitialization(CoreDispatcher uiDispatcher)
+		{
+
+		}
 
         private void networkStatusChanged(object sender)
         {
@@ -48,7 +55,7 @@ namespace SnooStream.PlatformServices
             }
             else if (tickHandle is Task<DispatcherTimer>)
             {
-                await _uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                await (await _uiDispatcher).RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
                     var timer = await (Task<DispatcherTimer>)tickHandle;
                     timer.Stop();
@@ -71,21 +78,21 @@ namespace SnooStream.PlatformServices
             {
                 if (tickSpan.Ticks == 0)
                 {
-                    var asyncItem = _uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => tickHandler(null, null));
+                    var asyncItem = _uiDispatcher.ContinueWith((dispatcher) => dispatcher.Result.RunAsync(CoreDispatcherPriority.Normal, () => tickHandler(null, null)));
                     return null;
                 }
                 else
                 {
 
                     TaskCompletionSource<DispatcherTimer> completionSource = new TaskCompletionSource<DispatcherTimer>();
-                    var asyncItem = _uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    _uiDispatcher.ContinueWith((dispatcher) => dispatcher.Result.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         DispatcherTimer dt = new DispatcherTimer();
                         dt.Tick += (sender, args) => tickHandler(sender, args);
                         dt.Interval = tickSpan;
                         dt.Start();
                         completionSource.SetResult(dt);
-                    });
+                    }));
                     return completionSource.Task;
                 }
             }
@@ -103,11 +110,11 @@ namespace SnooStream.PlatformServices
             }
             else if (tickHandle is Task<DispatcherTimer>)
             {
-                var asyncItem = _uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+				var asyncItem = _uiDispatcher.ContinueWith((dispatcher) => dispatcher.Result.RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
                     var timer = await (Task<DispatcherTimer>)tickHandle;
                     timer.Start();
-                });
+                }));
             }
             else if (tickHandle is ThreadPoolTimer)
             {
@@ -498,16 +505,22 @@ namespace SnooStream.PlatformServices
 		public void HideProgress ()
 		{
 #if WINDOWS_PHONE_APP
-            var progressIndicator = StatusBar.GetForCurrentView().ProgressIndicator;
-            progressIndicator.HideAsync();
+			QueueNonCriticalUI(() =>
+			{
+				var progressIndicator = StatusBar.GetForCurrentView().ProgressIndicator;
+				progressIndicator.HideAsync();
+			});
 #endif
 		}
 
 		public void ShowProgress (string notificationText, double progressPercent)
 		{
 #if WINDOWS_PHONE_APP
-            var progressIndicator = StatusBar.GetForCurrentView().ProgressIndicator;
-            progressIndicator.ShowAsync();
+			QueueNonCriticalUI(() =>
+			{
+				var progressIndicator = StatusBar.GetForCurrentView().ProgressIndicator;
+				progressIndicator.ShowAsync();
+			});
 #endif
 		}
 
@@ -543,7 +556,7 @@ namespace SnooStream.PlatformServices
 
 				if (needToRun)
 				{
-					await _uiDispatcher.RunIdleAsync((args) =>
+					await (await _uiDispatcher).RunIdleAsync((args) =>
 							{
 								try
 								{
@@ -560,6 +573,188 @@ namespace SnooStream.PlatformServices
 							});
 				}
 				await Task.Delay(100);
+			}
+		}
+
+
+		public async Task<IImageLoader> DownloadImageWithProgress(string uri, Action<int> progress, CancellationToken cancelToken)
+		{
+			HttpClient client = new HttpClient();
+			var response = await client.GetAsync(new Uri(uri), HttpCompletionOption.ResponseHeadersRead);
+			
+			var responseStream = (await response.Content.ReadAsInputStreamAsync()).AsStreamForRead();
+			var initialBuffer = new byte[4096];
+			var initialReadLength = await responseStream.ReadAsync(initialBuffer, 0, 4096);
+			if (initialReadLength == 0)
+				throw new Exception("failed to read initial bytes of image");
+
+			var contentLengthHeader = response.Headers.ContainsKey("Content-Length") ? response.Headers["Content-Length"] : "-1";
+			int contentLength = -1;
+			int.TryParse(contentLengthHeader, out contentLength);
+
+			return new ImageLoader(initialBuffer, responseStream, uri, progress, cancelToken, contentLength);
+		}
+
+		class ImageLoader : IImageLoader
+		{
+			public ImageLoader(byte[] initialData, Stream responseStream, string url, Action<int> progress, CancellationToken cancelToken, int contentLength)
+			{
+				_contentLength = contentLength;
+				_progress = progress;
+				_cancelToken = cancelToken;
+				_responseStream = responseStream;
+				_url = url;
+				_isGif = CheckGif(initialData);
+				_loadTask = new Lazy<Task>(() => Load());
+				if (_isGif)
+				{
+					_memoryStream.Write(initialData, 0, initialData.Length);
+					_gifRenderer = new GifRenderer.GifRenderer(GetMore);
+					
+				}
+				else
+				{
+					_responseStream.Dispose();
+					_responseStream = null;
+					_cancelCallback = _cancelToken.Register(() => 
+						{
+							if (_bitmapImage != null)
+							{
+								_bitmapImage.UriSource = null;
+								_bitmapImage = null;
+							}
+						});
+				}
+				
+			}
+
+			bool _isGif;
+			GifRenderer.GifRenderer _gifRenderer;
+			BitmapImage _bitmapImage;
+			Action<int> _progress;
+			Lazy<Task> _loadTask;
+			int _contentLength;
+			CancellationToken _cancelToken;
+			CancellationTokenRegistration _cancelCallback;
+			bool _finished = false;
+			long _returnedPosition = 0;
+			MemoryStream _memoryStream = new MemoryStream();
+			Stream _responseStream;
+			string _url;
+
+			private static bool CheckGif(byte[] data)
+			{
+				return
+					data[0] == 0x47 && // G
+					data[1] == 0x49 && // I
+					data[2] == 0x46 && // F
+					data[3] == 0x38 && // 8
+					(data[4] == 0x39 || data[4] == 0x37) && // 9 or 7
+					data[5] == 0x61;   // a
+			}
+
+			public byte[] GetMore()
+			{
+				//its over
+				if (_finished && _returnedPosition == _memoryStream.Length)
+					return null;
+
+				if (_returnedPosition < _memoryStream.Length)
+				{
+					lock (_memoryStream)
+					{
+						var result = new byte[_memoryStream.Length - _returnedPosition];
+						_memoryStream.Seek(_returnedPosition, SeekOrigin.Begin);
+						_memoryStream.Read(result, 0, result.Length);
+						_returnedPosition += result.Length;
+						return result;
+					}
+				}
+				else
+					return new byte[0];
+			}
+
+			public async Task Load()
+			{
+				if (_responseStream != null)
+				{
+					try
+					{
+						var buffer = new byte[4096];
+						for (; ; )
+						{
+							var readBytes = await _responseStream.ReadAsync(buffer, 0, 4096);
+							if (readBytes == 0)
+								break;
+							else
+							{
+								lock (_memoryStream)
+								{
+									_memoryStream.Seek(0, SeekOrigin.End);
+									_memoryStream.Write(buffer, 0, readBytes);
+								}
+							}
+						}
+					}
+					catch { }
+					finally
+					{
+						_finished = true;
+					}
+				}
+			}
+
+			public object ImageSource
+			{
+				get
+				{
+					if (_isGif && _loadTask.Value != null)
+					{
+						return _gifRenderer.ImageSource;
+					}
+					else
+					{
+						if (_bitmapImage == null)
+						{
+							lock (this)
+							{
+								if(_bitmapImage == null)
+								{
+									_bitmapImage = new BitmapImage();
+									_bitmapImage.DownloadProgress += _bitmapImage_DownloadProgress;
+									_bitmapImage.ImageOpened += _bitmapImage_ImageOpened;
+									_bitmapImage.UriSource = new Uri(_url);
+								}
+							}
+						}
+						return _bitmapImage;
+					}
+				}
+			}
+
+			void _bitmapImage_ImageOpened(object sender, RoutedEventArgs e)
+			{
+				_finished = true;
+			}
+
+			void _bitmapImage_DownloadProgress(object sender, DownloadProgressEventArgs e)
+			{
+				_progress(e.Progress);
+			}
+
+			public bool Loaded
+			{
+				get { return _finished; }
+			}
+
+			public void AttachWatcher(Action<int> progress)
+			{
+				_progress = progress;
+			}
+
+			public Task ForceLoad
+			{
+				get { return _loadTask.Value; }
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 ﻿using CommonResourceAcquisition.VideoAcquisition;
 using GalaSoft.MvvmLight;
 using SnooStream.Common;
+using SnooStream.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,7 +21,7 @@ namespace SnooStream.ViewModel
         }
         public ObservableCollection<Tuple<string, string>> AvailableStreams { get; private set; }
 
-        public ImageSource Preview { get; private set; }
+        public IImageLoader Preview { get; private set; }
         public string Url { get; private set; }
 
         private string _selectedStream;
@@ -49,10 +50,10 @@ namespace SnooStream.ViewModel
 				}
 				if (!string.IsNullOrWhiteSpace(videoResult.PreviewUrl))
 				{
-					var bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(videoResult.PreviewUrl, progress, cancelToken);
-					if (bytes != null && bytes.Length > 6) //minimum to identify the image type
+					var image = await SnooStreamViewModel.SystemServices.DownloadImageWithProgress(videoResult.PreviewUrl, progress, cancelToken);
+					if (image != null)
 					{
-						Preview = new ImageSource(videoResult.PreviewUrl, bytes);
+						Preview = image;
 					}
 				}
             }

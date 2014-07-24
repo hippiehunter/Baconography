@@ -34,6 +34,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\DomainConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\InvertedBooleanConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\LinkGlyphConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\PortableObservableCollectionConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\StringCaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeRelationConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\UnixTimeConverter.cs" />
@@ -108,9 +109,6 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\SnooHubMark2.xaml.cs">
       <DependentUpon>SnooHubMark2.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Pages\SnooStreamHub.xaml.cs">
-      <DependentUpon>SnooStreamHub.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\CommentTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\ContentTemplateSelector.cs" />
@@ -189,9 +187,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\SnooHubMark2.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Pages\SnooStreamHub.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

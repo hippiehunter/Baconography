@@ -11,35 +11,21 @@
 
     <Grid x:Name="LayoutRoot">
         <Grid.Resources>
-            <DataTemplate x:Name="normalSubreddit">
-                <Button Margin="0,0,0,-18"
-                    BorderThickness="0" Tapped="listBox_ItemTap">
-                    <localC:SubredditSmallView />
-                </Button>
-            </DataTemplate>
-
             <DataTemplate x:Name="subredditGroupHeader">
-                <Border
-                        BorderBrush="{StaticResource PhoneChromeBrush}" HorizontalAlignment="Stretch"
+                <Border HorizontalAlignment="Stretch"
                         BorderThickness="0,0,0,0" Margin="0,0,18,0"
                         Visibility="{Binding Converter={StaticResource blankVisibilityConverter}}">
-                    <TextBlock Text="{Binding}" Foreground="{StaticResource PhoneForegroundBrush}"
-                               FontSize="{StaticResource PhoneFontSizeExtraLarge}"
-                               Padding="6" FontFamily="{StaticResource PhoneFontFamilySemiLight}"
-                               Margin="12,0,12,0"
+                    <TextBlock Text="{Binding}" Padding="6" Margin="12,0,12,0"
                                HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 </Border>
             </DataTemplate>
 
             <DataTemplate x:Name="stickyGroupHeader">
-                <Border BorderBrush="{StaticResource PhoneChromeBrush}" HorizontalAlignment="Stretch"
+                <Border HorizontalAlignment="Stretch"
                         BorderThickness="0,0,0,0" Margin="0,0,0,36"
                         Visibility="{Binding Converter={StaticResource blankVisibilityConverter}}"
                         Background="Black">
-                    <TextBlock Text="{Binding}" Foreground="{StaticResource PhoneForegroundBrush}"
-                               FontSize="{StaticResource PhoneFontSizeExtraLarge}" Padding="6"
-                               Margin="12,0,12,0"
-                               FontFamily="{StaticResource PhoneFontFamilySemiLight}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding}" Margin="12,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 </Border>
             </DataTemplate>
         </Grid.Resources>
@@ -48,8 +34,14 @@
             x:Name="listBox" 
             HorizontalAlignment="Stretch"
             HorizontalContentAlignment="Stretch"
-            Margin="-12,0,-12,0" ItemsSource="{Binding CombinedRivers}"
-            ItemTemplate="{StaticResource normalSubreddit}">
+            Margin="-12,0,-12,0" ItemsSource="{Binding CombinedRivers}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Button Margin="0,0,0,-18" BorderThickness="0" Tapped="listBox_ItemTap">
+                        <localC:SubredditSmallView />
+                    </Button>
+                </DataTemplate>
+            </ListView.ItemTemplate>
             <ListView.Header>
                 <StackPanel Margin="12,0,12,0">
                     <ContentControl x:Name="header"
@@ -76,10 +68,10 @@
                     </StackPanel>
                 </StackPanel>
             </ListView.Header>
-            <ListView.GroupStyle>
+            <!--ListView.GroupStyle>
                 <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource subredditGroupHeader}">
                 </GroupStyle>
-            </ListView.GroupStyle>
+            <ListView.GroupStyle/-->
         </ListView>
     </Grid>
 </UserControl>

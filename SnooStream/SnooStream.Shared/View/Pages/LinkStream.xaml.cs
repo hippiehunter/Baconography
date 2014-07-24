@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Media;
 
 namespace SnooStream.View.Pages
 {
@@ -192,30 +193,7 @@ namespace SnooStream.View.Pages
 				var imageViewModel = pZoom.DataContext as ImageViewModel;
 				if(imageViewModel != null)
 				{
-					pZoom.Source = new BitmapImage(new Uri(imageViewModel.ImageSource.UrlSource));
-				}
-			}
-		}
-
-        private void GifControl_Unloaded(object sender, RoutedEventArgs e)
-        {
-            //gif control also leaks if you dont clear its imagesource and manipulationController
-			var gControl = sender as Image;
-			gControl.Source = null;
-        }
-
-		private void GifControl_Loaded(object sender, RoutedEventArgs e)
-		{
-			//rebind the control if we're returning from another page in the back stack,
-			//this should be the only scenario where the image source has been set to null
-			//at the time of this event
-			var gControl = sender as Image;
-			if (gControl.Source == null && gControl.DataContext != null)
-			{
-				var imageViewModel = gControl.DataContext as ImageViewModel;
-				if (imageViewModel != null)
-				{
-					//gControl.Source = imageViewModel.ImageSource.ImageData;
+					pZoom.Source = imageViewModel.ImageSource.ImageSource as ImageSource;
 				}
 			}
 		}

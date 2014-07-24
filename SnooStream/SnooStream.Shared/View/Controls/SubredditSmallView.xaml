@@ -4,9 +4,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
     d:DesignHeight="480" d:DesignWidth="480">
 
     <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" MinWidth="460">
@@ -30,9 +27,7 @@
         </Border>
 
         <TextBlock Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
-                   Margin="0,2,0,0"
-                   FontSize="{StaticResource PhoneFontSizeLarge}"
-                   FontWeight="Normal" Text="{Binding Thing.DisplayName}"/>
+                   Margin="0,2,0,0" FontWeight="Normal" Text="{Binding Thing.DisplayName}"/>
 
         <!--<TextBlock Grid.Column="2" Grid.Row="1" FontSize="15" Text="{Binding PublicDescription}"
                    TextWrapping="Wrap" LineHeight="20"/>-->

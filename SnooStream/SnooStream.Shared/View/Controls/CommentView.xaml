@@ -6,9 +6,6 @@
     xmlns:local="using:SnooStream.View.Controls"
     xmlns:snoodom="using:SnooDom"
     mc:Ignorable="d"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
     d:DesignHeight="480" d:DesignWidth="480">
 
     <Grid HorizontalAlignment="Left"
@@ -43,7 +40,7 @@
                             <TextBlock Foreground="{Binding PosterFlair, Converter={StaticResource fgAuthorFlairKindConverter}}" FontSize="16" Margin="0,1,0,0" Text="{Binding PosterName}" />
                         </Border>
 
-                        <TextBlock Foreground="{StaticResource PhoneAccentBrush}" Opacity="0.6" FontStyle="Italic"
+                        <TextBlock Opacity="0.6" FontStyle="Italic"
                                    FontSize="15" Text="{Binding Path=AuthorFlairText}" Margin="4,2,2,0"
                                    Visibility="{Binding HasAuthorFlair, Converter={StaticResource booleanVisibilityConverter}}"/>
 

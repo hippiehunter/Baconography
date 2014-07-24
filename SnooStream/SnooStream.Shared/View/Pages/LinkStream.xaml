@@ -15,15 +15,9 @@
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid.Resources>
             <DataTemplate x:Name="imageTemplate">
-                <Image Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
+                <Image
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Unloaded="PanAndZoomImage_Unloaded" Loaded="PanAndZoomImage_Loaded"
                     Source="{Binding ImageSource, Converter={StaticResource asyncImageSourceConverter}}" />
-            </DataTemplate>
-
-            <DataTemplate x:Name="gifTemplate">
-                <Image
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Unloaded="GifControl_Unloaded" Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
-                    Source="{Binding ImageSource.ImageData}" Loaded="GifControl_Loaded" />
             </DataTemplate>
 
             <DataTemplate x:Name="videoTemplate" >
@@ -61,14 +55,13 @@
 
 
             <selectors:ImageTemplateSelector x:Name="imageSelector"
-                    StaticTemplate="{StaticResource imageTemplate}"
-                    GifTemplate="{StaticResource gifTemplate}"/>
+                    StaticTemplate="{StaticResource imageTemplate}"/>
 
             <DataTemplate x:Name="albumTemplate">
                 <Grid>
                     <!-- TODO: FIX this, its doesnt draw right and its probably not in the right place -->
                     <!--<telerikPrimitives:RadPaginationControl Grid.Row="0" PageProvider="{Binding ElementName=albumSlideView}" DisplayMode="IndexLabel"/>-->
-                    <FlipView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}" ItemTemplateSelector="{StaticResource imageSelector}" 
+                    <FlipView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}" ItemTemplate="{StaticResource imageTemplate}"
                                                     Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
                                                     Loaded="albumSlideView_Loaded" Unloaded="albumSlideView_Unloaded"/>
                 </Grid>
@@ -85,7 +78,6 @@
                                                        IsLoaded="{Binding IsInitiallyLoaded}"
                                                        Visibility="{Binding IsInitiallyLoaded, Converter={StaticResource booleanVisibilityConverter}}"
                                                     ImageContentTemplate="{StaticResource imageTemplate}"
-                                                    GifTemplate="{StaticResource gifTemplate}"
                                                     AlbumContentTemplate="{StaticResource albumTemplate}"
                                                     TextWebContentTemplate="{StaticResource webTemplate}"
                                                     WebContentTemplate="{StaticResource webTemplate}"
@@ -97,7 +89,7 @@
 
 
             <DataTemplate x:Name="overlayTemplate">
-                <Border HorizontalAlignment="Stretch" Margin="0,0,0,15" VerticalAlignment="Top" Height="Auto" Opacity="1" Background="{StaticResource PhoneBackgroundBrush}">
+                <Border HorizontalAlignment="Stretch" Margin="0,0,0,15" VerticalAlignment="Top" Height="Auto" Opacity="1">
                     <TextBlock Text="{Binding PreviewText}" TextWrapping="Wrap" MaxHeight="300"/>
                 </Border>
             </DataTemplate>

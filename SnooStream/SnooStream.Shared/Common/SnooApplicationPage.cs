@@ -3,6 +3,8 @@ using SnooStream.Messages;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,12 +23,15 @@ namespace SnooStream.Common
         OrientationManager _orientationManager;
         public SnooApplicationPage()
         {
-            FontSize = (double)Application.Current.Resources["PhoneFontSizeNormal"];
-            FontFamily = Application.Current.Resources["PhoneFontFamilyNormal"] as FontFamily;
-            Foreground = Application.Current.Resources["PhoneForegroundBrush"] as Brush;
-            _orientationManager = Application.Current.Resources["orientationManager"] as OrientationManager;
-            Messenger.Default.Register<SettingsChangedMessage>(this, OnSettingsChanged);
-			OnSettingsChanged(null);
+			try
+			{
+				_orientationManager = Application.Current.Resources["orientationManager"] as OrientationManager;
+				Messenger.Default.Register<SettingsChangedMessage>(this, OnSettingsChanged);
+				OnSettingsChanged(null);
+			}
+			catch
+			{
+			}
         }
 
         public virtual bool DefaultSystray { get { return true; } }
@@ -92,45 +97,56 @@ namespace SnooStream.Common
             }
         }
 
+		private string GetStateGuid(string query)
+		{
+			if (query != null && query.Contains("state="))
+			{
+				var splitQuery = query.Split('=').ToList();
+				return splitQuery[splitQuery.IndexOf("state") + 1];
+			}
+			else
+				return null;
+
+		}
+
         string _stateGuid;
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            base.OnNavigatedTo(e);
-
-
-            var validParameters = Frame.ForwardStack
-                .Concat(Frame.BackStack)
-                .Select(stackEntry => stackEntry.Parameter as string)
-                .ToList();
-
-            var parameterHash = new HashSet<string>(validParameters);
-            SnooStreamViewModel.NavigationService.ValidateStates(parameterHash);
-
-            AdjustForOrientation(ApplicationView.GetForCurrentView().Orientation);
-
-            if (e.Parameter is string)
-            {
-                DataContext = NavigationStateUtility.GetDataContext(e.Parameter as string, out _stateGuid);
-            }
-        }
-
-        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
-        {
             
-            //if (e.NavigationMode == NavigationMode.New && e.SourcePageType == typeof(SnooStreamHubView)Uri.ToString() == "/View/Pages/SnooStreamHub.xaml" && e.IsCancelable)
-            //    e.Cancel = true;
-            //else
-                base.OnNavigatingFrom(e);
+			try
+			{
+				var validParameters = Frame.ForwardStack
+					.Concat(Frame.BackStack)
+					.Select(stackEntry => GetStateGuid(stackEntry.Parameter as string))
+					.ToList();
+
+				if (e.Parameter is string && !string.IsNullOrWhiteSpace((string)e.Parameter))
+				{
+					_stateGuid = GetStateGuid(e.Parameter as string);
+					validParameters.Add(_stateGuid);
+				}
+
+				var parameterHash = new HashSet<string>(validParameters);
+				SnooStreamViewModel.NavigationService.ValidateStates(parameterHash);
+
+				AdjustForOrientation(ApplicationView.GetForCurrentView().Orientation);
+
+				if (_stateGuid != null)
+				{
+					DataContext = NavigationStateUtility.GetDataContext(_stateGuid);
+				}
+			}
+			catch(Exception ex)
+			{
+				Debug.WriteLine(ex.ToString());
+			}
+			base.OnNavigatedTo(e);
         }
 
-        //protected override void OnRemovedFromJournal(JournalEntryRemovedEventArgs e)
-        //{
-        //    Windows.UI.Xaml.Navigation.PageStackEntry
-        //    base.OnRemovedFromJournal(e);
-        //    if(_stateGuid != null)
-        //    {
-        //        SnooStreamViewModel.NavigationService.RemoveState(_stateGuid);
-        //    }
-        //}
-    }
+		protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+		{
+			base.OnNavigatingFrom(e);
+		}
+
+	}
 }

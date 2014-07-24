@@ -48,13 +48,13 @@ namespace SnooStream.ViewModel
 		private async Task<bool> LoadImageImpl(string title, Uri source, bool isPreview, Action<int> progress, CancellationToken cancelToken)
         {
             bool loadedOne = false;
-			var bytes = await SnooStreamViewModel.SystemServices.DownloadWithProgress(source.ToString(), progress, cancelToken);
-            if (bytes != null && bytes.Length > 6) //minimum to identify the image type
+			var imageLoader = await SnooStreamViewModel.SystemServices.DownloadImageWithProgress(source.ToString(), progress, cancelToken);
+			if (imageLoader != null) //minimum to identify the image type
             {
                 loadedOne = true;
 				await Task.Factory.StartNew(() =>
                 {
-					var madeImageVm = new ImageViewModel(this, source.ToString(), title, new ImageSource(source.ToString(), bytes), bytes);
+					var madeImageVm = new ImageViewModel(this, source.ToString(), title, imageLoader);
 
 					if (Images.Any(img => ((ImageViewModel)img).Url == source.ToString()))
 					{
@@ -75,7 +75,6 @@ namespace SnooStream.ViewModel
         public int ApiImageCount { get; private set; }
         public ObservableCollection<ContentViewModel> Images { get; private set; }
         public string Title { get; private set; }
-        public PreviewImageSource Preview { get; private set; }
 
 		protected override bool HasPreview
 		{

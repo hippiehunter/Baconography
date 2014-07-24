@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
@@ -34,7 +35,9 @@ namespace SnooStream.ViewModel
         private async void LoadContent(string iden)
         {
             var url = "http://www.reddit.com/captcha/" + iden;
-			Content = new ImageViewModel(this, url, null, null, null);
+			CancellationTokenSource tokenSource = new CancellationTokenSource();
+			var imageLoader = await SnooStreamViewModel.SystemServices.DownloadImageWithProgress(url, (progress) => { }, tokenSource.Token);
+			Content = new ImageViewModel(this, url, null, imageLoader);
 			await Content.BeginLoad(SnooStreamViewModel.UIContextCancellationToken);   
         }
 

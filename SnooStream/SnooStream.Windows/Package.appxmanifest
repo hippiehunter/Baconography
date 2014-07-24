@@ -16,7 +16,7 @@
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="SnooStream.Windows.App">
       <m2:VisualElements DisplayName="SnooStream.Windows" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png" Description="SnooStream.Windows" ForegroundText="light" BackgroundColor="#464646" ToastCapable="true">
-        <m2:LockScreen Notification="badge" BadgeLogo="" />
+        <m2:LockScreen Notification="badge" BadgeLogo="Assets\BadgeLogo.png" />
         <m2:SplashScreen Image="Assets\SplashScreen.png" />
         <m2:InitialRotationPreference>
           <m2:Rotation Preference="portrait" />

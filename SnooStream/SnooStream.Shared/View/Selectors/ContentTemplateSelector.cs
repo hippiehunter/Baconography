@@ -142,32 +142,29 @@ namespace SnooStream.View.Selectors
 		}
 		protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
-            if (item is LoadingContentViewModel)
+			if (item is LoadingContentViewModel)
 				return _selector.LoadingContentTemplate;
-            else if (item is InternalRedditContentViewModel)
+			else if (item is InternalRedditContentViewModel)
 				return _selector.InternalRedditContentTemplate;
-            else if (item is SelfContentViewModel)
+			else if (item is SelfContentViewModel)
 				return _selector.SelfContentTemplate;
-            else if (item is AlbumViewModel)
+			else if (item is AlbumViewModel)
 				return _selector.AlbumContentTemplate;
-			else if(item is ImageViewModel)
-			{
-				var image = item as ImageViewModel;
-				return image.IsGif ? _selector.GifTemplate : _selector.ImageContentTemplate;
-			}
-			else if(item is VideoViewModel)
+			else if (item is ImageViewModel)
+				return _selector.ImageContentTemplate;
+			else if (item is VideoViewModel)
 				return _selector.VideoContentTemplate;
-			else if(item is ErrorContentViewModel)
+			else if (item is ErrorContentViewModel)
 				return _selector.ErrorContentTemplate;
-			else if(item is WebViewModel)
+			else if (item is WebViewModel)
 			{
-				if(((WebViewModel)item).NotText)
+				if (((WebViewModel)item).NotText)
 					return _selector.WebContentTemplate;
 				else
 					return _selector.TextWebContentTemplate;
 			}
 			else
-				throw new ArgumentOutOfRangeException();
+				return null;
         }
     }
 }

@@ -39,7 +39,7 @@ namespace SnooStream.Converters
 
         public VisitedMainLinkConverter()
         {
-            noHistory = Application.Current.Resources["PhoneForegroundBrush"] as Brush;
+			noHistory = new SolidColorBrush(Colors.White);
         }
 
         public object Convert(object value, Type targetType, object parameter, string language)

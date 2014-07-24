@@ -9,8 +9,7 @@
     <DataTemplate x:Name="plainExpandableContentTemplate">
         <Grid Margin="24, 0, 0, 0" MinHeight="0"
                 Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}}">
-            <Border VerticalAlignment="Stretch" MinHeight="0" BorderThickness="3, 0, 0, 0"
-                    BorderBrush="{StaticResource PhoneAccentBrush}" />
+            <Border VerticalAlignment="Stretch" MinHeight="0" BorderThickness="3, 0, 0, 0" />
             <ListBox ItemsSource="{Binding Activities}" ScrollViewer.VerticalScrollBarVisibility="Disabled">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -23,10 +22,8 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition MinWidth="60" Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Foreground="{StaticResource PhoneForegroundBrush}" Text="{Binding Author}"
-                                    FontSize="{StaticResource PhoneFontSizeLarge}" FontFamily="Segoe WP SemiLight" />
-                            <TextBlock Grid.Row="1" Foreground="{StaticResource PhoneSubtleBrush}" Text="{Binding Body}"
-                                    TextWrapping="Wrap" MaxHeight="54" />
+                            <TextBlock Text="{Binding Author}"/>
+                            <TextBlock Grid.Row="1" Text="{Binding Body}" TextWrapping="Wrap" MaxHeight="54" />
                             <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="1"
                                     Text="{Binding CreatedUTC, Converter={StaticResource unixTimeConverter}}" />
                         </Grid>
@@ -38,16 +35,12 @@
 
     <DataTemplate x:Name="activityTemplate">
         <local:ExpanderView Header="{Binding}" ItemsSource="{Binding}"
-                ItemTemplate="{StaticResource plainExpandableContentTemplate}"
-                Foreground="{StaticResource PhoneForegroundBrush}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+                ItemTemplate="{StaticResource plainExpandableContentTemplate}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
             <local:ExpanderView.HeaderTemplate>
                 <DataTemplate>
                     <StackPanel Height="120">
-                        <TextBlock Text="{Binding FirstActivity.PreviewTitle}"
-                                    FontSize="{StaticResource PhoneFontSizeExtraLarge}" FontFamily="Segoe WP SemiLight" />
-                        <TextBlock Foreground="{StaticResource PhoneSubtleBrush}"
-                                        Text="{Binding FirstActivity.Author}"
-                                        FontSize="{StaticResource PhoneFontSizeLarge}" />
+                        <TextBlock Text="{Binding FirstActivity.PreviewTitle}" />
+                        <TextBlock Text="{Binding FirstActivity.Author}" />
                     </StackPanel>
                 </DataTemplate>
             </local:ExpanderView.HeaderTemplate>

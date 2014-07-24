@@ -125,7 +125,7 @@
                                             <TextBlock Grid.Column="0" FontSize="16" Text="{Binding Glyph}"
                                                 FontFamily="Segoe UI Symbol" />
                                             <TextBlock Grid.Column="1" FontSize="16" Text="{Binding DisplayText}"
-                                                TextWrapping="Wrap" FontFamily="Segoe WP" FontStyle="Italic" />
+                                                TextWrapping="Wrap" FontStyle="Italic" />
                                         </Grid>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
