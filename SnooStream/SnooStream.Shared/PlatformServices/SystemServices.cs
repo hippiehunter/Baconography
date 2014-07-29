@@ -1,4 +1,5 @@
-﻿using Nokia.Graphics.Imaging;
+﻿using GalaSoft.MvvmLight;
+using Nokia.Graphics.Imaging;
 using Nokia.InteropServices.WindowsRuntime;
 using SnooStream.Services;
 using SnooStream.ViewModel;
@@ -37,7 +38,7 @@ namespace SnooStream.PlatformServices
 
 		public void FinishInitialization(CoreDispatcher uiDispatcher)
 		{
-
+			_uiDispatcherSource.SetResult(uiDispatcher);
 		}
 
         private void networkStatusChanged(object sender)
@@ -577,184 +578,365 @@ namespace SnooStream.PlatformServices
 		}
 
 
-		public async Task<IImageLoader> DownloadImageWithProgress(string uri, Action<int> progress, CancellationToken cancelToken)
+		public IImageLoader DownloadImageWithProgress(string uri, Action<int> progress, CancellationToken cancelToken, Action<Exception> errorHandler)
 		{
-			HttpClient client = new HttpClient();
-			var response = await client.GetAsync(new Uri(uri), HttpCompletionOption.ResponseHeadersRead);
-			
-			var responseStream = (await response.Content.ReadAsInputStreamAsync()).AsStreamForRead();
-			var initialBuffer = new byte[4096];
-			var initialReadLength = await responseStream.ReadAsync(initialBuffer, 0, 4096);
-			if (initialReadLength == 0)
-				throw new Exception("failed to read initial bytes of image");
-
-			var contentLengthHeader = response.Headers.ContainsKey("Content-Length") ? response.Headers["Content-Length"] : "-1";
-			int contentLength = -1;
-			int.TryParse(contentLengthHeader, out contentLength);
-
-			return new ImageLoader(initialBuffer, responseStream, uri, progress, cancelToken, contentLength);
+			var imageLoader = new ImageLoader(uri, _uiDispatcher, errorHandler);
+			imageLoader.InitialLoad(progress, cancelToken);
+			return imageLoader;
 		}
 
-		class ImageLoader : IImageLoader
+		class ImageLoader : ViewModelBase, IImageLoader
 		{
-			public ImageLoader(byte[] initialData, Stream responseStream, string url, Action<int> progress, CancellationToken cancelToken, int contentLength)
+			public ImageLoader(string url, Task<CoreDispatcher> dispatcher, Action<Exception> errorHandler)
 			{
-				_contentLength = contentLength;
-				_progress = progress;
-				_cancelToken = cancelToken;
-				_responseStream = responseStream;
 				_url = url;
-				_isGif = CheckGif(initialData);
-				_loadTask = new Lazy<Task>(() => Load());
-				if (_isGif)
+				_dispatcher = dispatcher;
+				_internalLoader = new WeakReference<ImageLoaderInternal>(null);
+				_errorHandler = errorHandler;
+			}
+
+			public async void InitialLoad(Action<int> progress, CancellationToken cancelToken)
+			{
+				HttpClient client = new HttpClient();
+				var response = await client.GetAsync(new Uri(_url), HttpCompletionOption.ResponseHeadersRead);
+
+				var responseStream = (await response.Content.ReadAsInputStreamAsync()).AsStreamForRead();
+				var initialBuffer = new byte[4096];
+				var initialReadLength = await responseStream.ReadAsync(initialBuffer, 0, 4096);
+				if (initialReadLength == 0)
+					throw new Exception("failed to read initial bytes of image");
+
+				var contentLengthHeader = response.Headers.ContainsKey("Content-Length") ? response.Headers["Content-Length"] : "-1";
+				int contentLength = -1;
+				int.TryParse(contentLengthHeader, out contentLength);
+
+				if ((await _dispatcher).HasThreadAccess)
 				{
-					_memoryStream.Write(initialData, 0, initialData.Length);
-					_gifRenderer = new GifRenderer.GifRenderer(GetMore);
-					
+					await InternalLoader.Init(initialBuffer, responseStream, _url, progress, cancelToken, contentLength, _errorHandler);
+					RaisePropertyChanged("ImageSource");
 				}
 				else
 				{
-					_responseStream.Dispose();
-					_responseStream = null;
-					_cancelCallback = _cancelToken.Register(() => 
+					await (await _dispatcher).RunAsync(CoreDispatcherPriority.High, async () =>
+					{
+						await InternalLoader.Init(initialBuffer, responseStream, _url, progress, cancelToken, contentLength, _errorHandler);
+						RaisePropertyChanged("ImageSource");
+					});
+				}
+
+				
+			}
+			private string _url;
+			Action<Exception> _errorHandler;
+			private Task<CoreDispatcher> _dispatcher;
+			private WeakReference<ImageLoaderInternal> _internalLoader;
+			private ImageLoaderInternal InternalLoader
+			{
+				get
+				{
+					ImageLoaderInternal internalLoader;
+					if (!_internalLoader.TryGetTarget(out internalLoader) || internalLoader == null)
+					{
+						lock (this)
 						{
+							if (!_internalLoader.TryGetTarget(out internalLoader) || internalLoader == null)
+							{
+								internalLoader = new ImageLoaderInternal();
+								_internalLoader.SetTarget(internalLoader);
+								InitialLoad(null, CancellationToken.None);
+							}
+						}
+					}
+					return internalLoader;
+				}
+					
+			}
+
+			private class ImageLoaderInternal
+			{
+				public async Task Init(byte[] initialData, Stream responseStream, string url, Action<int> progress, CancellationToken cancelToken, int contentLength, Action<Exception> errorHandler)
+				{
+					_errorHandler = errorHandler;
+					_cancelToken = new CancellationTokenSource();
+					_contentLength = contentLength;
+					_progress = progress;
+					_responseStream = responseStream;
+					_url = url;
+					_isGif = CheckGif(initialData);
+					_loadTask = new Lazy<Task>(() => Load());
+					if (_isGif)
+					{
+						bool tryAfter = false;
+						_memoryStream.Write(initialData, 0, initialData.Length);
+						var readBytes = await responseStream.ReadAsync(initialData, 0, 4096);
+						_memoryStream.Write(initialData, 0, readBytes);
+						if (readBytes > 0)
+						{
+							readBytes = await responseStream.ReadAsync(initialData, 0, 4096);
+							_memoryStream.Write(initialData, 0, readBytes);
+						}
+						try
+						{
+							_returnedPosition = 0;
+							_gifRenderer = new GifRenderer.GifRenderer(GetMore);
+						}
+						catch(ArgumentException)
+						{
+							tryAfter = true;
+						}
+						catch(Exception ex)
+						{
+							_errorHandler(ex);
+						}
+						if(tryAfter)
+						{
+							try
+							{
+								await Load();
+								_returnedPosition = 0;
+								_gifRenderer = new GifRenderer.GifRenderer(GetMore);
+							}
+							catch (Exception ex)
+							{
+								_errorHandler(ex);
+							}
+						}
+
+					}
+					else
+					{
+						_responseStream.Dispose();
+						_responseStream = null;
+						_cancelCallback = cancelToken.Register(() =>
+						{
+							_cancelToken.Cancel();
 							if (_bitmapImage != null)
 							{
 								_bitmapImage.UriSource = null;
 								_bitmapImage = null;
 							}
 						});
-				}
-				
-			}
-
-			bool _isGif;
-			GifRenderer.GifRenderer _gifRenderer;
-			BitmapImage _bitmapImage;
-			Action<int> _progress;
-			Lazy<Task> _loadTask;
-			int _contentLength;
-			CancellationToken _cancelToken;
-			CancellationTokenRegistration _cancelCallback;
-			bool _finished = false;
-			long _returnedPosition = 0;
-			MemoryStream _memoryStream = new MemoryStream();
-			Stream _responseStream;
-			string _url;
-
-			private static bool CheckGif(byte[] data)
-			{
-				return
-					data[0] == 0x47 && // G
-					data[1] == 0x49 && // I
-					data[2] == 0x46 && // F
-					data[3] == 0x38 && // 8
-					(data[4] == 0x39 || data[4] == 0x37) && // 9 or 7
-					data[5] == 0x61;   // a
-			}
-
-			public byte[] GetMore()
-			{
-				//its over
-				if (_finished && _returnedPosition == _memoryStream.Length)
-					return null;
-
-				if (_returnedPosition < _memoryStream.Length)
-				{
-					lock (_memoryStream)
-					{
-						var result = new byte[_memoryStream.Length - _returnedPosition];
-						_memoryStream.Seek(_returnedPosition, SeekOrigin.Begin);
-						_memoryStream.Read(result, 0, result.Length);
-						_returnedPosition += result.Length;
-						return result;
 					}
+					_initialLoaded = true;
 				}
-				else
-					return new byte[0];
-			}
 
-			public async Task Load()
-			{
-				if (_responseStream != null)
+				Action<Exception> _errorHandler;
+				bool _initialLoaded = false;
+				bool _isGif;
+				GifRenderer.GifRenderer _gifRenderer;
+				BitmapImage _bitmapImage;
+				Action<int> _progress;
+				Lazy<Task> _loadTask;
+				int _contentLength;
+				CancellationTokenSource _cancelToken;
+				CancellationTokenRegistration _cancelCallback;
+				bool _finished = false;
+				long _returnedPosition = 0;
+				MemoryStream _memoryStream = new MemoryStream();
+				Stream _responseStream;
+				string _url;
+
+				private static bool CheckGif(byte[] data)
 				{
-					try
+					return
+						data[0] == 0x47 && // G
+						data[1] == 0x49 && // I
+						data[2] == 0x46 && // F
+						data[3] == 0x38 && // 8
+						(data[4] == 0x39 || data[4] == 0x37) && // 9 or 7
+						data[5] == 0x61;   // a
+				}
+
+				public byte[] GetMore()
+				{
+					//its over
+					if (_memoryStream == null || (_finished && _returnedPosition == _memoryStream.Length))
+						return null;
+
+					if (_returnedPosition < _memoryStream.Length)
 					{
-						var buffer = new byte[4096];
-						for (; ; )
+						lock (_memoryStream)
 						{
-							var readBytes = await _responseStream.ReadAsync(buffer, 0, 4096);
-							if (readBytes == 0)
-								break;
-							else
+							var result = new byte[_memoryStream.Length - _returnedPosition];
+							_memoryStream.Seek(_returnedPosition, SeekOrigin.Begin);
+							_memoryStream.Read(result, 0, result.Length);
+							_returnedPosition += result.Length;
+							return result;
+						}
+					}
+					else
+						return new byte[0];
+				}
+
+				public async Task Load()
+				{
+					if (_responseStream != null)
+					{
+						while (!_initialLoaded)
+						{
+							await Task.Delay(100);
+						}
+						try
+						{
+							var buffer = new byte[4096];
+							for (; ; )
 							{
-								lock (_memoryStream)
+								_cancelToken.Token.ThrowIfCancellationRequested();
+								var readBytes = await _responseStream.ReadAsync(buffer, 0, 4096);
+								if (readBytes == 0)
+									break;
+								else
 								{
-									_memoryStream.Seek(0, SeekOrigin.End);
-									_memoryStream.Write(buffer, 0, readBytes);
+									_cancelToken.Token.ThrowIfCancellationRequested();
+									if (_memoryStream != null)
+									{
+										lock (_memoryStream)
+										{
+											_memoryStream.Seek(0, SeekOrigin.End);
+											_memoryStream.Write(buffer, 0, readBytes);
+										}
+									}
+									else
+										return;
 								}
 							}
 						}
+						catch { }
+						finally
+						{
+							_finished = true;
+							try
+							{
+								_cancelCallback.Dispose();
+								if (_responseStream != null)
+								{
+									_responseStream.Dispose();
+									_responseStream = null;
+								}
+							}
+							catch { }
+						}
 					}
-					catch { }
-					finally
+				}
+
+
+				public object ImageSource
+				{
+					get
 					{
-						_finished = true;
+						if (!_initialLoaded)
+							return null;
+						else
+						{
+							if (_isGif)
+							{
+								if (_loadTask.Value != null && _gifRenderer != null)
+									return _gifRenderer.ImageSource;
+								else
+									return null;
+							}
+							else
+							{
+								if (_bitmapImage == null)
+								{
+									lock (this)
+									{
+										if (_bitmapImage == null)
+										{
+											_bitmapImage = new BitmapImage();
+											_bitmapImage.DownloadProgress += _bitmapImage_DownloadProgress;
+											_bitmapImage.ImageOpened += _bitmapImage_ImageOpened;
+											_bitmapImage.ImageFailed += _bitmapImage_ImageFailed;
+											_bitmapImage.UriSource = new Uri(_url);
+										}
+									}
+								}
+								return _bitmapImage;
+							}
+						}
+					}
+				}
+
+				void _bitmapImage_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+				{
+					_cancelCallback.Dispose();
+					var bitmapImage = sender as BitmapImage;
+					if (bitmapImage != null)
+					{
+						_bitmapImage.DownloadProgress -= _bitmapImage_DownloadProgress;
+						_bitmapImage.ImageOpened -= _bitmapImage_ImageOpened;
+						_bitmapImage.ImageFailed -= _bitmapImage_ImageFailed;
+					}
+					_errorHandler(new Exception(e.ErrorMessage));
+				}
+
+				void _bitmapImage_ImageOpened(object sender, RoutedEventArgs e)
+				{
+					_finished = true;
+					_cancelCallback.Dispose();
+					_progress = null;
+					var bitmapImage = sender as BitmapImage;
+					if (bitmapImage != null)
+					{
+						_bitmapImage.DownloadProgress -= _bitmapImage_DownloadProgress;
+						_bitmapImage.ImageOpened -= _bitmapImage_ImageOpened;
+						_bitmapImage.ImageFailed -= _bitmapImage_ImageFailed;
+					}
+				}
+
+				void _bitmapImage_DownloadProgress(object sender, DownloadProgressEventArgs e)
+				{
+					if (_progress != null)
+					{
+						_progress(e.Progress);
+					}
+				}
+
+				~ImageLoaderInternal()
+				{
+					if (_gifRenderer != null)
+					{
+						_gifRenderer.Dispose();
+						_gifRenderer = null;
+					}
+
+					if (_memoryStream != null)
+						_memoryStream.Dispose();
+					_memoryStream = null;
+
+					if (_responseStream != null)
+						_responseStream.Dispose();
+					_responseStream = null;
+
+					_cancelCallback.Dispose();
+				}
+
+				public bool Loaded
+				{
+					get
+					{
+						return _finished;
 					}
 				}
 			}
 
 			public object ImageSource
 			{
-				get
+				get 
 				{
-					if (_isGif && _loadTask.Value != null)
-					{
-						return _gifRenderer.ImageSource;
-					}
-					else
-					{
-						if (_bitmapImage == null)
-						{
-							lock (this)
-							{
-								if(_bitmapImage == null)
-								{
-									_bitmapImage = new BitmapImage();
-									_bitmapImage.DownloadProgress += _bitmapImage_DownloadProgress;
-									_bitmapImage.ImageOpened += _bitmapImage_ImageOpened;
-									_bitmapImage.UriSource = new Uri(_url);
-								}
-							}
-						}
-						return _bitmapImage;
-					}
+					return InternalLoader.ImageSource;
 				}
 			}
 
-			void _bitmapImage_ImageOpened(object sender, RoutedEventArgs e)
-			{
-				_finished = true;
-			}
-
-			void _bitmapImage_DownloadProgress(object sender, DownloadProgressEventArgs e)
-			{
-				_progress(e.Progress);
-			}
 
 			public bool Loaded
 			{
-				get { return _finished; }
-			}
-
-			public void AttachWatcher(Action<int> progress)
-			{
-				_progress = progress;
+				get { return InternalLoader.Loaded; }
 			}
 
 			public Task ForceLoad
 			{
-				get { return _loadTask.Value; }
+				get { return InternalLoader.Load(); }
 			}
 		}
 	}

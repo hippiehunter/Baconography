@@ -18,7 +18,7 @@
     <PackageCertificateKeyFile>SnooStream.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>491d3e28</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>7892c3c6</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -206,20 +206,20 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
-    <Error Condition="!Exists('..\..\packages\GifRenderer.1.0.0.0\build\win81\GifRenderer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\GifRenderer.1.0.0.0\build\win81\GifRenderer.targets'))" />
     <Error Condition="!Exists('..\..\packages\KitaroDB.2.2.1\build\win81\KitaroDB.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\KitaroDB.2.2.1\build\win81\KitaroDB.targets'))" />
     <Error Condition="!Exists('..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets'))" />
     <Error Condition="!Exists('..\..\packages\SnooDom.1.0.1\build\win81\SnooDom.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SnooDom.1.0.1\build\win81\SnooDom.targets'))" />
+    <Error Condition="!Exists('..\..\packages\GifRenderer.1.0.1\build\win81\GifRenderer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\GifRenderer.1.0.1\build\win81\GifRenderer.targets'))" />
   </Target>
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
     <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
     <Error Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
   </Target>
-  <Import Project="..\..\packages\GifRenderer.1.0.0.0\build\win81\GifRenderer.targets" Condition="Exists('..\..\packages\GifRenderer.1.0.0.0\build\win81\GifRenderer.targets')" />
   <Import Project="..\..\packages\KitaroDB.2.2.1\build\win81\KitaroDB.targets" Condition="Exists('..\..\packages\KitaroDB.2.2.1\build\win81\KitaroDB.targets')" />
   <Import Project="..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets" Condition="Exists('..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets')" />
   <Import Project="..\..\packages\SnooDom.1.0.1\build\win81\SnooDom.targets" Condition="Exists('..\..\packages\SnooDom.1.0.1\build\win81\SnooDom.targets')" />
+  <Import Project="..\..\packages\GifRenderer.1.0.1\build\win81\GifRenderer.targets" Condition="Exists('..\..\packages\GifRenderer.1.0.1\build\win81\GifRenderer.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -30,7 +30,6 @@ namespace SnooStream.ViewModel
 
 		internal override Task LoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken)
         {
-			ImageSource.AttachWatcher(progress);
 			return ImageSource.ForceLoad;
         }
     }

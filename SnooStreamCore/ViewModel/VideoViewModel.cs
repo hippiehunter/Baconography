@@ -50,7 +50,11 @@ namespace SnooStream.ViewModel
 				}
 				if (!string.IsNullOrWhiteSpace(videoResult.PreviewUrl))
 				{
-					var image = await SnooStreamViewModel.SystemServices.DownloadImageWithProgress(videoResult.PreviewUrl, progress, cancelToken);
+					var image = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(videoResult.PreviewUrl, progress, cancelToken, (ex) =>
+						{
+							Errored = true;
+							Error = ex.Message;
+						});
 					if (image != null)
 					{
 						Preview = image;

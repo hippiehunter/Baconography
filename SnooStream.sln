@@ -38,6 +38,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F6CBD2
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{34F6CAFD-F5E9-44D2-B68B-059F3D152AD4}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\winrtxamltoolkit\WinRTXamlToolkit\WinRTXamlToolkit.Shared\WinRTXamlToolkit.Shared.projitems*{952bd2b0-e12a-4bfc-bce7-f4ee9f7461b6}*SharedItemsImports = 13

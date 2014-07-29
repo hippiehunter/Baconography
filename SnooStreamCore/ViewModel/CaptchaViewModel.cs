@@ -36,7 +36,15 @@ namespace SnooStream.ViewModel
         {
             var url = "http://www.reddit.com/captcha/" + iden;
 			CancellationTokenSource tokenSource = new CancellationTokenSource();
-			var imageLoader = await SnooStreamViewModel.SystemServices.DownloadImageWithProgress(url, (progress) => { }, tokenSource.Token);
+			var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(url, (progress) => { }, tokenSource.Token, (ex) =>
+			{
+				if (Content != null)
+				{
+					Content.Errored = true;
+					Content.Error = ex.Message;
+				}
+				
+			});
 			Content = new ImageViewModel(this, url, null, imageLoader);
 			await Content.BeginLoad(SnooStreamViewModel.UIContextCancellationToken);   
         }

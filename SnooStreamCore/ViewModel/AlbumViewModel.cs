@@ -48,7 +48,11 @@ namespace SnooStream.ViewModel
 		private async Task<bool> LoadImageImpl(string title, Uri source, bool isPreview, Action<int> progress, CancellationToken cancelToken)
         {
             bool loadedOne = false;
-			var imageLoader = await SnooStreamViewModel.SystemServices.DownloadImageWithProgress(source.ToString(), progress, cancelToken);
+			var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(source.ToString(), progress, cancelToken, (ex) =>
+				{
+					Error = ex.Message;
+					Errored = true;
+				});
 			if (imageLoader != null) //minimum to identify the image type
             {
                 loadedOne = true;

@@ -15,9 +15,9 @@
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid.Resources>
             <DataTemplate x:Name="imageTemplate">
-                <Image
-                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Unloaded="PanAndZoomImage_Unloaded" Loaded="PanAndZoomImage_Loaded"
-                    Source="{Binding ImageSource, Converter={StaticResource asyncImageSourceConverter}}" />
+                <Image Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                    Source="{Binding ImageSource.ImageSource}"/>
             </DataTemplate>
 
             <DataTemplate x:Name="videoTemplate" >
@@ -62,8 +62,13 @@
                     <!-- TODO: FIX this, its doesnt draw right and its probably not in the right place -->
                     <!--<telerikPrimitives:RadPaginationControl Grid.Row="0" PageProvider="{Binding ElementName=albumSlideView}" DisplayMode="IndexLabel"/>-->
                     <FlipView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}" ItemTemplate="{StaticResource imageTemplate}"
-                                                    Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
-                                                    Loaded="albumSlideView_Loaded" Unloaded="albumSlideView_Unloaded"/>
+                                                    Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}">
+                        <FlipView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Vertical"/>
+                            </ItemsPanelTemplate>
+                        </FlipView.ItemsPanel>
+                    </FlipView>
                 </Grid>
             </DataTemplate>
 
@@ -107,8 +112,13 @@
         <Grid x:Name="ContentPanel" Margin="0,0,0,0" Grid.Row="0">
             <FlipView x:Name="flipView" SelectedItem="{Binding SelectedItem, ElementName=linkStream, Mode=TwoWay}" ItemsSource="{Binding Links, ElementName=linkStream}"
                                             ItemTemplate="{StaticResource loadingTemplate}">
+                <FlipView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </FlipView.ItemsPanel>
             </FlipView>
-            
+
         </Grid>
         <!-- TODO: change positioning in landscape -->
         <!--local:ExtendedAppBarControl Name="appBar" Grid.Row="1" DataContext="{Binding SelectedItem.Context, ElementName=radSlideView}" LastButtonSymbol="&#xE118;" LastButtonText="Save"/-->

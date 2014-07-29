@@ -86,8 +86,17 @@ namespace SnooStream.ViewModel
                         else if (imageApiResults != null && imageApiResults.Count() == 1)
 						{
 							CancellationTokenSource tokenSource = new CancellationTokenSource();
-							var imageLoader = await SnooStreamViewModel.SystemServices.DownloadImageWithProgress(imageApiResults.First().Item2, (progress) => { }, tokenSource.Token);
-							return new ImageViewModel(this, imageApiResults.First().Item2, imageApiResults.First().Item1, imageLoader);
+							ImageViewModel ivmResult = null;
+							var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(imageApiResults.First().Item2, (progress) => { }, tokenSource.Token, (ex) =>
+								{
+									if(ivmResult != null)
+									{
+										ivmResult.Error = ex.Message;
+										ivmResult.Errored = true;
+									}
+								});
+							ivmResult = new ImageViewModel(this, imageApiResults.First().Item2, imageApiResults.First().Item1, imageLoader);
+							return ivmResult;
 						}
                             
                     }
@@ -97,8 +106,17 @@ namespace SnooStream.ViewModel
                         fileName.EndsWith(".jpeg"))
                     {
 						CancellationTokenSource tokenSource = new CancellationTokenSource();
-						var imageLoader = await SnooStreamViewModel.SystemServices.DownloadImageWithProgress(Link.Url, (progress) => { }, tokenSource.Token);
-						return new ImageViewModel(this, Link.Url, Link.Title, imageLoader);
+						ImageViewModel ivmResult = null;
+						var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(Link.Url, (progress) => { }, tokenSource.Token, (ex) =>
+						{
+							if (ivmResult != null)
+							{
+								ivmResult.Error = ex.Message;
+								ivmResult.Errored = true;
+							}
+						});
+						ivmResult = new ImageViewModel(this, Link.Url, Link.Title, imageLoader);
+						return ivmResult;
                     }
                     
                     return new WebViewModel(this, true, Link.Url);
