@@ -79,6 +79,7 @@ namespace SnooStream.ViewModel
             else
             {
                 subscribedListing = await SnooStreamViewModel.RedditService.GetDefaultSubreddits();
+                subscribedListing.Data.Children.Insert(0, new Thing { Data = new Subreddit { Name = "gifs", DisplayName = "gifs", Url = "/r/gifs", Title = "gifs" } });
             }
 
             foreach (var river in subscribedListing.Data.Children.Select(thing => new LinkRiverViewModel(false, thing.Data as Subreddit, "hot", null)))

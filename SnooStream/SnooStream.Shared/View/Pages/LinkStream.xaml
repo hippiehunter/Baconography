@@ -15,9 +15,9 @@
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid.Resources>
             <DataTemplate x:Name="imageTemplate">
-                <Image Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                    Source="{Binding ImageSource.ImageSource}"/>
+                <ScrollViewer DataContextChanged="Image_DataContextChanged" Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}" ZoomMode="Enabled">
+                    <Image Unloaded="Image_Unloaded" />
+                </ScrollViewer>
             </DataTemplate>
 
             <DataTemplate x:Name="videoTemplate" >
@@ -114,7 +114,7 @@
                                             ItemTemplate="{StaticResource loadingTemplate}">
                 <FlipView.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Horizontal"/>
+                        <VirtualizingStackPanel Orientation="Horizontal" VirtualizingStackPanel.VirtualizationMode="Recycling"/>
                     </ItemsPanelTemplate>
                 </FlipView.ItemsPanel>
             </FlipView>

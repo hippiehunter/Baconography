@@ -31,6 +31,7 @@ namespace SnooStream.Services
 	public interface IImageLoader
 	{
 		object ImageSource { get; }
+        IDisposable ImageHandle { get; }
 		bool Loaded { get;}
 		Task ForceLoad { get;}
 	}

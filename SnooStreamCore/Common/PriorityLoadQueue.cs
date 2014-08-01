@@ -204,29 +204,31 @@ namespace SnooStream.Common
 			LoadTimout = 15000;
             try
             {
-				var currentTasks = new Dictionary<Task, DateTime>();
+				var currentTasks = new List<Tuple<Task, DateTime>>();
 				foreach (var currentItem in LoadItemStream())
 				{
-					currentTasks.Add(ProcLoadItem(currentItem), DateTime.Now);
+					currentTasks.Add(Tuple.Create(ProcLoadItem(currentItem), DateTime.Now));
 					if (currentTasks.Count > LoadConcurrency)
 					{
-						var taskArray = currentTasks.Keys.ToArray();
+                        var taskArray = currentTasks.Select(tpl => tpl.Item1).ToArray();
 						var taskIndex = Task.WaitAny(taskArray, LoadTimout, _cancelTokenSource.Token);
-						List<Task> removeTasks = new List<Task>();
+                        var removeTasks = new List<Tuple<Task, DateTime>>();
 						//scrub for overall aged out items and completed items
 						var now = DateTime.Now;
 						foreach (var taskTpl in currentTasks)
 						{
-							if (taskTpl.Key.IsCompleted || taskTpl.Key.IsFaulted || taskTpl.Key.IsCanceled)
-								removeTasks.Add(taskTpl.Key);
-							if ((now - taskTpl.Value).TotalMilliseconds > LoadTimout)
+                            if (taskTpl.Item1.IsCompleted || taskTpl.Item1.IsFaulted || taskTpl.Item1.IsCanceled)
+                                removeTasks.Add(taskTpl);
+							if ((now - taskTpl.Item2).TotalMilliseconds > LoadTimout)
 							{
 								//let it die elsewhere
-								removeTasks.Add(taskTpl.Key);
+                                removeTasks.Add(taskTpl);
 							}
 						}
-						foreach (var task in removeTasks)
-							currentTasks.Remove(task);
+                        foreach (var task in removeTasks)
+                        {
+                            currentTasks.Remove(task);
+                        }
 					}
 				}
             }

@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Media;
 using SnooStream.View.Selectors;
+using System.Threading;
 
 namespace SnooStream.View.Pages
 {
@@ -54,7 +55,27 @@ namespace SnooStream.View.Pages
 
 		bool _loading = false;
 
-		public async void LoadInitialLinks(ObservableCollection<ContentViewModel> links)
+#if WINDOWS_PHONE_APP
+        bool CanAddMore(int itemCount)
+        {
+            if (Windows.System.MemoryManager.AppMemoryUsageLimit <= 193986560 && itemCount > 2)
+            {
+                return false;
+            }
+            else
+            {
+                return Windows.System.MemoryManager.AppMemoryUsageLevel == Windows.System.AppMemoryUsageLevel.Medium ||
+                    Windows.System.MemoryManager.AppMemoryUsageLevel == Windows.System.AppMemoryUsageLevel.Low;
+            }
+        }
+#else
+        bool CanAddMore(int itemCount)
+        {
+            return true;
+        }
+#endif
+
+        public async void LoadInitialLinks(ObservableCollection<ContentViewModel> links)
 		{
 			try
 			{
@@ -63,7 +84,7 @@ namespace SnooStream.View.Pages
 				if (linkStream != null && await linkStream.MoveNext())
 				{
 					AddLoadingLink(links, linkStream.Current, false);
-					for (int i = 0; i < 5 && await linkStream.MoveNext(); i++)
+                    for (int i = 0; i < 5 && await linkStream.MoveNext(); i++)
 					{
 						AddLoadingLink(links, linkStream.Current, false);
 					}
@@ -76,8 +97,8 @@ namespace SnooStream.View.Pages
 					var backLinkCount = 0;
 					LinkViewModel currentPrior;
 					while (linkStream.LoadPrior.Value != null &&
-						(currentPrior = (await linkStream.LoadPrior.Value.Next()) as LinkViewModel) != null &&
-						backLinkCount < 5)
+                        backLinkCount < 5 && 
+						(currentPrior = (await linkStream.LoadPrior.Value.Next()) as LinkViewModel) != null)
 					{
 						AddLoadingLink(links, currentPrior, true);
 					}
@@ -182,24 +203,48 @@ namespace SnooStream.View.Pages
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		private Image FindImageInTemplates(UIElement element)
-		{
-			if (element is FlipViewItem)
-			{
-				return FindImageInTemplates(((FlipViewItem)element).ContentTemplateRoot);
-			}
-			else if (element is Grid)
-			{
-				return FindImageInTemplates(((Grid)element).Children[1]);
-			}
-			else if (element is ContentControl)
-			{
-				return FindImageInTemplates(((ContentControl)element).ContentTemplateRoot);
-			}
-			else if (element is Image)
-				return element as Image;
-			else
-				return null;
-		}
+        private void Image_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        {
+            var scrollViewer = sender as ScrollViewer;
+            var image = scrollViewer.Content as Image;
+            var imageViewModel = args.NewValue as ImageViewModel;
+
+            if (image.DataContext is IDisposable)
+                ((IDisposable)image.DataContext).Dispose();
+
+            image.DataContext = null;
+            image.Source = null;
+
+            if (imageViewModel.ImageSource.ImageSource == null)
+            {
+                var propChanged = imageViewModel.ImageSource as INotifyPropertyChanged;
+                PropertyChangedEventHandler handler = null;
+                handler = (s, a) =>
+                    {
+                        image.DataContext = imageViewModel.ImageSource.ImageHandle;
+                        var imageSource = imageViewModel.ImageSource.ImageSource as ImageSource;
+                        image.Source = imageSource;
+                        propChanged.PropertyChanged -= handler;
+                    };
+                propChanged.PropertyChanged += handler;
+            }
+            else
+            {
+                image.DataContext = imageViewModel.ImageSource.ImageHandle;
+                var imageSource = imageViewModel.ImageSource.ImageSource as ImageSource;
+                image.Source = imageSource;
+            }
+                
+        }
+
+        private void Image_Unloaded(object sender, RoutedEventArgs e)
+        {
+            var image = sender as Image;
+            if (image.DataContext is IDisposable)
+                ((IDisposable)image.DataContext).Dispose();
+
+            image.DataContext = null;
+            image.Source = null;
+        }
 	}
 }

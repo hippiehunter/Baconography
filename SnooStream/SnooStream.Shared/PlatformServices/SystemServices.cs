@@ -5,6 +5,7 @@ using SnooStream.Services;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -580,52 +581,69 @@ namespace SnooStream.PlatformServices
 
 		public IImageLoader DownloadImageWithProgress(string uri, Action<int> progress, CancellationToken cancelToken, Action<Exception> errorHandler)
 		{
-			var imageLoader = new ImageLoader(uri, _uiDispatcher, errorHandler);
-			imageLoader.InitialLoad(progress, cancelToken);
+			var imageLoader = new ImageLoader(uri, _uiDispatcher, errorHandler, progress, cancelToken);
+            imageLoader.InitialLoad();
 			return imageLoader;
 		}
 
 		class ImageLoader : ViewModelBase, IImageLoader
 		{
-			public ImageLoader(string url, Task<CoreDispatcher> dispatcher, Action<Exception> errorHandler)
+            public ImageLoader(string url, Task<CoreDispatcher> dispatcher, Action<Exception> errorHandler, Action<int> progress, CancellationToken cancelToken)
 			{
 				_url = url;
 				_dispatcher = dispatcher;
 				_internalLoader = new WeakReference<ImageLoaderInternal>(null);
 				_errorHandler = errorHandler;
+                _progress = progress;
+                _cancelToken = cancelToken;
 			}
-
-			public async void InitialLoad(Action<int> progress, CancellationToken cancelToken)
+            bool _isInitializing = false;
+			public async void InitialLoad()
 			{
-				HttpClient client = new HttpClient();
-				var response = await client.GetAsync(new Uri(_url), HttpCompletionOption.ResponseHeadersRead);
+                if (_isInitializing)
+                    throw new Exception();
+                try
+                {
+                    _isInitializing = true;
+                    HttpClient client = new HttpClient();
+                    var response = await client.GetAsync(new Uri(_url), HttpCompletionOption.ResponseHeadersRead);
 
-				var responseStream = (await response.Content.ReadAsInputStreamAsync()).AsStreamForRead();
-				var initialBuffer = new byte[4096];
-				var initialReadLength = await responseStream.ReadAsync(initialBuffer, 0, 4096);
-				if (initialReadLength == 0)
-					throw new Exception("failed to read initial bytes of image");
+                    var responseStream = (await response.Content.ReadAsInputStreamAsync()).AsStreamForRead();
+                    var initialBuffer = new byte[4096];
+                    var initialReadLength = await responseStream.ReadAsync(initialBuffer, 0, 4096);
+                    if (initialReadLength == 0)
+                        throw new Exception("failed to read initial bytes of image");
 
-				var contentLengthHeader = response.Headers.ContainsKey("Content-Length") ? response.Headers["Content-Length"] : "-1";
-				int contentLength = -1;
-				int.TryParse(contentLengthHeader, out contentLength);
+                    var contentLengthHeader = response.Headers.ContainsKey("Content-Length") ? response.Headers["Content-Length"] : "-1";
+                    int contentLength = -1;
+                    int.TryParse(contentLengthHeader, out contentLength);
 
-				if ((await _dispatcher).HasThreadAccess)
-				{
-					await InternalLoader.Init(initialBuffer, responseStream, _url, progress, cancelToken, contentLength, _errorHandler);
-					RaisePropertyChanged("ImageSource");
-				}
-				else
-				{
-					await (await _dispatcher).RunAsync(CoreDispatcherPriority.High, async () =>
-					{
-						await InternalLoader.Init(initialBuffer, responseStream, _url, progress, cancelToken, contentLength, _errorHandler);
-						RaisePropertyChanged("ImageSource");
-					});
-				}
-
+                    if ((await _dispatcher).HasThreadAccess)
+                    {
+                        InternalLoader.Init(initialBuffer, responseStream, _url, _progress, _cancelToken, contentLength, _errorHandler);
+                        RaisePropertyChanged("ImageSource");
+                    }
+                    else
+                    {
+                        await (await _dispatcher).RunAsync(CoreDispatcherPriority.High, () =>
+                        {
+                            InternalLoader.Init(initialBuffer, responseStream, _url, _progress, _cancelToken, contentLength, _errorHandler);
+                            RaisePropertyChanged("ImageSource");
+                        });
+                    }
+                }
+                catch(Exception ex)
+                {
+                    _errorHandler(ex);
+                }
+                finally
+                {
+                    _isInitializing = false;
+                }
 				
 			}
+            Action<int> _progress;
+            CancellationToken _cancelToken;
 			private string _url;
 			Action<Exception> _errorHandler;
 			private Task<CoreDispatcher> _dispatcher;
@@ -643,7 +661,8 @@ namespace SnooStream.PlatformServices
 							{
 								internalLoader = new ImageLoaderInternal();
 								_internalLoader.SetTarget(internalLoader);
-								InitialLoad(null, CancellationToken.None);
+                                if (!_isInitializing)
+								    InitialLoad();
 							}
 						}
 					}
@@ -652,9 +671,37 @@ namespace SnooStream.PlatformServices
 					
 			}
 
-			private class ImageLoaderInternal
+            private delegate bool GetterDelegate(out byte[] data);
+            private class Getter : GifRenderer.GetMoreData
+            {
+                public Getter(ImageLoaderInternal loader, GetterDelegate del)
+                {
+                    _del = del;
+                    _loader = loader;
+                }
+                GetterDelegate _del;
+                ImageLoaderInternal _loader; 
+
+                public bool Get(out byte[] data)
+                {
+                    return _del(out data);
+                }
+
+                public void DisposeWorkaround()
+                {
+                    _del = null;
+                    _loader.Dispose();
+                }
+            }
+
+			private class ImageLoaderInternal : IDisposable
 			{
-				public async Task Init(byte[] initialData, Stream responseStream, string url, Action<int> progress, CancellationToken cancelToken, int contentLength, Action<Exception> errorHandler)
+                public ImageLoaderInternal()
+                {
+                    _loadTask = new Lazy<Task>(() => Load());
+                }
+
+				public void Init(byte[] initialData, Stream responseStream, string url, Action<int> progress, CancellationToken cancelToken, int contentLength, Action<Exception> errorHandler)
 				{
 					_errorHandler = errorHandler;
 					_cancelToken = new CancellationTokenSource();
@@ -663,45 +710,17 @@ namespace SnooStream.PlatformServices
 					_responseStream = responseStream;
 					_url = url;
 					_isGif = CheckGif(initialData);
-					_loadTask = new Lazy<Task>(() => Load());
 					if (_isGif)
 					{
-						bool tryAfter = false;
-						_memoryStream.Write(initialData, 0, initialData.Length);
-						var readBytes = await responseStream.ReadAsync(initialData, 0, 4096);
-						_memoryStream.Write(initialData, 0, readBytes);
-						if (readBytes > 0)
-						{
-							readBytes = await responseStream.ReadAsync(initialData, 0, 4096);
-							_memoryStream.Write(initialData, 0, readBytes);
-						}
 						try
 						{
-							_returnedPosition = 0;
-							_gifRenderer = new GifRenderer.GifRenderer(GetMore);
-						}
-						catch(ArgumentException)
-						{
-							tryAfter = true;
+                            _memoryStream = new MemoryStream();
+                            _memoryStream.Write(initialData, 0, initialData.Length);
 						}
 						catch(Exception ex)
 						{
 							_errorHandler(ex);
 						}
-						if(tryAfter)
-						{
-							try
-							{
-								await Load();
-								_returnedPosition = 0;
-								_gifRenderer = new GifRenderer.GifRenderer(GetMore);
-							}
-							catch (Exception ex)
-							{
-								_errorHandler(ex);
-							}
-						}
-
 					}
 					else
 					{
@@ -723,16 +742,15 @@ namespace SnooStream.PlatformServices
 				Action<Exception> _errorHandler;
 				bool _initialLoaded = false;
 				bool _isGif;
-				GifRenderer.GifRenderer _gifRenderer;
+				internal GifRenderer.GifRenderer _gifRenderer;
 				BitmapImage _bitmapImage;
 				Action<int> _progress;
-				Lazy<Task> _loadTask;
+				internal Lazy<Task> _loadTask;
 				int _contentLength;
 				CancellationTokenSource _cancelToken;
 				CancellationTokenRegistration _cancelCallback;
 				bool _finished = false;
-				long _returnedPosition = 0;
-				MemoryStream _memoryStream = new MemoryStream();
+				MemoryStream _memoryStream;
 				Stream _responseStream;
 				string _url;
 
@@ -747,78 +765,78 @@ namespace SnooStream.PlatformServices
 						data[5] == 0x61;   // a
 				}
 
-				public byte[] GetMore()
+				public bool GetMore(out byte[] result) 
 				{
+                    result = null;
 					//its over
-					if (_memoryStream == null || (_finished && _returnedPosition == _memoryStream.Length))
-						return null;
+					if (_memoryStream == null || (_finished && _memoryStream.Length == 0))
+						return false;
 
-					if (_returnedPosition < _memoryStream.Length)
+					if (_memoryStream.Length > 0)
 					{
 						lock (_memoryStream)
 						{
-							var result = new byte[_memoryStream.Length - _returnedPosition];
-							_memoryStream.Seek(_returnedPosition, SeekOrigin.Begin);
-							_memoryStream.Read(result, 0, result.Length);
-							_returnedPosition += result.Length;
-							return result;
+                            result = _memoryStream.ToArray();
+                            _memoryStream.SetLength(0);
+							return true;
 						}
 					}
 					else
-						return new byte[0];
+						return true;
 				}
 
 				public async Task Load()
 				{
+                    while (!_initialLoaded)
+                    {
+                        await Task.Delay(100);
+                    }
+
 					if (_responseStream != null)
 					{
-						while (!_initialLoaded)
-						{
-							await Task.Delay(100);
-						}
-						try
-						{
-							var buffer = new byte[4096];
-							for (; ; )
-							{
-								_cancelToken.Token.ThrowIfCancellationRequested();
-								var readBytes = await _responseStream.ReadAsync(buffer, 0, 4096);
-								if (readBytes == 0)
-									break;
-								else
-								{
-									_cancelToken.Token.ThrowIfCancellationRequested();
-									if (_memoryStream != null)
-									{
-										lock (_memoryStream)
-										{
-											_memoryStream.Seek(0, SeekOrigin.End);
-											_memoryStream.Write(buffer, 0, readBytes);
-										}
-									}
-									else
-										return;
-								}
-							}
-						}
-						catch { }
-						finally
-						{
-							_finished = true;
-							try
-							{
-								_cancelCallback.Dispose();
-								if (_responseStream != null)
-								{
-									_responseStream.Dispose();
-									_responseStream = null;
-								}
-							}
-							catch { }
-						}
+                        try
+                        {
+                            var buffer = new byte[4096];
+                            for (; ; )
+                            {
+                                _cancelToken.Token.ThrowIfCancellationRequested();
+                                var readBytes = await _responseStream.ReadAsync(buffer, 0, 4096);
+                                if (readBytes == 0)
+                                    break;
+                                else
+                                {
+                                    _cancelToken.Token.ThrowIfCancellationRequested();
+                                    lock (_memoryStream)
+                                    {
+                                        _memoryStream.Write(buffer, 0, readBytes);
+                                    }
+                                }
+                            }
+                        }
+
+                        catch { }
+                        finally
+                        {
+                            _finished = true;
+                            try
+                            {
+                                _cancelCallback.Dispose();
+                                if (_responseStream != null)
+                                {
+                                    _responseStream.Dispose();
+                                    _responseStream = null;
+                                }
+                            }
+                            catch { }
+                        }
+                       
 					}
 				}
 
+                private async void RunTask(Task task)
+                {
+                    await task;
+                }
 
 				public object ImageSource
 				{
@@ -830,10 +848,16 @@ namespace SnooStream.PlatformServices
 						{
 							if (_isGif)
 							{
-								if (_loadTask.Value != null && _gifRenderer != null)
-									return _gifRenderer.ImageSource;
-								else
-									return null;
+                                if (_loadTask.Value != null)
+                                {
+                                    RunTask(_loadTask.Value);
+                                    if(_gifRenderer == null)
+                                        _gifRenderer = new GifRenderer.GifRenderer(new Getter(this, GetMore));
+
+                                    return _gifRenderer.ImageSource;
+                                }
+                                else
+                                    return null;
 							}
 							else
 							{
@@ -892,25 +916,6 @@ namespace SnooStream.PlatformServices
 					}
 				}
 
-				~ImageLoaderInternal()
-				{
-					if (_gifRenderer != null)
-					{
-						_gifRenderer.Dispose();
-						_gifRenderer = null;
-					}
-
-					if (_memoryStream != null)
-						_memoryStream.Dispose();
-					_memoryStream = null;
-
-					if (_responseStream != null)
-						_responseStream.Dispose();
-					_responseStream = null;
-
-					_cancelCallback.Dispose();
-				}
-
 				public bool Loaded
 				{
 					get
@@ -918,7 +923,22 @@ namespace SnooStream.PlatformServices
 						return _finished;
 					}
 				}
-			}
+
+                public void Dispose()
+                {
+                    _gifRenderer = null;
+
+                    if (_memoryStream != null)
+                        _memoryStream.Dispose();
+                    _memoryStream = null;
+
+                    if (_responseStream != null)
+                        _responseStream.Dispose();
+                    _responseStream = null;
+
+                    _cancelCallback.Dispose();
+                }
+            }
 
 			public object ImageSource
 			{
@@ -927,6 +947,13 @@ namespace SnooStream.PlatformServices
 					return InternalLoader.ImageSource;
 				}
 			}
+            public IDisposable ImageHandle
+            {
+                get
+                {
+                    return InternalLoader._gifRenderer;
+                }
+            }
 
 
 			public bool Loaded
@@ -936,7 +963,7 @@ namespace SnooStream.PlatformServices
 
 			public Task ForceLoad
 			{
-				get { return InternalLoader.Load(); }
+                get { return InternalLoader._loadTask.Value; }
 			}
 		}
 	}

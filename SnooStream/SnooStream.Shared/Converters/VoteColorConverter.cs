@@ -51,7 +51,7 @@ namespace SnooStream.Converters
                 }
             }
 
-            return (SolidColorBrush)Application.Current.Resources["PhoneForegroundBrush"];
+            return upvote;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

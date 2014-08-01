@@ -18,7 +18,7 @@
     <PackageCertificateKeyFile>SnooStream.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>7892c3c6</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>36f2f34f</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -209,7 +209,7 @@
     <Error Condition="!Exists('..\..\packages\KitaroDB.2.2.1\build\win81\KitaroDB.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\KitaroDB.2.2.1\build\win81\KitaroDB.targets'))" />
     <Error Condition="!Exists('..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets'))" />
     <Error Condition="!Exists('..\..\packages\SnooDom.1.0.1\build\win81\SnooDom.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SnooDom.1.0.1\build\win81\SnooDom.targets'))" />
-    <Error Condition="!Exists('..\..\packages\GifRenderer.1.0.1\build\win81\GifRenderer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\GifRenderer.1.0.1\build\win81\GifRenderer.targets'))" />
+    <Error Condition="!Exists('..\..\packages\GifRenderer.1.0.19\build\win81\GifRenderer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\GifRenderer.1.0.19\build\win81\GifRenderer.targets'))" />
   </Target>
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
@@ -219,7 +219,7 @@
   <Import Project="..\..\packages\KitaroDB.2.2.1\build\win81\KitaroDB.targets" Condition="Exists('..\..\packages\KitaroDB.2.2.1\build\win81\KitaroDB.targets')" />
   <Import Project="..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets" Condition="Exists('..\..\packages\NokiaImagingSDK.1.2.151\build\win81\NokiaImagingSDK.targets')" />
   <Import Project="..\..\packages\SnooDom.1.0.1\build\win81\SnooDom.targets" Condition="Exists('..\..\packages\SnooDom.1.0.1\build\win81\SnooDom.targets')" />
-  <Import Project="..\..\packages\GifRenderer.1.0.1\build\win81\GifRenderer.targets" Condition="Exists('..\..\packages\GifRenderer.1.0.1\build\win81\GifRenderer.targets')" />
+  <Import Project="..\..\packages\GifRenderer.1.0.19\build\win81\GifRenderer.targets" Condition="Exists('..\..\packages\GifRenderer.1.0.19\build\win81\GifRenderer.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
