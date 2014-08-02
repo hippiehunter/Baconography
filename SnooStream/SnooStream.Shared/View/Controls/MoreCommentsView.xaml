@@ -3,8 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d"
-        FontFamily="{StaticResource PhoneFontFamilyNormal}" FontSize="{StaticResource PhoneFontSizeNormal}"
-        Foreground="{StaticResource PhoneForegroundBrush}" d:DesignHeight="480" d:DesignWidth="480">
+             d:DesignHeight="480" d:DesignWidth="480">
 
     <Grid HorizontalAlignment="Stretch" MinWidth="430" MinHeight="40"
             Margin="{Binding Path=Depth, Converter={StaticResource commentDepthMarginConverter}}"
@@ -19,14 +18,13 @@
                     BorderThickness="0" Padding="0" Margin="0,0,0,0" VerticalAlignment="Top"
                     Command="{Binding TriggerLoad}" HorizontalContentAlignment="Left" HorizontalAlignment="Stretch">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{StaticResource PhoneTextAccentStyle}" Text="Load more comments" Margin="0,0,0,0" />
-                    <TextBlock Style="{StaticResource PhoneTextAccentStyle}" Text="{Binding CountString}"
+                    <TextBlock Text="Load more comments" Margin="0,0,0,0" />
+                    <TextBlock Text="{Binding CountString}"
                             Margin="5,0,0,0" />
                 </StackPanel>
             </Button>
             <TextBlock Visibility="{Binding Loading, Converter={StaticResource booleanVisibilityConverter}}"
-                    Text="Loading..." Margin="12, 12, 0, 12" HorizontalAlignment="Stretch" Grid.Column="1"
-                    Style="{StaticResource PhoneTextAccentStyle}" />
+                    Text="Loading..." Margin="12, 12, 0, 12" HorizontalAlignment="Stretch" Grid.Column="1" />
         </Grid>
     </Grid>
 </UserControl>

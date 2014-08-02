@@ -214,15 +214,15 @@ namespace SnooStream.View.Pages
 
             image.DataContext = null;
             image.Source = null;
-
-            if (imageViewModel.ImageSource.ImageSource == null)
+            var imageSource = imageViewModel.ImageSource.ImageSource as ImageSource;
+            if (imageSource == null)
             {
                 var propChanged = imageViewModel.ImageSource as INotifyPropertyChanged;
                 PropertyChangedEventHandler handler = null;
                 handler = (s, a) =>
                     {
+                        imageSource = imageViewModel.ImageSource.ImageSource as ImageSource;
                         image.DataContext = imageViewModel.ImageSource.ImageHandle;
-                        var imageSource = imageViewModel.ImageSource.ImageSource as ImageSource;
                         image.Source = imageSource;
                         propChanged.PropertyChanged -= handler;
                     };
@@ -231,7 +231,6 @@ namespace SnooStream.View.Pages
             else
             {
                 image.DataContext = imageViewModel.ImageSource.ImageHandle;
-                var imageSource = imageViewModel.ImageSource.ImageSource as ImageSource;
                 image.Source = imageSource;
             }
                 

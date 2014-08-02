@@ -204,7 +204,7 @@
                     MoreTemplate="{StaticResource MoreViewTemplate}" />
         </Grid.Resources>
         <ListView x:Name="commentsList" HeaderTemplate="{StaticResource HeaderTemplate}"
-                  ItemTemplateSelector="{StaticResource commentTemplateSelector}"
+                  ItemTemplateSelector="{Binding Path=Selector, Source={StaticResource commentTemplateSelector}}"
                   ItemsSource="{Binding FlatComments}"/>
         <Popup x:Name="sortPopup" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>

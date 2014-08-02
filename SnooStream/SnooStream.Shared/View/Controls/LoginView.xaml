@@ -6,9 +6,6 @@
     xmlns:local="using:SnooStream.View.Controls"
     xmlns:common="using:SnooStream.Common"
     mc:Ignorable="d"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
     d:DesignHeight="579.524" d:DesignWidth="480">
 
     <Grid x:Name="LayoutRoot">

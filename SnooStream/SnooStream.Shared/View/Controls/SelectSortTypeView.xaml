@@ -4,14 +4,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
     d:DesignHeight="480" d:DesignWidth="480">
 
-    <Grid Background="{StaticResource PhoneBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
             MinWidth="250" MinHeight="300">
-        <Border BorderThickness="1" BorderBrush="{StaticResource PhoneForegroundBrush}">
+        <Border BorderThickness="1">
             <StackPanel Margin="12,12,0,0">
                 <TextBlock FontWeight="SemiBold">SELECT SORT TYPE</TextBlock>
                 <RadioButton x:Name="hotRad" Margin="12,0,0,0" Content="hot" Checked="OnChecked" />

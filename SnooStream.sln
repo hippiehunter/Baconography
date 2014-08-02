@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30626.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WinRTXamlToolkit", "WinRTXamlToolkit", "{FD6E380E-F40C-4EE6-BAC1-499CF97C7CBA}"
 EndProject
@@ -156,6 +156,7 @@ Global
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release|ARM.ActiveCfg = Release|Any CPU
+		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release|ARM.Build.0 = Release|Any CPU
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release|Win32.ActiveCfg = Release|Any CPU
@@ -164,6 +165,7 @@ Global
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release2|Any CPU.ActiveCfg = Release2|Any CPU
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release2|Any CPU.Build.0 = Release2|Any CPU
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release2|ARM.ActiveCfg = Release2|Any CPU
+		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release2|ARM.Build.0 = Release2|Any CPU
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release2|Mixed Platforms.ActiveCfg = Release2|Any CPU
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release2|Mixed Platforms.Build.0 = Release2|Any CPU
 		{DAF4D2B8-E906-422A-B53A-C57DBA2AE94D}.Release2|Win32.ActiveCfg = Release2|Any CPU
@@ -183,6 +185,7 @@ Global
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release|ARM.ActiveCfg = Release|Any CPU
+		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release|ARM.Build.0 = Release|Any CPU
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release|Win32.ActiveCfg = Release|Any CPU
@@ -191,6 +194,7 @@ Global
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release2|Any CPU.ActiveCfg = Release2|Any CPU
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release2|Any CPU.Build.0 = Release2|Any CPU
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release2|ARM.ActiveCfg = Release2|Any CPU
+		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release2|ARM.Build.0 = Release2|Any CPU
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release2|Mixed Platforms.ActiveCfg = Release2|Any CPU
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release2|Mixed Platforms.Build.0 = Release2|Any CPU
 		{17272736-FE78-416B-96C4-90FCF0BEA45B}.Release2|Win32.ActiveCfg = Release2|Any CPU
@@ -237,7 +241,6 @@ Global
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release2|Any CPU.Deploy.0 = Release|Any CPU
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release2|ARM.ActiveCfg = Release|ARM
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release2|ARM.Build.0 = Release|ARM
-		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release2|ARM.Deploy.0 = Release|ARM
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release2|Mixed Platforms.ActiveCfg = Release|x86
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release2|Mixed Platforms.Build.0 = Release|x86
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release2|Mixed Platforms.Deploy.0 = Release|x86

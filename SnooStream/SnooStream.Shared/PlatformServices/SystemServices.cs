@@ -613,6 +613,8 @@ namespace SnooStream.PlatformServices
                     var initialReadLength = await responseStream.ReadAsync(initialBuffer, 0, 4096);
                     if (initialReadLength == 0)
                         throw new Exception("failed to read initial bytes of image");
+                    else
+                        Array.Resize(ref initialBuffer, initialReadLength);
 
                     var contentLengthHeader = response.Headers.ContainsKey("Content-Length") ? response.Headers["Content-Length"] : "-1";
                     int contentLength = -1;
@@ -659,7 +661,7 @@ namespace SnooStream.PlatformServices
 						{
 							if (!_internalLoader.TryGetTarget(out internalLoader) || internalLoader == null)
 							{
-								internalLoader = new ImageLoaderInternal();
+								internalLoader = new ImageLoaderInternal(ClearInternal);
 								_internalLoader.SetTarget(internalLoader);
                                 if (!_isInitializing)
 								    InitialLoad();
@@ -670,6 +672,11 @@ namespace SnooStream.PlatformServices
 				}
 					
 			}
+
+            private void ClearInternal()
+            {
+                _internalLoader.SetTarget(null);
+            }
 
             private delegate bool GetterDelegate(out byte[] data);
             private class Getter : GifRenderer.GetMoreData
@@ -696,8 +703,9 @@ namespace SnooStream.PlatformServices
 
 			private class ImageLoaderInternal : IDisposable
 			{
-                public ImageLoaderInternal()
+                public ImageLoaderInternal(Action clearInternal)
                 {
+                    _clearInternal = clearInternal;
                     _loadTask = new Lazy<Task>(() => Load());
                 }
 
@@ -738,7 +746,7 @@ namespace SnooStream.PlatformServices
 					}
 					_initialLoaded = true;
 				}
-
+                Action _clearInternal;
 				Action<Exception> _errorHandler;
 				bool _initialLoaded = false;
 				bool _isGif;
@@ -851,9 +859,9 @@ namespace SnooStream.PlatformServices
                                 if (_loadTask.Value != null)
                                 {
                                     RunTask(_loadTask.Value);
-                                    if(_gifRenderer == null)
-                                        _gifRenderer = new GifRenderer.GifRenderer(new Getter(this, GetMore));
-
+                                    if (_gifRenderer != null)
+                                        throw new Exception("accessed Image Source more than once");
+                                    _gifRenderer = new GifRenderer.GifRenderer(new Getter(this, GetMore));
                                     return _gifRenderer.ImageSource;
                                 }
                                 else
@@ -926,6 +934,7 @@ namespace SnooStream.PlatformServices
 
                 public void Dispose()
                 {
+                    _clearInternal();
                     _gifRenderer = null;
 
                     if (_memoryStream != null)
