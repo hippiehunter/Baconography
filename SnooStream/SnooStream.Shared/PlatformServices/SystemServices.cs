@@ -579,10 +579,10 @@ namespace SnooStream.PlatformServices
 		}
 
 
-		public IImageLoader DownloadImageWithProgress(string uri, Action<int> progress, CancellationToken cancelToken, Action<Exception> errorHandler)
+		public async Task<IImageLoader> DownloadImageWithProgress(string uri, Action<int> progress, CancellationToken cancelToken, Action<Exception> errorHandler)
 		{
 			var imageLoader = new ImageLoader(uri, _uiDispatcher, errorHandler, progress, cancelToken);
-            imageLoader.InitialLoad();
+            await imageLoader.InitialLoad();
 			return imageLoader;
 		}
 
@@ -598,7 +598,7 @@ namespace SnooStream.PlatformServices
                 _cancelToken = cancelToken;
 			}
             bool _isInitializing = false;
-			public async void InitialLoad()
+			public async Task InitialLoad()
 			{
                 if (_isInitializing)
                     throw new Exception();
@@ -608,13 +608,14 @@ namespace SnooStream.PlatformServices
                     HttpClient client = new HttpClient();
                     var response = await client.GetAsync(new Uri(_url), HttpCompletionOption.ResponseHeadersRead);
 
-                    var responseStream = (await response.Content.ReadAsInputStreamAsync()).AsStreamForRead();
-                    var initialBuffer = new byte[4096];
+                    var responseStream = await response.Content.ReadAsInputStreamAsync();
+                    var initialBuffer = new Windows.Storage.Streams.Buffer(4096);
                     var initialReadLength = await responseStream.ReadAsync(initialBuffer, 0, 4096);
                     if (initialReadLength == 0)
                         throw new Exception("failed to read initial bytes of image");
                     else
                         Array.Resize(ref initialBuffer, initialReadLength);
+
 
                     var contentLengthHeader = response.Headers.ContainsKey("Content-Length") ? response.Headers["Content-Length"] : "-1";
                     int contentLength = -1;
@@ -681,23 +682,19 @@ namespace SnooStream.PlatformServices
             private delegate bool GetterDelegate(out byte[] data);
             private class Getter : GifRenderer.GetMoreData
             {
-                public Getter(ImageLoaderInternal loader, GetterDelegate del)
+                IInputStream
+                public Getter(byte[] initialData, string url)
                 {
-                    _del = del;
-                    _loader = loader;
+                    
                 }
-                GetterDelegate _del;
-                ImageLoaderInternal _loader; 
-
                 public bool Get(out byte[] data)
                 {
-                    return _del(out data);
+                    
                 }
 
                 public void DisposeWorkaround()
                 {
-                    _del = null;
-                    _loader.Dispose();
+                    
                 }
             }
 

@@ -17,7 +17,7 @@ namespace SnooStream.Services
         Task<string> SendGet(string uri);
         void StartThreadPoolTimer(Func<object, Task> action, TimeSpan timer);
         Task<byte[]> DownloadWithProgress(string uri, Action<int> progress, CancellationToken cancelToken);
-		IImageLoader DownloadImageWithProgress(string uri, Action<int> progress, CancellationToken cancelToken, Action<Exception> errorHandler);
+		Task<IImageLoader> DownloadImageWithProgress(string uri, Action<int> progress, CancellationToken cancelToken, Action<Exception> errorHandler);
         Task<byte[]> ResizeImage(byte[] data, int maxWidth, int maxHeight);
         Stream ResizeImage(Stream source, int maxWidth, int maxHeight);
         void ShowMessage(string title, string text);
@@ -30,9 +30,13 @@ namespace SnooStream.Services
 
 	public interface IImageLoader
 	{
-		object ImageSource { get; }
-        IDisposable ImageHandle { get; }
-		bool Loaded { get;}
+        IImageSource ImageSource { get; }
+        bool Loaded { get;}
 		Task ForceLoad { get;}
 	}
+    
+    public interface IImageSource : IDisposable
+    {
+        object ImageSource { get; }
+    }
 }
