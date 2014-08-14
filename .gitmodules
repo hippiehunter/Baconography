@@ -1,0 +1,12 @@
+[submodule "GifRenderer"]
+	path = GifRenderer
+	url = https://github.com/hippiehunter/GifRenderer.git
+[submodule "SnooDom"]
+	path = SnooDom
+	url = https://github.com/hippiehunter/SnooDom.git
+[submodule "SnooSharp"]
+	path = SnooSharp
+	url = https://github.com/hippiehunter/SnooSharp.git
+[submodule "winrtxamltoolkit"]
+	path = winrtxamltoolkit
+	url = https://git01.codeplex.com/winrtxamltoolkit
