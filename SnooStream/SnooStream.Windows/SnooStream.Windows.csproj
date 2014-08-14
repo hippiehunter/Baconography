@@ -161,10 +161,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.3\lib\netcore45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="SnooSharp">
-      <HintPath>..\..\packages\SnooSharp.1.0.1\lib\portable-net45+win+wpa81+wp80\SnooSharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Net.Http.Extensions">
       <HintPath>..\..\packages\Microsoft.Net.Http.2.2.22\lib\win8\System.Net.Http.Extensions.dll</HintPath>
     </Reference>
@@ -188,6 +184,10 @@
     <ProjectReference Include="..\..\NBoilerpipePortable\NBoilerpipePortable.csproj">
       <Project>{17272736-fe78-416b-96c4-90fcf0bea45b}</Project>
       <Name>NBoilerpipePortable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SnooSharp\SnooSharp.csproj">
+      <Project>{d9baa749-5bbe-4dae-b5ea-4d70def266fc}</Project>
+      <Name>SnooSharp</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\SnooStreamBackground\SnooStreamBackground.Windows\SnooStreamBackground.Windows.vcxproj">
       <Project>{21cec526-5230-497d-b1b9-adf599b265f3}</Project>
