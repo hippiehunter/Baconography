@@ -54,8 +54,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F6CBD2
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{34F6CAFD-F5E9-44D2-B68B-059F3D152AD4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnooSharp", "SnooSharp\SnooSharp.csproj", "{D9BAA749-5BBE-4DAE-B5EA-4D70DEF266FC}"
 EndProject
 Global

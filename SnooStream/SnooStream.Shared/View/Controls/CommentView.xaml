@@ -50,7 +50,7 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
-            <snoodom:MarkdownControl Markdown="{Binding BodyMD}" HorizontalAlignment="Left"
+            <snoodom:MarkdownControl Markdown="{Binding BodyMD.MarkdownDom}" StyleProvider="{StaticResource markdownHelpers}" CommandFactory="{StaticResource markdownHelpers}" HorizontalAlignment="Left"
                               Margin="3,0,0,0"/>
             <!--<ContentControl Margin="5,0,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch"
                 Content="{Binding ExtendedData, Converter={StaticResource extendedCommentConverter}}"/>-->

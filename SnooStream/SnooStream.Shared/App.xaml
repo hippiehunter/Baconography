@@ -26,6 +26,7 @@
             <converters:BoolToAccentBrushConverter x:Key="boolToAccentBrushConverter" />
             <converters:UnixTimeConverter x:Key="unixTimeConverter" />
             <common:LinkViewLayoutManager x:Key="linkViewLayoutManager" />
+            <common:MarkdownHelpers x:Key="markdownHelpers"/>
             <converters:AuthorFlairKindConverter x:Key="authorFlairKindConverter"/>
             <converters:ForegroundAuthorFlairKindConverter x:Key="fgAuthorFlairKindConverter"/>
             <common:OrientationManager x:Key="orientationManager" />

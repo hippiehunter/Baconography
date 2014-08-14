@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Common\BackgroundTaskManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\LinkViewLayoutManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\ManipulationController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\MarkdownHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\MessageBoxHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\NavigationStateUtility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\OrientationManager.cs" />
