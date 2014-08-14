@@ -21,7 +21,7 @@ namespace SnooStream.ViewModel
         }
         public ObservableCollection<Tuple<string, string>> AvailableStreams { get; private set; }
 
-        public IImageLoader Preview { get; private set; }
+        public object Preview { get; private set; }
         public string Url { get; private set; }
 
         private string _selectedStream;

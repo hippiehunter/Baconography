@@ -12,25 +12,22 @@ namespace SnooStream.ViewModel
 {
     public class ImageViewModel : ContentViewModel
     {
-
         public ImageViewModel(ViewModelBase context, string url, string title, IImageLoader imageLoader) : base(context)
         {
             Url = url;
 			ImageSource = imageLoader;
             Title = title;
             Domain = new Uri(url).DnsSafeHost;
-			Loaded = imageLoader.Loaded;
         }
 
         public string Url { get; set; }
         public string Domain { get; set; }
         public string Title { get; set; }
-        public bool IsGif { get; set; }
 		public IImageLoader ImageSource { get; set; }
 
 		internal override Task LoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken)
         {
-			return ImageSource.ForceLoad;
+			return Task.FromResult<bool>(true);
         }
     }
 }

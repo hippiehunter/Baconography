@@ -15,8 +15,8 @@
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid.Resources>
             <DataTemplate x:Name="imageTemplate">
-                <ScrollViewer DataContextChanged="Image_DataContextChanged" Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}" ZoomMode="Enabled">
-                    <Image Unloaded="Image_Unloaded" />
+                <ScrollViewer Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}" ZoomMode="Enabled">
+                    <Image DataContext="{Binding ImageSource.ImageData, Converter={StaticResource gifConverter}}" Source="{Binding ImageSource}" />
                 </ScrollViewer>
             </DataTemplate>
 
@@ -52,10 +52,6 @@
             <DataTemplate x:Name="selfTemplate">
                 <local:CommentsView/>
             </DataTemplate>
-
-
-            <selectors:ImageTemplateSelector x:Name="imageSelector"
-                    StaticTemplate="{StaticResource imageTemplate}"/>
 
             <DataTemplate x:Name="albumTemplate">
                 <Grid>

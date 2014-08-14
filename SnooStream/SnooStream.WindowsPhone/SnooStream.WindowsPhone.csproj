@@ -17,7 +17,7 @@
     <SynthesizeLinkMetadata>true</SynthesizeLinkMetadata>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>d474f2d0</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>98a4ac86</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86</AppxBundlePlatforms>
   </PropertyGroup>
@@ -149,6 +149,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\GifRenderer\GifRenderer.WindowsPhone\GifRenderer.WindowsPhone.vcxproj">
+      <Project>{57985df4-90bc-4b9f-b1fc-291a30a48156}</Project>
+      <Name>GifRenderer.WindowsPhone</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\SnooDom\SnooDom.WindowsPhone\SnooDom.WindowsPhone.vcxproj">
+      <Project>{3434fe66-ee43-4c14-ad32-b6ebdb174c7e}</Project>
+      <Name>SnooDom.WindowsPhone</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\winrtxamltoolkit\WinRTXamlToolkit\WinRTXamlToolkit.WindowsPhone\WinRTXamlToolkit.WindowsPhone.csproj">
       <Project>{1af78321-7d45-487b-bcfb-ce6b92389eb2}</Project>
       <Name>WinRTXamlToolkit.WindowsPhone</Name>
@@ -186,10 +194,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
     <Error Condition="!Exists('..\..\packages\KitaroDB.2.2.1\build\wpa81\KitaroDB.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\KitaroDB.2.2.0.0\build\wpa81\KitaroDB.targets'))" />
-    <Error Condition="!Exists('..\..\packages\SnooDom.1.0.0.0\build\wpa81\SnooDom.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SnooDom.1.0.0.0\build\wpa81\SnooDom.targets'))" />
     <Error Condition="!Exists('..\..\packages\NokiaImagingSDK.1.2.115\build\wpa81\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NokiaImagingSDK.1.2.115\build\wpa81\NokiaImagingSDK.targets'))" />
-    <Error Condition="!Exists('..\..\packages\SnooDom.1.0.1\build\wpa81\SnooDom.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SnooDom.1.0.1\build\wpa81\SnooDom.targets'))" />
-    <Error Condition="!Exists('..\..\packages\GifRenderer.1.1.1\build\wpa81\GifRenderer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\GifRenderer.1.1.1\build\wpa81\GifRenderer.targets'))" />
   </Target>
   <Import Project="..\..\packages\KitaroDB.2.2.1\build\wpa81\KitaroDB.targets" Condition="Exists('..\..\packages\KitaroDB.2.2.1\build\wpa81\KitaroDB.targets')" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
@@ -197,10 +202,7 @@
     <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
     <Error Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
   </Target>
-  <Import Project="..\..\packages\SnooDom.1.0.0.0\build\wpa81\SnooDom.targets" Condition="Exists('..\..\packages\SnooDom.1.0.0.0\build\wpa81\SnooDom.targets')" />
   <Import Project="..\..\packages\NokiaImagingSDK.1.2.115\build\wpa81\NokiaImagingSDK.targets" Condition="Exists('..\..\packages\NokiaImagingSDK.1.2.115\build\wpa81\NokiaImagingSDK.targets')" />
-  <Import Project="..\..\packages\SnooDom.1.0.1\build\wpa81\SnooDom.targets" Condition="Exists('..\..\packages\SnooDom.1.0.1\build\wpa81\SnooDom.targets')" />
-  <Import Project="..\..\packages\GifRenderer.1.1.1\build\wpa81\GifRenderer.targets" Condition="Exists('..\..\packages\GifRenderer.1.1.1\build\wpa81\GifRenderer.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

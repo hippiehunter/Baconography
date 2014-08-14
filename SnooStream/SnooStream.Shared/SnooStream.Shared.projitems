@@ -26,7 +26,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Common\SnooApplicationPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\Utility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ActivityGroupCountConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Converters\AsyncImageSourceConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\AuthorFlairKindConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BoolToAccentBrushConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CommentDepthColorConverter.cs" />
@@ -113,7 +112,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\CommentTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\ContentTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\DataTemplateSelectorControl.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\ImageTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\SubredditRiverTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\TypedTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\UserActivityTemplateSelector.cs" />

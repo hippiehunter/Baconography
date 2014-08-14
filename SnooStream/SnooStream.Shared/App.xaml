@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream"
     xmlns:converters="using:SnooStream.Converters"
+    xmlns:gif="using:GifRenderer"
     xmlns:common="using:SnooStream.Common"
     xmlns:core="using:SnooStream.ViewModel">
     <Application.Resources>
@@ -28,7 +29,7 @@
             <converters:AuthorFlairKindConverter x:Key="authorFlairKindConverter"/>
             <converters:ForegroundAuthorFlairKindConverter x:Key="fgAuthorFlairKindConverter"/>
             <common:OrientationManager x:Key="orientationManager" />
-            <converters:AsyncImageSourceConverter x:Key="asyncImageSourceConverter" />
+            <gif:GifConverter x:Key="gifConverter" />
             <converters:BlankVisibilityConverter x:Key="blankVisibilityConverter" />
             <converters:StringToUpperConverter x:Key="stringToUpperConverter" />
             <converters:StringToLowerConverter x:Key="stringToLowerConverter" />

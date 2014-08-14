@@ -202,48 +202,5 @@ namespace SnooStream.View.Pages
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
-
-        private void Image_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-        {
-            var scrollViewer = sender as ScrollViewer;
-            var image = scrollViewer.Content as Image;
-            var imageViewModel = args.NewValue as ImageViewModel;
-
-            if (image.DataContext is IDisposable)
-                ((IDisposable)image.DataContext).Dispose();
-
-            image.DataContext = null;
-            image.Source = null;
-            var imageSource = imageViewModel.ImageSource.ImageSource as ImageSource;
-            if (imageSource == null)
-            {
-                var propChanged = imageViewModel.ImageSource as INotifyPropertyChanged;
-                PropertyChangedEventHandler handler = null;
-                handler = (s, a) =>
-                    {
-                        imageSource = imageViewModel.ImageSource.ImageSource as ImageSource;
-                        image.DataContext = imageViewModel.ImageSource.ImageHandle;
-                        image.Source = imageSource;
-                        propChanged.PropertyChanged -= handler;
-                    };
-                propChanged.PropertyChanged += handler;
-            }
-            else
-            {
-                image.DataContext = imageViewModel.ImageSource.ImageHandle;
-                image.Source = imageSource;
-            }
-                
-        }
-
-        private void Image_Unloaded(object sender, RoutedEventArgs e)
-        {
-            var image = sender as Image;
-            if (image.DataContext is IDisposable)
-                ((IDisposable)image.DataContext).Dispose();
-
-            image.DataContext = null;
-            image.Source = null;
-        }
 	}
 }
