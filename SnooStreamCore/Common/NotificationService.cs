@@ -26,16 +26,19 @@ namespace SnooStream.Common
 
         private void AddNotificationInfo(NotificationInfo info)
         {
-            lock (this)
-            {
-				_notificationStack.Add(info);
-				ProgressActive = true;
-            }
-
-			if(!_isProcessing)
+			if (!ViewModelBase.IsInDesignModeStatic)
 			{
-				_isProcessing = true;
-				Task.Run(() => ProcessProgress());
+				lock (this)
+				{
+					_notificationStack.Add(info);
+					ProgressActive = true;
+				}
+
+				if (!_isProcessing)
+				{
+					_isProcessing = true;
+					Task.Run(() => ProcessProgress());
+				}
 			}
         }
 

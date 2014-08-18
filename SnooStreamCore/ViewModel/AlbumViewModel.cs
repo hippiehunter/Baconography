@@ -56,19 +56,20 @@ namespace SnooStream.ViewModel
 			if (imageLoader != null) //minimum to identify the image type
             {
                 loadedOne = true;
-				await Task.Factory.StartNew(() =>
-                {
-					var madeImageVm = new ImageViewModel(this, source.ToString(), title, imageLoader);
+				SnooStreamViewModel.SystemServices.RunUIAsync(() =>
+					{
+						var madeImageVm = new ImageViewModel(this, source.ToString(), title, imageLoader);
 
-					if (Images.Any(img => ((ImageViewModel)img).Url == source.ToString()))
-					{
-						//ignore duplicates (Shouldnt get here, need to investigate how it happens)		
-					}
-					else
-					{
-						Images.Add(madeImageVm);
-					}
-				}, cancelToken, TaskCreationOptions.None, SnooStreamViewModel.UIScheduler);	
+						if (Images.Any(img => ((ImageViewModel)img).Url == source.ToString()))
+						{
+							//ignore duplicates (Shouldnt get here, need to investigate how it happens)		
+						}
+						else
+						{
+							Images.Add(madeImageVm);
+						}
+						return Task.FromResult(true);
+					});
             }
             return loadedOne;
         }

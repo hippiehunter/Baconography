@@ -18,39 +18,39 @@ namespace SnooStream.ViewModel
     public class SnooStreamViewModel : ViewModelBase
     {
         public static string CWD { get; set; }
-        public SnooStreamViewModel()
-        {
-            UIScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            _listingFilter = new NSFWListingFilter();
-            if (IsInDesignMode)
-            {
-                _initializationBlob = new InitializationBlob { Settings = new Dictionary<string, string>(), NSFWFilter = new Dictionary<string, bool>() };
-            }
-            else
-            {
-                OfflineService = new OfflineService();
-                _initializationBlob = OfflineService.LoadInitializationBlob("");
-            }
-            Settings = new Model.Settings(_initializationBlob.Settings);
-            RedditUserState = _initializationBlob.DefaultUser ?? new UserState();
-            NotificationService = new Common.NotificationService();
-            CaptchaProvider = new CaptchaService();
-            RedditService = new Reddit(_listingFilter, RedditUserState, OfflineService, CaptchaProvider);
-            LoadQueue = new PriorityLoadQueue();
+
+		protected void FinishInit()
+		{
+			_listingFilter = new NSFWListingFilter();
+			if (IsInDesignMode)
+			{
+				_initializationBlob = new InitializationBlob { Settings = new Dictionary<string, string>(), NSFWFilter = new Dictionary<string, bool>() };
+			}
+			else
+			{
+				OfflineService = new OfflineService();
+				_initializationBlob = OfflineService.LoadInitializationBlob("");
+			}
+			Settings = new Model.Settings(_initializationBlob.Settings);
+			RedditUserState = _initializationBlob.DefaultUser ?? new UserState();
+			NotificationService = new Common.NotificationService();
+			CaptchaProvider = new CaptchaService();
+			RedditService = new Reddit(_listingFilter, RedditUserState, OfflineService, CaptchaProvider);
+			LoadQueue = new PriorityLoadQueue();
 
 
-            _listingFilter.Initialize(Settings, OfflineService, RedditService, _initializationBlob.NSFWFilter);
-            CommandDispatcher = new CommandDispatcher();
-            UserHub = new UserHubViewModel(_initializationBlob.Self);
-            ModeratorHub = new ModeratorHubViewModel();
-            SettingsHub = new SettingsViewModel(Settings);
-            SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
-            if (!IsInDesignMode)
-            {
-                LoadLargeImages();
-            }
-            MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
-        }
+			_listingFilter.Initialize(Settings, OfflineService, RedditService, _initializationBlob.NSFWFilter);
+			CommandDispatcher = new CommandDispatcher();
+			UserHub = new UserHubViewModel(_initializationBlob.Self);
+			ModeratorHub = new ModeratorHubViewModel();
+			SettingsHub = new SettingsViewModel(Settings);
+			SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
+			if (!IsInDesignMode)
+			{
+				LoadLargeImages();
+			}
+			MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
+		}
 
         private void OnUserLoggedIn(UserLoggedInMessage obj)
         {
@@ -142,7 +142,5 @@ namespace SnooStream.ViewModel
         }
 
 		public string GetNavigationBlob() {  return _initializationBlob.NavigationBlob; }
-
-        public static TaskScheduler UIScheduler { get; set; }
     }
 }

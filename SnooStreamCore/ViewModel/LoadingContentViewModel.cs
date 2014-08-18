@@ -15,29 +15,28 @@ namespace SnooStream.ViewModel
         {
             Underlying = underlying;
 			IsInitiallyLoaded = false;
-			underlying.BeginLoad(_cancelTokenSource.Token).ContinueWith((tsk) =>
+			var loadTask = underlying.BeginLoad(_cancelTokenSource.Token);
+			SnooStreamViewModel.SystemServices.RunUIAsync(async () =>
 				{
+					await loadTask;
 					IsInitiallyLoaded = true;
 					RaisePropertyChanged("Underlying");
 					RaisePropertyChanged("IsInitiallyLoaded");
-				}, SnooStreamViewModel.UIScheduler);
+				});
         }
 
         public LoadingContentViewModel(Task<ContentViewModel> underlying, ViewModelBase context)
             : base(context)
         {
             var linkVm = context as LinkViewModel;
-            underlying.ContinueWith(async (tsk) =>
-                {
-                    if (tsk.Status == TaskStatus.RanToCompletion)
-                    {
-						Underlying = tsk.Result;
-						await Underlying.BeginLoad(_cancelTokenSource.Token);
-                        IsInitiallyLoaded = true;
-                        RaisePropertyChanged("Underlying");
-                        RaisePropertyChanged("IsInitiallyLoaded");
-                    }
-                }, SnooStreamViewModel.UIScheduler);
+			SnooStreamViewModel.SystemServices.RunUIAsync(async () =>
+			{
+				Underlying = await underlying;
+				await Underlying.BeginLoad(_cancelTokenSource.Token);
+				IsInitiallyLoaded = true;
+				RaisePropertyChanged("Underlying");
+				RaisePropertyChanged("IsInitiallyLoaded");
+			});
         }
 
 		private CancellationTokenSource _cancelTokenSource = new CancellationTokenSource();

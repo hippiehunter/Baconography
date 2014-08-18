@@ -1,4 +1,5 @@
-﻿using SnooStream.ViewModel;
+﻿using GalaSoft.MvvmLight;
+using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +20,10 @@ namespace SnooStream.Converters
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            if (SnooStreamViewModel.OfflineService.HasHistory(parameter as string))
-                return history;
-            else
-                return noHistory;
-                
+			if (!ViewModelBase.IsInDesignModeStatic && SnooStreamViewModel.OfflineService.HasHistory(parameter as string))
+				return history;
+			else
+				return noHistory;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -44,6 +44,10 @@ namespace SnooStream.Converters
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
+			if(ViewModelBase.IsInDesignModeStatic)
+			{
+				return noHistory;
+			}
             if (value is string)
             {
                 if (SnooStreamViewModel.OfflineService.HasHistory(value as string))

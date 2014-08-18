@@ -27,18 +27,13 @@ namespace SnooStream
 #if WINDOWS_PHONE_APP
         private TransitionCollection transitions;
 #endif
-
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
         public App()
         {
-			SnooStreamViewModel.SystemServices = new SystemServices();
-			SnooStreamViewModel.CWD = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
-			SnooStreamViewModel.UserCredentialService = new DefaultUserCredentialService();
-			SnooStreamViewModel.MarkdownProcessor = new MarkdownProvider();
-
+			
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
         }
@@ -96,7 +91,6 @@ namespace SnooStream
                 rootFrame.Navigated += this.RootFrame_FirstNavigated;
 				Windows.Phone.UI.Input.HardwareButtons.BackPressed += HardwareButtons_BackPressed;
 #endif
-				((SystemServices)SnooStreamViewModel.SystemServices).FinishInitialization(rootFrame.Dispatcher);
 				var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
 				SnooStreamViewModel.NavigationService = new NavigationService(rootFrame, null, snooStreamViewModel);
                 // When the navigation stack isn't restored navigate to the first page,

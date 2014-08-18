@@ -667,5 +667,27 @@ namespace SnooStream.PlatformServices
 				get { return _forceLoadTask.Value; }
 			}
 		}
+
+		public async void RunUIAsync(Func<Task> action)
+		{
+			try
+			{
+				if (ViewModelBase.IsInDesignModeStatic)
+				{
+					await action();
+				}
+				else
+					await (await _uiDispatcher).RunAsync(CoreDispatcherPriority.Normal, async () => await action());
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine(ex.ToString());
+			}
+		}
+
+		public async void RunUIIdleAsync(Func<Task> action)
+		{
+			await (await _uiDispatcher).RunIdleAsync(async (dispArgs) => await action());
+		}
 	}
 }

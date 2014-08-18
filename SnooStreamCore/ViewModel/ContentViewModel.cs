@@ -75,32 +75,26 @@ namespace SnooStream.ViewModel
 									Error = ex.ToString();
 								}
 							});
+						SnooStreamViewModel.SystemServices.RunUIAsync(async () =>
+							{
+								try
+								{
+									await ContentLoadTask;
+									Loaded = true;
+									Loading = false;
 
-						ContentLoadTask.ContinueWith((tsk) =>
-						{
-							var tskResult = tsk.WasSuccessfull() && !Errored;
-							if (tskResult)
-							{
-								Loaded = true;
-								Loading = false;
-
-								RaisePropertyChanged("Loaded");
-								RaisePropertyChanged("Loading");
-								RaisePropertyChanged("Content");
-							}
-							else if (tsk.Exception != null)
-							{
-								Errored = true;
-								Error = tsk.Exception.ToString();
-								RaisePropertyChanged("Errored");
-								RaisePropertyChanged("Error");
-							}
-							else
-							{
-								RaisePropertyChanged("Errored");
-								RaisePropertyChanged("Error");
-							}
-						}, SnooStreamViewModel.UIScheduler);
+									RaisePropertyChanged("Loaded");
+									RaisePropertyChanged("Loading");
+									RaisePropertyChanged("Content");
+								}
+								catch(Exception ex)
+								{
+									Errored = true;
+									Error = ex.ToString();
+									RaisePropertyChanged("Errored");
+									RaisePropertyChanged("Error");
+								}
+							});
                     }
                 }
             }

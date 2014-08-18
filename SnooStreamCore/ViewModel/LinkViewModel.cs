@@ -23,8 +23,12 @@ namespace SnooStream.ViewModel
             _content = new Lazy<Task<ContentViewModel>>(() =>
                 {
                     var contentTask = LoadContent();
-                    contentTask.ContinueWith((tsk) => RaisePropertyChanged("Content"), SnooStreamViewModel.UIScheduler);
-                    return contentTask;
+					SnooStreamViewModel.SystemServices.RunUIAsync(async () =>
+						{
+							await contentTask;
+							RaisePropertyChanged("Content");
+						});
+					return contentTask;
                 });
 
             Comments = new CommentsViewModel(this, link);

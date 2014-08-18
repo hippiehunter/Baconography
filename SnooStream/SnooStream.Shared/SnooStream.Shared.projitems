@@ -25,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Common\OrientationManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\PlatformImageAcquisition.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\SnooApplicationPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\SnooStreamViewModelPlatform.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\Utility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ActivityGroupCountConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\AuthorFlairKindConverter.cs" />

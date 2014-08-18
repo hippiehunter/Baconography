@@ -14,6 +14,8 @@ namespace SnooStream.Services
         void RestartTimer(object tickHandle);
         void StopTimer(object tickHandle);
         void RunAsync(Func<object, Task> action);
+		void RunUIAsync(Func<Task> action);
+		void RunUIIdleAsync(Func<Task> action);
         Task<string> SendGet(string uri);
         void StartThreadPoolTimer(Func<object, Task> action, TimeSpan timer);
         Task<byte[]> DownloadWithProgress(string uri, Action<int> progress, CancellationToken cancelToken);

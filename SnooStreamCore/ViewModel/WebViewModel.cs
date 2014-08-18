@@ -61,48 +61,48 @@ namespace SnooStream.ViewModel
                 var loadResult = await LoadOneImpl(httpService, nextUrl, result);
 
                 //need to do these things on the UI thread since we're trying to trigger a UI response
-                await Task.Factory.StartNew(() =>
-                {
-                    if (Title == null)
-                    {
-                        Title = loadResult.Item2;
-                        RaisePropertyChanged("Title");
-                    }
-                    bool hasImage = false;
-                    bool hasText = false;
+				SnooStreamViewModel.SystemServices.RunUIAsync(() =>
+					{
+						if (Title == null)
+						{
+							Title = loadResult.Item2;
+							RaisePropertyChanged("Title");
+						}
+						bool hasImage = false;
+						bool hasText = false;
 
-                    foreach (var item in result)
-                    {
-                        if (item is ReadableArticleImage)
-                            hasImage = true;
-                        else if (item is ReadableArticleParagraph)
-                            hasText = true;
+						foreach (var item in result)
+						{
+							if (item is ReadableArticleImage)
+								hasImage = true;
+							else if (item is ReadableArticleParagraph)
+								hasText = true;
 
-                        WebParts.Add(item);
-                    }
+							WebParts.Add(item);
+						}
 
-                    if (i == 0)
-                    {
-                        NoPreview = (!hasImage && !hasText);
-                        TextPreview = (!hasImage && hasText);
-                        ImagePreview = hasImage;
-                        NotText = !hasText;
+						if (i == 0)
+						{
+							NoPreview = (!hasImage && !hasText);
+							TextPreview = (!hasImage && hasText);
+							ImagePreview = hasImage;
+							NotText = !hasText;
 
-                        RaisePropertyChanged("NoPreview");
-                        RaisePropertyChanged("TextPreview");
-                        RaisePropertyChanged("ImagePreview");
-                        RaisePropertyChanged("NotText");
+							RaisePropertyChanged("NoPreview");
+							RaisePropertyChanged("TextPreview");
+							RaisePropertyChanged("ImagePreview");
+							RaisePropertyChanged("NotText");
 
-                        if (hasText)
-                            PreviewText = (WebParts.FirstOrDefault(part => part is ReadableArticleParagraph) as ReadableArticleParagraph).Text;
-                                
-                        if (hasImage)
-                            PreviewImage = (WebParts.FirstOrDefault(part => part is ReadableArticleImage) as ReadableArticleImage).Url;
-                    }
+							if (hasText)
+								PreviewText = (WebParts.FirstOrDefault(part => part is ReadableArticleParagraph) as ReadableArticleParagraph).Text;
 
-					progress(i * 10);
-                }, SnooStreamViewModel.UIContextCancellationToken, TaskCreationOptions.None, SnooStreamViewModel.UIScheduler);
+							if (hasImage)
+								PreviewImage = (WebParts.FirstOrDefault(part => part is ReadableArticleImage) as ReadableArticleImage).Url;
+						}
 
+						progress(i * 10);
+						return Task.FromResult(true);
+					});
                 nextUrl = loadResult.Item1;
             }
         }

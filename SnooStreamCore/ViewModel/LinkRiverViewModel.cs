@@ -86,6 +86,11 @@ namespace SnooStream.ViewModel
 				ProcessLinkThings(initialLinks);
 			}
 
+			if (IsInDesignMode)
+			{
+				CurrentSelected = new LinkViewModel(this, new Link { Title = "Lorem Ipsum", Domain = "http://www.google.com", Author = "fredbob", Url = "http://www.google.com" });
+			}
+
 		}
 
         private void ProcessLinkThings(IEnumerable<Link> links)
@@ -123,27 +128,27 @@ namespace SnooStream.ViewModel
 
                     if (postListing != null)
                     {
-                        await Task.Factory.StartNew(async () =>
-                            {
-                                var linkIds = new List<string>();
-                                var linkViewModels = new List<LinkViewModel>();
-                                foreach (var thing in postListing.Data.Children)
-                                {
-                                    if (thing.Data is Link)
-                                    {
-                                        linkIds.Add(((Link)thing.Data).Id);
-                                        var viewModel = new LinkViewModel(this, thing.Data as Link);
-                                        linkViewModels.Add(viewModel);
-                                        Links.Add(viewModel);
-                                    }
-                                }
-                                var linkMetadata = (await SnooStreamViewModel.OfflineService.GetLinkMetadata(linkIds)).ToList();
-                                for (int i = 0; i < linkMetadata.Count; i++)
-                                {
-                                    linkViewModels[i].UpdateMetadata(linkMetadata[i]);
-                                }
-                                LastLinkId = postListing.Data.After;
-                            }, SnooStreamViewModel.UIContextCancellationToken, TaskCreationOptions.PreferFairness, SnooStreamViewModel.UIScheduler);
+						SnooStreamViewModel.SystemServices.RunUIAsync(async () =>
+							{
+								var linkIds = new List<string>();
+								var linkViewModels = new List<LinkViewModel>();
+								foreach (var thing in postListing.Data.Children)
+								{
+									if (thing.Data is Link)
+									{
+										linkIds.Add(((Link)thing.Data).Id);
+										var viewModel = new LinkViewModel(this, thing.Data as Link);
+										linkViewModels.Add(viewModel);
+										Links.Add(viewModel);
+									}
+								}
+								var linkMetadata = (await SnooStreamViewModel.OfflineService.GetLinkMetadata(linkIds)).ToList();
+								for (int i = 0; i < linkMetadata.Count; i++)
+								{
+									linkViewModels[i].UpdateMetadata(linkMetadata[i]);
+								}
+								LastLinkId = postListing.Data.After;
+							});
                     }
                 });
             
