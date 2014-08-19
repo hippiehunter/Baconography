@@ -28,7 +28,7 @@
                 ItemsSource="{Binding Links, Converter={StaticResource collectionConverter}}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <local:SimpleLinkView HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
+                        <local:SimpleLinkView/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

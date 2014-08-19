@@ -6,10 +6,13 @@
     d:DataContext="{Binding Source={StaticResource SnooStream}, Path=SubredditRiver.SelectedRiver.CurrentSelected}"
     mc:Ignorable="d">
     
-    <Grid MinHeight="65" HorizontalAlignment="Stretch" Margin="0,0,0,12">
+    <Grid MinHeight="65" Margin="0,0,0,12">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="{Binding Source={StaticResource linkViewLayoutManager}, Path=FirstColumnWidth}" />
-            <ColumnDefinition Width="{Binding Source={StaticResource linkViewLayoutManager}, Path=SecondColumnWidth}" />
+            <!--<ColumnDefinition Width="{Binding Source={StaticResource linkViewLayoutManager}, Path=FirstColumnWidth}" />
+            <ColumnDefinition Width="{Binding Source={StaticResource linkViewLayoutManager}, Path=SecondColumnWidth}" />-->
+            
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -17,22 +20,18 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Grid.Column="{Binding Source={StaticResource linkViewLayoutManager}, Path=TextColumn}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*" />
-                <RowDefinition Height="2*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Button Grid.Row="0" BorderThickness="0" Margin="0" Padding="0" HorizontalContentAlignment="Left" Command="{Binding GotoLink}">
-                <Button.Content>
-                    <TextBlock HorizontalAlignment="Left" Text="{Binding Title}" TextWrapping="Wrap">
-                        <TextBlock.Foreground>
-                            <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
-                        </TextBlock.Foreground>
-                    </TextBlock>
-                </Button.Content>
-            </Button>
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Text="{Binding Title}" TextWrapping="Wrap">
+                <TextBlock.Foreground>
+                    <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
+                </TextBlock.Foreground>
+            </TextBlock>
             <Button Grid.Row="1"
                 BorderThickness="0" Margin="0,-18,0,0" Padding="0" HorizontalContentAlignment="Left"
                 Visibility="{Binding FromMultiReddit, Converter={StaticResource booleanVisibilityConverter}}"
@@ -42,13 +41,13 @@
                     <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="{Binding Subreddit}" />
                 </StackPanel>
             </Button>
-            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="12,-6,0,0">
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="12,-6,0,0">
                 <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}}" />
                 <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="{Binding Domain, Converter={StaticResource domainConverter}}"
                            Margin="3,0,0,0"/>
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch">
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="120" />
@@ -94,8 +93,8 @@
             </Button>
         </Grid>
 
-        <Grid Grid.Column="{Binding Source={StaticResource linkViewLayoutManager}, Path=PictureColumn}" Grid.Row="0" VerticalAlignment="Stretch"
-              MinHeight="90" Width="100">
+        <Grid Grid.Column="{Binding Source={StaticResource linkViewLayoutManager}, Path=PictureColumn}" Width="100" Grid.Row="0" VerticalAlignment="Stretch"
+              MinHeight="90">
             <Button BorderThickness="0" VerticalContentAlignment="Center"
                     HorizontalAlignment="Center" VerticalAlignment="Center"
                     Height="100" Width="100" Padding="5,5,5,5" Margin="0"
