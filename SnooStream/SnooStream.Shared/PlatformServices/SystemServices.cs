@@ -633,7 +633,7 @@ namespace SnooStream.PlatformServices
 						return null;
 					}
 					else
-						return _gifPayload;
+						return new GifRenderer.GifPayload { url = _url };
 				}
 			}
 
