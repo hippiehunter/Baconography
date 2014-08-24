@@ -616,7 +616,7 @@ namespace SnooStream.PlatformServices
 					{
 						GetPayload().ContinueWith((tsk) =>
 							{
-								if(tsk.Status == TaskStatus.RanToCompletion && tsk.IsCompleted)
+								if (tsk.Status == TaskStatus.RanToCompletion && tsk.IsCompleted)
 								{
 									_gifPayload = tsk.Result;
 									Loaded = true;
@@ -628,10 +628,12 @@ namespace SnooStream.PlatformServices
 									if (_errorHandler != null)
 										_errorHandler(tsk.Exception);
 								}
-								
+
 							}, TaskScheduler.FromCurrentSynchronizationContext());
 						return null;
 					}
+					else if (_gifPayload != null)
+						return _gifPayload;
 					else
 						return new GifRenderer.GifPayload { url = _url };
 				}
@@ -647,15 +649,15 @@ namespace SnooStream.PlatformServices
 					throw new Exception("failed to read initial bytes of image");
 
 				var bufferBytes = new byte[initialBuffer.Length];
-				_isGif = bufferBytes[0] == 0x47 && // G
-				bufferBytes[1] == 0x49 && // I
-				bufferBytes[2] == 0x46 && // F
-				bufferBytes[3] == 0x38 && // 8
-				(bufferBytes[4] == 0x39 || bufferBytes[4] == 0x37) && // 9 or 7
-				bufferBytes[5] == 0x61;   // a
-
-				
 				initialBuffer.CopyTo(bufferBytes);
+
+				_isGif = bufferBytes[0] == 0x47 && // G
+						 bufferBytes[1] == 0x49 && // I
+						 bufferBytes[2] == 0x46 && // F
+						 bufferBytes[3] == 0x38 && // 8
+						 (bufferBytes[4] == 0x39 || bufferBytes[4] == 0x37) && // 9 or 7
+						 bufferBytes[5] == 0x61;   // a
+
 
 				return new GifRenderer.GifPayload { initialData = bufferBytes.ToList(), inputStream = responseStream, url = _url };
 			}

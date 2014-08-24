@@ -16,8 +16,10 @@
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid.Resources>
             <DataTemplate x:Name="imageTemplate">
-                <ScrollViewer Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}" ZoomMode="Enabled">
-                    <Image DataContext="{Binding ImageSource.ImageData, Converter={StaticResource gifConverter}}" Source="{Binding ImageSource}" />
+                <ScrollViewer Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}" 
+                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" 
+                  ZoomMode="Enabled">
+                    <Image HorizontalAlignment="Center" VerticalAlignment="Center" DataContext="{Binding ImageSource.ImageData, Converter={StaticResource gifConverter}}" Stretch="Uniform" Source="{Binding ImageSource}" />
                 </ScrollViewer>
             </DataTemplate>
 
