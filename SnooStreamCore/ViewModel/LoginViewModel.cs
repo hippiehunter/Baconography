@@ -67,12 +67,15 @@ namespace SnooStream.ViewModel
                 _selectedCredential = value;
                 RaisePropertyChanged("SelectedCredential");
                 RaisePropertyChanged("SelectedUsername");
-                UsingStoredCredential = UnselectedUsername != _selectedCredential.Username;
-                if (UsingStoredCredential)
+                if (_selectedCredential != null)
                 {
-                    Username = SelectedCredential.Username;
-                    IsRememberLogin = true;
-                    IsDefaultLogin = SelectedCredential.IsDefault;
+                    UsingStoredCredential = UnselectedUsername != _selectedCredential.Username;
+                    if (UsingStoredCredential)
+                    {
+                        Username = SelectedCredential.Username;
+                        IsRememberLogin = true;
+                        IsDefaultLogin = SelectedCredential.IsDefault;
+                    }
                 }
             }
         }

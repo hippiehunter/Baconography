@@ -21,7 +21,15 @@ namespace SnooStream.Common
             {
                 _realSorted.Add(initial.Value, initial.Value);
             }
+        }
 
+        public TValue GetElementFollowing(TValue value)
+        {
+            var indexOfValue = _realSorted.IndexOfKey(value);
+            if (indexOfValue < (Count - 1))
+                return _realSorted.ValueAt(indexOfValue + 1);
+            else
+                return null;
         }
 
         public ObservableSortedUniqueCollection(IComparer<TValue> comparer)

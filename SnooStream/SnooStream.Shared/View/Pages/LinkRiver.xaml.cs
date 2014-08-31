@@ -14,10 +14,5 @@ namespace SnooStream.View.Pages
         {
             InitializeComponent();
         }
-
-        private void RadDataBoundListBox_DataRequested(object sender, EventArgs e)
-        {
-            ((LinkRiverViewModel)DataContext).LoadMore();
-        }
     }
 }

@@ -24,8 +24,8 @@
             <HubSection Header="self">
                 <DataTemplate>
                     <Grid>
-                        <!--local:SelfActivityView DataContext="{Binding UserHub.Self}" Visibility="{Binding UserHub.Self.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}"/>
-                        <local:LoginView DataContext="{Binding UserHub.Login}" Visibility="{Binding UserHub.Self.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource invertedBooleanVisibilityConverter}}"/-->
+                        <local:SelfActivityView DataContext="{Binding UserHub.Self}" Visibility="{Binding UserHub.Self.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}"/>
+                        <local:LoginView DataContext="{Binding UserHub.Login}" Visibility="{Binding UserHub.Self.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>
                     </Grid>
                 </DataTemplate>
             </HubSection>

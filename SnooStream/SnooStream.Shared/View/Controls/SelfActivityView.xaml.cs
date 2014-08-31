@@ -21,7 +21,7 @@ namespace SnooStream.View.Controls
         {
 			if(((SelfViewModel)DataContext).IsLoggedIn)
 			{
-				if(((SelfViewModel)DataContext).Activities.Count == 0)
+				if(((SelfViewModel)DataContext).Groups.Count == 0)
 					await ((SelfViewModel)DataContext).PullNew();
 				else
 					await ((SelfViewModel)DataContext).PullOlder();

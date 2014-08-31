@@ -12,35 +12,102 @@ namespace SnooStream.View.Selectors
 {
     public class UserActivityTemplateSelector : DependencyObject
     {
-        public DataTemplate CommentActivityTemplate
+        ////////multi bodies
+        //////public DataTemplate CommentActivityTemplate
+        //////{
+        //////    get { return (DataTemplate)GetValue(CommentActivityTemplateProperty); }
+        //////    set { SetValue(CommentActivityTemplateProperty, value); }
+        //////}
+
+        //////// Using a DependencyProperty as the backing store for SelfContentTemplate.  This enables animation, styling, binding, etc...
+        //////public static readonly DependencyProperty CommentActivityTemplateProperty =
+        //////    DependencyProperty.Register("CommentActivityTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
+
+        //////public DataTemplate ModeratorActivityTemplate
+        //////{
+        //////    get { return (DataTemplate)GetValue(ModeratorActivityTemplateProperty); }
+        //////    set { SetValue(ModeratorActivityTemplateProperty, value); }
+        //////}
+
+        //////// Using a DependencyProperty as the backing store for SelfContentTemplate.  This enables animation, styling, binding, etc...
+        //////public static readonly DependencyProperty ModeratorActivityTemplateProperty =
+        //////    DependencyProperty.Register("ModeratorActivityTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
+
+        //////public DataTemplate MessageActivityTemplate
+        //////{
+        //////    get { return (DataTemplate)GetValue(MessageActivityTemplateProperty); }
+        //////    set { SetValue(MessageActivityTemplateProperty, value); }
+        //////}
+
+        //////// Using a DependencyProperty as the backing store for SelfContentTemplate.  This enables animation, styling, binding, etc...
+        //////public static readonly DependencyProperty MessageActivityTemplateProperty =
+        //////    DependencyProperty.Register("MessageActivityTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
+
+
+
+        ////////Headers
+        //////public DataTemplate CommentActivityHeaderTemplate
+        //////{
+        //////    get { return (DataTemplate)GetValue(CommentActivityHeaderTemplateProperty); }
+        //////    set { SetValue(CommentActivityHeaderTemplateProperty, value); }
+        //////}
+
+        //////// Using a DependencyProperty as the backing store for CommentActivityHeaderTemplate.  This enables animation, styling, binding, etc...
+        //////public static readonly DependencyProperty CommentActivityHeaderTemplateProperty =
+        //////    DependencyProperty.Register("CommentActivityHeaderTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
+
+        //////public DataTemplate ModeratorActivityHeaderTemplate
+        //////{
+        //////    get { return (DataTemplate)GetValue(ModeratorActivityHeaderProperty); }
+        //////    set { SetValue(ModeratorActivityHeaderProperty, value); }
+        //////}
+
+        //////// Using a DependencyProperty as the backing store for ModeratorActivityHeader.  This enables animation, styling, binding, etc...
+        //////public static readonly DependencyProperty ModeratorActivityHeaderProperty =
+        //////    DependencyProperty.Register("ModeratorActivityHeaderTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
+
+        //////public DataTemplate MessageActivityHeaderTemplate
+        //////{
+        //////    get { return (DataTemplate)GetValue(MessageActivityHeaderProperty); }
+        //////    set { SetValue(MessageActivityHeaderProperty, value); }
+        //////}
+
+        //////// Using a DependencyProperty as the backing store for SelfContentTemplate.  This enables animation, styling, binding, etc...
+        //////public static readonly DependencyProperty MessageActivityHeaderProperty =
+        //////    DependencyProperty.Register("MessageActivityHeaderTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
+
+
+        public DataTemplate SingleActivityTemplate
         {
-            get { return (DataTemplate)GetValue(CommentActivityTemplateProperty); }
-            set { SetValue(CommentActivityTemplateProperty, value); }
+            get { return (DataTemplate)GetValue(SingleActivityProperty); }
+            set { SetValue(SingleActivityProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CommentActivitySingleTemplate.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SingleActivityProperty =
+            DependencyProperty.Register("SingleActivityTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
+
+        public DataTemplate HeaderActivityTemplate
+        {
+            get { return (DataTemplate)GetValue(HeaderActivityProperty); }
+            set { SetValue(HeaderActivityProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for SelfContentTemplate.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty CommentActivityTemplateProperty =
-            DependencyProperty.Register("CommentActivityTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
+        public static readonly DependencyProperty HeaderActivityProperty =
+            DependencyProperty.Register("HeaderActivityTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
 
-        public DataTemplate ModeratorActivityTemplate
+        public DataTemplate BodyActivityTemplate
         {
-            get { return (DataTemplate)GetValue(ModeratorActivityTemplateProperty); }
-            set { SetValue(ModeratorActivityTemplateProperty, value); }
+            get { return (DataTemplate)GetValue(BodyActivityProperty); }
+            set { SetValue(BodyActivityProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for SelfContentTemplate.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ModeratorActivityTemplateProperty =
-            DependencyProperty.Register("ModeratorActivityTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
+        public static readonly DependencyProperty BodyActivityProperty =
+            DependencyProperty.Register("BodyActivityTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
 
-        public DataTemplate MessageActivityTemplate
-        {
-            get { return (DataTemplate)GetValue(MessageActivityTemplateProperty); }
-            set { SetValue(MessageActivityTemplateProperty, value); }
-        }
 
-        // Using a DependencyProperty as the backing store for SelfContentTemplate.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty MessageActivityTemplateProperty =
-            DependencyProperty.Register("MessageActivityTemplate", typeof(DataTemplate), typeof(UserActivityTemplateSelector), new PropertyMetadata(null));
 
 		public DataTemplateSelector Selector { get; set; }
 
@@ -60,21 +127,17 @@ namespace SnooStream.View.Selectors
         {
             //decide if its a group or a single
             var group = item as ActivityGroupViewModel;
-            var firstActivity = group.FirstActivity;
-
-            if (firstActivity is PostedCommentActivityViewModel || 
-                firstActivity is RecivedCommentReplyActivityViewModel ||
-                firstActivity is PostedLinkActivityViewModel)
+            if (group != null)
             {
-				return _selector.CommentActivityTemplate;
+                if (group.Activities.Count == 1)
+                    return _selector.SingleActivityTemplate;
+                else
+                    return _selector.HeaderActivityTemplate;
             }
-            else if (firstActivity is ModeratorActivityViewModel)
+            var activity = item as ActivityViewModel;
+            if(activity != null)
             {
-				return _selector.ModeratorActivityTemplate;
-            }
-            else if (firstActivity is ModeratorMessageActivityViewModel || firstActivity is MessageActivityViewModel)
-            {
-				return _selector.MessageActivityTemplate;
+                return _selector.BodyActivityTemplate;
             }
             else
                 throw new ArgumentOutOfRangeException();

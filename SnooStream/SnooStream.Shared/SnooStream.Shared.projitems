@@ -61,7 +61,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\ComposePostView.xaml.cs">
       <DependentUpon>ComposePostView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\Expander.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\ExtendedAppBarControl.xaml.cs">
       <DependentUpon>ExtendedAppBarControl.xaml</DependentUpon>
     </Compile>
@@ -122,9 +121,6 @@
     <Page Include="$(MSBuildThisFileDirectory)Resources\StyleResources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\ActivitiesResources.xaml">
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\CaptchaControl.xaml">
       <SubType>Designer</SubType>

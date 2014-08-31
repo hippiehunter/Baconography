@@ -5,11 +5,62 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:localC="using:SnooStream.View.Controls"
         xmlns:selectors="using:SnooStream.View.Selectors" xmlns:s="using:System;assembly=mscorlib"
+        xmlns:converters="using:SnooStream.Converters"
         mc:Ignorable="d" d:DesignHeight="480" d:DesignWidth="480">
 
     <Grid x:Name="LayoutRoot" Margin="12,0,12,0">
         <Grid.Resources>
-            <!--ResourceDictionary Source="ActivitiesResources.xaml"/-->
+            <converters:ActivityGroupCountConverter x:Name="activityGroupCountConverter" />
+            <selectors:UserActivityTemplateSelector x:Key="activityTemplateSelector">
+                <selectors:UserActivityTemplateSelector.HeaderActivityTemplate>
+                    <DataTemplate>
+                        <ToggleButton IsChecked="{Binding IsExpanded, Mode=TwoWay}">
+                            <ToggleButton.Content>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding FirstActivity.PreviewTitle}" />
+                                    <TextBlock Text="{Binding FirstActivity.Author}" />
+                                </StackPanel>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+                    </DataTemplate>
+                </selectors:UserActivityTemplateSelector.HeaderActivityTemplate>
+                <selectors:UserActivityTemplateSelector.BodyActivityTemplate>
+                    <DataTemplate>
+                        <Grid Margin="8, 8, 0, 12" Height="120">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition MinWidth="60" Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Author}"/>
+                            <TextBlock Grid.Row="1" Text="{Binding Body}" TextWrapping="Wrap" MaxHeight="54" />
+                            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="1"
+                                    Text="{Binding CreatedUTC, Converter={StaticResource unixTimeConverter}}" />
+                        </Grid>
+                    </DataTemplate>
+                </selectors:UserActivityTemplateSelector.BodyActivityTemplate>
+                <selectors:UserActivityTemplateSelector.SingleActivityTemplate>
+                    <DataTemplate>
+                        <Grid Height="120">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition MinWidth="60" Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding FirstActivity.Author}"/>
+                            <TextBlock Grid.Row="1" Text="{Binding FirstActivity.Body}" TextWrapping="Wrap" MaxHeight="54" />
+                            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="1"
+                                    Text="{Binding FirstActivity.CreatedUTC, Converter={StaticResource unixTimeConverter}}" />
+                        </Grid>
+                    </DataTemplate>
+                </selectors:UserActivityTemplateSelector.SingleActivityTemplate>
+            </selectors:UserActivityTemplateSelector>
         </Grid.Resources>
         
         <Grid.RowDefinitions>
@@ -28,8 +79,8 @@
             </ContentControl.RenderTransform>
         </ContentControl>
 
-        <ListView Grid.Row="1" x:Name="listBox" ItemsSource="{Binding Activities}"
-                ItemTemplate="{StaticResource activityTemplate}" >
+        <ListView Grid.Row="1" x:Name="listBox" ItemsSource="{Binding Activities, Converter={StaticResource collectionConverter}}"
+                ItemTemplateSelector="{Binding Selector, Source={StaticResource activityTemplateSelector}}" >
         </ListView>
     </Grid>
 </UserControl>

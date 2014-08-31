@@ -13,7 +13,7 @@
             <StackPanel>
                 <ContentControl x:Name="header"
                                 CharacterSpacing="-10"
-                                FontSize="40" FontFamily="{StaticResource PhoneFontFamilySemiLight}"
+                                FontSize="40"
                                 HorizontalAlignment="Left" Margin="12,6,0,24"
                                 Content="login">
                     <ContentControl.RenderTransform>

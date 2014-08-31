@@ -87,7 +87,12 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public bool IsExpanded { get; set; }
+        private bool _isExpanded;
+        public bool IsExpanded 
+        {
+            get { return _isExpanded; }
+            set { _isExpanded = value; RaisePropertyChanged("IsExpanded"); }
+        }
         public bool IsConversation { get; protected set; }
         public ObservableSortedUniqueCollection<string, ActivityViewModel> Activities { get; protected set; }
 

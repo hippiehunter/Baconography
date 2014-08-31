@@ -28,7 +28,6 @@ namespace SnooStream.ViewModel
         public DateTime CreatedUTC { get; protected set; }
 		public string PreviewTitle { get; set; }
 		public string PreviewBody { get; set; }
-
 		internal static string Elipsis(string text, int maxLength)
 		{
 			if(text.Length > maxLength)

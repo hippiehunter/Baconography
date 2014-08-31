@@ -12,21 +12,131 @@ namespace SnooStream.ViewModel
 {
     public class SelfViewModel : ViewModelBase
     {
+        public class SelfActivityAggregate : PortableObservableCollection<ViewModelBase>
+        {
+            ObservableSortedUniqueCollection<string, ActivityGroupViewModel> _groups;
+            public SelfActivityAggregate(ObservableSortedUniqueCollection<string, ActivityGroupViewModel> groups, Func<Task> loadMore) : base(loadMore)
+            {
+                _groups = groups;
+                _groups.CollectionChanged += _groups_CollectionChanged;
+            }
+
+            void RegisterGroup(ActivityGroupViewModel group)
+            {
+                group.Activities.CollectionChanged += Activities_CollectionChanged;
+                group.PropertyChanged += group_PropertyChanged;
+            }
+
+            void group_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                if(e.PropertyName == "IsExpanded")
+                {
+                    var group = sender as ActivityGroupViewModel;
+                    if(group.IsExpanded && group.Activities.Count > 1)
+                    {
+                        //need to make sure no one else is marked as expanded
+                        //because we only allow one at a time
+                        var existingExpanded = this.FirstOrDefault(vm => vm != group && vm is ActivityGroupViewModel && ((ActivityGroupViewModel)vm).IsExpanded) as ActivityGroupViewModel;
+                        if (existingExpanded != null)
+                            existingExpanded.IsExpanded = false;
+
+                        var indexOfGroup = IndexOf(group);
+                        foreach(var activity in group.Activities)
+                        {
+                            Insert(++indexOfGroup, activity);
+                        }
+                    }
+                    else
+                    {
+                        //remove all of the activities from this group
+                        foreach (var item in group.Activities)
+                            Remove(item);
+                    }
+                }
+            }
+
+            void Activities_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+            {
+
+                switch (e.Action)
+                {
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                        break;
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                        break;
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                        break;
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                        break;
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            void UnregisterGroup(ActivityGroupViewModel group)
+            {
+                group.Activities.CollectionChanged -= Activities_CollectionChanged;
+                group.PropertyChanged -= group_PropertyChanged;
+            }
+
+            void _groups_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+            {
+                var collection = sender as ObservableSortedUniqueCollection<string, ActivityGroupViewModel>;
+                switch (e.Action)
+                {
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                        RegisterGroup(e.NewItems[0] as ActivityGroupViewModel);
+                        var followingGroup = collection.GetElementFollowing(e.NewItems[0] as ActivityGroupViewModel);
+                        if(followingGroup != null)
+                        {
+                            Insert(Math.Max(0, IndexOf(followingGroup) - 1), e.NewItems[0] as ActivityGroupViewModel);
+                        }
+                        else
+                        {
+                            Add(e.NewItems[0] as ActivityGroupViewModel);
+                        }
+                        
+                        break;
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                        break;
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                        var removedGroup = e.OldItems[0] as ActivityGroupViewModel;
+                        UnregisterGroup(removedGroup);
+                        if(removedGroup.IsExpanded)
+                        {
+                            foreach (var item in removedGroup.Activities)
+                                Remove(item);
+                        }
+                        break;
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                        break;
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                        Clear();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
         public SelfViewModel(IEnumerable<Thing> initialThings, string oldestMessage, string oldestSentMessage, string oldestActivity)
         {
             //load up the activities
-            Activities = new ObservableSortedUniqueCollection<string, ActivityGroupViewModel>(new ActivityGroupViewModel.ActivityAgeComparitor());
+            Groups = new ObservableSortedUniqueCollection<string, ActivityGroupViewModel>(new ActivityGroupViewModel.ActivityAgeComparitor());
+            Activities = new SelfActivityAggregate(Groups, () => PullNew());
             foreach (var thing in initialThings)
             {
                 var thingName = ActivityViewModel.GetActivityGroupName(thing);
                 ActivityGroupViewModel existingGroup;
-                if (Activities.TryGetValue(thingName, out existingGroup))
+                if (Groups.TryGetValue(thingName, out existingGroup))
                 {
                     existingGroup.Merge(thing);
                 }
                 else
                 {
-                    Activities.Add(thingName, ActivityGroupViewModel.MakeActivityGroup(thing));
+                    Groups.Add(thingName, ActivityGroupViewModel.MakeActivityGroup(thing));
                 }
             }
 
@@ -41,7 +151,7 @@ namespace SnooStream.ViewModel
         {
             RaisePropertyChanged("IsLoggedIn");
             RaisePropertyChanged("Activities");
-            Activities.Clear();
+            Groups.Clear();
             await PullNew();
         }
 
@@ -66,7 +176,8 @@ namespace SnooStream.ViewModel
         private string OldestMessage { get; set; }
         private string OldestSentMessage { get; set; }
         private string OldestActivity { get; set; }
-        public ObservableSortedUniqueCollection<string, ActivityGroupViewModel> Activities { get; private set; }
+        public ObservableSortedUniqueCollection<string, ActivityGroupViewModel> Groups { get; private set; }
+        public SelfActivityAggregate Activities { get; private set; }
         public async Task PullNew()
         {
             if (!IsLoggedIn)
@@ -106,7 +217,7 @@ namespace SnooStream.ViewModel
                 {
                     var childName = ActivityViewModel.GetActivityGroupName(child);
                     ActivityGroupViewModel existingGroup;
-                    if (Activities.TryGetValue(childName, out existingGroup))
+                    if (Groups.TryGetValue(childName, out existingGroup))
                     {
                         if (existingGroup.Activities.Count <= 1)
                         {
@@ -117,7 +228,7 @@ namespace SnooStream.ViewModel
                     }
                     else
                     {
-                        Activities.Add(childName, ActivityGroupViewModel.MakeActivityGroup(child));
+                        Groups.Add(childName, ActivityGroupViewModel.MakeActivityGroup(child));
                     }
                 }
 
@@ -172,7 +283,7 @@ namespace SnooStream.ViewModel
         {
             return new SelfInit
             {
-                SelfThings = new List<Thing>(DumpThings(Activities)),
+                SelfThings = new List<Thing>(DumpThings(Groups)),
                 AfterSelfAction = OldestActivity,
                 AfterSelfMessage = OldestMessage,
                 AfterSelfSentMessage = OldestSentMessage

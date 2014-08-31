@@ -177,10 +177,6 @@
       <Project>{f21692c7-0955-4e64-a684-2272f0e7b664}</Project>
       <Name>SnooDom.Windows</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\winrtxamltoolkit\WinRTXamlToolkit\WinRTXamlToolkit.Windows\WinRTXamlToolkit.Windows.csproj">
-      <Project>{7b7966be-213f-4b84-867d-2a0ccf61245f}</Project>
-      <Name>WinRTXamlToolkit.Windows</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\NBoilerpipePortable\NBoilerpipePortable.csproj">
       <Project>{17272736-fe78-416b-96c4-90fcf0bea45b}</Project>
       <Name>NBoilerpipePortable</Name>
