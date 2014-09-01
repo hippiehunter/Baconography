@@ -41,27 +41,6 @@ namespace SnooStream.View.Controls
             }
         }
 
-        //this bit of unpleasantry is needed to prevent the input box from getting defocused when an item gets added to the collection
-        bool _disableFocusHack = false;
-        bool _needToHackFocus = false;
-        TextBox _manualBox = null;
-        private void manualBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            _manualBox = sender as TextBox;
-            if (_disableFocusHack)
-                _disableFocusHack = false;
-            else
-            {
-                _needToHackFocus = true;
-            }
-        }
-
-		private void manualBox_MouseLeave(object sender, TappedRoutedEventArgs e)
-        {
-            _disableFocusHack = true;
-            _needToHackFocus = false;
-        }
-
 		private void listBox_ItemTap(object sender, TappedRoutedEventArgs e)
 		{
 			var linkRiver = ((Button)sender).DataContext as LinkRiverViewModel;

@@ -25,14 +25,126 @@ namespace SnooStream.ViewModel
             return viewModel.Thing.DisplayName.Substring(0, 1);
         }
         
-        public ObservableCollection<LinkRiverViewModel> CombinedRivers { get; private set; }
+        internal ObservableCollection<LinkRiverViewModel> CombinedRivers { get; set; }
+		private ObservableCollection<LinkRiverViewModel> _subreddits;
+		public ObservableCollection<LinkRiverViewModel> Subreddits { get { return _subreddits; } set { _subreddits = value; RaisePropertyChanged("Subreddits"); } }
         public LinkRiverViewModel SelectedRiver { get; private set; }
-        public string SearchString { get; set; }
+		private string _searchString;
+		public string SearchString
+		{
+			get
+			{
+				return _searchString;
+			}
+			set
+			{
+				bool wasChanged = _searchString != value;
+				if (wasChanged)
+				{
+					_searchString = value;
+
+					if (_searchString.Length < 3)
+					{
+						Subreddits = CombinedRivers;
+						RevokeQueryTimer();
+					}
+					else
+					{
+						RestartQueryTimer();
+					}
+				}
+			}
+		}
+
+		Object _queryTimer;
+		void RevokeQueryTimer()
+		{
+			if (_queryTimer != null)
+			{
+				SnooStreamViewModel.SystemServices.StopTimer(_queryTimer);
+				_queryTimer = null;
+			}
+		}
+
+		void RestartQueryTimer()
+		{
+			// Start or reset a pending query
+			if (_queryTimer == null)
+			{
+				_queryTimer = SnooStreamViewModel.SystemServices.StartTimer(queryTimer_Tick, new TimeSpan(0, 0, 1), true);
+			}
+			else
+			{
+				SnooStreamViewModel.SystemServices.StopTimer(_queryTimer);
+				SnooStreamViewModel.SystemServices.RestartTimer(_queryTimer);
+			}
+		}
+
+		bool _searchLoadInProgress = false;
+
+		void queryTimer_Tick(object sender, object timer)
+		{
+			// Stop the timer so it doesn't fire again unless rescheduled
+			RevokeQueryTimer();
+
+			if (!(_searchString != null && _searchString.Contains("/")))
+			{
+				_searchLoadInProgress = true;
+				try
+				{
+					//get new search results
+					string afterSearch = "";
+					string afterUri = "";
+					PortableObservableCollection<LinkRiverViewModel> searchResults = null;
+					searchResults = new PortableObservableCollection<LinkRiverViewModel>(async () =>
+					{
+						if (string.IsNullOrWhiteSpace(afterSearch))
+						{
+							//dump out early so we dont get duplicates in a small search that had no 'after'
+							if (searchResults.Count > 0)
+								return;
+
+							var searchListing = await SnooStreamViewModel.RedditService.Search(SearchString, null, true, null);
+							if (searchListing != null)
+							{
+								afterUri = searchListing.Item1;
+								afterSearch = searchListing.Item2.Data.After;
+								foreach (var subreddit in searchListing.Item2.Data.Children)
+								{
+									if (subreddit.Data is Subreddit)
+									{
+										//TODO: this represents an oddity, we loose the cached links by creating a new LinkRiverViewModel
+										searchResults.Add(new LinkRiverViewModel(false, subreddit.Data as Subreddit, null, null));
+									}
+								}
+							}
+						}
+						else
+						{
+							var searchListing = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(afterUri, afterSearch);
+							afterSearch = searchListing.Data.After;
+							foreach (var subreddit in searchListing.Data.Children)
+							{
+								if (subreddit.Data is Subreddit)
+								{
+									//TODO: this represents an oddity, we loose the cached links by creating a new LinkRiverViewModel
+									searchResults.Add(new LinkRiverViewModel(false, subreddit.Data as Subreddit, null, null));
+								}
+							}
+						}
+					});
+					Subreddits = searchResults;
+				}
+				finally
+				{
+					_searchLoadInProgress = false;
+				}
+			}
+		}
         public SubredditRiverViewModel(SubredditRiverInit initBlob)
         {
             if (initBlob != null)
             {
-                
                 var localSubreddits = initBlob.Pinned.Select(blob => new LinkRiverViewModel(true, blob.Thing, blob.DefaultSort, blob.Links));
                 var subscribbedSubreddits = initBlob.Subscribed.Select(blob => new LinkRiverViewModel(false, blob.Thing, blob.DefaultSort, blob.Links));
                 
@@ -45,6 +157,7 @@ namespace SnooStream.ViewModel
                 LoadWithoutInitial();
                 EnsureFrontPage();
             }
+			Subreddits = CombinedRivers;
             SelectedRiver = CombinedRivers.FirstOrDefault() ?? new LinkRiverViewModel(true, new Subreddit("/"), "hot", null);
             MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
         }

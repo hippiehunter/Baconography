@@ -11,9 +11,7 @@
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <Grid x:Name="LayoutRoot">
-
         <Hub>
-
             <!--Panorama item one-->
             <HubSection Header="subreddits">
                 <DataTemplate>
@@ -34,7 +32,7 @@
             <HubSection Header="settings" DataContext="{Binding SettingsHub}">
                 <DataTemplate>
                     <Grid>
-                        <!--local:HubSettingsView /-->
+                        <local:HubSettingsView />
                     </Grid>
                 </DataTemplate>
             </HubSection>
