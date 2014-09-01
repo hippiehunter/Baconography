@@ -32,7 +32,7 @@ namespace SnooStream.ViewModel
                 if(e.PropertyName == "IsExpanded")
                 {
                     var group = sender as ActivityGroupViewModel;
-                    if(group.IsExpanded && group.Activities.Count > 1)
+                    if(group.IsExpanded)
                     {
                         //need to make sure no one else is marked as expanded
                         //because we only allow one at a time
@@ -40,17 +40,23 @@ namespace SnooStream.ViewModel
                         if (existingExpanded != null)
                             existingExpanded.IsExpanded = false;
 
-                        var indexOfGroup = IndexOf(group);
-                        foreach(var activity in group.Activities)
+                        if (group.Activities.Count > 1)
                         {
-                            Insert(++indexOfGroup, activity);
+                            var indexOfGroup = IndexOf(group);
+                            foreach (var activity in group.Activities)
+                            {
+                                Insert(++indexOfGroup, activity);
+                            }
                         }
                     }
                     else
                     {
                         //remove all of the activities from this group
-                        foreach (var item in group.Activities)
-                            Remove(item);
+                        if (group.Activities.Count > 1)
+                        {
+                            foreach (var item in group.Activities)
+                                Remove(item);
+                        }
                     }
                 }
             }
