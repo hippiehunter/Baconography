@@ -644,7 +644,7 @@ namespace SnooStream.PlatformServices
 				HttpClient client = new HttpClient();
 				var response = await client.GetAsync(new Uri(_url), HttpCompletionOption.ResponseHeadersRead);
 				var responseStream = await response.Content.ReadAsInputStreamAsync();
-				var initialBuffer = await responseStream.ReadAsync(new Windows.Storage.Streams.Buffer(4096), 4096, InputStreamOptions.None);
+				var initialBuffer = await responseStream.ReadAsync(new Windows.Storage.Streams.Buffer(4096), 4096, InputStreamOptions.ReadAhead);
 				if (initialBuffer.Length == 0)
 					throw new Exception("failed to read initial bytes of image");
 

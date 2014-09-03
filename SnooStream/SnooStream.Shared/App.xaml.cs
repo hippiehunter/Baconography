@@ -134,6 +134,11 @@ namespace SnooStream
 				//Indicate the back button press is handled so the app does not exit
 				e.Handled = true;
 			}
+            else
+            {
+                var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
+                snooStreamViewModel.DumpInitBlob();
+            }
             
 		}
 #endif
@@ -149,6 +154,8 @@ namespace SnooStream
         {
             var deferral = e.SuspendingOperation.GetDeferral();
 
+            var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
+            snooStreamViewModel.DumpInitBlob(snooStreamViewModel.GetNavigationBlob());
             // TODO: Save application state and stop any background activity
             deferral.Complete();
         }
