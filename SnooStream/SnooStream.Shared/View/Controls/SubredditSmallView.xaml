@@ -6,11 +6,11 @@
     mc:Ignorable="d"
     d:DesignHeight="480" d:DesignWidth="480">
 
-    <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" MinWidth="460">
+    <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="125" />
             <ColumnDefinition Width="12" />
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />

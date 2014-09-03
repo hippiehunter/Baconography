@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Xaml.Interactivity;
 using SnooStream.Messages;
 using SnooStream.ViewModel;
 using System;
@@ -143,10 +144,68 @@ namespace SnooStream.Common
 			base.OnNavigatedTo(e);
         }
 
-		protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+		public bool PopNavState()
 		{
-			base.OnNavigatingFrom(e);
+            if (_navState.Count > 0)
+            {
+                var poppedState = _navState.Pop();
+                VisualStateManager.GoToState(poppedState.Item1 as Control, poppedState.Item2, true);
+                return true;
+            }
+            return false;
 		}
 
-	}
+        Stack<Tuple<object, string>> _navState = new Stack<Tuple<object, string>>();
+        internal void PushNavState(object sender, string pushedState)
+        {
+            //var currentState = VisualStateManager.GetVisualStateGroups(sender as FrameworkElement).First().CurrentState;
+            //var currentStateName = currentState != null ? currentState.Name : null;
+            VisualStateManager.GoToState(sender as Control, pushedState, false);
+            _navState.Push(Tuple.Create(sender, "Normal"));
+        }
+    }
+
+    public class PushNavState : DependencyObject, IAction
+    {
+        public string TargetState
+        {
+            get { return (string)GetValue(TargetStateProperty); }
+            set { SetValue(TargetStateProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Actions.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TargetStateProperty =
+            DependencyProperty.Register("TargetState", typeof(string), typeof(PushNavState), new PropertyMetadata(null));
+
+        public FrameworkElement VisualStateObject
+        {
+            get { return (FrameworkElement)GetValue(VisualStateObjectProperty); }
+            set { SetValue(VisualStateObjectProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for VisualStateObject.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty VisualStateObjectProperty =
+            DependencyProperty.Register("VisualStateObject", typeof(FrameworkElement), typeof(PushNavState), new PropertyMetadata(null));
+        
+
+        private T FindAncestor<T>(DependencyObject obj) where T : class
+        {
+            if (obj == null)
+                return null;
+            else if (obj is T)
+                return obj as T;
+            else
+                return FindAncestor<T>(VisualTreeHelper.GetParent(obj));
+        }
+
+        public object Execute(object sender, object parameter)
+        {
+            var appPage = FindAncestor<SnooApplicationPage>(sender as DependencyObject);
+            if(appPage != null)
+                appPage.PushNavState(VisualStateObject, TargetState);
+            
+            return null;
+        }
+    }
+
 }

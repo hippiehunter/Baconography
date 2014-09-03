@@ -1,4 +1,5 @@
-﻿using SnooStream.PlatformServices;
+﻿using SnooStream.Common;
+using SnooStream.PlatformServices;
 using SnooStream.Services;
 using SnooStream.View.Pages;
 using SnooStream.ViewModel;
@@ -122,12 +123,18 @@ namespace SnooStream
 		void HardwareButtons_BackPressed(object sender, Windows.Phone.UI.Input.BackPressedEventArgs e)
 		{
 			var rootFrame = Window.Current.Content as Frame;
-			if (rootFrame.CanGoBack)
+            var appPage = rootFrame.Content as SnooApplicationPage;
+            if(appPage.PopNavState())
+            {
+                e.Handled = true;
+            }
+			else if (rootFrame.CanGoBack)
 			{
 				rootFrame.GoBack();
 				//Indicate the back button press is handled so the app does not exit
 				e.Handled = true;
 			}
+            
 		}
 #endif
 
