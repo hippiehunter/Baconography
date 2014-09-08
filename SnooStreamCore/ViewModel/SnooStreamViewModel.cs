@@ -71,9 +71,9 @@ namespace SnooStream.ViewModel
                     //check if there is a LinkRiver for the target subreddit, then cache things 
                     //into it directly so we arent making 2x the reddit calls
                     var targetRiver = SubredditRiver.CombinedRivers.FirstOrDefault(lrvm => string.Compare(lrvm.Thing.Url, Settings.LockScreenReddit, StringComparison.CurrentCultureIgnoreCase) == 0);
-                    if (targetRiver != null)
+                    if (targetRiver == null)
                     {
-                        targetRiver = new LinkRiverViewModel(true, new Subreddit(Settings.LockScreenReddit), "hot", null);
+                        targetRiver = new LinkRiverViewModel(true, new Subreddit(Settings.LockScreenReddit), "hot", null, null);
                     }
 
 

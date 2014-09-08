@@ -39,5 +39,6 @@ namespace SnooStream.Common
         public Subreddit Thing { get; set; }
         public List<Link> Links { get; set; }
         public string DefaultSort { get; set; }
+		public DateTime? LastRefresh { get; set; }
     }
 }

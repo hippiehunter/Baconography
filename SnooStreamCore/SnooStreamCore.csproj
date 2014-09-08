@@ -75,6 +75,7 @@
     <Compile Include="ViewModel\AboutUserViewModel.cs" />
     <Compile Include="ViewModel\CaptchaViewModel.cs" />
     <Compile Include="ViewModel\ErrorContentViewModel.cs" />
+    <Compile Include="ViewModel\IRefreshable.cs" />
     <Compile Include="ViewModel\LoadFullCommentsViewModel.cs" />
     <Compile Include="ViewModel\LoadingContentViewModel.cs" />
     <Compile Include="ViewModel\MoreViewModel.cs" />

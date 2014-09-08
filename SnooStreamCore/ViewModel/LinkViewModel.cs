@@ -157,7 +157,7 @@ namespace SnooStream.ViewModel
 
         internal void MergeLink(Link link)
         {
-            throw new NotImplementedException();
+			Votable.MergeVotable(link);
         }
 
         object _selfText;

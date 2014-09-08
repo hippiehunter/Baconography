@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-    interface IRefreshable
+    public interface IRefreshable
     {
         void MaybeRefresh();
         void Refresh();
