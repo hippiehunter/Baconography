@@ -263,7 +263,7 @@ namespace SnooStream.ViewModel
 							foreach(var linkTpl in move.OrderBy(tpl => tpl.Item2))
 							{
 								var currentIndex = Links.IndexOf(linkTpl.Item3);
-								if (currentIndex != linkTpl.Item2)
+								if (currentIndex > 0 && currentIndex != linkTpl.Item2)
 								{
 									unfinished = true;
 									Links.Move(currentIndex, linkTpl.Item2);

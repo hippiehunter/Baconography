@@ -39,6 +39,17 @@ namespace SnooStream.Model
                 return int.Parse(result);
         }
 
+		internal static double DefaultGet(this Dictionary<string, string> dict, string key, double defaultValue)
+		{
+			string result;
+			if (!dict.TryGetValue(key, out result))
+			{
+				return defaultValue;
+			}
+			else
+				return double.Parse(result);
+		}
+
         internal static DateTime DefaultGet(this Dictionary<string, string> dict, string key, DateTime defaultValue)
         {
             string result;
@@ -88,8 +99,8 @@ namespace SnooStream.Model
             OnlyFlipViewImages = init.DefaultGet("OnlyFlipViewImages", true);
             AllowAdvertising = init.DefaultGet("AllowAdvertising", true);
             DisableBackground = init.DefaultGet("DisableBackground", false);
-            ScreenWidth = init.DefaultGet("ScreenWidth", 480);
-            ScreenHeight = init.DefaultGet("ScreenHeight", 800);
+            ScreenWidth = init.DefaultGet("ScreenWidth", 480.0);
+			ScreenHeight = init.DefaultGet("ScreenHeight", 800.0);
             LastUpdatedImages = init.DefaultGet("LastUpdatedImages", new DateTime());
             LastCleanedCache = init.DefaultGet("LastCleanedCache", new DateTime());
             HeavyPreview = init.DefaultGet("HeavyPreview", false);
