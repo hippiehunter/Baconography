@@ -271,9 +271,12 @@ namespace SnooStream.ViewModel
 							}
 						}
 
-						foreach (var newLink in replace)
+						foreach (var newLink in replace.OrderBy(tpl => tpl.Item1))
 						{
-							Links[newLink.Item1] = newLink.Item2;
+							if (Links.Count - 1 > newLink.Item1)
+								Links[newLink.Item1] = newLink.Item2;
+							else
+								Links.Add(newLink.Item2);
 						}
 
 						for(int i = Links.Count - 1; i > linkIds.Count; i--)
