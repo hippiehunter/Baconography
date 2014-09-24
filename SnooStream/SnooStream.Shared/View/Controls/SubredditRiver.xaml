@@ -7,7 +7,9 @@
     xmlns:selectors="using:SnooStream.View.Selectors"
     xmlns:common="using:SnooStream.Common"
     xmlns:s="using:System;assembly=mscorlib"
-    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" xmlns:Core="using:Microsoft.Xaml.Interactions.Core" x:Class="SnooStream.View.Controls.SubredditRiver"
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" 
+    xmlns:Core="using:Microsoft.Xaml.Interactions.Core" 
+    x:Class="SnooStream.View.Controls.SubredditRiver"
     mc:Ignorable="d"
     d:DesignHeight="480" d:DesignWidth="480" x:Name="root" >
     
