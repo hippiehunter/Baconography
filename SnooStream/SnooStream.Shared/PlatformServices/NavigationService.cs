@@ -10,6 +10,8 @@ using Windows.System;
 using Windows.UI.Xaml.Controls;
 using SnooStream.View.Pages;
 using SnooStream.View.Controls;
+using GalaSoft.MvvmLight.Messaging;
+using SnooStream.Messages;
 
 namespace SnooStream.PlatformServices
 {
@@ -48,7 +50,8 @@ namespace SnooStream.PlatformServices
 
         public void NavigateToLinkStream(LinkStreamViewModel viewModel)
         {
-			_frame.Navigate(typeof(LinkStream), "state=" + _navState.AddState(viewModel));
+			//_frame.Navigate(typeof(LinkStream), "state=" + _navState.AddState(viewModel));
+			Messenger.Default.Send(new SelectLinkMessage { Kind = SelectLinkMessage.LinkSelectionKind.Content, Link = viewModel.Current });
         }
 
         public void NavigateToMessageReply(CreateMessageViewModel viewModel)

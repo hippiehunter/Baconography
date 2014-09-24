@@ -30,6 +30,7 @@ namespace SnooStream.ViewModel
                         {
                             //need to be -1 because movenext does ++ before it gets current
                             linkIndex = i - 1;
+							Current = linkRiver.Links[i];
                             break;
                         }
                     }

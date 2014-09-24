@@ -233,12 +233,7 @@
 
                 <ListView Grid.Row="1" Grid.Column="0"  Margin="12,0,12,0"
                 ItemsSource="{Binding Source={StaticResource linksViewSource}}"
-                ScrollViewer.HorizontalScrollBarVisibility="Disabled" IsItemClickEnabled="True">
-                    <Interactivity:Interaction.Behaviors>
-                        <Core:EventTriggerBehavior EventName="ItemClick">
-                            <common:PushNavState VisualStateObject="{Binding ElementName=root}" TargetState="FlipView"/>
-                        </Core:EventTriggerBehavior>
-                    </Interactivity:Interaction.Behaviors>
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
