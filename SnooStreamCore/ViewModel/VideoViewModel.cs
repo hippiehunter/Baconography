@@ -40,17 +40,18 @@ namespace SnooStream.ViewModel
 
 		internal override async Task LoadContent(bool previewOnly, Action<int> progress, CancellationToken cancelToken)
         {
-            var videoResult = await VideoAcquisition.GetPlayableStreams(Url, SnooStreamViewModel.SystemServices.SendGet);
+            var videoResult = VideoAcquisition.GetVideo(Url);
             if (videoResult != null)
             {
-                AvailableStreams = new ObservableCollection<Tuple<string, string>>(videoResult.PlayableStreams);
+                AvailableStreams = new ObservableCollection<Tuple<string, string>>(await videoResult.PlayableStreams(cancelToken));
 				if (AvailableStreams.Count > 0)
 				{
 					SelectedStream = AvailableStreams[0].Item1;
 				}
-				if (!string.IsNullOrWhiteSpace(videoResult.PreviewUrl))
+				var previewResult = await videoResult.PreviewUrl(cancelToken);
+				if (!string.IsNullOrWhiteSpace(previewResult))
 				{
-					var image = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(videoResult.PreviewUrl, progress, cancelToken, (ex) =>
+					var image = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(previewResult, progress, cancelToken, (ex) =>
 						{
 							Errored = true;
 							Error = ex.Message;

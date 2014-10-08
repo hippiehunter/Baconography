@@ -10,3 +10,6 @@
 [submodule "winrtxamltoolkit"]
 	path = winrtxamltoolkit
 	url = https://git01.codeplex.com/winrtxamltoolkit
+[submodule "CommonResourceAcquisition"]
+	path = CommonResourceAcquisition
+	url = https://github.com/hippiehunter/CommonResourceAcquisition.git

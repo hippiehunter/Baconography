@@ -121,9 +121,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="CommonResourceAcquisition">
-      <HintPath>..\packages\CommonResourceAcquisition.1.0.1\lib\portable-net45+win+wpa81+wp80\CommonResourceAcquisition.dll</HintPath>
-    </Reference>
     <Reference Include="GalaSoft.MvvmLight">
       <HintPath>..\packages\Portable.MvvmLightLibs.4.4.32.1\lib\portable-net45+wp8+win8+wpa81\GalaSoft.MvvmLight.dll</HintPath>
     </Reference>
@@ -147,6 +144,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CommonResourceAcquisition\CommonResourceAcquisition.csproj">
+      <Project>{9316a5e4-85f8-4833-839f-a2e03c97bd67}</Project>
+      <Name>CommonResourceAcquisition</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NBoilerpipePortable\NBoilerpipePortable.csproj">
       <Project>{17272736-fe78-416b-96c4-90fcf0bea45b}</Project>
       <Name>NBoilerpipePortable</Name>

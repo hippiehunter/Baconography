@@ -118,9 +118,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="CommonResourceAcquisition">
-      <HintPath>..\..\packages\CommonResourceAcquisition.1.0.1\lib\portable-net45+win+wpa81+wp80\CommonResourceAcquisition.dll</HintPath>
-    </Reference>
     <Reference Include="GalaSoft.MvvmLight">
       <HintPath>..\..\packages\Portable.MvvmLightLibs.4.4.32.1\lib\wpa81\GalaSoft.MvvmLight.dll</HintPath>
     </Reference>
@@ -136,22 +133,21 @@
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\..\packages\Portable.MvvmLightLibs.4.4.32.1\lib\wpa81\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.Extensions">
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.2.27-beta\lib\wpa81\System.Net.Http.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.Primitives">
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.2.27-beta\lib\wpa81\System.Net.Http.Primitives.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.5\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\GifRenderer\GifRenderer.WindowsPhone\GifRenderer.WindowsPhone.vcxproj">
+    <ProjectReference Include="..\..\..\CommonResourceAcquisition\CommonResourceAcquisition.csproj">
+      <Project>{9316a5e4-85f8-4833-839f-a2e03c97bd67}</Project>
+      <Name>CommonResourceAcquisition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GifRenderer\GifRenderer.WindowsPhone\GifRenderer.WindowsPhone.vcxproj">
       <Project>{57985df4-90bc-4b9f-b1fc-291a30a48156}</Project>
       <Name>GifRenderer.WindowsPhone</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\SnooDom\SnooDom.WindowsPhone\SnooDom.WindowsPhone.vcxproj">
+    <ProjectReference Include="..\..\SnooDom\SnooDom.WindowsPhone\SnooDom.WindowsPhone.vcxproj">
       <Project>{3434fe66-ee43-4c14-ad32-b6ebdb174c7e}</Project>
       <Name>SnooDom.WindowsPhone</Name>
     </ProjectReference>
@@ -198,11 +194,6 @@
     <Error Condition="!Exists('..\..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets'))" />
   </Target>
   <Import Project="..\..\packages\KitaroDB.2.2.1\build\wpa81\KitaroDB.targets" Condition="Exists('..\..\packages\KitaroDB.2.2.1\build\wpa81\KitaroDB.targets')" />
-  <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.17-beta\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.17-beta\tools\Microsoft.Bcl.Build.targets')" />
-  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
-    <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.17-beta\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
-    <Error Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.17-beta\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
-  </Target>
   <Import Project="..\..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets" Condition="Exists('..\..\packages\NokiaImagingSDK.1.2.151\build\wpa81\NokiaImagingSDK.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
