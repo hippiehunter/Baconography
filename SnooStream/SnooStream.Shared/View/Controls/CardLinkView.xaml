@@ -1,0 +1,117 @@
+﻿<UserControl
+    x:Class="SnooStream.View.Controls.CardLinkView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream.View.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DataContext="{Binding Source={StaticResource SnooStream}, Path=SubredditRiver.SelectedRiver.CurrentSelected}">
+    
+    <Border Background="{StaticResource PhoneChromeBrush}" Margin="0,0,0,12">
+        <Grid HorizontalAlignment="Stretch" Margin="12,0,12,12">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                   HorizontalAlignment="Left" TextWrapping="Wrap"
+                   Style="{StaticResource SubheaderTextBlockStyle}"
+                   Text="{Binding Title}"
+                   TextTrimming="WordEllipsis"
+                   MaxHeight="200">
+                <TextBlock.Foreground>
+                    <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
+                </TextBlock.Foreground>
+            </TextBlock>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+                <TextBlock Text="{Binding Author}" />
+                <TextBlock Opacity="0.75" FontStyle="Italic"
+                    Text="{Binding Path=AuthorFlairText}" Margin="4,0,0,0"
+                    Visibility="{Binding HasAuthorFlair, Converter={StaticResource booleanVisibilityConverter}}"/>
+                <TextBlock Text="-" Margin="6,0,6,0" />
+                <TextBlock VerticalAlignment="Center" Text="{Binding Domain, Converter={StaticResource domainConverter}}"/>
+            </StackPanel>
+
+            <Button Grid.Row="2" Margin="-12,0,-12,0"
+                    BorderThickness="0"
+                    VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" 
+                    Tapped="Button_Tap" >
+                <Button.Content>
+                    <Grid Margin="0,0,0,0" VerticalAlignment="Stretch">
+                        <Border BorderThickness="0"
+                                Margin="0,0,0,0" VerticalAlignment="Center"
+                                Visibility="{Binding HasThumbnail, Converter={StaticResource booleanVisibilityConverter}}">
+                            <Grid>
+                                <Image Source="{Binding Thumbnail}" HorizontalAlignment="Stretch" Stretch="UniformToFill" Margin="0"
+                                       VerticalAlignment="Center" MaxHeight="175"/>
+                                <Border Padding="2" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                                    <Border.Background>
+                                        <SolidColorBrush Color="Black" Opacity="0.3" />
+                                    </Border.Background>
+                                    <TextBlock FontFamily="Segoe UI Symbol" FontSize="36"
+                                        Foreground="White"
+                                        Text="{Binding Converter={StaticResource linkGlyphConverter}}" />
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                                Visibility="{Binding HasThumbnail, Converter={StaticResource invertedBooleanVisibilityConverter}}">
+                            <TextBlock FontFamily="Segoe UI Symbol" FontSize="56" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Margin="0,12,0,0"
+                                       Text="{Binding Converter={StaticResource linkGlyphConverter}}" />
+                        </Border>
+                    </Grid>
+                </Button.Content>
+            </Button>
+
+            <Grid Grid.Row="3" Margin="0,6,0,0" HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0">
+                    <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}}" />
+                    <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="{Binding Subreddit}" />
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button
+                        HorizontalContentAlignment="Right" HorizontalAlignment="Center"
+                        BorderThickness="0" Margin="0,-12,-24,0" Padding="0"
+                        Command="{Binding Votable.ToggleVote}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="0,0,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=1, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol"/>
+                            <TextBlock Margin="-6,4,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=0, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol">
+                                <TextBlock.RenderTransform>
+                                    <RotateTransform Angle="180" CenterX="9" CenterY="12" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                            <TextBlock Margin="-2,0,0,0" Text="{Binding Path=Votable.TotalVotes}"
+                               Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Margin="0,-12,0,0"
+                            BorderThickness="0" Padding="0" HorizontalContentAlignment="Right"
+                            FontFamily="Segoe UI Symbol" HorizontalAlignment="Stretch"
+                            Command="{Binding NavigateToComments}">
+                        <Grid>
+                            <TextBlock Margin="0,0,0,0" FontSize="36" Text="&#xE200;" />
+                            <TextBlock Margin="2,12,0,0" Text="{Binding Path=CommentCount}" Foreground="Black" HorizontalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+    
+</UserControl>
