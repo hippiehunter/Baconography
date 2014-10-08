@@ -57,7 +57,7 @@
 			</DataTemplate>
 		</Grid.Resources>
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="Auto"/>
+			<ColumnDefinition Width="50"/>
 			<ColumnDefinition Width="*"/>
 		</Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -66,7 +66,8 @@
         </Grid.RowDefinitions>
 
 
-        <Button x:Name="search" Grid.RowSpan="2" Padding="0" Margin="0" BorderThickness="0" VerticalAlignment="Top" HorizontalAlignment="Left">
+        <Button x:Name="search" Grid.RowSpan="2" Padding="0" Margin="-24,0,0,0" BorderThickness="0" VerticalAlignment="Top" HorizontalAlignment="Left"
+                Width="50">
             <Interactivity:Interaction.Behaviors>
                 <Core:EventTriggerBehavior EventName="Click">
                     <common:PushNavState VisualStateObject="{Binding ElementName=root}" TargetState="ShowSearch"/>
@@ -74,19 +75,31 @@
             </Interactivity:Interaction.Behaviors>
             <SymbolIcon Symbol="Find"/>
         </Button>
-        <TextBox Grid.ColumnSpan="2" PlaceholderText="Search for subreddit" Visibility="Collapsed" x:Name="searchBox" KeyDown="manualBox_KeyDown" Text="{Binding Path=SearchString, Mode=TwoWay}"/>
+        <TextBox Grid.Column="1" PlaceholderText="Search for subreddit"
+                 Margin="-3,0,-3,0"
+                 Visibility="Collapsed" x:Name="searchBox" KeyDown="manualBox_KeyDown" Text="{Binding Path=SearchString, Mode=TwoWay}"/>
         <ListView Grid.Column="1" Grid.Row="1"
-			x:Name="listBox" MinWidth="360"
+			x:Name="listBox"
 			HorizontalAlignment="Stretch"
 			HorizontalContentAlignment="Stretch"
 			Margin="-12,0,-12,0" ItemsSource="{Binding Subreddits, Converter={StaticResource collectionConverter}}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
 			<ListView.ItemTemplate>
 				<DataTemplate>
-					<Button Margin="0,0,0,-18" BorderThickness="0" Tapped="listBox_ItemTap">
-						<localC:SubredditSmallView />
+					<Button Margin="0,0,0,-18" BorderThickness="0" Tapped="listBox_ItemTap"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+						<localC:SubredditSmallView HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" />
 					</Button>
 				</DataTemplate>
 			</ListView.ItemTemplate>
+            <ListView.Footer>
+                <Grid Height="12" />
+            </ListView.Footer>
 		</ListView>
 	</Grid>
 </UserControl>
