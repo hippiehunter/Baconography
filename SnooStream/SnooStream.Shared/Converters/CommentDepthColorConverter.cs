@@ -1,5 +1,4 @@
-﻿using Microsoft.Practices.ServiceLocation;
-using SnooStream.ViewModel;
+﻿using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
