@@ -8,8 +8,8 @@
     mc:Ignorable="d"
     d:DataContext="{Binding Source={StaticResource SnooStream}, Path=SubredditRiver.SelectedRiver.CurrentSelected}">
     
-    <Border Background="{StaticResource PhoneChromeBrush}" Margin="0,0,0,12">
-        <Grid HorizontalAlignment="Stretch" Margin="12,0,12,12">
+    <Border Background="{StaticResource PhoneChromeBrush}" Margin="0,0,0,24">
+        <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0">
             
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -38,7 +38,7 @@
                 <TextBlock VerticalAlignment="Center" Text="{Binding Domain, Converter={StaticResource domainConverter}}"/>
             </StackPanel>
 
-            <Button Grid.Row="2" Margin="-12,0,-12,0"
+            <Button Grid.Row="2" Margin="-24,0,-24,0"
                     BorderThickness="0"
                     VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" 
