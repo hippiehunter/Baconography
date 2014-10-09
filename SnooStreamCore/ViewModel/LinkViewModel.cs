@@ -5,6 +5,8 @@ using GalaSoft.MvvmLight.Command;
 using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Model;
+using SnooStream.Services;
+using SnooStream.ViewModel.Content;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,104 +23,19 @@ namespace SnooStream.ViewModel
             Context = context;
             Link = link;
             Comments = new CommentsViewModel(this, link);
+			_content = new Lazy<ContentViewModel>(() => SnooStream.ViewModel.Content.ContentViewModel.MakeContentViewModel(link.Url, link.Title, this, link.Thumbnail));
         }
 
         public bool HasContext { get { return true; } }
 
-		//private async Task<ContentViewModel> LoadContent()
-		//{
-		//	try
-		//	{
-		//		string targetHost = null;
-		//		string fileName = null;
-
-		//		if(Uri.IsWellFormedUriString(Link.Url, UriKind.Absolute))
-		//		{
-		//			var uri = new Uri(Link.Url);
-		//			targetHost = uri.DnsSafeHost.ToLower();
-		//			fileName = uri.AbsolutePath;
-		//		}
-
-
-		//		if(Link.IsSelf)
-		//			return new SelfContentViewModel(this, Link);
-		//		else if(LinkGlyphUtility.IsComment(Link.Url) ||
-		//			LinkGlyphUtility.IsCommentsPage(Link.Url) ||
-		//			LinkGlyphUtility.IsSubreddit(Link.Url) ||
-		//			LinkGlyphUtility.IsUser(Link.Url) ||
-		//			LinkGlyphUtility.IsUserMultiReddit(Link.Url))
-		//		{
-		//			return new InternalRedditContentViewModel(this, Link.Url);
-		//		}
-		//		else if (targetHost == "www.youtube.com" ||
-		//			targetHost == "www.youtu.be" ||
-		//			targetHost == "youtu.be" ||
-		//			targetHost == "youtube.com" ||
-		//			targetHost == "vimeo.com" ||
-		//			targetHost == "www.vimeo.com" ||
-		//			targetHost == "liveleak.com" ||
-		//			targetHost == "www.liveleak.com")
-		//		{
-		//			if (VideoAcquisition.IsAPI(Link.Url))
-		//			{
-		//				return new VideoViewModel(this, Link.Url);
-		//			}
-		//			else
-		//			{
-		//				return new WebViewModel(this, true, Link.Url);
-		//			}
-		//		}
-		//		else 
-		//		{
-		//			if (ImageAcquisition.IsImageAPI(Link.Url))
-		//			{
-		//				var imageApiResults = await ImageAcquisition.GetImagesFromUrl(Link.Title, Link.Url);
-		//				if (imageApiResults != null && imageApiResults.Count() > 1)
-		//					return new AlbumViewModel(this, Link.Url, imageApiResults, Link.Title);
-		//				else if (imageApiResults != null && imageApiResults.Count() == 1)
-		//				{
-		//					CancellationTokenSource tokenSource = new CancellationTokenSource();
-		//					ImageViewModel ivmResult = null;
-		//					var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(imageApiResults.First().Item2, (progress) => { }, tokenSource.Token, (ex) =>
-		//						{
-		//							if(ivmResult != null)
-		//							{
-		//								ivmResult.Error = ex.Message;
-		//								ivmResult.Errored = true;
-		//							}
-		//						});
-		//					ivmResult = new ImageViewModel(this, imageApiResults.First().Item2, imageApiResults.First().Item1, imageLoader);
-		//					return ivmResult;
-		//				}
-                            
-		//			}
-		//			else if (fileName.EndsWith(".jpg") ||
-		//				fileName.EndsWith(".png") ||
-		//				fileName.EndsWith(".gif") ||
-		//				fileName.EndsWith(".jpeg"))
-		//			{
-		//				CancellationTokenSource tokenSource = new CancellationTokenSource();
-		//				ImageViewModel ivmResult = null;
-		//				var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(Link.Url, (progress) => { }, tokenSource.Token, (ex) =>
-		//				{
-		//					if (ivmResult != null)
-		//					{
-		//						ivmResult.Error = ex.Message;
-		//						ivmResult.Errored = true;
-		//					}
-		//				});
-		//				ivmResult = new ImageViewModel(this, Link.Url, Link.Title, imageLoader);
-		//				return ivmResult;
-		//			}
-                    
-		//			return new WebViewModel(this, true, Link.Url);
-		//		}
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		return new ErrorContentViewModel(this, ex);
-		//	}
-		//}
+		Lazy<ContentViewModel> _content;
+		public ContentViewModel Content
+		{
+			get
+			{
+				return _content.Value;
+			}
+		}
 
         public ViewModelBase Context { get; private set; }
         public CommentsViewModel Comments { get; internal set; }
@@ -131,8 +48,8 @@ namespace SnooStream.ViewModel
 			Votable.MergeVotable(link);
         }
 
-        object _selfText;
-        public object SelfText
+		MarkdownData _selfText;
+        public MarkdownData SelfText
         {
             get
             {

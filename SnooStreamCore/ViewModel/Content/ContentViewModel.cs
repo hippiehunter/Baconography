@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel.Content
 {
-	public class ContentViewModel : ViewModelBase
+	public abstract class ContentViewModel : ViewModelBase
 	{
 		protected CancellationTokenSource CancelToken = new CancellationTokenSource(SnooStreamViewModel.Settings.ContentTimeout);
 		public static ContentViewModel MakeContentViewModel(string url, string title = null, LinkViewModel selfLink = null, string redditThumbnail = null)
@@ -27,7 +27,7 @@ namespace SnooStream.ViewModel.Content
 			}
 
 
-			if (selfLink != null)
+			if (selfLink != null && selfLink.IsSelfPost)
 			{
 				return new SelfViewModel(selfLink);
 			}
@@ -101,5 +101,20 @@ namespace SnooStream.ViewModel.Content
 		{
 			CancelToken = new CancellationTokenSource(SnooStreamViewModel.Settings.ContentTimeout);
 		}
+
+		public async void StartLoad(int? timeout)
+		{
+			CancelToken = new CancellationTokenSource(timeout ?? SnooStreamViewModel.Settings.ContentTimeout);
+			try
+			{
+				await StartLoad();
+			}
+			catch (Exception ex)
+			{
+				SetErrorStatus(ex.Message);
+			}
+		}
+
+		protected abstract Task StartLoad();
 	}
 }

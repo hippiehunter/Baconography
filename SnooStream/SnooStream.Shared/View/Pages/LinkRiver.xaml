@@ -43,7 +43,7 @@
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <local:SimpleLinkView/>
+                        <local:CardLinkView/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

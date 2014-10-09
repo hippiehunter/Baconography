@@ -29,29 +29,17 @@ namespace SnooStream.Common
 		{
 			Preview result = null;
 			if (content is ImageViewModel)
-			{
 				LoadPreview(content as ImageViewModel, (PreviewImage)(result = new PreviewImage()));
-			}
 			else if (content is AlbumViewModel)
-			{
 				LoadPreview(content as AlbumViewModel, (PreviewImage)(result = new PreviewImage()));
-			}
 			else if (content is PlainWebViewModel)
-			{
 				LoadPreview(content as PlainWebViewModel, (PreviewText)(result = new PreviewText()));
-			}
 			else if (content is InternalRedditViewModel)
-			{
 				LoadPreview(content as InternalRedditViewModel, (PreviewText)(result = new PreviewText()));
-			}
 			else if (content is VideoViewModel)
-			{
 				LoadPreview(content as VideoViewModel, (PreviewImage)(result = new PreviewImage()));
-			}
 			else if (content is SelfViewModel)
-			{
 				LoadPreview(content as SelfViewModel, (PreviewText)(result = new PreviewText()));
-			}
 			else
 				throw new NotImplementedException("invalid content type");
 
@@ -68,7 +56,7 @@ namespace SnooStream.Common
 			{
 				target.ThumbnailUrl = await albumViewModel.FirstUrl();
 			}
-			catch(TaskCanceledException canceledEx)
+			catch(TaskCanceledException)
 			{
 
 			}
@@ -80,22 +68,32 @@ namespace SnooStream.Common
 			{
 				target.ThumbnailUrl = await videoViewModel.StillUrl();
 			}
-			catch (TaskCanceledException canceledEx)
+			catch (TaskCanceledException)
 			{
 
 			}
 		}
 
-		private static async void LoadPreview(PlainWebViewModel videoViewModel, PreviewText target)
+		private static async void LoadPreview(PlainWebViewModel plainWebViewModel, PreviewText target)
 		{
+			try
+			{
+				target.Synopsis = await plainWebViewModel.FirstParagraph();
+			}
+			catch(TaskCanceledException)
+			{
+
+			}
 		}
 
-		private static async void LoadPreview(SelfViewModel selfViewModel, PreviewText target)
+		private static void LoadPreview(SelfViewModel selfViewModel, PreviewText target)
 		{
+			target.Synopsis = selfViewModel.SelfText;
 		}
 
-		private static async void LoadPreview(InternalRedditViewModel internalRedditViewModel, PreviewText target)
+		private static void LoadPreview(InternalRedditViewModel internalRedditViewModel, PreviewText target)
 		{
+			//TODO ??
 		}
 	}
 	public class PreviewText : Preview

@@ -66,7 +66,7 @@ namespace SnooStream.Model
     {
         public Settings(Dictionary<string, string> init)
         {
-			ContentTimeout = init.DefaultGet("AllowOver18", 60 * 1000); //default to 60 seconds
+			ContentTimeout = init.DefaultGet("ContentTimeout", 60 * 1000); //default to 60 seconds
             AllowOver18 = init.DefaultGet("AllowOver18", false);
             AllowOver18Items = init.DefaultGet("AllowOver18Items", false);
             OpenLinksInBrowser = init.DefaultGet("OpenLinksInBrowser", true);

@@ -1,5 +1,7 @@
 ﻿using SnooStream.Common;
 using SnooStream.View.Controls;
+using SnooStream.ViewModel;
+using SnooStream.ViewModel.Content;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,13 +13,15 @@ namespace SnooStream.Converters
     {
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{
-			if (value is PreviewText)
+			var linkViewModel = value as LinkViewModel;
+			var preview = Preview.LoadLinkPreview(linkViewModel.Content);
+			if (preview is PreviewText)
 			{
-				return new PreviewTextControl { DataContext = value };
+				return new PreviewTextControl { DataContext = preview };
 			}
-			else if (value is PreviewImage)
+			else if (preview is PreviewImage)
 			{
-				return new PreviewImageControl { DataContext = value };
+				return new PreviewImageControl { DataContext = preview };
 			}
 			else
 			{

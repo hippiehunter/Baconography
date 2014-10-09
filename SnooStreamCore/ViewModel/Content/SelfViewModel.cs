@@ -15,5 +15,18 @@ namespace SnooStream.ViewModel.Content
 		{
 			_selfLink = selfLink;
 		}
+
+		public string SelfText
+		{
+			get
+			{
+				return _selfLink.SelfText.BasicText;
+			}
+		}
+
+		protected override Task StartLoad()
+		{
+			return _selfLink.Comments.LoadFull();
+		}
 	}
 }

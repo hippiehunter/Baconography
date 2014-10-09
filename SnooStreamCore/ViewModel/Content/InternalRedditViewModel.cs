@@ -9,12 +9,17 @@ namespace SnooStream.ViewModel.Content
 {
 	public class InternalRedditViewModel : ContentViewModel
 	{
-		private string url;
+		private string _url;
 
 		public InternalRedditViewModel(string url)
 		{
-			// TODO: Complete member initialization
-			this.url = url;
+			_url = url;
+		}
+
+		protected override Task StartLoad()
+		{
+			//TODO ??
+			return Task.FromResult(true);
 		}
 	}
 }

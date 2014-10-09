@@ -58,6 +58,7 @@ namespace SnooStream.ViewModel.Content
 				if (!_hasLoaded)
 				{
 					var apiResult = await _viewModel._apiResult.Value;
+					_hasLoaded = true;
 					return apiResult.Select(tpl => new ImageViewModel(tpl.Item2, tpl.Item1, null));
 				}
 				else
@@ -85,6 +86,11 @@ namespace SnooStream.ViewModel.Content
 			}
 			else
 				return RedditThumbnail;
+		}
+
+		protected override Task StartLoad()
+		{
+			return FirstUrl();
 		}
 	}
 }

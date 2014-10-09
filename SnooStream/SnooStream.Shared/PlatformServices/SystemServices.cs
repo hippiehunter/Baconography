@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using Nokia.Graphics.Imaging;
 using Nokia.InteropServices.WindowsRuntime;
+using SnooStream.Common;
 using SnooStream.Services;
 using SnooStream.ViewModel;
 using System;
@@ -703,7 +704,7 @@ namespace SnooStream.PlatformServices
 
 		public ObservableCollection<T> MakeIncrementalLoadCollection<T>(IIncrementalCollectionLoader<T> loader, int loadIncrement = 5, int auxiliaryTimeout = 2500)
 		{
-			throw new NotImplementedException();
+			return new BufferedAuxiliaryIncrementalLoadCollection<T>(loader, loadIncrement, auxiliaryTimeout);
 		}
 
 

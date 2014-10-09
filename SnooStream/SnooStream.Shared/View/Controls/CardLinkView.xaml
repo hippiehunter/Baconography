@@ -29,47 +29,13 @@
                 </TextBlock.Foreground>
             </TextBlock>
 
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
-                <TextBlock Text="{Binding Author}" />
-                <TextBlock Opacity="0.75" FontStyle="Italic"
-                    Text="{Binding Path=AuthorFlairText}" Margin="4,0,0,0"
-                    Visibility="{Binding HasAuthorFlair, Converter={StaticResource booleanVisibilityConverter}}"/>
-                <TextBlock Text="-" Margin="6,0,6,0" />
-                <TextBlock VerticalAlignment="Center" Text="{Binding Domain, Converter={StaticResource domainConverter}}"/>
-            </StackPanel>
+            <ContentControl Grid.Row="1" HorizontalAlignment="Stretch" Content="{Binding Converter={StaticResource linkMetadataConverter}}"/>
 
             <Button Grid.Row="2" Margin="-24,0,-24,0"
                     BorderThickness="0"
                     VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" 
-                    Tapped="Button_Tap" >
-                <Button.Content>
-                    <Grid Margin="0,0,0,0" VerticalAlignment="Stretch">
-                        <Border BorderThickness="0"
-                                Margin="0,0,0,0" VerticalAlignment="Center"
-                                Visibility="{Binding HasThumbnail, Converter={StaticResource booleanVisibilityConverter}}">
-                            <Grid>
-                                <Image Source="{Binding Thumbnail}" HorizontalAlignment="Stretch" Stretch="UniformToFill" Margin="0"
-                                       VerticalAlignment="Center" MaxHeight="175"/>
-                                <Border Padding="2" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                                    <Border.Background>
-                                        <SolidColorBrush Color="Black" Opacity="0.3" />
-                                    </Border.Background>
-                                    <TextBlock FontFamily="Segoe UI Symbol" FontSize="36"
-                                        Foreground="White"
-                                        Text="{Binding Converter={StaticResource linkGlyphConverter}}" />
-                                </Border>
-                            </Grid>
-                        </Border>
-
-                        <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                                Visibility="{Binding HasThumbnail, Converter={StaticResource invertedBooleanVisibilityConverter}}">
-                            <TextBlock FontFamily="Segoe UI Symbol" FontSize="56" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                       Margin="0,12,0,0"
-                                       Text="{Binding Converter={StaticResource linkGlyphConverter}}" />
-                        </Border>
-                    </Grid>
-                </Button.Content>
+                    Tapped="Button_Tap" Content="{Binding Converter={StaticResource contentPreviewConverter}}">
             </Button>
 
             <Grid Grid.Row="3" Margin="0,6,0,0" HorizontalAlignment="Stretch">
@@ -77,12 +43,6 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                
-                <StackPanel Grid.Column="0">
-                    <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}}" />
-                    <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="{Binding Subreddit}" />
-                </StackPanel>
-                
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button
                         HorizontalContentAlignment="Right" HorizontalAlignment="Center"

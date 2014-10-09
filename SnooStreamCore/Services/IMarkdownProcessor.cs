@@ -14,5 +14,6 @@ namespace SnooStream.Services
     public class MarkdownData
     {
         public object MarkdownDom { get; set; }
+		public string BasicText { get; set; }
     }
 }

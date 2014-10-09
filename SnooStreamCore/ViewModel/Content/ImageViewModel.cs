@@ -31,5 +31,10 @@ namespace SnooStream.ViewModel.Content
 				});
 			}
 		}
+
+		protected override Task StartLoad()
+		{
+			return ImageLoader.ForceLoad(SnooStreamViewModel.Settings.ContentTimeout);
+		}
 	}
 }
