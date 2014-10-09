@@ -33,6 +33,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BoolToAccentBrushConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CommentDepthColorConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CommentDepthMarginConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\ContentConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ContentPreviewConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\DomainConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\InvertedBooleanConverter.cs" />
@@ -66,6 +67,18 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\ComposePostView.xaml.cs">
       <DependentUpon>ComposePostView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\Content\AlbumControl.xaml.cs">
+      <DependentUpon>AlbumControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\Content\ImageControl.xaml.cs">
+      <DependentUpon>ImageControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\Content\PlainWebControl.xaml.cs">
+      <DependentUpon>PlainWebControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\Content\VideoControl.xaml.cs">
+      <DependentUpon>VideoControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\ExtendedAppBarControl.xaml.cs">
       <DependentUpon>ExtendedAppBarControl.xaml</DependentUpon>
@@ -147,6 +160,22 @@
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\ComposePostView.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\Content\AlbumControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\Content\ImageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\Content\PlainWebControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\Content\VideoControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\ExtendedAppBarControl.xaml">
       <SubType>Designer</SubType>

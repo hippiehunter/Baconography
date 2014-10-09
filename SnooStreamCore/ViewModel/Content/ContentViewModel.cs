@@ -14,8 +14,10 @@ namespace SnooStream.ViewModel.Content
 	public abstract class ContentViewModel : ViewModelBase
 	{
 		protected CancellationTokenSource CancelToken = new CancellationTokenSource(SnooStreamViewModel.Settings.ContentTimeout);
+		public string Glyph { get; set; }
 		public static ContentViewModel MakeContentViewModel(string url, string title = null, LinkViewModel selfLink = null, string redditThumbnail = null)
 		{
+			ContentViewModel result = null;
 			string targetHost = null;
 			string fileName = null;
 
@@ -26,10 +28,11 @@ namespace SnooStream.ViewModel.Content
 				fileName = uri.AbsolutePath;
 			}
 
+			var glyph = LinkGlyphUtility.GetLinkGlyph((selfLink as object) ?? (url as object));
 
 			if (selfLink != null && selfLink.IsSelfPost)
 			{
-				return new SelfViewModel(selfLink);
+				result = new SelfViewModel(selfLink);
 			}
 			else if (LinkGlyphUtility.IsComment(url) ||
 				LinkGlyphUtility.IsCommentsPage(url) ||
@@ -37,7 +40,7 @@ namespace SnooStream.ViewModel.Content
 				LinkGlyphUtility.IsUser(url) ||
 				LinkGlyphUtility.IsUserMultiReddit(url))
 			{
-				return new InternalRedditViewModel(url);
+				result = new InternalRedditViewModel(url);
 			}
 			else if (targetHost == "www.youtube.com" ||
 				targetHost == "www.youtu.be" ||
@@ -49,28 +52,31 @@ namespace SnooStream.ViewModel.Content
 				targetHost == "www.liveleak.com")
 			{
 				if (VideoAcquisition.IsAPI(url))
-					return new VideoViewModel(url);
+					result = new VideoViewModel(url);
 				else
-					return new PlainWebViewModel(true, url, redditThumbnail);
+					result = new PlainWebViewModel(true, url, redditThumbnail);
 
 			}
 			else
 			{
 				if (ImageAcquisition.IsImageAPI(url))
 				{
-					return new AlbumViewModel(url, title, redditThumbnail);
+					result = new AlbumViewModel(url, title, redditThumbnail);
 				}
 				else if (fileName.EndsWith(".jpg") ||
 					fileName.EndsWith(".png") ||
 					fileName.EndsWith(".gif") ||
 					fileName.EndsWith(".jpeg"))
 				{
-					return new ImageViewModel(url, title, redditThumbnail);
+					result = new ImageViewModel(url, title, redditThumbnail);
 				}
 				else
-					return new PlainWebViewModel(true, url, redditThumbnail);
+					result = new PlainWebViewModel(true, url, redditThumbnail);
 			}
 
+			result.Glyph = glyph;
+
+			return result;
 		}
 
 		private int _progress = 0;

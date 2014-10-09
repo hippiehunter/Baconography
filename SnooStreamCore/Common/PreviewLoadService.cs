@@ -24,6 +24,7 @@ namespace SnooStream.Common
 				RaisePropertyChanged("ThumbnailUrl");
 			}
 		}
+		public string Glyph { get; set; }
 
 		public static Preview LoadLinkPreview(ContentViewModel content)
 		{
@@ -42,6 +43,8 @@ namespace SnooStream.Common
 				LoadPreview(content as SelfViewModel, (PreviewText)(result = new PreviewText()));
 			else
 				throw new NotImplementedException("invalid content type");
+
+			result.Glyph = content.Glyph;
 
 			return result;
 		}

@@ -118,7 +118,9 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="Help\Nokia Imaging SDK.chm" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="SnooStream.Windows_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
