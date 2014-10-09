@@ -671,9 +671,10 @@ namespace SnooStream.PlatformServices
 
 			public bool Loaded { get; set; }
 			Lazy<Task> _forceLoadTask;
-			public Task ForceLoad
+			public Task ForceLoad(int timeout)
 			{
-				get { return _forceLoadTask.Value; }
+				//TODO let this timeout and trigger the cancel task
+				return _forceLoadTask.Value;
 			}
 		}
 
