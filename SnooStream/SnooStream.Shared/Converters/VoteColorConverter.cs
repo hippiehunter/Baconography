@@ -16,6 +16,7 @@ namespace SnooStream.Converters
     {
         private static Brush upvote = new SolidColorBrush(Colors.Orange);
         private static Brush downvote = new SolidColorBrush(Color.FromArgb(0xFF, 0x87, 0xCE, 0xFA));
+        private static Brush neutral = new SolidColorBrush(Colors.White);
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
@@ -51,7 +52,7 @@ namespace SnooStream.Converters
                 }
             }
 
-            return upvote;
+            return neutral;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

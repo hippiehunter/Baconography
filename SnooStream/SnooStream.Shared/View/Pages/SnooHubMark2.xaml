@@ -7,10 +7,11 @@
     xmlns:common="using:SnooStream.Common"
     x:Class="SnooStream.View.Pages.SnooHubMark2"
     mc:Ignorable="d"
+    
     DataContext="{StaticResource SnooStream}">
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
-    <Grid x:Name="LayoutRoot">
+    <Grid x:Name="LayoutRoot" Margin="0,24,0,0">
         <Hub>
             <!--Panorama item one-->
             <HubSection Header="subreddits">

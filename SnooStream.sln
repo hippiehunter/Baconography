@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GifRenderer", "GifRenderer", "{A63CCFBD-164C-4896-9306-25FF73E85DD4}"
 EndProject
@@ -47,6 +47,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F6CBD2
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnooSharp", "SnooSharp\SnooSharp.csproj", "{D9BAA749-5BBE-4DAE-B5EA-4D70DEF266FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonResourceAcquisition", "CommonResourceAcquisition\CommonResourceAcquisition.csproj", "{9316A5E4-85F8-4833-839F-A2E03C97BD67}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -460,6 +462,30 @@ Global
 		{D9BAA749-5BBE-4DAE-B5EA-4D70DEF266FC}.Release2|Win32.ActiveCfg = Release2|Any CPU
 		{D9BAA749-5BBE-4DAE-B5EA-4D70DEF266FC}.Release2|x64.ActiveCfg = Release2|Any CPU
 		{D9BAA749-5BBE-4DAE-B5EA-4D70DEF266FC}.Release2|x86.ActiveCfg = Release2|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release|ARM.ActiveCfg = Release|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release|Win32.ActiveCfg = Release|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release|x64.ActiveCfg = Release|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release|x86.ActiveCfg = Release|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release2|Any CPU.ActiveCfg = Release2|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release2|Any CPU.Build.0 = Release2|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release2|ARM.ActiveCfg = Release2|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release2|Mixed Platforms.ActiveCfg = Release2|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release2|Mixed Platforms.Build.0 = Release2|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release2|Win32.ActiveCfg = Release2|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release2|x64.ActiveCfg = Release2|Any CPU
+		{9316A5E4-85F8-4833-839F-A2E03C97BD67}.Release2|x86.ActiveCfg = Release2|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
