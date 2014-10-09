@@ -29,38 +29,38 @@ namespace SnooStream.ViewModel
         }
         public CaptchaViewModel(string iden)
         {
-            LoadContent(iden);
+            //LoadContent(iden);
         }
 
-        private async void LoadContent(string iden)
-        {
-            var url = "http://www.reddit.com/captcha/" + iden;
-			CancellationTokenSource tokenSource = new CancellationTokenSource();
-			var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(url, (progress) => { }, tokenSource.Token, (ex) =>
-			{
-				if (Content != null)
-				{
-					Content.Errored = true;
-					Content.Error = ex.Message;
-				}
+		//private async void LoadContent(string iden)
+		//{
+		//	var url = "http://www.reddit.com/captcha/" + iden;
+		//	CancellationTokenSource tokenSource = new CancellationTokenSource();
+		//	var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(url, (progress) => { }, tokenSource.Token, (ex) =>
+		//	{
+		//		if (Content != null)
+		//		{
+		//			Content.Errored = true;
+		//			Content.Error = ex.Message;
+		//		}
 				
-			});
-			Content = new ImageViewModel(this, url, null, imageLoader);
-			await Content.BeginLoad(SnooStreamViewModel.UIContextCancellationToken);   
-        }
+		//	});
+		//	Content = new ImageViewModel(this, url, null, imageLoader);
+		//	await Content.BeginLoad(SnooStreamViewModel.UIContextCancellationToken);   
+		//}
 
-        private ContentViewModel _content;
-        public ContentViewModel Content
-        {
-            get
-            {
-                return _content;
-            }
-            set
-            {
-                _content = value;
-                RaisePropertyChanged("Content");
-            }
-        }
+		//private ContentViewModel _content;
+		//public ContentViewModel Content
+		//{
+		//	get
+		//	{
+		//		return _content;
+		//	}
+		//	set
+		//	{
+		//		_content = value;
+		//		RaisePropertyChanged("Content");
+		//	}
+		//}
     }
 }

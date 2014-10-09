@@ -15,238 +15,38 @@
     x:Name="root">
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
-
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState x:Name="Normal"/>
-                <VisualState x:Name="FlipView">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="flipViewView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Visible" />
-                        </ObjectAnimationUsingKeyFrames>
-                        
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="normalView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Collapsed" />
-                        </ObjectAnimationUsingKeyFrames>
-
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="zoomedContentView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Collapsed" />
-                        </ObjectAnimationUsingKeyFrames>
-
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="commentsView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Collapsed" />
-                        </ObjectAnimationUsingKeyFrames>
-
-                    </Storyboard>
-                </VisualState>
-
-                <VisualState x:Name="ZoomedContent">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="zoomedContentView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Visible" />
-                        </ObjectAnimationUsingKeyFrames>
-
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="normalView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Collapsed" />
-                        </ObjectAnimationUsingKeyFrames>
-
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="flipViewView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Collapsed" />
-                        </ObjectAnimationUsingKeyFrames>
-
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="commentsView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Collapsed" />
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-
-                <VisualState x:Name="Comments">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="commentsView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Visible" />
-                        </ObjectAnimationUsingKeyFrames>
-                        
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="normalView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Collapsed" />
-                        </ObjectAnimationUsingKeyFrames>
-
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="flipViewView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Collapsed" />
-                        </ObjectAnimationUsingKeyFrames>
-
-                        <ObjectAnimationUsingKeyFrames
-                        Storyboard.TargetName="zoomedContentView"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="Collapsed" />
-                        </ObjectAnimationUsingKeyFrames>
-
-                    </Storyboard>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
-
         <Grid.Resources>
             <CollectionViewSource x:Name="linksViewSource" Source="{Binding Links, Converter={StaticResource collectionConverter}}"/>
-            
-            <DataTemplate x:Name="imageTemplate">
-                <ScrollViewer Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}" 
-                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" 
-                  ZoomMode="Enabled">
-                    <Image HorizontalAlignment="Center" VerticalAlignment="Center" DataContext="{Binding ImageSource.ImageData, Converter={StaticResource gifConverter}}" Stretch="Uniform" Source="{Binding ImageSource}" />
-                </ScrollViewer>
-            </DataTemplate>
-
-            <DataTemplate x:Name="videoTemplate" >
-                <mmppf:MediaPlayer x:Name="player" Source="{Binding SelectedStream}" IsFullScreen="True"/>
-            </DataTemplate>
-
-            <DataTemplate x:Key="Type:ReadableArticleParagraph">
-                <TextBlock HorizontalAlignment="Left" FontSize="20" Padding="0" Margin="10" Text="{Binding Text}" TextWrapping="Wrap"/>
-            </DataTemplate>
-            <DataTemplate x:Key="Type:ReadableArticleImage">
-                <Image Source="{Binding Url}" Stretch="Uniform" Margin="10"/>
-            </DataTemplate>
-
-
-            <selectors:TypedTemplateSelector x:Name="articleTemplateSelector" />
-
-
-            <DataTemplate x:Name="webTemplate" >
-                <ListView ItemsSource="{Binding WebParts}"
-                                                       Margin="0" Padding="0"
-                                                       BorderThickness="0" VerticalAlignment="Stretch" 
-                                                       ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                                       ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                                                       HorizontalContentAlignment="Stretch"
-                                                       ItemTemplateSelector="{StaticResource articleTemplateSelector}">
-                    <ListView.Header>
-                        <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" FontSize="32" Margin="20" TextWrapping="Wrap"/>
-                    </ListView.Header>
-                </ListView>
-            </DataTemplate>
-
-            <DataTemplate x:Name="selfTemplate">
-                <local:CommentsView/>
-            </DataTemplate>
-
-            <DataTemplate x:Name="albumTemplate">
-                <Grid>
-                    <!-- TODO: FIX this, its doesnt draw right and its probably not in the right place -->
-                    <!--<telerikPrimitives:RadPaginationControl Grid.Row="0" PageProvider="{Binding ElementName=albumSlideView}" DisplayMode="IndexLabel"/>-->
-                    <FlipView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}" ItemTemplate="{StaticResource imageTemplate}"
-                                                    Width="{Binding ActualWidth, ElementName=ContentPanel}" Height="{Binding ActualHeight, ElementName=ContentPanel}">
-                        <FlipView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel Orientation="Vertical"/>
-                            </ItemsPanelTemplate>
-                        </FlipView.ItemsPanel>
-                    </FlipView>
-                </Grid>
-            </DataTemplate>
-
-
-
-
-
-            <DataTemplate x:Name="loadingTemplate">
-                <Grid DataContext="{Binding Content}">
-                    <!--ProgressRing IsActive="{Binding IsInitiallyLoaded, Converter={StaticResource invertedBooleanConverter}}"/-->
-                    <selectors:ContentTemplateSelector Content="{Binding}"
-                                                       IsLoaded="True"
-                                                       Visibility="Visible"
-                                                    ImageContentTemplate="{StaticResource imageTemplate}"
-                                                    AlbumContentTemplate="{StaticResource albumTemplate}"
-                                                    TextWebContentTemplate="{StaticResource webTemplate}"
-                                                    WebContentTemplate="{StaticResource webTemplate}"
-                                                    VideoContentTemplate="{StaticResource videoTemplate}"
-                                                    SelfContentTemplate="{StaticResource selfTemplate}"/>
-                </Grid>
-            </DataTemplate>
-
-
-
-            <DataTemplate x:Name="overlayTemplate">
-                <Border HorizontalAlignment="Stretch" Margin="0,0,0,15" VerticalAlignment="Top" Height="Auto" Opacity="1">
-                    <TextBlock Text="{Binding PreviewText}" TextWrapping="Wrap" MaxHeight="300"/>
-                </Border>
-            </DataTemplate>
-
-
-
         </Grid.Resources>
-        <Grid x:Name="ContentPanel">
-            <Popup x:Name="zoomedContentView">
-                <ContentControl ContentTemplate="{StaticResource loadingTemplate}"/>
-            </Popup>
+        <Grid x:Name="normalView">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <Grid x:Name="flipViewView" Visibility="Collapsed">
-                <FlipView x:Name="flipView" ItemsSource="{Binding Source={StaticResource linksViewSource}}"
-                                            ItemTemplate="{StaticResource loadingTemplate}">
-                    <FlipView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Horizontal" VirtualizingStackPanel.VirtualizationMode="Recycling"/>
-                        </ItemsPanelTemplate>
-                    </FlipView.ItemsPanel>
-                </FlipView>
-            </Grid>
+            <!--TitlePanel contains the name of the application and page title-->
+            <StackPanel Grid.Row="0" Margin="12,17,0,28">
+                <TextBlock Text="Snoo Stream"/>
+                <TextBlock Text="{Binding Thing.DisplayName}" Margin="9,-7,0,0"/>
+            </StackPanel>
 
-            <Grid x:Name="commentsView" Visibility="Collapsed">
-                <local:CommentsView DataContext="{Binding Path=View.CurrentItem, Source={StaticResource linksViewSource}}"/>
-            </Grid>
-
-            <Grid x:Name="normalView">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <!--TitlePanel contains the name of the application and page title-->
-                <StackPanel Grid.Row="0" Margin="12,17,0,28">
-                    <TextBlock Text="Snoo Stream"/>
-                    <TextBlock Text="{Binding Thing.DisplayName}" Margin="9,-7,0,0"/>
-                </StackPanel>
-
-                <ListView Grid.Row="1" Grid.Column="0"  Margin="12,0,12,0"
-                ItemsSource="{Binding Source={StaticResource linksViewSource}}"
-                ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <local:SimpleLinkView/>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
+            <ListView Grid.Row="1" Grid.Column="0"  Margin="12,0,12,0"
+            ItemsSource="{Binding Source={StaticResource linksViewSource}}"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <local:SimpleLinkView/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </Grid>
     </Grid>
-
 </common:SnooApplicationPage>

@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     d:DataContext="{Binding Source={StaticResource SnooStream}, Path=SubredditRiver.SelectedRiver.CurrentSelected}"
     mc:Ignorable="d">
-    
+
     <Grid MinHeight="65" Margin="0,0,0,12" HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="{Binding Source={StaticResource linkViewLayoutManager}, Path=FirstColumnWidth}" />
@@ -13,79 +13,66 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Grid.Column="{Binding Source={StaticResource linkViewLayoutManager}, Path=TextColumn}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4*" />
-                <ColumnDefinition Width="1*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="3*" />
-                <RowDefinition Height="1*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Text="{Binding Title}" TextWrapping="Wrap">
-                <TextBlock.Foreground>
-                    <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
-                </TextBlock.Foreground>
-            </TextBlock>
-            <Button Grid.Row="1"
-                BorderThickness="0" Margin="0,-18,0,0" Padding="0" HorizontalContentAlignment="Left"
-                Visibility="{Binding FromMultiReddit, Converter={StaticResource booleanVisibilityConverter}}"
-                Command="{Binding GotoSubreddit}">
-                <StackPanel  Orientation="Horizontal">
-                    <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="in " />
-                    <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="{Binding Subreddit}" />
-                </StackPanel>
-            </Button>
-            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="12,-6,0,0">
-                <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}}" />
-                <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="{Binding Domain, Converter={StaticResource domainConverter}}"
-                           Margin="3,0,0,0"/>
-            </StackPanel>
-        </Grid>
+        <TextBlock Grid.Row="0" Grid.Column="{Binding Source={StaticResource linkViewLayoutManager}, Path=TextColumn}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" Text="{Binding Title}" TextWrapping="Wrap">
+            <TextBlock.Foreground>
+                <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
+            </TextBlock.Foreground>
+        </TextBlock>
         <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="120" />
-                <ColumnDefinition Width="90" />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <Button Grid.Column="0"
-                BorderThickness="0" Margin="0,-16,0,0" Padding="0" HorizontalContentAlignment="Left"
-                Command="{Binding GotoUserDetails}">
-                <StackPanel  Orientation="Horizontal">
-                    <TextBlock Foreground="Gray" VerticalAlignment="Center" Text="by " />
-                    <TextBlock Text="{Binding Author}" />
-                    <TextBlock Opacity="0.75" FontStyle="Italic"
-                        Text="{Binding Path=AuthorFlairText}" Margin="4,3,0,0"
-                        Visibility="{Binding HasAuthorFlair, Converter={StaticResource booleanVisibilityConverter}}"/>
-                </StackPanel>
-            </Button>
-
-            <Button Grid.Column="1"
-                    BorderThickness="0" Margin="0,-16,0,0" Padding="0" HorizontalContentAlignment="Left" HorizontalAlignment="Center"
+            <ContentControl Grid.ColumnSpan="4" HorizontalAlignment="Stretch" Content="{Binding Converter={StaticResource linkMetadataConverter}}"/>
+            
+            <Button Grid.Column="1" Grid.Row="1"
+                    BorderThickness="0" Margin="0" Padding="0" HorizontalContentAlignment="Center" HorizontalAlignment="Center"
                     Command="{Binding Votable.ToggleVote}">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Margin="0,0,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=1, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol"/>
-                    <TextBlock Margin="-6,4,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=0, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol">
+                    <TextBlock Margin="0,0,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=1, Mode=TwoWay}" FontSize="20" Text="&#xE110;" FontFamily="Segoe UI Symbol"/>
+                    <TextBlock Margin="-6,4,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=0, Mode=TwoWay}" FontSize="20" Text="&#xE110;" FontFamily="Segoe UI Symbol">
                         <TextBlock.RenderTransform>
                             <RotateTransform Angle="180" CenterX="9" CenterY="12" />
                         </TextBlock.RenderTransform>
                     </TextBlock>
-                    <TextBlock Margin="-2,0,0,0" Text="{Binding Path=Votable.TotalVotes}"
+                    <TextBlock Margin="-2,0,0,0" FontSize="20" Text="{Binding Path=Votable.TotalVotes}"
                                Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, Mode=TwoWay}"/>
                 </StackPanel>
             </Button>
 
-            <Button Grid.Column="2"
-                    BorderThickness="0" Margin="-5,-16,0,0" Padding="0" HorizontalContentAlignment="Left"
+            <Button Grid.Column="0" Grid.Row="1"
+                    BorderThickness="0" Margin="0" Padding="0" HorizontalContentAlignment="Center"
                     FontFamily="Segoe UI Symbol" HorizontalAlignment="Center"
                     Command="{Binding NavigateToComments}">
                 <Grid>
-                    <TextBlock Margin="0,0,0,0" FontSize="45" Text="&#xE200;" />
-                    <TextBlock Margin="2,17,0,0" Text="{Binding Path=CommentCount}"
+                    <TextBlock Margin="0,0,0,0" FontSize="40" Text="&#xE200;" />
+                    <TextBlock Margin="2,14,0,0" Foreground="{ThemeResource FlyoutBackgroundThemeBrush}" Text="{Binding Path=CommentCount}"
                                HorizontalAlignment="Center"/>
+                </Grid>
+            </Button>
+            
+            <Button Grid.Column="3" Grid.Row="1"
+                    BorderThickness="0" Padding="0" HorizontalContentAlignment="Center"
+                    FontFamily="Segoe UI Symbol" HorizontalAlignment="Center">
+                <Grid>
+                    <TextBlock Margin="0,0,0,0" FontSize="45" Text="&#xE10C;" />
+                </Grid>
+            </Button>
+
+            <Button Grid.Column="2" Grid.Row="1"
+                    BorderThickness="0" Padding="0" HorizontalContentAlignment="Center"
+                    FontFamily="Segoe UI Symbol" HorizontalAlignment="Center">
+                <Grid>
+                    <TextBlock Margin="0,0,0,0" FontSize="35" Text="&#xE113;" />
                 </Grid>
             </Button>
         </Grid>

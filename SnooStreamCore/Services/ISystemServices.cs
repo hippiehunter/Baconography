@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,12 +29,49 @@ namespace SnooStream.Services
 		void ShowProgress(string notificationText, double progressPercent);
 		void HideProgress();
 		void QueueNonCriticalUI(Action action);
+		ObservableCollection<T> MakeIncrementalLoadCollection<T>(IIncrementalCollectionLoader<T> loader, int loadIncrement = 5, int auxiliaryTimeout = 2500);
+		IWrappedCollectionViewSource MakeCollectionViewSource();
+	}
+
+	public interface IIncrementalCollectionLoader<T>
+	{
+		//Get 2nd part of two part loader, takes elements, and timeout in milliseconds, returns Task
+		Task AuxiliaryItemLoader(IEnumerable<T> items, int timeout);
+		bool IsStale { get; }
+		bool HasMore();
+		Task<IEnumerable<T>> LoadMore();
+		Task Refresh(ObservableCollection<T> current, bool onlyNew);
+	}
+
+	public interface IWrappedCollectionView
+	{
+		bool MoveCurrentTo(object item);
+		bool MoveCurrentToPosition(int position);
+		bool IsCurrentAfterLast { get; }
+		bool MoveCurrentToFirst();
+		bool IsCurrentBeforeFirst { get; }
+		bool MoveCurrentToLast();
+		bool MoveCurrentToNext();
+		bool MoveCurrentToPrevious();
+	}
+
+	public interface IWrappedCollectionViewSource
+	{
+		object UnderlyingSource { get; }
+		IWrappedCollectionView View { get; }
+		object Source { get; set; }
 	}
 
 	public interface IImageLoader
 	{
         object ImageData { get; }
         bool Loaded { get;}
-		Task ForceLoad { get;}
+
+		/// <summary>
+		/// force load with a timeout
+		/// </summary>
+		/// <param name="timeout">timeout in milliseconds before the image load is aborted</param>
+		/// <returns></returns>
+		Task ForceLoad(int timeout);
 	}
 }

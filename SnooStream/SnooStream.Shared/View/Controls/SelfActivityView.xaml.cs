@@ -16,19 +16,5 @@ namespace SnooStream.View.Controls
         {
             InitializeComponent();
         }
-
-        private async void listBox_DataRequested(object sender, EventArgs e)
-        {
-			if(((SelfViewModel)DataContext).IsLoggedIn)
-			{
-				if(((SelfViewModel)DataContext).Groups.Count == 0)
-					await ((SelfViewModel)DataContext).PullNew();
-				else
-					await ((SelfViewModel)DataContext).PullOlder();
-			}
-        }
-		private void ctrLoadMore_Tap(object sender, TappedRoutedEventArgs e)
-        {
-        }
     }
 }

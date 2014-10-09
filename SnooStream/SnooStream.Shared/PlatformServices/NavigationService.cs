@@ -48,12 +48,6 @@ namespace SnooStream.PlatformServices
             }
         }
 
-        public void NavigateToLinkStream(LinkStreamViewModel viewModel)
-        {
-			//_frame.Navigate(typeof(LinkStream), "state=" + _navState.AddState(viewModel));
-			Messenger.Default.Send(new SelectLinkMessage { Kind = SelectLinkMessage.LinkSelectionKind.Content, Link = viewModel.Current });
-        }
-
         public void NavigateToMessageReply(CreateMessageViewModel viewModel)
         {
             throw new NotImplementedException();

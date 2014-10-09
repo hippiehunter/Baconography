@@ -11,23 +11,28 @@ namespace SnooStream.Converters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            var currentTime = DateTime.UtcNow;
-            if (((DateTime)value).Year == 1)
-                return "the dawn of reddit";
-            var timeDifference = DateTimeSpan.CompareDates(currentTime, (DateTime)value);
-            if (timeDifference.Years > 0)
-                return string.Format("{0} year{1} ago", timeDifference.Years, timeDifference.Years > 1 ? "s" : "");
-            else if (timeDifference.Months > 0)
-                return string.Format("{0} month{1} ago", timeDifference.Months, timeDifference.Months > 1 ? "s" : "");
-            else if (timeDifference.Days > 0)
-                return string.Format("{0} day{1} ago", timeDifference.Days, timeDifference.Days > 1 ? "s" : "");
-            else if (timeDifference.Hours > 0)
-                return string.Format("{0} hour{1} ago", timeDifference.Hours, timeDifference.Hours > 1 ? "s" : "");
-            else if (timeDifference.Minutes > 0)
-                return string.Format("{0} minute{1} ago", timeDifference.Minutes, timeDifference.Minutes > 1 ? "s" : "");
-            else
-                return "just now";
+			return GetRelationString(value);
         }
+
+		public static string GetRelationString(object value)
+		{
+			var currentTime = DateTime.UtcNow;
+			if (((DateTime)value).Year == 1)
+				return "the dawn of reddit";
+			var timeDifference = DateTimeSpan.CompareDates(currentTime, (DateTime)value);
+			if (timeDifference.Years > 0)
+				return string.Format("{0} year{1} ago", timeDifference.Years, timeDifference.Years > 1 ? "s" : "");
+			else if (timeDifference.Months > 0)
+				return string.Format("{0} month{1} ago", timeDifference.Months, timeDifference.Months > 1 ? "s" : "");
+			else if (timeDifference.Days > 0)
+				return string.Format("{0} day{1} ago", timeDifference.Days, timeDifference.Days > 1 ? "s" : "");
+			else if (timeDifference.Hours > 0)
+				return string.Format("{0} hour{1} ago", timeDifference.Hours, timeDifference.Hours > 1 ? "s" : "");
+			else if (timeDifference.Minutes > 0)
+				return string.Format("{0} minute{1} ago", timeDifference.Minutes, timeDifference.Minutes > 1 ? "s" : "");
+			else
+				return "just now";
+		}
 
         /// <summary>
         /// from Kirk Woll http://stackoverflow.com/questions/4638993/difference-in-months-between-two-dates

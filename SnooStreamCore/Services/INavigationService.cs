@@ -12,7 +12,6 @@ namespace SnooStream.Services
     {
         void NavigateToComments(CommentsViewModel viewModel);
         void NavigateToLinkRiver(LinkRiverViewModel viewModel);
-        void NavigateToLinkStream(LinkStreamViewModel viewModel);
         void NavigateToMessageReply(CreateMessageViewModel viewModel);
         void NavigateToPost(PostViewModel viewModel);
         void NavigateToUpload(UploadViewModel viewModel);

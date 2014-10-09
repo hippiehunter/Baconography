@@ -50,6 +50,7 @@
     <Compile Include="Common\NeverEndingRedditEnumerator.cs" />
     <Compile Include="Common\NotificationService.cs" />
     <Compile Include="Common\PortableObservableCollection.cs" />
+    <Compile Include="Common\PreviewLoadService.cs" />
     <Compile Include="Common\TaskExtensions.cs" />
     <Compile Include="Common\TaskSettings.cs" />
     <Compile Include="Common\ViewModelDumpUtility.cs" />
@@ -60,10 +61,8 @@
     <Compile Include="Common\CommandDispatcher.cs" />
     <Compile Include="Common\LinkGlyphUtility.cs" />
     <Compile Include="Common\NSFWListingFilter.cs" />
-    <Compile Include="Common\ObservableOrderedUniqueCollection.cs" />
     <Compile Include="Common\ObservableSortedUniqueCollection.cs" />
     <Compile Include="Common\OfflineService.cs" />
-    <Compile Include="Common\OfflineUtility.cs" />
     <Compile Include="Common\SortedList.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -75,44 +74,36 @@
     <Compile Include="Services\IUserCredentialService.cs" />
     <Compile Include="ViewModel\AboutUserViewModel.cs" />
     <Compile Include="ViewModel\CaptchaViewModel.cs" />
-    <Compile Include="ViewModel\ErrorContentViewModel.cs" />
+    <Compile Include="ViewModel\Content\AlbumViewModel.cs" />
+    <Compile Include="ViewModel\Content\ContentViewModel.cs" />
+    <Compile Include="ViewModel\Content\ImageViewModel.cs" />
+    <Compile Include="ViewModel\Content\InternalRedditViewModel.cs" />
+    <Compile Include="ViewModel\Content\PlainWebViewModel.cs" />
+    <Compile Include="ViewModel\Content\SelfViewModel.cs" />
+    <Compile Include="ViewModel\Content\VideoViewModel.cs" />
     <Compile Include="ViewModel\IRefreshable.cs" />
     <Compile Include="ViewModel\LoadFullCommentsViewModel.cs" />
-    <Compile Include="ViewModel\LoadingContentViewModel.cs" />
     <Compile Include="ViewModel\MoreViewModel.cs" />
     <Compile Include="Common\PriorityLoadQueue.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
-    <Compile Include="ViewModel\ActivityViewModel.cs" />
-    <Compile Include="ViewModel\AlbumViewModel.cs" />
-    <Compile Include="ViewModel\AppearanceSettingsViewModel.cs" />
+    <Compile Include="ViewModel\Activities\ActivityViewModel.cs" />
+    <Compile Include="ViewModel\Settings\AppearanceSettingsViewModel.cs" />
     <Compile Include="ViewModel\CommentReplyViewModel.cs" />
     <Compile Include="ViewModel\CommentsViewModel.cs" />
     <Compile Include="ViewModel\CommentViewModel.cs" />
-    <Compile Include="ViewModel\ContentSettingsViewModel.cs" />
-    <Compile Include="ViewModel\ContentViewModel.cs" />
-    <Compile Include="ViewModel\ImageViewModel.cs" />
-    <Compile Include="ViewModel\InternalRedditContentViewModel.cs" />
-    <Compile Include="ViewModel\LinkStreamViewModel.cs" />
+    <Compile Include="ViewModel\Settings\ContentSettingsViewModel.cs" />
     <Compile Include="ViewModel\LinkViewModel.cs" />
     <Compile Include="ViewModel\LockScreenViewModel.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
-    <Compile Include="ViewModel\ModeratorHubViewModel.cs" />
     <Compile Include="ViewModel\PostViewModel.cs" />
-    <Compile Include="ViewModel\PrimaryLiveTileViewModel.cs" />
     <Compile Include="ViewModel\LinkRiverViewModel.cs" />
     <Compile Include="ViewModel\CreateMessageViewModel.cs" />
-    <Compile Include="ViewModel\SecondaryLiveTileHubViewModel.cs" />
-    <Compile Include="ViewModel\ActivityGroupViewModel.cs" />
-    <Compile Include="ViewModel\SelfContentViewModel.cs" />
-    <Compile Include="ViewModel\SelfViewModel.cs" />
-    <Compile Include="ViewModel\SettingsViewModel.cs" />
+    <Compile Include="ViewModel\Activities\ActivityGroupViewModel.cs" />
+    <Compile Include="ViewModel\Settings\SettingsViewModel.cs" />
     <Compile Include="ViewModel\SnooStreamViewModel.cs" />
     <Compile Include="ViewModel\SubredditRiverViewModel.cs" />
     <Compile Include="ViewModel\UploadViewModel.cs" />
-    <Compile Include="ViewModel\UserHubViewModel.cs" />
-    <Compile Include="ViewModel\VideoViewModel.cs" />
     <Compile Include="ViewModel\VotableViewModel.cs" />
-    <Compile Include="ViewModel\WebViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -156,6 +147,7 @@
       <Name>SnooSharp</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.17-beta\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.17-beta\tools\Microsoft.Bcl.Build.targets')" />

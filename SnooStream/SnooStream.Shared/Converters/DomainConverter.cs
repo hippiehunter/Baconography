@@ -11,15 +11,20 @@ namespace SnooStream.Converters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            var valueString = value as string;
-            if (valueString != null && Uri.IsWellFormedUriString(valueString, UriKind.Absolute))
-            {
-                var uri = new Uri(valueString);
-                return string.Format("({0})", uri.DnsSafeHost);
-            }
-            else
-                return value;
+			return GetDomain(value);
         }
+
+		public static string GetDomain(object value)
+		{
+			var valueString = value as string;
+			if (valueString != null && Uri.IsWellFormedUriString(valueString, UriKind.Absolute))
+			{
+				var uri = new Uri(valueString);
+				return uri.DnsSafeHost;
+			}
+			else
+				return "";
+		}
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {

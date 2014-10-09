@@ -17,6 +17,7 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Background\BackgroundUpdater.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\BackgroundTaskManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\BufferedIncrementalLoadCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\LinkViewLayoutManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\ManipulationController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\MarkdownHelpers.cs" />
@@ -32,9 +33,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BoolToAccentBrushConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CommentDepthColorConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CommentDepthMarginConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\ContentPreviewConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\DomainConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\InvertedBooleanConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\LinkGlyphConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\LinkMetadataConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\PortableObservableCollectionConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\StringCaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeRelationConverter.cs" />
@@ -77,6 +80,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml.cs">
       <DependentUpon>MoreCommentsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\PreviewImageControl.xaml.cs">
+      <DependentUpon>PreviewImageControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\PreviewTextControl.xaml.cs">
+      <DependentUpon>PreviewTextControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\SelectSortTypeView.xaml.cs">
       <DependentUpon>SelectSortTypeView.xaml</DependentUpon>
     </Compile>
@@ -101,9 +110,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\LinkRiver.xaml.cs">
       <DependentUpon>LinkRiver.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Pages\LinkStream.xaml.cs">
-      <DependentUpon>LinkStream.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\LockScreenSettings.xaml.cs">
       <DependentUpon>LockScreenSettings.xaml</DependentUpon>
     </Compile>
@@ -111,9 +117,7 @@
       <DependentUpon>SnooHubMark2.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\CommentTemplateSelector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\ContentTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\DataTemplateSelectorControl.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\SubredditRiverTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\TypedTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\UserActivityTemplateSelector.cs" />
   </ItemGroup>
@@ -152,6 +156,14 @@
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\PreviewImageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\PreviewTextControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\SelectSortTypeView.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -174,9 +186,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\LinkRiver.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Pages\LinkStream.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\LockScreenSettings.xaml">

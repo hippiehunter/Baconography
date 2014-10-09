@@ -90,7 +90,7 @@ namespace SnooStream.ViewModel
 
 			if (IsInDesignMode)
 			{
-				CurrentSelected = new LinkViewModel(this, new Link { Title = "Lorem Ipsum", Domain = "http://www.google.com", Author = "fredbob", Url = "http://www.google.com" });
+				CurrentSelected = new LinkViewModel(this, new Link { Title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras ac tempor erat. Cras sagittis eu urna sed posuere. Proin sit amet fringilla magna. Sed feugiat lorem nibh, ac mollis risus rutrum non. Pellentesque pharetra auctor pellentesque. Maecenas vel lorem sagittis.", Domain = "http://www.google.com", Author = "fredbob", Url = "http://www.google.com", CommentCount = 2453 });
 			}
 
 		}
@@ -99,7 +99,7 @@ namespace SnooStream.ViewModel
         {
             foreach (var link in links)
             {
-                Links.Add(new LinkViewModel(this, link));
+				Links.Add(new LinkViewModel(this, link) { FromMultiReddit = (IsMultiReddit || Thing.Url == "/") });
             }
         }
 
@@ -155,7 +155,7 @@ namespace SnooStream.ViewModel
 									if (thing.Data is Link)
 									{
 										linkIds.Add(((Link)thing.Data).Id);
-										var viewModel = new LinkViewModel(this, thing.Data as Link);
+										var viewModel = new LinkViewModel(this, thing.Data as Link) { FromMultiReddit = (IsMultiReddit || Thing.Url == "/") };
 										linkViewModels.Add(viewModel);
 										Links.Add(viewModel);
 									}
@@ -192,11 +192,11 @@ namespace SnooStream.ViewModel
 			if (Links.Count == 0)
 				LoadMore();
 			if(LastRefresh == null || (DateTime.Now - LastRefresh.Value).TotalMinutes > 30)
-				Refresh();
+				Refresh(false);
 			
 		}
 
-		public async void Refresh()
+		public async void Refresh(bool onlyNew) //this param isnt implemented here
 		{
 			await RefreshTask();
 		}

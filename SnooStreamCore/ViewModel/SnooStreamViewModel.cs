@@ -41,9 +41,6 @@ namespace SnooStream.ViewModel
 
 			_listingFilter.Initialize(Settings, OfflineService, RedditService, _initializationBlob.NSFWFilter);
 			CommandDispatcher = new CommandDispatcher();
-			UserHub = new UserHubViewModel(_initializationBlob.Self);
-			ModeratorHub = new ModeratorHubViewModel();
-			SettingsHub = new SettingsViewModel(Settings);
 			SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
 			if (!IsInDesignMode)
 			{
@@ -106,8 +103,6 @@ namespace SnooStream.ViewModel
         public static ISystemServices SystemServices { get; set; }
         public static PriorityLoadQueue LoadQueue { get; set; }
 
-        public UserHubViewModel UserHub { get; private set; }
-        public ModeratorHubViewModel ModeratorHub { get; private set; }
         public SettingsViewModel SettingsHub { get; private set; }
         public SubredditRiverViewModel SubredditRiver { get; private set; }
 
@@ -135,7 +130,7 @@ namespace SnooStream.ViewModel
         public void DumpInitBlob(string navigationBlob = null)
         {
             _initializationBlob.Settings = Settings.Dump();
-            _initializationBlob.Self = UserHub.Self.Dump();
+            //_initializationBlob.Self = UserHub.Self.Dump();
 			_initializationBlob.NavigationBlob = navigationBlob;
 			_initializationBlob.Subreddits = SubredditRiver.Dump();
             OfflineService.StoreInitializationBlob(_initializationBlob);

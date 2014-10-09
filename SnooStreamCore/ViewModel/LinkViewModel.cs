@@ -20,136 +20,107 @@ namespace SnooStream.ViewModel
         {
             Context = context;
             Link = link;
-            _content = new Lazy<Task<ContentViewModel>>(() =>
-                {
-                    var contentTask = LoadContent();
-					SnooStreamViewModel.SystemServices.RunUIAsync(async () =>
-						{
-							await contentTask;
-							RaisePropertyChanged("Content");
-						});
-					return contentTask;
-                });
-
             Comments = new CommentsViewModel(this, link);
-
         }
 
         public bool HasContext { get { return true; } }
 
-        private async Task<ContentViewModel> LoadContent()
-        {
-            try
-            {
-                string targetHost = null;
-                string fileName = null;
+		//private async Task<ContentViewModel> LoadContent()
+		//{
+		//	try
+		//	{
+		//		string targetHost = null;
+		//		string fileName = null;
 
-                if(Uri.IsWellFormedUriString(Link.Url, UriKind.Absolute))
-                {
-                    var uri = new Uri(Link.Url);
-                    targetHost = uri.DnsSafeHost.ToLower();
-                    fileName = uri.AbsolutePath;
-                }
+		//		if(Uri.IsWellFormedUriString(Link.Url, UriKind.Absolute))
+		//		{
+		//			var uri = new Uri(Link.Url);
+		//			targetHost = uri.DnsSafeHost.ToLower();
+		//			fileName = uri.AbsolutePath;
+		//		}
 
 
-                if(Link.IsSelf)
-                    return new SelfContentViewModel(this, Link);
-                else if(LinkGlyphUtility.IsComment(Link.Url) ||
-                    LinkGlyphUtility.IsCommentsPage(Link.Url) ||
-                    LinkGlyphUtility.IsSubreddit(Link.Url) ||
-                    LinkGlyphUtility.IsUser(Link.Url) ||
-                    LinkGlyphUtility.IsUserMultiReddit(Link.Url))
-                {
-                    return new InternalRedditContentViewModel(this, Link.Url);
-                }
-                else if (targetHost == "www.youtube.com" ||
-                    targetHost == "www.youtu.be" ||
-                    targetHost == "youtu.be" ||
-                    targetHost == "youtube.com" ||
-                    targetHost == "vimeo.com" ||
-                    targetHost == "www.vimeo.com" ||
-                    targetHost == "liveleak.com" ||
-                    targetHost == "www.liveleak.com")
-                {
-                    if (VideoAcquisition.IsAPI(Link.Url))
-                    {
-                        return new VideoViewModel(this, Link.Url);
-                    }
-                    else
-                    {
-                        return new WebViewModel(this, true, Link.Url);
-                    }
-                }
-                else 
-				{
-                    if (ImageAcquisition.IsImageAPI(Link.Url))
-                    {
-                        var imageApiResults = await ImageAcquisition.GetImagesFromUrl(Link.Title, Link.Url);
-                        if (imageApiResults != null && imageApiResults.Count() > 1)
-                            return new AlbumViewModel(this, Link.Url, imageApiResults, Link.Title);
-                        else if (imageApiResults != null && imageApiResults.Count() == 1)
-						{
-							CancellationTokenSource tokenSource = new CancellationTokenSource();
-							ImageViewModel ivmResult = null;
-							var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(imageApiResults.First().Item2, (progress) => { }, tokenSource.Token, (ex) =>
-								{
-									if(ivmResult != null)
-									{
-										ivmResult.Error = ex.Message;
-										ivmResult.Errored = true;
-									}
-								});
-							ivmResult = new ImageViewModel(this, imageApiResults.First().Item2, imageApiResults.First().Item1, imageLoader);
-							return ivmResult;
-						}
+		//		if(Link.IsSelf)
+		//			return new SelfContentViewModel(this, Link);
+		//		else if(LinkGlyphUtility.IsComment(Link.Url) ||
+		//			LinkGlyphUtility.IsCommentsPage(Link.Url) ||
+		//			LinkGlyphUtility.IsSubreddit(Link.Url) ||
+		//			LinkGlyphUtility.IsUser(Link.Url) ||
+		//			LinkGlyphUtility.IsUserMultiReddit(Link.Url))
+		//		{
+		//			return new InternalRedditContentViewModel(this, Link.Url);
+		//		}
+		//		else if (targetHost == "www.youtube.com" ||
+		//			targetHost == "www.youtu.be" ||
+		//			targetHost == "youtu.be" ||
+		//			targetHost == "youtube.com" ||
+		//			targetHost == "vimeo.com" ||
+		//			targetHost == "www.vimeo.com" ||
+		//			targetHost == "liveleak.com" ||
+		//			targetHost == "www.liveleak.com")
+		//		{
+		//			if (VideoAcquisition.IsAPI(Link.Url))
+		//			{
+		//				return new VideoViewModel(this, Link.Url);
+		//			}
+		//			else
+		//			{
+		//				return new WebViewModel(this, true, Link.Url);
+		//			}
+		//		}
+		//		else 
+		//		{
+		//			if (ImageAcquisition.IsImageAPI(Link.Url))
+		//			{
+		//				var imageApiResults = await ImageAcquisition.GetImagesFromUrl(Link.Title, Link.Url);
+		//				if (imageApiResults != null && imageApiResults.Count() > 1)
+		//					return new AlbumViewModel(this, Link.Url, imageApiResults, Link.Title);
+		//				else if (imageApiResults != null && imageApiResults.Count() == 1)
+		//				{
+		//					CancellationTokenSource tokenSource = new CancellationTokenSource();
+		//					ImageViewModel ivmResult = null;
+		//					var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(imageApiResults.First().Item2, (progress) => { }, tokenSource.Token, (ex) =>
+		//						{
+		//							if(ivmResult != null)
+		//							{
+		//								ivmResult.Error = ex.Message;
+		//								ivmResult.Errored = true;
+		//							}
+		//						});
+		//					ivmResult = new ImageViewModel(this, imageApiResults.First().Item2, imageApiResults.First().Item1, imageLoader);
+		//					return ivmResult;
+		//				}
                             
-                    }
-                    else if (fileName.EndsWith(".jpg") ||
-                        fileName.EndsWith(".png") ||
-                        fileName.EndsWith(".gif") ||
-                        fileName.EndsWith(".jpeg"))
-                    {
-						CancellationTokenSource tokenSource = new CancellationTokenSource();
-						ImageViewModel ivmResult = null;
-						var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(Link.Url, (progress) => { }, tokenSource.Token, (ex) =>
-						{
-							if (ivmResult != null)
-							{
-								ivmResult.Error = ex.Message;
-								ivmResult.Errored = true;
-							}
-						});
-						ivmResult = new ImageViewModel(this, Link.Url, Link.Title, imageLoader);
-						return ivmResult;
-                    }
+		//			}
+		//			else if (fileName.EndsWith(".jpg") ||
+		//				fileName.EndsWith(".png") ||
+		//				fileName.EndsWith(".gif") ||
+		//				fileName.EndsWith(".jpeg"))
+		//			{
+		//				CancellationTokenSource tokenSource = new CancellationTokenSource();
+		//				ImageViewModel ivmResult = null;
+		//				var imageLoader = SnooStreamViewModel.SystemServices.DownloadImageWithProgress(Link.Url, (progress) => { }, tokenSource.Token, (ex) =>
+		//				{
+		//					if (ivmResult != null)
+		//					{
+		//						ivmResult.Error = ex.Message;
+		//						ivmResult.Errored = true;
+		//					}
+		//				});
+		//				ivmResult = new ImageViewModel(this, Link.Url, Link.Title, imageLoader);
+		//				return ivmResult;
+		//			}
                     
-                    return new WebViewModel(this, true, Link.Url);
-                }
-            }
-            catch (Exception ex)
-            {
-                return new ErrorContentViewModel(this, ex);
-            }
-        }
+		//			return new WebViewModel(this, true, Link.Url);
+		//		}
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		return new ErrorContentViewModel(this, ex);
+		//	}
+		//}
 
         public ViewModelBase Context { get; private set; }
-        private Lazy<Task<ContentViewModel>> _content;
-        public ContentViewModel Content
-        {
-            get
-            {
-                return _content.Value.TryValue();
-            }
-        }
-
-        public Task<ContentViewModel> AsyncContent
-        {
-            get
-            {
-                return _content.Value;
-            }
-        }
-
         public CommentsViewModel Comments { get; internal set; }
         public Link Link { get; private set; }
         public int CommentsLastViewed { get; private set; }

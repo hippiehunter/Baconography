@@ -25,17 +25,17 @@ namespace SnooStream.Common
 						var subredditThing = JsonConvert.DeserializeObject<Subreddit>(stateItem.Item2);
 						return snooStreamViewModel.SubredditRiver.CombinedRivers.FirstOrDefault(vm => vm.Thing.Id == subredditThing.Id);
                     }
-				case "LinkStreamViewModel":
-					{
-						return new LinkStreamViewModel(context, stateItem.Item2);
-					}
+				//case "LinkStreamViewModel":
+				//	{
+				//		return new LinkStreamViewModel(context, stateItem.Item2);
+				//	}
 				case "CommentsViewModel":
 					{
 						var dumpArgs = JsonConvert.DeserializeObject<Tuple<Listing, string, string>>(stateItem.Item2);
 						LinkViewModel targetContext = null;
-						if (context is LinkStreamViewModel)
-							targetContext = ((LinkStreamViewModel)context).Current;
-						else if (context is LinkRiverViewModel)
+						//if (context is LinkStreamViewModel)
+						//	targetContext = ((LinkStreamViewModel)context).Current; else
+						if (context is LinkRiverViewModel)
 							targetContext = ((LinkRiverViewModel)context).Links.FirstOrDefault(link => link.Link.Id == dumpArgs.Item3);
 
 						var comments = new CommentsViewModel(targetContext, dumpArgs.Item1, dumpArgs.Item2);
@@ -61,11 +61,11 @@ namespace SnooStream.Common
                 var serialized = JsonConvert.SerializeObject(linkRiver.Thing);
                 return JsonConvert.SerializeObject(Tuple.Create("LinkRiverViewModel", serialized));
             }
-			else if (viewModel is LinkStreamViewModel)
-			{
-				var linkStream = viewModel as LinkStreamViewModel;
-				return JsonConvert.SerializeObject(Tuple.Create("LinkStreamViewModel", ((LinkViewModel)linkStream.Visible.Context).Link.Id));
-			}
+			//else if (viewModel is LinkStreamViewModel)
+			//{
+			//	var linkStream = viewModel as LinkStreamViewModel;
+			//	return JsonConvert.SerializeObject(Tuple.Create("LinkStreamViewModel", ((LinkViewModel)linkStream.Visible.Context).Link.Id));
+			//}
 			else if (viewModel is CommentsViewModel)
 			{
 				var comments = viewModel as CommentsViewModel;

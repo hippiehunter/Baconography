@@ -11,6 +11,7 @@
         <ResourceDictionary>
             <common:SnooStreamViewModelPlatform x:Key="SnooStream"/>
             <converters:PortableObservableCollectionConverter x:Key="collectionConverter"/>
+            <converters:LinkMetadataConverter x:Key="linkMetadataConverter"/>
             <converters:VoteIndicatorConverter x:Key="voteIndicatorConverter" />
             <converters:BooleanVisibilityConverter x:Key="booleanVisibilityConverter"/>
             <converters:InvertedBooleanVisibilityConverter x:Key="invertedBooleanVisibilityConverter"/>

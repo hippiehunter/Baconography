@@ -66,6 +66,7 @@ namespace SnooStream.Model
     {
         public Settings(Dictionary<string, string> init)
         {
+			ContentTimeout = init.DefaultGet("AllowOver18", 60 * 1000); //default to 60 seconds
             AllowOver18 = init.DefaultGet("AllowOver18", false);
             AllowOver18Items = init.DefaultGet("AllowOver18Items", false);
             OpenLinksInBrowser = init.DefaultGet("OpenLinksInBrowser", true);
@@ -106,6 +107,7 @@ namespace SnooStream.Model
             HeavyPreview = init.DefaultGet("HeavyPreview", false);
         }
 
+		public int ContentTimeout { get; set; }
         public bool AllowOver18 { get; set; }
         public bool AllowOver18Items { get; set; }
         public bool OpenLinksInBrowser { get; set; }
@@ -149,6 +151,7 @@ namespace SnooStream.Model
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
 
+			result.Add("ContentTimeout", ContentTimeout.ToString());
             result.Add("AllowOver18", AllowOver18.ToString());
             result.Add("AllowOver18Items", AllowOver18Items.ToString());
             result.Add("OpenLinksInBrowser", OpenLinksInBrowser.ToString());

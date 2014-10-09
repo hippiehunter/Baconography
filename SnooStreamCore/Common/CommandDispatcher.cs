@@ -244,7 +244,7 @@ namespace SnooStream.Common
                 }
                 else
                 {
-                    SnooStreamViewModel.NavigationService.NavigateToLinkStream(new LinkStreamViewModel(riverContext, sourceLink == null ? url : sourceLink.Id));
+                    //SnooStreamViewModel.NavigationService.NavigateToLinkStream(new LinkStreamViewModel(riverContext, sourceLink == null ? url : sourceLink.Id));
                 }
             });
             await task;

@@ -5,6 +5,7 @@ using SnooStream.Services;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -21,351 +22,352 @@ using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Web.Http;
 
 namespace SnooStream.PlatformServices
 {
-    class SystemServices : ISystemServices
-    {
-        private Task<CoreDispatcher> _uiDispatcher;
+	class SystemServices : ISystemServices
+	{
+		private Task<CoreDispatcher> _uiDispatcher;
 		private TaskCompletionSource<CoreDispatcher> _uiDispatcherSource = new TaskCompletionSource<CoreDispatcher>();
-        public SystemServices()
-        {
+		public SystemServices()
+		{
 			_uiDispatcher = _uiDispatcherSource.Task;
-            NetworkInformation.NetworkStatusChanged += networkStatusChanged;
-            networkStatusChanged(null);
-        }
+			NetworkInformation.NetworkStatusChanged += networkStatusChanged;
+			networkStatusChanged(null);
+		}
 
 		public void FinishInitialization(CoreDispatcher uiDispatcher)
 		{
 			_uiDispatcherSource.SetResult(uiDispatcher);
 		}
 
-        private void networkStatusChanged(object sender)
-        {
-            _lowPriorityNetworkOk = new Lazy<bool>(LowPriorityNetworkOkImpl);
-            _highPriorityNetworkOk = new Lazy<bool>(IsHighPriorityNetworkOkImpl);
-        }
+		private void networkStatusChanged(object sender)
+		{
+			_lowPriorityNetworkOk = new Lazy<bool>(LowPriorityNetworkOkImpl);
+			_highPriorityNetworkOk = new Lazy<bool>(IsHighPriorityNetworkOkImpl);
+		}
 
-        public async void StopTimer(object tickHandle)
-        {
-            if (tickHandle is DispatcherTimer)
-            {
-                if (((DispatcherTimer)tickHandle).IsEnabled)
-                    ((DispatcherTimer)tickHandle).Stop();
-            }
-            else if (tickHandle is Task<DispatcherTimer>)
-            {
-                await (await _uiDispatcher).RunAsync(CoreDispatcherPriority.Normal, async () =>
-                {
-                    var timer = await (Task<DispatcherTimer>)tickHandle;
-                    timer.Stop();
-                });
-            }
-            else if (tickHandle is ThreadPoolTimer)
-            {
-                ((ThreadPoolTimer)tickHandle).Cancel();
-            }
-        }
+		public async void StopTimer(object tickHandle)
+		{
+			if (tickHandle is DispatcherTimer)
+			{
+				if (((DispatcherTimer)tickHandle).IsEnabled)
+					((DispatcherTimer)tickHandle).Stop();
+			}
+			else if (tickHandle is Task<DispatcherTimer>)
+			{
+				await (await _uiDispatcher).RunAsync(CoreDispatcherPriority.Normal, async () =>
+				{
+					var timer = await (Task<DispatcherTimer>)tickHandle;
+					timer.Stop();
+				});
+			}
+			else if (tickHandle is ThreadPoolTimer)
+			{
+				((ThreadPoolTimer)tickHandle).Cancel();
+			}
+		}
 
-        public async void RunAsync(Func<object, Task> action)
-        {
-            await AsyncInfo.Run((c) => action(c));
-        }
+		public async void RunAsync(Func<object, Task> action)
+		{
+			await AsyncInfo.Run((c) => action(c));
+		}
 
-        public object StartTimer(EventHandler<object> tickHandler, TimeSpan tickSpan, bool uiThread)
-        {
-            if (uiThread)
-            {
-                if (tickSpan.Ticks == 0)
-                {
-                    var asyncItem = _uiDispatcher.ContinueWith((dispatcher) => dispatcher.Result.RunAsync(CoreDispatcherPriority.Normal, () => tickHandler(null, null)));
-                    return null;
-                }
-                else
-                {
+		public object StartTimer(EventHandler<object> tickHandler, TimeSpan tickSpan, bool uiThread)
+		{
+			if (uiThread)
+			{
+				if (tickSpan.Ticks == 0)
+				{
+					var asyncItem = _uiDispatcher.ContinueWith((dispatcher) => dispatcher.Result.RunAsync(CoreDispatcherPriority.Normal, () => tickHandler(null, null)));
+					return null;
+				}
+				else
+				{
 
-                    TaskCompletionSource<DispatcherTimer> completionSource = new TaskCompletionSource<DispatcherTimer>();
-                    _uiDispatcher.ContinueWith((dispatcher) => dispatcher.Result.RunAsync(CoreDispatcherPriority.Normal, () =>
-                    {
-                        DispatcherTimer dt = new DispatcherTimer();
-                        dt.Tick += (sender, args) => tickHandler(sender, args);
-                        dt.Interval = tickSpan;
-                        dt.Start();
-                        completionSource.SetResult(dt);
-                    }));
-                    return completionSource.Task;
-                }
-            }
-            else
-            {
-                return ThreadPoolTimer.CreatePeriodicTimer((timer) => tickHandler(this, timer), tickSpan);
-            }
-        }
+					TaskCompletionSource<DispatcherTimer> completionSource = new TaskCompletionSource<DispatcherTimer>();
+					_uiDispatcher.ContinueWith((dispatcher) => dispatcher.Result.RunAsync(CoreDispatcherPriority.Normal, () =>
+					{
+						DispatcherTimer dt = new DispatcherTimer();
+						dt.Tick += (sender, args) => tickHandler(sender, args);
+						dt.Interval = tickSpan;
+						dt.Start();
+						completionSource.SetResult(dt);
+					}));
+					return completionSource.Task;
+				}
+			}
+			else
+			{
+				return ThreadPoolTimer.CreatePeriodicTimer((timer) => tickHandler(this, timer), tickSpan);
+			}
+		}
 
-        public void RestartTimer(object tickHandle)
-        {
-            if (tickHandle is DispatcherTimer)
-            {
-                ((DispatcherTimer)tickHandle).Start();
-            }
-            else if (tickHandle is Task<DispatcherTimer>)
-            {
+		public void RestartTimer(object tickHandle)
+		{
+			if (tickHandle is DispatcherTimer)
+			{
+				((DispatcherTimer)tickHandle).Start();
+			}
+			else if (tickHandle is Task<DispatcherTimer>)
+			{
 				var asyncItem = _uiDispatcher.ContinueWith((dispatcher) => dispatcher.Result.RunAsync(CoreDispatcherPriority.Normal, async () =>
-                {
-                    var timer = await (Task<DispatcherTimer>)tickHandle;
-                    timer.Start();
-                }));
-            }
-            else if (tickHandle is ThreadPoolTimer)
-            {
-                throw new NotImplementedException();
-            }
-        }
+				{
+					var timer = await (Task<DispatcherTimer>)tickHandle;
+					timer.Start();
+				}));
+			}
+			else if (tickHandle is ThreadPoolTimer)
+			{
+				throw new NotImplementedException();
+			}
+		}
 
 
-        public void StartThreadPoolTimer(Func<object, Task> action, TimeSpan timer)
-        {
-            ThreadPoolTimer.CreateTimer(async (obj) => await action(obj), timer);
-        }
+		public void StartThreadPoolTimer(Func<object, Task> action, TimeSpan timer)
+		{
+			ThreadPoolTimer.CreateTimer(async (obj) => await action(obj), timer);
+		}
 
-        public bool IsOnMeteredConnection { get; set; }
-        public bool IsNearingDataLimit { get; set; }
+		public bool IsOnMeteredConnection { get; set; }
+		public bool IsNearingDataLimit { get; set; }
 
-        public Task<byte[]> DownloadWithProgress(string uri, Action<int> progress, CancellationToken cancelToken)
-        {
-            TaskCompletionSource<byte[]> taskCompletion = new TaskCompletionSource<byte[]>();
-            HttpClient client = new HttpClient();
-            int cancelCount = 0;
-            Action doGet = null;
-            doGet = () =>
-             {
-                 var response = client.GetAsync(new Uri(uri));
-                 response.Progress = (message, value) =>
-                     {
-                         if ((value.TotalBytesToReceive ?? 0) > 0)
-                         {
-                             var progressValue = (double)(value.TotalBytesToReceive ?? 0) / (double)value.BytesReceived;
-                             progress((int)progressValue * 100);
-                         }
+		public Task<byte[]> DownloadWithProgress(string uri, Action<int> progress, CancellationToken cancelToken)
+		{
+			TaskCompletionSource<byte[]> taskCompletion = new TaskCompletionSource<byte[]>();
+			HttpClient client = new HttpClient();
+			int cancelCount = 0;
+			Action doGet = null;
+			doGet = () =>
+			 {
+				 var response = client.GetAsync(new Uri(uri));
+				 response.Progress = (message, value) =>
+					 {
+						 if ((value.TotalBytesToReceive ?? 0) > 0)
+						 {
+							 var progressValue = (double)(value.TotalBytesToReceive ?? 0) / (double)value.BytesReceived;
+							 progress((int)progressValue * 100);
+						 }
 
-                         if (cancelToken.IsCancellationRequested)
-                         {
-                             response.Cancel();
-                         }
-                     };
+						 if (cancelToken.IsCancellationRequested)
+						 {
+							 response.Cancel();
+						 }
+					 };
 
-                 response.Completed = async (message, value) =>
-                     {
-                         switch (value)
-                         {
-                             case AsyncStatus.Completed:
-                                 taskCompletion.TrySetResult((await message.GetResults().Content.ReadAsBufferAsync()).ToArray());
-                                 break;
-                             case AsyncStatus.Canceled:
-                                 if (cancelCount++ > 5 || cancelToken.IsCancellationRequested)
-                                     taskCompletion.TrySetCanceled();
-                                 else
-                                 {
-                                     doGet();
-                                 }
-                                 break;
-                             case AsyncStatus.Error:
-                                 taskCompletion.TrySetException(message.ErrorCode);
-                                 break;
-                             default:
-                                 break;
+				 response.Completed = async (message, value) =>
+					 {
+						 switch (value)
+						 {
+							 case AsyncStatus.Completed:
+								 taskCompletion.TrySetResult((await message.GetResults().Content.ReadAsBufferAsync()).ToArray());
+								 break;
+							 case AsyncStatus.Canceled:
+								 if (cancelCount++ > 5 || cancelToken.IsCancellationRequested)
+									 taskCompletion.TrySetCanceled();
+								 else
+								 {
+									 doGet();
+								 }
+								 break;
+							 case AsyncStatus.Error:
+								 taskCompletion.TrySetException(message.ErrorCode);
+								 break;
+							 default:
+								 break;
 
-                         }
+						 }
 
-                     };
-             };
+					 };
+			 };
 
-            doGet();
-            return taskCompletion.Task;
-        }
+			doGet();
+			return taskCompletion.Task;
+		}
 
 
-        public Task<byte[]> ResizeImage(byte[] data, int maxWidth, int maxHeight)
-        {
-            return CropPicture(data, new Size(maxWidth, maxHeight));
-        }
+		public Task<byte[]> ResizeImage(byte[] data, int maxWidth, int maxHeight)
+		{
+			return CropPicture(data, new Size(maxWidth, maxHeight));
+		}
 
-        private static async Task<byte[]> CropPicture(byte[] data, Size desiredSize)
-        {
-            using (var source = new BufferImageSource(data.AsBuffer()))
-            {
-                var info = await source.GetInfoAsync();
+		private static async Task<byte[]> CropPicture(byte[] data, Size desiredSize)
+		{
+			using (var source = new BufferImageSource(data.AsBuffer()))
+			{
+				var info = await source.GetInfoAsync();
 
-                if (info.ImageSize.Width * info.ImageSize.Height > (desiredSize.Height * desiredSize.Width))
-                {
-                    var resizeConfiguration = new AutoResizeConfiguration(5 * 1024 * 1024, desiredSize,
-                        new Size(0, 0), AutoResizeMode.Automatic, 0, ColorSpace.Yuv420);
+				if (info.ImageSize.Width * info.ImageSize.Height > (desiredSize.Height * desiredSize.Width))
+				{
+					var resizeConfiguration = new AutoResizeConfiguration(5 * 1024 * 1024, desiredSize,
+						new Size(0, 0), AutoResizeMode.Automatic, 0, ColorSpace.Yuv420);
 
-                    return (await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(source.Buffer, resizeConfiguration)).ToArray();
-                }
-                else
-                {
-                    return data;
-                }
-            }
-            
-        }
+					return (await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(source.Buffer, resizeConfiguration)).ToArray();
+				}
+				else
+				{
+					return data;
+				}
+			}
 
-        private static Rect? GetCropArea(Size imageSize, Size desiredSize)
-        {
-            // how big is the picture compared to the phone?
-            var widthRatio = desiredSize.Width / imageSize.Width;
-            var heightRatio = desiredSize.Height / imageSize.Height;
+		}
 
-            // the ratio is the same, no need to crop it
-            if (widthRatio == heightRatio) return null;
+		private static Rect? GetCropArea(Size imageSize, Size desiredSize)
+		{
+			// how big is the picture compared to the phone?
+			var widthRatio = desiredSize.Width / imageSize.Width;
+			var heightRatio = desiredSize.Height / imageSize.Height;
 
-            double cropWidth;
-            double cropheight;
-            if (widthRatio < heightRatio)
-            {
-                cropheight = imageSize.Height;
-                cropWidth = desiredSize.Width / heightRatio;
-            }
-            else
-            {
-                cropheight = desiredSize.Height / widthRatio;
-                cropWidth = imageSize.Width;
-            }
+			// the ratio is the same, no need to crop it
+			if (widthRatio == heightRatio) return null;
 
-            int left = (int)(imageSize.Width - cropWidth) / 2;
-            int top = (int)(imageSize.Height - cropheight) / 2;
+			double cropWidth;
+			double cropheight;
+			if (widthRatio < heightRatio)
+			{
+				cropheight = imageSize.Height;
+				cropWidth = desiredSize.Width / heightRatio;
+			}
+			else
+			{
+				cropheight = desiredSize.Height / widthRatio;
+				cropWidth = imageSize.Width;
+			}
 
-            var rect = new Windows.Foundation.Rect(left, top, cropWidth, cropheight);
-            return rect;
-        }
+			int left = (int)(imageSize.Width - cropWidth) / 2;
+			int top = (int)(imageSize.Height - cropheight) / 2;
 
-        public static Task<HttpWebResponse> GetResponseAsync(HttpWebRequest request)
-        {
-            var taskComplete = new TaskCompletionSource<HttpWebResponse>();
-            request.BeginGetResponse(asyncResponse =>
-            {
-                try
-                {
-                    HttpWebRequest responseRequest = (HttpWebRequest)asyncResponse.AsyncState;
-                    HttpWebResponse someResponse = (HttpWebResponse)responseRequest.EndGetResponse(asyncResponse);
-                    taskComplete.TrySetResult(someResponse);
-                }
-                catch (Exception ex)
-                {
-                    taskComplete.TrySetException(ex);
-                }
-            }, request);
-            return taskComplete.Task;
-        }
+			var rect = new Windows.Foundation.Rect(left, top, cropWidth, cropheight);
+			return rect;
+		}
 
-        public static Task<Stream> GetRequestStreamAsync(HttpWebRequest request)
-        {
-            var taskComplete = new TaskCompletionSource<Stream>();
-            request.BeginGetRequestStream(asyncResponse =>
-            {
-                try
-                {
-                    HttpWebRequest responseRequest = (HttpWebRequest)asyncResponse.AsyncState;
-                    Stream someResponse = (Stream)responseRequest.EndGetRequestStream(asyncResponse);
-                    taskComplete.TrySetResult(someResponse);
-                }
-                catch (Exception ex)
-                {
-                    taskComplete.TrySetException(ex);
-                }
-            }, request);
-            return taskComplete.Task;
-        }
+		public static Task<HttpWebResponse> GetResponseAsync(HttpWebRequest request)
+		{
+			var taskComplete = new TaskCompletionSource<HttpWebResponse>();
+			request.BeginGetResponse(asyncResponse =>
+			{
+				try
+				{
+					HttpWebRequest responseRequest = (HttpWebRequest)asyncResponse.AsyncState;
+					HttpWebResponse someResponse = (HttpWebResponse)responseRequest.EndGetResponse(asyncResponse);
+					taskComplete.TrySetResult(someResponse);
+				}
+				catch (Exception ex)
+				{
+					taskComplete.TrySetException(ex);
+				}
+			}, request);
+			return taskComplete.Task;
+		}
 
-        private async Task<string> SendGet(string uri, bool hasRetried)
-        {
-            HttpWebResponse getResult = null;
-            bool needsRetry = false;
-            try
-            {
-                HttpWebRequest request = HttpWebRequest.CreateHttp(uri);
-                request.AllowReadStreamBuffering = true;
-                request.Headers[HttpRequestHeader.IfModifiedSince] = DateTime.UtcNow.ToString();
-                request.Method = "GET";
-                var cookieContainer = new CookieContainer();
-                request.CookieContainer = cookieContainer;
+		public static Task<Stream> GetRequestStreamAsync(HttpWebRequest request)
+		{
+			var taskComplete = new TaskCompletionSource<Stream>();
+			request.BeginGetRequestStream(asyncResponse =>
+			{
+				try
+				{
+					HttpWebRequest responseRequest = (HttpWebRequest)asyncResponse.AsyncState;
+					Stream someResponse = (Stream)responseRequest.EndGetRequestStream(asyncResponse);
+					taskComplete.TrySetResult(someResponse);
+				}
+				catch (Exception ex)
+				{
+					taskComplete.TrySetException(ex);
+				}
+			}, request);
+			return taskComplete.Task;
+		}
 
-                getResult = await GetResponseAsync(request);
-            }
-            catch (WebException webException)
-            {
-                if (webException.Status == WebExceptionStatus.RequestCanceled)
-                {
-                    needsRetry = true;
-                }
-                else
-                    throw;
-            }
+		private async Task<string> SendGet(string uri, bool hasRetried)
+		{
+			HttpWebResponse getResult = null;
+			bool needsRetry = false;
+			try
+			{
+				HttpWebRequest request = HttpWebRequest.CreateHttp(uri);
+				request.AllowReadStreamBuffering = true;
+				request.Headers[HttpRequestHeader.IfModifiedSince] = DateTime.UtcNow.ToString();
+				request.Method = "GET";
+				var cookieContainer = new CookieContainer();
+				request.CookieContainer = cookieContainer;
 
-            if (needsRetry)
-            {
-                return await SendGet(uri, true);
-            }
+				getResult = await GetResponseAsync(request);
+			}
+			catch (WebException webException)
+			{
+				if (webException.Status == WebExceptionStatus.RequestCanceled)
+				{
+					needsRetry = true;
+				}
+				else
+					throw;
+			}
 
-            if (getResult != null && getResult.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                try
-                {
-                    return await (new StreamReader(getResult.GetResponseStream()).ReadToEndAsync());
-                }
-                catch (Exception ex)
-                {
-                    if (!hasRetried)
-                        needsRetry = true;
-                    else
-                        throw ex;
-                }
-                if (needsRetry)
-                    return await SendGet(uri, true);
-                else
-                    return null;
-            }
-            else if (!hasRetried)
-            {
-                int networkDownRetries = 0;
-                while (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable() && networkDownRetries < 10)
-                {
-                    networkDownRetries++;
-                    await Task.Delay(1000);
-                }
+			if (needsRetry)
+			{
+				return await SendGet(uri, true);
+			}
 
-                return await SendGet(uri, true);
-            }
-            else
-            {
-                throw new Exception(getResult.StatusCode.ToString());
-            }
-        }
-        public Task<string> SendGet(string uri)
-        {
-            return SendGet(uri, false);
-        }
+			if (getResult != null && getResult.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				try
+				{
+					return await (new StreamReader(getResult.GetResponseStream()).ReadToEndAsync());
+				}
+				catch (Exception ex)
+				{
+					if (!hasRetried)
+						needsRetry = true;
+					else
+						throw ex;
+				}
+				if (needsRetry)
+					return await SendGet(uri, true);
+				else
+					return null;
+			}
+			else if (!hasRetried)
+			{
+				int networkDownRetries = 0;
+				while (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable() && networkDownRetries < 10)
+				{
+					networkDownRetries++;
+					await Task.Delay(1000);
+				}
 
-        public void ShowMessage(string title, string text)
-        {
+				return await SendGet(uri, true);
+			}
+			else
+			{
+				throw new Exception(getResult.StatusCode.ToString());
+			}
+		}
+		public Task<string> SendGet(string uri)
+		{
+			return SendGet(uri, false);
+		}
+
+		public void ShowMessage(string title, string text)
+		{
 			var dialog = new MessageDialog(text, title);
 			var asyncOp = dialog.ShowAsync(); //just continue it doesnt matter at this point anyway
-        }
+		}
 
-        private static bool LowPriorityNetworkOkImpl()
-        {
-            var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
+		private static bool LowPriorityNetworkOkImpl()
+		{
+			var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
 			if (connectionProfile.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.InternetAccess)
 				return false;
 
-            var connectionCost = connectionProfile.GetConnectionCost();
-            var connectionCostType = connectionCost.NetworkCostType;
+			var connectionCost = connectionProfile.GetConnectionCost();
+			var connectionCostType = connectionCost.NetworkCostType;
 			var connectionStrength = connectionProfile.GetSignalBars() ?? 5;
-            if (connectionCostType != NetworkCostType.Unrestricted && connectionCostType != NetworkCostType.Unknown)
-                return false;
+			if (connectionCostType != NetworkCostType.Unrestricted && connectionCostType != NetworkCostType.Unknown)
+				return false;
 
 			if (connectionProfile.IsWwanConnectionProfile)
 			{
@@ -385,126 +387,126 @@ namespace SnooStream.PlatformServices
 					return false;
 			}
 
-            return !(connectionCost.ApproachingDataLimit || connectionCost.OverDataLimit || connectionCost.Roaming);
-        }
+			return !(connectionCost.ApproachingDataLimit || connectionCost.OverDataLimit || connectionCost.Roaming);
+		}
 
-        private static bool IsHighPriorityNetworkOkImpl()
-        {
+		private static bool IsHighPriorityNetworkOkImpl()
+		{
 			var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
 			if (connectionProfile.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.InternetAccess)
 				return false;
 
 			var connectionCost = connectionProfile.GetConnectionCost();
 			return !connectionCost.OverDataLimit;
-        }
+		}
 
-        Lazy<bool> _lowPriorityNetworkOk;
-        public bool IsLowPriorityNetworkOk { get { return _lowPriorityNetworkOk.Value; } }
-
-
-        Lazy<bool> _highPriorityNetworkOk;
-        public bool IsHighPriorityNetworkOk { get { return _highPriorityNetworkOk.Value; } }
+		Lazy<bool> _lowPriorityNetworkOk;
+		public bool IsLowPriorityNetworkOk { get { return _lowPriorityNetworkOk.Value; } }
 
 
-        public Stream ResizeImage(Stream source, int maxWidth, int maxHeight)
-        {
-            return new NokiaResizeStream(source, maxWidth, maxHeight);
-        }
-        private class NokiaResizeStream : Stream
-        {
-            public NokiaResizeStream(Stream sourceStream, int maxWidth, int maxHeight)
-            {
-                
-                _innerStream = new Lazy<Stream>(() =>
-                    {
-                        var desiredSize = new Size(maxWidth, maxHeight);
-                        using (var dataWriter = new DataWriter(sourceStream.AsOutputStream()))
-                        {
-                            var resize = Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(dataWriter.DetachBuffer(),
-                                new Nokia.Graphics.Imaging.AutoResizeConfiguration(5 * 1024 * 1024, desiredSize, desiredSize, Nokia.Graphics.Imaging.AutoResizeMode.PrioritizeHighEncodingQuality, 1.0, Nokia.Graphics.Imaging.ColorSpace.Undefined)).AsTask();
-
-                            resize.Wait();
-                            return resize.Result.AsStream();
-                        }
-                    });
-            }
+		Lazy<bool> _highPriorityNetworkOk;
+		public bool IsHighPriorityNetworkOk { get { return _highPriorityNetworkOk.Value; } }
 
 
-            protected override void Dispose(bool disposing)
-            {
-                if (disposing && _innerStream.IsValueCreated)
-                {
-                    _innerStream.Value.Dispose();
-                }
+		public Stream ResizeImage(Stream source, int maxWidth, int maxHeight)
+		{
+			return new NokiaResizeStream(source, maxWidth, maxHeight);
+		}
+		private class NokiaResizeStream : Stream
+		{
+			public NokiaResizeStream(Stream sourceStream, int maxWidth, int maxHeight)
+			{
 
-                _innerStream = null;
+				_innerStream = new Lazy<Stream>(() =>
+					{
+						var desiredSize = new Size(maxWidth, maxHeight);
+						using (var dataWriter = new DataWriter(sourceStream.AsOutputStream()))
+						{
+							var resize = Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(dataWriter.DetachBuffer(),
+								new Nokia.Graphics.Imaging.AutoResizeConfiguration(5 * 1024 * 1024, desiredSize, desiredSize, Nokia.Graphics.Imaging.AutoResizeMode.PrioritizeHighEncodingQuality, 1.0, Nokia.Graphics.Imaging.ColorSpace.Undefined)).AsTask();
 
-                base.Dispose(disposing);
-            }
+							resize.Wait();
+							return resize.Result.AsStream();
+						}
+					});
+			}
 
-            Lazy<Stream> _innerStream;
-            public override bool CanRead
-            {
-                get { return true; }
-            }
 
-            public override bool CanSeek
-            {
-                get { return true; }
-            }
+			protected override void Dispose(bool disposing)
+			{
+				if (disposing && _innerStream.IsValueCreated)
+				{
+					_innerStream.Value.Dispose();
+				}
 
-            public override bool CanWrite
-            {
-                get { return false; }
-            }
+				_innerStream = null;
 
-            public override void Flush()
-            {
-                _innerStream.Value.Flush();
-            }
+				base.Dispose(disposing);
+			}
 
-            public override long Length
-            {
-                get { return _innerStream.Value.Length; }
-            }
+			Lazy<Stream> _innerStream;
+			public override bool CanRead
+			{
+				get { return true; }
+			}
 
-            public override long Position
-            {
-                get
-                {
-                    return _innerStream.Value.Position;
-                }
-                set
-                {
-                    _innerStream.Value.Position = value;
-                }
-            }
+			public override bool CanSeek
+			{
+				get { return true; }
+			}
 
-            public override int Read(byte[] buffer, int offset, int count)
-            {
-                return _innerStream.Value.Read(buffer, offset, count);
-            }
+			public override bool CanWrite
+			{
+				get { return false; }
+			}
 
-            public override long Seek(long offset, SeekOrigin origin)
-            {
-                return _innerStream.Value.Seek(offset, origin);
-            }
+			public override void Flush()
+			{
+				_innerStream.Value.Flush();
+			}
 
-            public override void SetLength(long value)
-            {
-                _innerStream.Value.SetLength(value);
-            }
+			public override long Length
+			{
+				get { return _innerStream.Value.Length; }
+			}
 
-            public override void Write(byte[] buffer, int offset, int count)
-            {
-                throw new NotImplementedException();
-            }   
-        }
+			public override long Position
+			{
+				get
+				{
+					return _innerStream.Value.Position;
+				}
+				set
+				{
+					_innerStream.Value.Position = value;
+				}
+			}
+
+			public override int Read(byte[] buffer, int offset, int count)
+			{
+				return _innerStream.Value.Read(buffer, offset, count);
+			}
+
+			public override long Seek(long offset, SeekOrigin origin)
+			{
+				return _innerStream.Value.Seek(offset, origin);
+			}
+
+			public override void SetLength(long value)
+			{
+				_innerStream.Value.SetLength(value);
+			}
+
+			public override void Write(byte[] buffer, int offset, int count)
+			{
+				throw new NotImplementedException();
+			}
+		}
 
 #if WINDOWS_PHONE_APP
-        List<WeakReference<StatusBarProgressIndicator>> _activeProgressIdicators = new List<WeakReference<StatusBarProgressIndicator>>();
+		List<WeakReference<StatusBarProgressIndicator>> _activeProgressIdicators = new List<WeakReference<StatusBarProgressIndicator>>();
 #endif
-		public void HideProgress ()
+		public void HideProgress()
 		{
 #if WINDOWS_PHONE_APP
 			QueueNonCriticalUI(() =>
@@ -515,7 +517,7 @@ namespace SnooStream.PlatformServices
 #endif
 		}
 
-		public void ShowProgress (string notificationText, double progressPercent)
+		public void ShowProgress(string notificationText, double progressPercent)
 		{
 #if WINDOWS_PHONE_APP
 			QueueNonCriticalUI(() =>
@@ -610,7 +612,7 @@ namespace SnooStream.PlatformServices
 
 			public object ImageData
 			{
-				get 
+				get
 				{
 					if (_isGif && _gifPayload == null)
 					{
@@ -638,7 +640,7 @@ namespace SnooStream.PlatformServices
 						_gifPayload = null;
 						return tmpPayload;
 					}
-						
+
 					else
 						return new GifRenderer.GifPayload { url = _url };
 				}
@@ -696,5 +698,100 @@ namespace SnooStream.PlatformServices
 		{
 			await (await _uiDispatcher).RunIdleAsync(async (dispArgs) => await action());
 		}
+
+
+		public ObservableCollection<T> MakeIncrementalLoadCollection<T>(IIncrementalCollectionLoader<T> loader, int loadIncrement = 5, int auxiliaryTimeout = 2500)
+		{
+			throw new NotImplementedException();
+		}
+
+
+		internal class WrappedCollectionViewSource : IWrappedCollectionViewSource
+		{
+			private readonly CollectionViewSource _source = new CollectionViewSource();
+			private readonly WrappedView _view;
+
+			public WrappedCollectionViewSource()
+			{
+				_view = new WrappedView(_source);
+			}
+
+			public object Source
+			{
+				get { return _source.Source; }
+				set { _source.Source = value; }
+			}
+
+			public object UnderlyingSource
+			{
+				get { return _source; }
+			}
+
+			public IWrappedCollectionView View
+			{
+				get
+				{
+					if (_source.View == null)
+						return null;
+					return _view;
+				}
+			}
+
+			private class WrappedView : IWrappedCollectionView
+			{
+				private readonly CollectionViewSource _source;
+
+				public WrappedView(CollectionViewSource source)
+				{
+					_source = source;
+				}
+
+				public bool MoveCurrentTo(object item)
+				{
+					return _source.View.MoveCurrentTo(item);
+				}
+
+				public bool MoveCurrentToPosition(int position)
+				{
+					return _source.View.MoveCurrentToPosition(position);
+				}
+
+				public bool IsCurrentAfterLast
+				{
+					get { return _source.View.IsCurrentAfterLast; }
+				}
+
+				public bool MoveCurrentToFirst()
+				{
+					return _source.View.MoveCurrentToFirst();
+				}
+
+				public bool IsCurrentBeforeFirst
+				{
+					get { return _source.View.IsCurrentBeforeFirst; }
+				}
+
+				public bool MoveCurrentToLast()
+				{
+					return _source.View.MoveCurrentToLast();
+				}
+
+				public bool MoveCurrentToNext()
+				{
+					return _source.View.MoveCurrentToNext();
+				}
+
+				public bool MoveCurrentToPrevious()
+				{
+					return _source.View.MoveCurrentToPrevious();
+				}
+			}
+		}
+
+		public IWrappedCollectionViewSource MakeCollectionViewSource()
+		{
+			return new WrappedCollectionViewSource();
+		}
+
 	}
 }
