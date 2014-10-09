@@ -82,6 +82,7 @@ namespace SnooStream.Common
 			try
 			{
 				target.Synopsis = await plainWebViewModel.FirstParagraph();
+                target.ThumbnailUrl = await plainWebViewModel.FirstImage() ?? "ms-appx:///Assets/WebGlyphTile.png";
 			}
 			catch(TaskCanceledException)
 			{
