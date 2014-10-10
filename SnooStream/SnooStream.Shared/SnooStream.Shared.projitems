@@ -237,4 +237,7 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Assets\WebGlyphTile.png" />
+  </ItemGroup>
 </Project>

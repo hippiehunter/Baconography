@@ -7,8 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DataContext="{Binding Source={StaticResource SnooStream}, Path=SubredditRiver.SelectedRiver.CurrentSelected}">
-    
-    <Border Background="{StaticResource PhoneChromeBrush}" Margin="0,0,0,24">
+
+    <Border HorizontalAlignment="Stretch" Background="#FF1F1F1F" Margin="0,0,0,24">
         <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0">
             
             <Grid.RowDefinitions>
@@ -40,36 +40,57 @@
 
             <Grid Grid.Row="3" Margin="0,6,0,0" HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button
-                        HorizontalContentAlignment="Right" HorizontalAlignment="Center"
-                        BorderThickness="0" Margin="0,-12,-24,0" Padding="0"
-                        Command="{Binding Votable.ToggleVote}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Margin="0,0,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=1, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol"/>
-                            <TextBlock Margin="-6,4,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=0, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol">
-                                <TextBlock.RenderTransform>
-                                    <RotateTransform Angle="180" CenterX="9" CenterY="12" />
-                                </TextBlock.RenderTransform>
-                            </TextBlock>
-                            <TextBlock Margin="-2,0,0,0" Text="{Binding Path=Votable.TotalVotes}"
-                               Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, Mode=TwoWay}"/>
-                        </StackPanel>
-                    </Button>
+                <Button Grid.Column="0"
+                    HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
+                    BorderThickness="0" Padding="0"
+                    Margin="0,-12,-12,0"
+                    FontFamily="Segoe UI Symbol">
+                    <Grid>
+                        <TextBlock Margin="0,0,0,0" FontSize="35" Text="&#xE10C;" />
+                    </Grid>
+                </Button>
 
-                    <Button Margin="0,-12,0,0"
-                            BorderThickness="0" Padding="0" HorizontalContentAlignment="Right"
-                            FontFamily="Segoe UI Symbol" HorizontalAlignment="Stretch"
-                            Command="{Binding NavigateToComments}">
-                        <Grid>
-                            <TextBlock Margin="0,0,0,0" FontSize="36" Text="&#xE200;" />
-                            <TextBlock Margin="2,12,0,0" Text="{Binding Path=CommentCount}" Foreground="Black" HorizontalAlignment="Center"/>
-                        </Grid>
-                    </Button>
-                </StackPanel>
+                <!--<Button Grid.Column="1"
+                    HorizontalContentAlignment="Center" HorizontalAlignment="Stretch"
+                    BorderThickness="0" Padding="0"
+                    Margin="0,-12,0,0"
+                    FontFamily="Segoe UI Symbol">
+                    <Grid>
+                        <TextBlock Margin="0,0,0,0" FontSize="35" Text="&#xE113;" />
+                    </Grid>
+                </Button>-->
+
+                <Button Grid.Column="1"
+                    HorizontalContentAlignment="Center" HorizontalAlignment="Stretch"
+                    BorderThickness="0" Margin="0,-12,0,0" Padding="0"
+                    Command="{Binding Votable.ToggleVote}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0,0,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=1, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol"/>
+                        <TextBlock Margin="-6,4,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=0, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol">
+                            <TextBlock.RenderTransform>
+                                <RotateTransform Angle="180" CenterX="9" CenterY="12" />
+                            </TextBlock.RenderTransform>
+                        </TextBlock>
+                        <TextBlock Margin="-2,0,0,0" Text="{Binding Path=Votable.TotalVotes}"
+                            Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, Mode=TwoWay}"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Grid.Column="2"
+                        HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
+                        Margin="0,-12,0,0"
+                        BorderThickness="0" Padding="0" 
+                        FontFamily="Segoe UI Symbol"
+                        Command="{Binding NavigateToComments}">
+                    <Grid>
+                        <TextBlock Margin="0,0,0,0" FontSize="36" Text="&#xE200;" />
+                        <TextBlock Margin="1,11,0,0" Text="{Binding Path=CommentCount}" Foreground="Black" HorizontalAlignment="Center"/>
+                    </Grid>
+                </Button>
             </Grid>
         </Grid>
     </Border>

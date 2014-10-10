@@ -151,6 +151,17 @@ namespace SnooStream.ViewModel.Content
 			return onePageResult.Item2;
 		}
 
+        internal async Task<string> FirstImage()
+        {
+            var onePageResult = await LoadOneImpl(_httpClient, Url);
+            var result = onePageResult.Item3.FirstOrDefault((rd) => rd is ReadableImage) as ReadableImage;
+            if (result != null)
+            {
+                return result.Url;
+            }
+            return null;
+        }
+
 		protected override Task StartLoad()
 		{
 			//TODO maybe this should do a full load, not sure
