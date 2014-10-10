@@ -13,24 +13,9 @@
     d:DataContext="{Binding SubredditRiver.SelectedRiver, Source={StaticResource SnooStream}}"
     x:Name="root"
     NavigationCacheMode="Required">
-    <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
-        <Grid x:Name="normalView">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <!--TitlePanel contains the name of the application and page title-->
-            <StackPanel Grid.Row="0" Margin="12,17,0,28">
-                <TextBlock Text="Snoo Stream"/>
-                <TextBlock Text="{Binding Thing.DisplayName}" Margin="9,-7,0,0"/>
-            </StackPanel>
-
-            <ListView x:Name="linksListView" Grid.Row="1" Grid.Column="0"  Margin="12,0,12,0"
+        <Grid>
+            <ListView x:Name="linksListView" Grid.Column="0"  Margin="12,0,12,0"
                       SelectionMode="None"
                       ItemsSource="{Binding LinksViewSource.UnderlyingSource.View}"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"

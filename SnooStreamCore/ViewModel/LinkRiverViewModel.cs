@@ -21,7 +21,7 @@ namespace SnooStream.ViewModel
 		public int HeaderImageHeight { get { return GetHeaderSizeOrDefault(false); } }
         public string Sort { get; private set; }
         private string LastLinkId { get; set; }
-		private DateTime? LastRefresh { get; set; }
+		public DateTime? LastRefresh { get; set; }
         public bool IsLocal { get; private set; }
         public bool IsUserMultiReddit
         {

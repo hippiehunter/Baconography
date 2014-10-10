@@ -65,7 +65,12 @@ namespace SnooStream.Common
             if (viewModel is LinkRiverViewModel)
             {
                 var linkRiver = viewModel as LinkRiverViewModel;
-                var serialized = JsonConvert.SerializeObject(linkRiver.Thing);
+				string selectedId = null;
+				if(linkRiver.CurrentSelected != null)
+					selectedId = linkRiver.CurrentSelected.Link.Id;
+
+				var serializationTpl = new Tuple<Subreddit, string, List<Link>, DateTime, string>(linkRiver.Thing, linkRiver.Sort, linkRiver.Links.Take(100).Select(lvm => lvm.Link).ToList(), linkRiver.LastRefresh ?? DateTime.Now, selectedId);
+				var serialized = JsonConvert.SerializeObject(serializationTpl);
                 return JsonConvert.SerializeObject(Tuple.Create("LinkRiverViewModel", serialized));
             }
 			//else if (viewModel is ContentStreamViewModel)
