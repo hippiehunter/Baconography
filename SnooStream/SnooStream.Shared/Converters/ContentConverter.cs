@@ -15,7 +15,7 @@ namespace SnooStream.Converters
 		{
 			var linkViewModel = value as LinkViewModel;
 			var content = linkViewModel.Content;
-
+			content.StartLoad(SnooStreamViewModel.Settings.ContentTimeout);
 			if (content is ImageViewModel)
 				return new ImageControl { DataContext = content };
 			else if (content is AlbumViewModel)

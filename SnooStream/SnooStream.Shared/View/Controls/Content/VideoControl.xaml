@@ -9,6 +9,6 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
-    
-    <mmppf:MediaPlayer x:Name="player" Source="{Binding SelectedStream}" IsFullScreen="True"/>
+
+    <mmppf:MediaPlayer x:Name="player" Source="{Binding BestPlayableUrl}" IsFullScreen="True"/>
 </UserControl>

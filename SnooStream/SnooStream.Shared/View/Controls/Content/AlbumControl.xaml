@@ -10,12 +10,18 @@
     d:DesignWidth="400">
 
     <Grid>
-        <FlipView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}">
+        <FlipView x:Name="albumSlideView" ItemsSource="{Binding Images}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <FlipView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <VirtualizingStackPanel Orientation="Vertical"/>
+                    <VirtualizingStackPanel Orientation="Vertical" VirtualizingStackPanel.VirtualizationMode="Recycling"/>
                 </ItemsPanelTemplate>
             </FlipView.ItemsPanel>
+            <FlipView.ItemContainerStyle>
+                <Style TargetType="FlipViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                </Style>
+            </FlipView.ItemContainerStyle>
             <FlipView.ItemTemplate>
                 <DataTemplate>
                     <local:ImageControl />

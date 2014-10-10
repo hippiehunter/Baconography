@@ -34,6 +34,7 @@ namespace SnooStream.View.Controls.Content
 
 			// If the image is larger than the screen, zoom it out.
 			var zoomFactor = (float)Math.Min(scrollViewer.ViewportWidth / image.ActualWidth, scrollViewer.ViewportHeight / image.ActualHeight);
+			scrollViewer.MinZoomFactor = zoomFactor;
 			scrollViewer.ChangeView(null, null, zoomFactor, true);
 			imageSizeSet = true;
 		}
