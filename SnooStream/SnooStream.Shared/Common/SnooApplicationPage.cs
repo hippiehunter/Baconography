@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Xaml.Interactivity;
 using SnooStream.Messages;
+using SnooStream.PlatformServices;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -134,12 +135,15 @@ namespace SnooStream.Common
 
 				if (_stateGuid != null)
 				{
+					SystemServices.WrappedCollectionViewSource._dataBinding = true;
 					DataContext = NavigationStateUtility.GetDataContext(_stateGuid);
-                    if(DataContext is IRefreshable)
-                    {
-                        ((IRefreshable)DataContext).MaybeRefresh();
-                    }
+					SystemServices.WrappedCollectionViewSource._dataBinding = false;
+					if (DataContext is IRefreshable)
+					{
+						((IRefreshable)DataContext).MaybeRefresh();
+					}
 				}
+				
 			}
 			catch(Exception ex)
 			{

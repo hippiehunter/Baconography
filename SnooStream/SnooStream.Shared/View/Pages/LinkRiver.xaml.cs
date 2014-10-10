@@ -17,17 +17,15 @@ namespace SnooStream.View.Pages
         public LinkRiver()
         {
             InitializeComponent();
-			var linksViewSource = LayoutRoot.Resources["linksViewSource"] as CollectionViewSource;
-			Messenger.Default.Register<SelectLinkMessage>(this, act = (message) =>
-				{
-					if (linksViewSource.View.Contains(message.Link))
-					{
-						linksViewSource.View.MoveCurrentTo(message.Link);
-						PushNavState(this, message.Kind == SelectLinkMessage.LinkSelectionKind.Content ?
-							"FlipView" : "CommentsView");
-					}
-				});
         }
-		Action<SelectLinkMessage> act;
+		protected override void OnNavigatedTo(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
+		{
+			base.OnNavigatedTo(e);
+
+			if (e.NavigationMode == Windows.UI.Xaml.Navigation.NavigationMode.Back)
+			{
+				linksListView.ScrollIntoView(((LinkRiverViewModel)DataContext).LinksViewSource.View.CurrentItem);
+			}
+		}
     }
 }

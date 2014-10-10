@@ -42,6 +42,11 @@ namespace SnooStream.ViewModel.Content
 			{
 				result = new InternalRedditViewModel(url);
 			}
+			else if(fileName.EndsWith(".mp4") ||
+				fileName.EndsWith(".gifv"))
+			{
+				result = new VideoViewModel(url);
+			}
 			else if (targetHost == "www.youtube.com" ||
 				targetHost == "www.youtu.be" ||
 				targetHost == "youtu.be" ||

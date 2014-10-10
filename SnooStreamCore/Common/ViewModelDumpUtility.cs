@@ -22,8 +22,15 @@ namespace SnooStream.Common
                     {
 						Debug.Assert(context is SnooStreamViewModel);
 						var snooStreamViewModel = (SnooStreamViewModel)context;
-						var subredditThing = JsonConvert.DeserializeObject<Subreddit>(stateItem.Item2);
-						return snooStreamViewModel.SubredditRiver.CombinedRivers.FirstOrDefault(vm => vm.Thing.Id == subredditThing.Id);
+						var subredditThing = JsonConvert.DeserializeObject<Tuple<Subreddit, string, List<Link>, DateTime, string>>(stateItem.Item2);
+						var result = snooStreamViewModel.SubredditRiver.CombinedRivers.FirstOrDefault(vm => vm.Thing.Id == subredditThing.Item1.Id);
+						if (result == null)
+						{
+							result = new LinkRiverViewModel(false, subredditThing.Item1, subredditThing.Item2, subredditThing.Item3, subredditThing.Item4);
+						}
+
+						result.CurrentSelected = result.Links.FirstOrDefault(lnk => lnk.Link.Id == subredditThing.Item5);
+						return result;
                     }
 				//case "LinkStreamViewModel":
 				//	{
@@ -61,10 +68,10 @@ namespace SnooStream.Common
                 var serialized = JsonConvert.SerializeObject(linkRiver.Thing);
                 return JsonConvert.SerializeObject(Tuple.Create("LinkRiverViewModel", serialized));
             }
-			//else if (viewModel is LinkStreamViewModel)
+			//else if (viewModel is ContentStreamViewModel)
 			//{
-			//	var linkStream = viewModel as LinkStreamViewModel;
-			//	return JsonConvert.SerializeObject(Tuple.Create("LinkStreamViewModel", ((LinkViewModel)linkStream.Visible.Context).Link.Id));
+			//	var contentStream = viewModel as ContentStreamViewModel;
+			//	return JsonConvert.SerializeObject(Tuple.Create("ContentStreamViewModel", ((LinkViewModel)contentStream.).Link.Id));
 			//}
 			else if (viewModel is CommentsViewModel)
 			{

@@ -141,5 +141,10 @@ namespace SnooStream.PlatformServices
         {
             _navState.ValidateParameters(validStates);
         }
-    }
+
+		public void NavigateToContentRiver(LinkRiverViewModel viewModel)
+		{
+			_frame.Navigate(typeof(ContentRiver), "state=" + _navState.AddState(viewModel));
+		}
+	}
 }

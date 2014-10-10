@@ -39,7 +39,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\InvertedBooleanConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\LinkGlyphConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\LinkMetadataConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Converters\PortableObservableCollectionConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\StringCaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeRelationConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\UnixTimeConverter.cs" />
@@ -119,6 +118,9 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\Comments.xaml.cs">
       <DependentUpon>Comments.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Pages\ContentRiver.xaml.cs">
+      <DependentUpon>ContentRiver.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\ContentSettings.xaml.cs">
       <DependentUpon>ContentSettings.xaml</DependentUpon>
@@ -217,6 +219,10 @@
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\Comments.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Pages\ContentRiver.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\ContentSettings.xaml">
       <SubType>Designer</SubType>

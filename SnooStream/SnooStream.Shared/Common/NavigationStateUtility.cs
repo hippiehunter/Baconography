@@ -14,9 +14,11 @@ namespace SnooStream.Common
     class NavigationStateUtility
     {
 		Dictionary<string, ViewModelBase> _navState;
+		Dictionary<string, int> _navDuplicates;
 		Stack<string> _navStateInsertionOrder;
         public NavigationStateUtility(string existingState, SnooStreamViewModel rootContext)
         {
+			_navDuplicates = new Dictionary<string, int>();
 			_navState = new Dictionary<string, ViewModelBase>();
 			_navStateInsertionOrder = new Stack<string>();
             if (!string.IsNullOrEmpty(existingState))
@@ -26,8 +28,7 @@ namespace SnooStream.Common
                 foreach (var item in serializedItems.Item1.Reverse())
                 {
 					context = RestoreStateItem(serializedItems.Item2[item], context) as ViewModelBase;
-					_navState.Add(item, context);
-					_navStateInsertionOrder.Push(item);
+					AddState(context, item);
                 }
             }
             
@@ -48,17 +49,48 @@ namespace SnooStream.Common
 			}
 		}
 
-        public object AddState(ViewModelBase state)
+        public object AddState(ViewModelBase state, string guid = null)
         {
-            var guid = Uri.EscapeDataString(Guid.NewGuid().ToString());
-            _navState.Add(guid, state);
+			if (_navState.ContainsValue(state))
+			{
+				var navKvp = _navState.FirstOrDefault(kvp => kvp.Value == state);
+				guid = navKvp.Key;
+				if (_navDuplicates.ContainsKey(guid))
+				{
+					_navDuplicates[guid] = _navDuplicates[guid] + 1;
+				}
+				else
+					_navDuplicates[guid] = 2;
+			}
+			else if (guid != null)
+			{
+				_navState.Add(guid, state);
+			}
+			else
+			{
+				guid = Uri.EscapeDataString(Guid.NewGuid().ToString());
+				_navState.Add(guid, state);
+			}
+
 			_navStateInsertionOrder.Push(guid);
             return guid;
         }
 
         public void RemoveState(string guid)
         {
-            _navState.Remove(guid);
+			if (_navDuplicates.ContainsKey(guid))
+			{
+				_navDuplicates[guid] = _navDuplicates[guid] - 1;
+				if (_navDuplicates[guid] <= 0)
+				{
+					_navState.Remove(guid);
+					_navDuplicates.Remove(guid);
+				}
+			}
+			else
+			{
+				_navState.Remove(guid);
+			}
 			Remove(_navStateInsertionOrder, guid);
         }
 

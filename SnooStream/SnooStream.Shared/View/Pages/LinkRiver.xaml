@@ -5,19 +5,16 @@
     xmlns:local="using:SnooStream.View.Controls"
     xmlns:selectors="using:SnooStream.View.Selectors"
     xmlns:common="using:SnooStream.Common"
-    xmlns:mmppf="using:Microsoft.PlayerFramework"
     xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" 
     xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    DataContext="{Binding SubredditRiver.SelectedRiver, Source={StaticResource SnooStream}}"
-    x:Name="root">
+    d:DataContext="{Binding SubredditRiver.SelectedRiver, Source={StaticResource SnooStream}}"
+    x:Name="root"
+    NavigationCacheMode="Required">
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
-        <Grid.Resources>
-            <CollectionViewSource x:Name="linksViewSource" Source="{Binding Links, Converter={StaticResource collectionConverter}}"/>
-        </Grid.Resources>
         <Grid x:Name="normalView">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -33,9 +30,11 @@
                 <TextBlock Text="{Binding Thing.DisplayName}" Margin="9,-7,0,0"/>
             </StackPanel>
 
-            <ListView Grid.Row="1" Grid.Column="0"  Margin="12,0,12,0"
-            ItemsSource="{Binding Source={StaticResource linksViewSource}}"
-            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListView x:Name="linksListView" Grid.Row="1" Grid.Column="0"  Margin="12,0,12,0"
+                      SelectionMode="None"
+                      ItemsSource="{Binding LinksViewSource.UnderlyingSource.View}"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      IsItemClickEnabled="False">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />

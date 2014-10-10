@@ -2,6 +2,7 @@
 using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Messages;
+using SnooStream.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -80,8 +81,6 @@ namespace SnooStream.ViewModel
 			}
 		}
 
-		bool _searchLoadInProgress = false;
-
 		void queryTimer_Tick(object sender, object timer)
 		{
 			// Stop the timer so it doesn't fire again unless rescheduled
@@ -89,58 +88,93 @@ namespace SnooStream.ViewModel
 
 			if (!(_searchString != null && _searchString.Contains("/")))
 			{
-				_searchLoadInProgress = true;
-				try
-				{
-					//get new search results
-					string afterSearch = "";
-					string afterUri = "";
-					PortableObservableCollection<LinkRiverViewModel> searchResults = null;
-					searchResults = new PortableObservableCollection<LinkRiverViewModel>(async () =>
-					{
-						if (string.IsNullOrWhiteSpace(afterSearch))
-						{
-							//dump out early so we dont get duplicates in a small search that had no 'after'
-							if (searchResults.Count > 0)
-								return;
-
-							var searchListing = await SnooStreamViewModel.RedditService.Search(SearchString, null, true, null);
-							if (searchListing != null)
-							{
-								afterUri = searchListing.Item1;
-								afterSearch = searchListing.Item2.Data.After;
-								foreach (var subreddit in searchListing.Item2.Data.Children)
-								{
-									if (subreddit.Data is Subreddit)
-									{
-										//TODO: this represents an oddity, we loose the cached links by creating a new LinkRiverViewModel
-										searchResults.Add(new LinkRiverViewModel(false, subreddit.Data as Subreddit, null, null, null));
-									}
-								}
-							}
-						}
-						else
-						{
-							var searchListing = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(afterUri, afterSearch);
-							afterSearch = searchListing.Data.After;
-							foreach (var subreddit in searchListing.Data.Children)
-							{
-								if (subreddit.Data is Subreddit)
-								{
-									//TODO: this represents an oddity, we loose the cached links by creating a new LinkRiverViewModel
-									searchResults.Add(new LinkRiverViewModel(false, subreddit.Data as Subreddit, null, null, null));
-								}
-							}
-						}
-					});
-					Subreddits = searchResults;
-				}
-				finally
-				{
-					_searchLoadInProgress = false;
-				}
+				Subreddits = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SubreditSearchLoader(_searchString, CombinedRivers));
 			}
 		}
+
+		private class SubreditSearchLoader : IIncrementalCollectionLoader<LinkRiverViewModel>
+		{
+			string _afterSearch = "";
+			string _afterUri = "";
+			string _searchString;
+			bool _hasLoaded = false;
+			IEnumerable<LinkRiverViewModel> _existing;
+
+			public SubreditSearchLoader(string searchString, IEnumerable<LinkRiverViewModel> existing)
+			{
+				_existing = existing;
+				_searchString = searchString;
+			}
+
+			public Task AuxiliaryItemLoader(IEnumerable<LinkRiverViewModel> items, int timeout)
+			{
+				return Task.FromResult(true);
+			}
+
+			public bool IsStale
+			{
+				get { return false; }
+			}
+
+			public bool HasMore()
+			{
+				return !_hasLoaded || !string.IsNullOrWhiteSpace(_afterSearch);
+			}
+
+			public async Task<IEnumerable<LinkRiverViewModel>> LoadMore()
+			{
+				var result = new List<LinkRiverViewModel>();
+				if (string.IsNullOrWhiteSpace(_afterSearch))
+				{
+					var searchListing = await SnooStreamViewModel.RedditService.Search(_searchString, null, true, null);
+					if (searchListing != null)
+					{
+						_afterUri = searchListing.Item1;
+						_afterSearch = searchListing.Item2.Data.After;
+						foreach (var subreddit in searchListing.Item2.Data.Children)
+						{
+							if (subreddit.Data is Subreddit)
+							{
+								var existing = _existing.FirstOrDefault(lrvm => lrvm.Thing.Id == ((Subreddit)subreddit.Data).Id);
+								if (existing != null)
+									result.Add(existing);
+								else
+								{
+									//TODO: this represents an oddity, we loose the cached links by creating a new LinkRiverViewModel
+									result.Add(new LinkRiverViewModel(false, subreddit.Data as Subreddit, null, null, null));
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					var searchListing = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(_afterUri, _afterSearch);
+					_afterSearch = searchListing.Data.After;
+					foreach (var subreddit in searchListing.Data.Children)
+					{
+						if (subreddit.Data is Subreddit)
+						{
+							var existing = _existing.FirstOrDefault(lrvm => lrvm.Thing.Id == ((Subreddit)subreddit.Data).Id);
+							if (existing != null)
+								result.Add(existing);
+							else
+							{
+								//TODO: this represents an oddity, we loose the cached links by creating a new LinkRiverViewModel
+								result.Add(new LinkRiverViewModel(false, subreddit.Data as Subreddit, null, null, null));
+							}
+						}
+					}
+				}
+				return result;
+			}
+
+			public Task Refresh(ObservableCollection<LinkRiverViewModel> current, bool onlyNew)
+			{
+				throw new NotImplementedException();
+			}
+		}
+
         public SubredditRiverViewModel(SubredditRiverInit initBlob)
         {
             if (initBlob != null)

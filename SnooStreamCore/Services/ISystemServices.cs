@@ -30,7 +30,7 @@ namespace SnooStream.Services
 		void HideProgress();
 		void QueueNonCriticalUI(Action action);
 		ObservableCollection<T> MakeIncrementalLoadCollection<T>(IIncrementalCollectionLoader<T> loader, int loadIncrement = 5, int auxiliaryTimeout = 2500);
-		IWrappedCollectionViewSource MakeCollectionViewSource();
+		IWrappedCollectionViewSource MakeCollectionViewSource(object source);
 	}
 
 	public interface IIncrementalCollectionLoader<T>
@@ -45,6 +45,9 @@ namespace SnooStream.Services
 
 	public interface IWrappedCollectionView
 	{
+		object CurrentItem { get; }
+		int CurrentPosition { get; }
+
 		bool MoveCurrentTo(object item);
 		bool MoveCurrentToPosition(int position);
 		bool IsCurrentAfterLast { get; }

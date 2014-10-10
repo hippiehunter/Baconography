@@ -8,8 +8,19 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
-    
-    <Grid>
 
+    <Grid>
+        <FlipView x:Name="albumSlideView" Grid.Row="1" ItemsSource="{Binding Images}">
+            <FlipView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </FlipView.ItemsPanel>
+            <FlipView.ItemTemplate>
+                <DataTemplate>
+                    <local:ImageControl />
+                </DataTemplate>
+            </FlipView.ItemTemplate>
+        </FlipView>
     </Grid>
 </UserControl>

@@ -47,10 +47,7 @@
   <ItemGroup>
     <Compile Include="Common\CacheStore.cs" />
     <Compile Include="Common\CaptchaService.cs" />
-    <Compile Include="Common\IPortableISupportIncrementalLoad.cs" />
-    <Compile Include="Common\NeverEndingRedditEnumerator.cs" />
     <Compile Include="Common\NotificationService.cs" />
-    <Compile Include="Common\PortableObservableCollection.cs" />
     <Compile Include="Common\PreviewLoadService.cs" />
     <Compile Include="Common\TaskExtensions.cs" />
     <Compile Include="Common\TaskSettings.cs" />
@@ -75,6 +72,7 @@
     <Compile Include="Services\IUserCredentialService.cs" />
     <Compile Include="ViewModel\AboutUserViewModel.cs" />
     <Compile Include="ViewModel\CaptchaViewModel.cs" />
+    <Compile Include="ViewModel\ContentStreamViewModel.cs" />
     <Compile Include="ViewModel\Content\AlbumViewModel.cs" />
     <Compile Include="ViewModel\Content\ContentViewModel.cs" />
     <Compile Include="ViewModel\Content\ImageViewModel.cs" />

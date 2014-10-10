@@ -99,37 +99,45 @@ namespace SnooStream.ViewModel.Content
 
 		private async Task<Tuple<string, string, IEnumerable<Readable>>> LoadOneImpl(HttpClient httpClient, string url)
 		{
-			var result = new List<Readable>();
-			string domain = url;
-			if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
-				domain = new Uri(url).Authority;
-
-			Lazy<Task<string>> loadTask;
-			lock (this)
+			try
 			{
-				if (!_pageLoadLookup.TryGetValue(url, out loadTask))
-				{
-					_pageLoadLookup.Add(url, loadTask = new Lazy<Task<string>>(() => _httpClient.GetStringAsync(url)));
-				}
-			}
+				var result = new List<Readable>();
+				string domain = url;
+				if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
+					domain = new Uri(url).Authority;
 
-			var page = await loadTask.Value;
-			string title;
-			var pageBlocks = ArticleExtractor.INSTANCE.GetTextAndImageBlocks(page, new Uri(url), out title);
-			foreach (var tpl in pageBlocks)
+				Lazy<Task<string>> loadTask;
+				lock (this)
+				{
+					if (!_pageLoadLookup.TryGetValue(url, out loadTask))
+					{
+						_pageLoadLookup.Add(url, loadTask = new Lazy<Task<string>>(() => _httpClient.GetStringAsync(url)));
+					}
+				}
+
+				var page = await loadTask.Value;
+				string title;
+				var pageBlocks = ArticleExtractor.INSTANCE.GetTextAndImageBlocks(page, new Uri(url), out title);
+				foreach (var tpl in pageBlocks)
+				{
+					if (!string.IsNullOrEmpty(tpl.Item2))
+					{
+						result.Add(new ReadableImage { Url = tpl.Item2 });
+					}
+
+					if (!string.IsNullOrEmpty(tpl.Item1))
+					{
+						result.Add(new ReadableText { Text = tpl.Item1 });
+					}
+				}
+				var nextPageUrl = MultiPageUtils.FindNextPageLink(SgmlDomBuilder.GetBody(SgmlDomBuilder.BuildDocument(page)), url);
+				return Tuple.Create(nextPageUrl, title, (IEnumerable<Readable>)result);
+			}
+			catch (Exception ex)
 			{
-				if (!string.IsNullOrEmpty(tpl.Item2))
-				{
-					result.Add(new ReadableImage { Url = tpl.Item2 });
-				}
-
-				if (!string.IsNullOrEmpty(tpl.Item1))
-				{
-					result.Add(new ReadableText { Text = tpl.Item1 });
-				}
+				this.SetErrorStatus(ex.Message);
+				return Tuple.Create("", "", Enumerable.Empty<Readable>());
 			}
-			var nextPageUrl = MultiPageUtils.FindNextPageLink(SgmlDomBuilder.GetBody(SgmlDomBuilder.BuildDocument(page)), url);
-			return Tuple.Create(nextPageUrl, title, (IEnumerable<Readable>)result);
 		}
 
 		internal async Task<string> FirstParagraph()

@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using SnooSharp;
 using SnooStream.Common;
+using SnooStream.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,7 +20,6 @@ namespace SnooStream.ViewModel
 		public int HeaderImageWidth { get { return GetHeaderSizeOrDefault(true); } }
 		public int HeaderImageHeight { get { return GetHeaderSizeOrDefault(false); } }
         public string Sort { get; private set; }
-        public bool Loading { get { return _loadingTask != null; } }
         private string LastLinkId { get; set; }
 		private DateTime? LastRefresh { get; set; }
         public bool IsLocal { get; private set; }
@@ -82,133 +82,76 @@ namespace SnooStream.ViewModel
 			IsLocal = isLocal;
 			Thing = thing;
 			Sort = sort ?? "hot";
-			Links = new PortableObservableCollection<LinkViewModel>(LoadMore);
+			Links = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new LinksLoader(this));
+			_linksViewSource = new Lazy<IWrappedCollectionViewSource>(() => SnooStreamViewModel.SystemServices.MakeCollectionViewSource(Links));
 			if (initialLinks != null)
 			{
 				ProcessLinkThings(initialLinks);
 			}
+		}
 
-			if (IsInDesignMode)
+		private class LinksLoader : IIncrementalCollectionLoader<LinkViewModel>
+		{
+			LinkRiverViewModel _linkRiverViewModel;
+			public LinksLoader(LinkRiverViewModel linkRiverViewModel)
 			{
-				CurrentSelected = new LinkViewModel(this, new Link { Title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras ac tempor erat. Cras sagittis eu urna sed posuere. Proin sit amet fringilla magna. Sed feugiat lorem nibh, ac mollis risus rutrum non. Pellentesque pharetra auctor pellentesque. Maecenas vel lorem sagittis.", Domain = "http://www.google.com", Author = "fredbob", Url = "http://www.google.com", CommentCount = 2453 });
+				_linkRiverViewModel = linkRiverViewModel;
 			}
 
-		}
-
-        private void ProcessLinkThings(IEnumerable<Link> links)
-        {
-            foreach (var link in links)
-            {
-				Links.Add(new LinkViewModel(this, link) { FromMultiReddit = (IsMultiReddit || Thing.Url == "/") });
-            }
-        }
-
-        public PortableObservableCollection<LinkViewModel> Links { get; set; }
-        private Task _loadingTask;
-        public Task LoadMore()
-        {
-            if (_loadingTask == null)
-            {
-                lock (this)
-                {
-                    if (_loadingTask == null)
-                    {
-                        _loadingTask = LoadMoreImpl();
-                    }
-                }
-            }
-            return _loadingTask;
-        }
-
-		public Task RefreshTask()
-		{
-			if (_loadingTask == null)
+			public Task AuxiliaryItemLoader(IEnumerable<LinkViewModel> items, int timeout)
 			{
-				lock (this)
-				{
-					if (_loadingTask == null)
-					{
-						_loadingTask = RefreshImpl();
-					}
-				}
+				return Task.FromResult(true);
 			}
-			return _loadingTask;
-		}
 
-        public async Task LoadMoreImpl()
-        {
-            await SnooStreamViewModel.NotificationService.Report("loading posts", async () =>
-                {
-                    var postListing = LastLinkId != null ? 
-                        await SnooStreamViewModel.RedditService.GetAdditionalFromListing(Thing.Url + ".json?sort=" + Sort, LastLinkId) :
-						await SnooStreamViewModel.RedditService.GetPostsBySubreddit(Thing.Url, Sort);
-
-                    if (postListing != null)
-                    {
-						LastRefresh = DateTime.Now;
-						SnooStreamViewModel.SystemServices.RunUIAsync(async () =>
-							{
-								var linkIds = new List<string>();
-								var linkViewModels = new List<LinkViewModel>();
-								foreach (var thing in postListing.Data.Children)
-								{
-									if (thing.Data is Link)
-									{
-										linkIds.Add(((Link)thing.Data).Id);
-										var viewModel = new LinkViewModel(this, thing.Data as Link) { FromMultiReddit = (IsMultiReddit || Thing.Url == "/") };
-										linkViewModels.Add(viewModel);
-										Links.Add(viewModel);
-									}
-								}
-								var linkMetadata = (await SnooStreamViewModel.OfflineService.GetLinkMetadata(linkIds)).ToList();
-								for (int i = 0; i < linkMetadata.Count; i++)
-								{
-									linkViewModels[i].UpdateMetadata(linkMetadata[i]);
-								}
-								LastLinkId = postListing.Data.After;
-							});
-                    }
-                });
-            
-            //clear the loading task when we're done
-            _loadingTask = null;
-        }
-
-		public LinkViewModel CurrentSelected { get; set; }
-
-		internal SubredditInit Dump()
-		{
-			return new SubredditInit
+			public bool IsStale
 			{
-				DefaultSort = Sort,
-				Thing = Thing,
-				Links = Links.Select(vm => vm.Link).ToList(),
-				LastRefresh = LastRefresh
-			};
-		}
+				get { return _linkRiverViewModel.LastRefresh == null || (DateTime.Now - _linkRiverViewModel.LastRefresh.Value).TotalMinutes > 30; }
+			}
 
-		public void MaybeRefresh()
-		{
-			if (Links.Count == 0)
-				LoadMore();
-			if(LastRefresh == null || (DateTime.Now - LastRefresh.Value).TotalMinutes > 30)
-				Refresh(false);
-			
-		}
-
-		public async void Refresh(bool onlyNew) //this param isnt implemented here
-		{
-			await RefreshTask();
-		}
-
-		private async Task RefreshImpl()
-		{
-			await SnooStreamViewModel.NotificationService.Report("refreshing posts", async () =>
+			public bool HasMore()
 			{
-				var postListing = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(Thing.Url + ".json?sort=" + Sort, LastLinkId);
+				return _linkRiverViewModel.Links.Count == 0 || _linkRiverViewModel.LastLinkId != null;
+			}
+
+			public async Task<IEnumerable<LinkViewModel>> LoadMore()
+			{
+				var result = new List<LinkViewModel>();
+				var postListing = _linkRiverViewModel.LastLinkId != null ?
+						await SnooStreamViewModel.RedditService.GetAdditionalFromListing(_linkRiverViewModel.Thing.Url + ".json?sort=" + _linkRiverViewModel.Sort, _linkRiverViewModel.LastLinkId) :
+						await SnooStreamViewModel.RedditService.GetPostsBySubreddit(_linkRiverViewModel.Thing.Url, _linkRiverViewModel.Sort);
+
 				if (postListing != null)
 				{
-					LastRefresh = DateTime.Now;
+					_linkRiverViewModel.LastRefresh = DateTime.Now;
+					SnooStreamViewModel.SystemServices.RunUIAsync(async () =>
+					{
+						var linkIds = new List<string>();
+						foreach (var thing in postListing.Data.Children)
+						{
+							if (thing.Data is Link)
+							{
+								linkIds.Add(((Link)thing.Data).Id);
+								var viewModel = new LinkViewModel(_linkRiverViewModel, thing.Data as Link) { FromMultiReddit = (_linkRiverViewModel.IsMultiReddit || _linkRiverViewModel.Thing.Url == "/") };
+								result.Add(viewModel);
+							}
+						}
+						var linkMetadata = (await SnooStreamViewModel.OfflineService.GetLinkMetadata(linkIds)).ToList();
+						for (int i = 0; i < linkMetadata.Count; i++)
+						{
+							result[i].UpdateMetadata(linkMetadata[i]);
+						}
+						_linkRiverViewModel.LastLinkId = postListing.Data.After;
+					});
+				}
+				return result;
+			}
+
+			public async Task Refresh(ObservableCollection<LinkViewModel> current, bool onlyNew)
+			{
+				var postListing = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(_linkRiverViewModel.Thing.Url + ".json?sort=" + _linkRiverViewModel.Sort, _linkRiverViewModel.LastLinkId);
+				if (postListing != null)
+				{
+					_linkRiverViewModel.LastRefresh = DateTime.Now;
 					var linkIds = new List<string>();
 					var replace = new List<Tuple<int, LinkViewModel>>();
 					var move = new List<Tuple<int, int, LinkViewModel>>();
@@ -220,15 +163,15 @@ namespace SnooStream.ViewModel
 						if (thing.Data is Link)
 						{
 							linkIds.Add(((Link)thing.Data).Id);
-							var viewModel = new LinkViewModel(this, thing.Data as Link);
+							var viewModel = new LinkViewModel(_linkRiverViewModel, thing.Data as Link);
 							replace.Add(Tuple.Create(i, viewModel));
 						}
 					}
 
-					for(int i = 0; i < Links.Count; i++)
+					for (int i = 0; i < current.Count; i++)
 					{
-						if(!existing.ContainsKey(Links[i].Link.Id))
-							existing.Add(Links[i].Link.Id, Tuple.Create(i, Links[i]));
+						if (!existing.ContainsKey(current[i].Link.Id))
+							existing.Add(current[i].Link.Id, Tuple.Create(i, current[i]));
 					}
 
 					foreach (var link in replace)
@@ -251,51 +194,102 @@ namespace SnooStream.ViewModel
 							existing[link.Link.Id].Item2.MergeLink(link.Link);
 						}
 
-						foreach(var linkTpl in move)
+						foreach (var linkTpl in move)
 						{
 							existing[linkTpl.Item3.Link.Id].Item2.MergeLink(linkTpl.Item3.Link);
 						}
 
 						bool unfinished = true;
-						while(unfinished)
+						while (unfinished)
 						{
 							unfinished = false;
-							foreach(var linkTpl in move.OrderBy(tpl => tpl.Item2))
+							foreach (var linkTpl in move.OrderBy(tpl => tpl.Item2))
 							{
-								var currentIndex = Links.IndexOf(linkTpl.Item3);
+								var currentIndex = current.IndexOf(linkTpl.Item3);
 								if (currentIndex > 0 && currentIndex != linkTpl.Item2)
 								{
 									unfinished = true;
-									Links.Move(currentIndex, linkTpl.Item2);
+									current.Move(currentIndex, linkTpl.Item2);
 								}
 							}
 						}
 
 						foreach (var newLink in replace.OrderBy(tpl => tpl.Item1))
 						{
-							if (Links.Count - 1 > newLink.Item1)
-								Links[newLink.Item1] = newLink.Item2;
+							if (current.Count - 1 > newLink.Item1)
+								current[newLink.Item1] = newLink.Item2;
 							else
-								Links.Add(newLink.Item2);
+								current.Add(newLink.Item2);
 						}
 
-						for(int i = Links.Count - 1; i > linkIds.Count; i--)
+						for (int i = current.Count - 1; i > linkIds.Count; i--)
 						{
-							Links.RemoveAt(i);
+							current.RemoveAt(i);
 						}
 
 						var linkMetadata = (await SnooStreamViewModel.OfflineService.GetLinkMetadata(linkIds)).ToList();
 						for (int i = 0; i < linkMetadata.Count; i++)
 						{
-							Links[i].UpdateMetadata(linkMetadata[i]);
+							current[i].UpdateMetadata(linkMetadata[i]);
 						}
-						LastLinkId = postListing.Data.After;
+						_linkRiverViewModel.LastLinkId = postListing.Data.After;
 					});
 				}
-			});
+			}
+		}
 
-			//clear the loading task when we're done
-			_loadingTask = null;
+        private void ProcessLinkThings(IEnumerable<Link> links)
+        {
+            foreach (var link in links)
+            {
+				Links.Add(new LinkViewModel(this, link) { FromMultiReddit = (IsMultiReddit || Thing.Url == "/") });
+            }
+        }
+
+		Lazy<IWrappedCollectionViewSource> _linksViewSource;
+		public IWrappedCollectionViewSource LinksViewSource
+		{
+			get
+			{
+				return _linksViewSource.Value;
+			}
+		}
+        public ObservableCollection<LinkViewModel> Links { get; set; }
+
+		public LinkViewModel CurrentSelected
+		{
+			get
+			{
+				if (IsInDesignMode)
+					return new LinkViewModel(this, new Link { Title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras ac tempor erat. Cras sagittis eu urna sed posuere. Proin sit amet fringilla magna. Sed feugiat lorem nibh, ac mollis risus rutrum non. Pellentesque pharetra auctor pellentesque. Maecenas vel lorem sagittis.", Domain = "http://www.google.com", Author = "fredbob", Url = "http://www.google.com", CommentCount = 2453 });
+				else
+					return this.LinksViewSource.View.CurrentItem as LinkViewModel;
+			}
+			internal set
+			{
+				LinksViewSource.View.MoveCurrentTo(value);
+			}
+		}
+
+		internal SubredditInit Dump()
+		{
+			return new SubredditInit
+			{
+				DefaultSort = Sort,
+				Thing = Thing,
+				Links = Links.Select(vm => vm.Link).ToList(),
+				LastRefresh = LastRefresh
+			};
+		}
+
+		public void MaybeRefresh()
+		{
+			((IRefreshable)Links).MaybeRefresh();
+		}
+
+		public void Refresh(bool onlyNew)
+		{
+			((IRefreshable)Links).Refresh(onlyNew);
 		}
 	}
 }

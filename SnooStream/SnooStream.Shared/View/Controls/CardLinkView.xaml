@@ -35,7 +35,7 @@
                     BorderThickness="0"
                     VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" 
-                    Tapped="Button_Tap" Content="{Binding Converter={StaticResource contentPreviewConverter}}">
+                    Command="{Binding GotoLink}" Content="{Binding Converter={StaticResource contentPreviewConverter}}">
             </Button>
 
             <Grid Grid.Row="3" Margin="0,6,0,0" HorizontalAlignment="Stretch">

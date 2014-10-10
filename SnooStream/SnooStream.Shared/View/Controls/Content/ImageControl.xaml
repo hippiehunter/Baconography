@@ -8,8 +8,10 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
-    
-    <Grid>
 
-    </Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsHorizontalRailEnabled="True" ZoomMode="Enabled">
+
+        <Image HorizontalAlignment="Center" VerticalAlignment="Center" DataContext="{Binding ImageLoader.ImageData, Converter={StaticResource gifConverter}}" Stretch="Uniform" Source="{Binding ImageSource}" />
+
+    </ScrollViewer>
 </UserControl>

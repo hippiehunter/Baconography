@@ -710,12 +710,27 @@ namespace SnooStream.PlatformServices
 
 		internal class WrappedCollectionViewSource : IWrappedCollectionViewSource
 		{
+			internal static bool _dataBinding = false;
 			private readonly CollectionViewSource _source = new CollectionViewSource();
 			private readonly WrappedView _view;
 
-			public WrappedCollectionViewSource()
+			public WrappedCollectionViewSource(object source)
 			{
 				_view = new WrappedView(_source);
+				Source = source;
+				_source.View.CurrentChanging += View_CurrentChanging;
+				_source.View.CurrentChanged += View_CurrentChanged;
+			}
+
+			void View_CurrentChanged(object sender, object e)
+			{
+				
+			}
+
+			void View_CurrentChanging(object sender, CurrentChangingEventArgs e)
+			{
+				if (_dataBinding)
+					e.Cancel = true;
 			}
 
 			public object Source
@@ -787,12 +802,22 @@ namespace SnooStream.PlatformServices
 				{
 					return _source.View.MoveCurrentToPrevious();
 				}
+
+				public object CurrentItem
+				{
+					get { return _source.View.CurrentItem; }
+				}
+
+				public int CurrentPosition
+				{
+					get { return _source.View.CurrentPosition; }
+				}
 			}
 		}
 
-		public IWrappedCollectionViewSource MakeCollectionViewSource()
+		public IWrappedCollectionViewSource MakeCollectionViewSource(object source)
 		{
-			return new WrappedCollectionViewSource();
+			return new WrappedCollectionViewSource(source);
 		}
 
 	}

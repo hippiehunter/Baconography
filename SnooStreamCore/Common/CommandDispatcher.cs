@@ -244,7 +244,14 @@ namespace SnooStream.Common
                 }
                 else
                 {
-                    //SnooStreamViewModel.NavigationService.NavigateToLinkStream(new LinkStreamViewModel(riverContext, sourceLink == null ? url : sourceLink.Id));
+					if (context is LinkViewModel)
+					{
+						var linkRiver = ((LinkViewModel)context).Context as LinkRiverViewModel;
+						linkRiver.LinksViewSource.View.MoveCurrentTo(context);
+						//linkRiver.LinksViewSource.View.MoveCurrentTo(context);
+						//linkRiver.LinksViewSource.View.MoveCurrentToFirst();
+						SnooStreamViewModel.NavigationService.NavigateToContentRiver(linkRiver);
+					}
                 }
             });
             await task;
