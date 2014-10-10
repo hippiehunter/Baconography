@@ -23,5 +23,19 @@ namespace SnooStream.View.Controls.Content
         {
             this.InitializeComponent();
         }
+
+		private bool imageSizeSet;
+		private void Image_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			if (imageSizeSet || !(image.ActualWidth > scrollViewer.ViewportWidth) && !(image.ActualHeight > scrollViewer.ViewportHeight))
+			{
+				return;
+			}
+
+			// If the image is larger than the screen, zoom it out.
+			var zoomFactor = (float)Math.Min(scrollViewer.ViewportWidth / image.ActualWidth, scrollViewer.ViewportHeight / image.ActualHeight);
+			scrollViewer.ChangeView(null, null, zoomFactor, true);
+			imageSizeSet = true;
+		}
     }
 }
