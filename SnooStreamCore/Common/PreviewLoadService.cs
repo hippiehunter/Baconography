@@ -5,14 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.Common
 {
 	public class Preview : ViewModelBase
 	{
-		private string _thumbnailUrl;
-		public string ThumbnailUrl
+		private object _thumbnailUrl;
+		public object ThumbnailUrl
 		{
 			get
 			{
@@ -26,21 +27,40 @@ namespace SnooStream.Common
 		}
 		public string Glyph { get; set; }
 
+		public Func<CancellationToken, Task<string>> FinishLoad { get; private set; }
 		public static Preview LoadLinkPreview(ContentViewModel content)
 		{
 			Preview result = null;
 			if (content is ImageViewModel)
-				LoadPreview(content as ImageViewModel, (PreviewImage)(result = new PreviewImage()));
+			{
+				result = new PreviewImage { ThumbnailUrl = ((ImageViewModel)content).RedditThumbnail };
+				result.FinishLoad = (cancel) => LoadPreview(content as ImageViewModel, result as PreviewImage); 
+			}
 			else if (content is AlbumViewModel)
-				LoadPreview(content as AlbumViewModel, (PreviewImage)(result = new PreviewImage()));
+			{
+				result = new PreviewImage { ThumbnailUrl = ((AlbumViewModel)content).RedditThumbnail };
+				result.FinishLoad = (cancel) => LoadPreview(content as AlbumViewModel, result as PreviewImage, cancel); 
+			}
 			else if (content is PlainWebViewModel)
-				LoadPreview(content as PlainWebViewModel, (PreviewText)(result = new PreviewText()));
+			{
+				result = new PreviewText { ThumbnailUrl = ((PlainWebViewModel)content).RedditThumbnail };
+				result.FinishLoad = (cancel) => LoadPreview(content as PlainWebViewModel, result as PreviewText, cancel);
+			}
 			else if (content is InternalRedditViewModel)
-				LoadPreview(content as InternalRedditViewModel, (PreviewText)(result = new PreviewText()));
+			{
+				result = new PreviewText { };
+				result.FinishLoad = (cancel) => LoadPreview(content as InternalRedditViewModel, result as PreviewText, cancel);
+			}
 			else if (content is VideoViewModel)
-				LoadPreview(content as VideoViewModel, (PreviewImage)(result = new PreviewImage()));
+			{
+				result = new PreviewImage { ThumbnailUrl = ((VideoViewModel)content).RedditThumbnail };
+				result.FinishLoad = (cancel) => LoadPreview(content as VideoViewModel, result as PreviewImage, cancel); 
+			}
 			else if (content is SelfViewModel)
-				LoadPreview(content as SelfViewModel, (PreviewText)(result = new PreviewText()));
+			{
+				result = new PreviewText { };
+				result.FinishLoad = (cancel) => LoadPreview(content as SelfViewModel, result as PreviewText, cancel);
+			}
 			else
 				throw new NotImplementedException("invalid content type");
 
@@ -48,58 +68,60 @@ namespace SnooStream.Common
 
 			return result;
 		}
-		private static void LoadPreview(ImageViewModel imageViewModel, PreviewImage target)
+		private static Task<string> LoadPreview(ImageViewModel imageViewModel, PreviewImage target)
 		{
-			target.ThumbnailUrl = imageViewModel.Url;
+			return Task.FromResult(imageViewModel.Url);
 		}
 
-		private static async void LoadPreview(AlbumViewModel albumViewModel, PreviewImage target)
+		private static async Task<string> LoadPreview(AlbumViewModel albumViewModel, PreviewImage target, CancellationToken cancel)
 		{
 			try
 			{
-				target.ThumbnailUrl = await albumViewModel.FirstUrl();
+				return await albumViewModel.FirstUrl();
 			}
 			catch(TaskCanceledException)
 			{
-
+				return null;
 			}
 		}
 
-		private static async void LoadPreview(VideoViewModel videoViewModel, PreviewImage target)
+		private static async Task<string> LoadPreview(VideoViewModel videoViewModel, PreviewImage target, CancellationToken cancel)
 		{
 			try
 			{
-				target.ThumbnailUrl = await videoViewModel.StillUrl();
+				return await videoViewModel.StillUrl();
 			}
 			catch (TaskCanceledException)
 			{
-
+				return null;
 			}
 		}
 
-		private static async void LoadPreview(PlainWebViewModel plainWebViewModel, PreviewText target)
+		private static async Task<string> LoadPreview(PlainWebViewModel plainWebViewModel, PreviewText target, CancellationToken cancel)
 		{
 			try
 			{
 				target.Synopsis = await plainWebViewModel.FirstParagraph();
-                if (String.IsNullOrEmpty(plainWebViewModel.RedditThumbnail))
-                    target.ThumbnailUrl = await plainWebViewModel.FirstImage() ?? "ms-appx:///Assets/WebGlyphTile.png";
-                else
-                    target.ThumbnailUrl = plainWebViewModel.RedditThumbnail;
+				if (String.IsNullOrEmpty(plainWebViewModel.RedditThumbnail))
+					return await plainWebViewModel.FirstImage();
+				else
+					return null;
 			}
 			catch(TaskCanceledException)
 			{
-
+				return null;
 			}
 		}
 
-		private static void LoadPreview(SelfViewModel selfViewModel, PreviewText target)
+		private static Task<string> LoadPreview(SelfViewModel selfViewModel, PreviewText target, CancellationToken cancel)
 		{
 			target.Synopsis = selfViewModel.SelfText;
+			return Task.FromResult<string>(null);
 		}
 
-		private static void LoadPreview(InternalRedditViewModel internalRedditViewModel, PreviewText target)
+		private static Task<string> LoadPreview(InternalRedditViewModel internalRedditViewModel, PreviewText target, CancellationToken cancel)
 		{
+			return Task.FromResult<string>(null);
 			//TODO ??
 		}
 	}

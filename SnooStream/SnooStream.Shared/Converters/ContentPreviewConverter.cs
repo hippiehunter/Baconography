@@ -5,6 +5,7 @@ using SnooStream.ViewModel.Content;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
 namespace SnooStream.Converters
@@ -13,7 +14,11 @@ namespace SnooStream.Converters
     {
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{
-			var linkViewModel = value as LinkViewModel;
+			return MakePreviewControl(value as LinkViewModel);
+		}
+
+		public static FrameworkElement MakePreviewControl(LinkViewModel linkViewModel)
+		{
 			var preview = Preview.LoadLinkPreview(linkViewModel.Content);
 			if (preview is PreviewText)
 			{
@@ -25,7 +30,7 @@ namespace SnooStream.Converters
 			}
 			else
 			{
-				throw new NotImplementedException(string.Format("cant convert value of type {0} to type of Preview", value.GetType().FullName));
+				throw new NotImplementedException(string.Format("cant convert value of type {0} to type of Preview", preview.GetType().FullName));
 			}
 		}
 

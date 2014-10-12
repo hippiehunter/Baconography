@@ -12,7 +12,8 @@ namespace SnooStream.ViewModel.Content
 	{
 		private string _url;
 		Lazy<IVideoResult> _videoResult;
-		public VideoViewModel(string url)
+		public string RedditThumbnail { get; set; }
+		public VideoViewModel(string url, string redditThumbnail)
 		{
 			_url = url;
 			_videoResult = new Lazy<IVideoResult>(() => CommonResourceAcquisition.VideoAcquisition.VideoAcquisition.GetVideo(_url));

@@ -83,7 +83,7 @@ namespace SnooStream.ViewModel.Content
 			{
 				if (!_hasLoaded || string.IsNullOrEmpty(_viewModel._nextUrl))
 				{
-					var loadResult = await _viewModel.LoadOneImpl(_httpClient, _viewModel._nextUrl ?? _viewModel.Url);
+					var loadResult = await Task.Run(() => _viewModel.LoadOneImpl(_httpClient, _viewModel._nextUrl ?? _viewModel.Url));
 					_viewModel._nextUrl = loadResult.Item1;
 					return loadResult.Item3;
 				}
@@ -142,7 +142,7 @@ namespace SnooStream.ViewModel.Content
 
 		internal async Task<string> FirstParagraph()
 		{
-			var onePageResult = await LoadOneImpl(_httpClient, Url);
+			var onePageResult = await Task.Run(() => LoadOneImpl(_httpClient, Url));
 			var result = onePageResult.Item3.FirstOrDefault((rd) => rd is ReadableText) as ReadableText;
 			if(result != null)
 			{
@@ -153,7 +153,7 @@ namespace SnooStream.ViewModel.Content
 
         internal async Task<string> FirstImage()
         {
-            var onePageResult = await LoadOneImpl(_httpClient, Url);
+            var onePageResult = await Task.Run(() => LoadOneImpl(_httpClient, Url));
             var result = onePageResult.Item3.FirstOrDefault((rd) => rd is ReadableImage) as ReadableImage;
             if (result != null)
             {
@@ -165,7 +165,7 @@ namespace SnooStream.ViewModel.Content
 		protected override Task StartLoad()
 		{
 			//TODO maybe this should do a full load, not sure
-			return FirstParagraph();
+			return Task.Run(() => FirstParagraph());
 		}
 	}
 }

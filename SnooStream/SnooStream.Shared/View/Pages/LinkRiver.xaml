@@ -19,12 +19,15 @@
                       SelectionMode="None"
                       ItemsSource="{Binding LinksViewSource.UnderlyingSource.View}"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      ContainerContentChanging="linksListView_ContainerContentChanging"
+                      ShowsScrollingPlaceholders="True"
                       IsItemClickEnabled="False">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     </Style>
                 </ListView.ItemContainerStyle>
+                
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <local:CardLinkView/>

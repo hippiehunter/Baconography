@@ -24,10 +24,10 @@
                    HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Border>
                     <Border.Background>
-                        <SolidColorBrush Color="{StaticResource PhoneBackgroundColor}" Opacity="0.35" />
+                        <SolidColorBrush Color="Black" Opacity="0.35" />
                     </Border.Background>
 
-                    <TextBlock Foreground="{StaticResource PhoneForegroundBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                    <TextBlock Foreground="White" VerticalAlignment="Bottom" HorizontalAlignment="Right"
                         Margin="24,0,6,0" Style="{StaticResource SubheaderTextBlockStyle}" FontWeight="Bold" Text="{Binding Thing.DisplayName}"/>
                 </Border>
             </Grid>

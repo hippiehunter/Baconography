@@ -45,7 +45,7 @@ namespace SnooStream.ViewModel.Content
 			else if(fileName.EndsWith(".mp4") ||
 				fileName.EndsWith(".gifv"))
 			{
-				result = new VideoViewModel(url);
+				result = new VideoViewModel(url, redditThumbnail);
 			}
 			else if (targetHost == "www.youtube.com" ||
 				targetHost == "www.youtu.be" ||
@@ -57,7 +57,7 @@ namespace SnooStream.ViewModel.Content
 				targetHost == "www.liveleak.com")
 			{
 				if (VideoAcquisition.IsAPI(url))
-					result = new VideoViewModel(url);
+					result = new VideoViewModel(url, redditThumbnail);
 				else
 					result = new PlainWebViewModel(true, url, redditThumbnail);
 
@@ -118,7 +118,7 @@ namespace SnooStream.ViewModel.Content
 			CancelToken = new CancellationTokenSource(timeout ?? SnooStreamViewModel.Settings.ContentTimeout);
 			try
 			{
-				await StartLoad();
+				await Task.Run((Func<Task>)StartLoad);
 			}
 			catch (Exception ex)
 			{
