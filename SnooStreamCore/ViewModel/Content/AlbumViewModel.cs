@@ -95,7 +95,7 @@ namespace SnooStream.ViewModel.Content
 				return RedditThumbnail;
 		}
 
-		protected override async Task StartLoad()
+		protected override Task StartLoad()
 		{
 			return FirstUrl();
 		}
