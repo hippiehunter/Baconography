@@ -18,14 +18,21 @@ namespace SnooStream.ViewModel.Content
 		public string RedditThumbnail { get; private set; }
 		Lazy<Task<IEnumerable<Tuple<string, string>>>> _apiResult;
 
-		public ObservableCollection<ImageViewModel> Images { get; private set; }
+		ObservableCollection<ImageViewModel> _images;
+		public ObservableCollection<ImageViewModel> Images
+		{
+			get
+			{
+				return _images;
+			}
+		}
 		public AlbumViewModel(string url, string title, string linkThumbnailUrl)
 		{
 			_url = url;
 			_title = title;
 			RedditThumbnail = linkThumbnailUrl;
 			_apiResult = new Lazy<Task<IEnumerable<Tuple<string, string>>>>(LoadAPI);
-			Images = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection<ImageViewModel>(new AlbumLoader(this));
+			_images = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection<ImageViewModel>(new AlbumLoader(this));
 		}
 
 		private class AlbumLoader : IIncrementalCollectionLoader<ImageViewModel>
@@ -88,7 +95,7 @@ namespace SnooStream.ViewModel.Content
 				return RedditThumbnail;
 		}
 
-		protected override Task StartLoad()
+		protected override async Task StartLoad()
 		{
 			return FirstUrl();
 		}

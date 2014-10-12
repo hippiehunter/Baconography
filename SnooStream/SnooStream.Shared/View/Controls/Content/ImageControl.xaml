@@ -9,9 +9,10 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsHorizontalRailEnabled="True" ZoomMode="Enabled">
+    <ScrollViewer x:Name="scrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsHorizontalRailEnabled="True" ZoomMode="Enabled">
 
-        <Image HorizontalAlignment="Center" VerticalAlignment="Center" DataContext="{Binding ImageLoader.ImageData, Converter={StaticResource gifConverter}}" Stretch="Uniform" Source="{Binding ImageSource}" />
+        <Image x:Name="image" HorizontalAlignment="Center" VerticalAlignment="Center" 
+               DataContext="{Binding ImageLoader.ImageData, Converter={StaticResource gifConverter}}" Stretch="None" Source="{Binding ImageSource}" SizeChanged="Image_SizeChanged"/>
 
     </ScrollViewer>
 </UserControl>

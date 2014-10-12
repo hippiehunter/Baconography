@@ -17,7 +17,7 @@ namespace SnooStream.Common
 		bool _locked;
 		int _loadIncrement;
 		int _auxiliaryTimeout;
-		public BufferedAuxiliaryIncrementalLoadCollection(IIncrementalCollectionLoader<T> loader, int loadIncrement = 5, int auxiliaryTimeout = 2500)
+		public BufferedAuxiliaryIncrementalLoadCollection(IIncrementalCollectionLoader<T> loader, int loadIncrement = 20, int auxiliaryTimeout = 2500)
 		{
 			_loader = loader;
 			_locked = false;
@@ -56,7 +56,7 @@ namespace SnooStream.Common
 				{
 					var targetItems = _unloadedBuffer.Take(_loadIncrement).ToList();
 					_unloadedBuffer = _unloadedBuffer.Skip(_loadIncrement).ToList();
-					await _loader.AuxiliaryItemLoader(targetItems, _auxiliaryTimeout);
+					var task = _loader.AuxiliaryItemLoader(targetItems, _auxiliaryTimeout);
 					foreach (var item in targetItems)
 					{
 						Add(item);
