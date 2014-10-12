@@ -64,7 +64,13 @@ namespace SnooStream.View.Controls
 						try
 						{
 							var previewUrl = PlatformImageAcquisition.ImagePreviewFromUrl(hqImageUrl, cancelSource.Token);
-							((Preview)((UserControl)previewSection.Content).DataContext).ThumbnailUrl = await previewUrl;
+							args.RegisterUpdateCallback(async (nestedSender, nestedArgs) =>
+								{
+									if (!nestedArgs.InRecycleQueue)
+									{
+										((Preview)((UserControl)previewSection.Content).DataContext).ThumbnailUrl = await previewUrl;
+									}
+								});
 						}
 						catch (OperationCanceledException)
 						{

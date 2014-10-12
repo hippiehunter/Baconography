@@ -41,7 +41,12 @@ namespace SnooStream.ViewModel.Content
 		protected override async Task StartLoad()
 		{
 			var playableStreams = await _videoResult.Value.PlayableStreams(CancelToken.Token);
-			BestPlayableUrl = playableStreams.FirstOrDefault().Item1;
+			SnooStreamViewModel.SystemServices.RunUIAsync(() =>
+				{
+					BestPlayableUrl = playableStreams.FirstOrDefault().Item1;
+					return Task.FromResult(true);
+				});
+			
 		}
 	}
 }

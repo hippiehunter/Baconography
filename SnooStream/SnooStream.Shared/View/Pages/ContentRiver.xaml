@@ -11,7 +11,7 @@
     x:Name="root">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <FlipView x:Name="flipView" ItemsSource="{Binding LinksViewSource.UnderlyingSource.View}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <FlipView x:Name="flipView" ItemsSource="{Binding LinksViewSource.UnderlyingSource.View}" SelectionChanged="flipView_SelectionChanged" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <FlipView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel Orientation="Horizontal" VirtualizingStackPanel.VirtualizationMode="Recycling"/>

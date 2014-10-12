@@ -54,7 +54,12 @@ namespace SnooStream.ViewModel.Content
 				targetHost == "vimeo.com" ||
 				targetHost == "www.vimeo.com" ||
 				targetHost == "liveleak.com" ||
-				targetHost == "www.liveleak.com")
+				targetHost == "www.liveleak.com" ||
+				targetHost == "zippy.gfycat.com" ||
+				targetHost == "fat.gfycat.com" ||
+				targetHost == "giant.gfycat.com" ||
+				targetHost == "www.gfycat.com" ||
+				targetHost == "gfycat.com")
 			{
 				if (VideoAcquisition.IsAPI(url))
 					result = new VideoViewModel(url, redditThumbnail);

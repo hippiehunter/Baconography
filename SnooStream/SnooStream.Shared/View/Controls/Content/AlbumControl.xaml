@@ -10,7 +10,9 @@
     d:DesignWidth="400">
 
     <Grid>
-        <FlipView x:Name="albumSlideView" ItemsSource="{Binding Images}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <FlipView x:Name="albumSlideView" ItemsSource="{Binding Images}" HorizontalAlignment="Stretch" 
+                  VerticalAlignment="Stretch" DataContextChanged="albumSlideView_DataContextChanged"
+                  SelectionChanged="albumSlideView_SelectionChanged" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.IsVerticalRailEnabled="True">
             <FlipView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel Orientation="Vertical" VirtualizingStackPanel.VirtualizationMode="Recycling"/>

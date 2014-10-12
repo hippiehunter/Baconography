@@ -11,10 +11,10 @@
     d:DesignWidth="400">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="Type:ReadableArticleParagraph">
+        <DataTemplate x:Key="Type:ReadableText">
             <TextBlock HorizontalAlignment="Left" FontSize="20" Padding="0" Margin="10" Text="{Binding Text}" TextWrapping="Wrap"/>
         </DataTemplate>
-        <DataTemplate x:Key="Type:ReadableArticleImage">
+        <DataTemplate x:Key="Type:ReadableImage">
             <Image Source="{Binding Url}" Stretch="Uniform" Margin="10"/>
         </DataTemplate>
         <selectors:TypedTemplateSelector x:Name="articleTemplateSelector" />
@@ -24,6 +24,10 @@
                 BorderThickness="0" VerticalAlignment="Stretch" 
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                IsItemClickEnabled="False"
+                IsTapEnabled="False"
+                SelectionMode="None"
+                IsSwipeEnabled="False"
                 HorizontalContentAlignment="Stretch"
                 ItemTemplateSelector="{StaticResource articleTemplateSelector}">
         <ListView.Header>

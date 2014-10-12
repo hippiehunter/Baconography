@@ -27,5 +27,15 @@ namespace SnooStream.View.Pages
         {
             this.InitializeComponent();
         }
+
+		private async void flipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			//var loader = flipView.ItemsSource as ISupportIncrementalLoading;
+			//if (flipView.Items.Count < (flipView.Items.IndexOf(e.AddedItems.First()) + 5) && loader != null)
+			//{
+			//	if (loader.HasMoreItems)
+			//		await loader.LoadMoreItemsAsync(20);
+			//}
+		}
     }
 }

@@ -12,6 +12,19 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel.Content
 {
+	public class Readable : ViewModelBase
+	{
+	}
+
+	public class ReadableText : Readable
+	{
+		public string Text { get; set; }
+	}
+
+	public class ReadableImage : Readable
+	{
+		public string Url { get; set; }
+	}
 	public class PlainWebViewModel : ContentViewModel
 	{
 		public bool NoPreview { get; private set; }
@@ -40,19 +53,7 @@ namespace SnooStream.ViewModel.Content
 			WebParts = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new WebLoader(this));
         }
 
-		public class Readable : ViewModelBase
-		{
-		}
-
-		public class ReadableText : Readable
-		{
-			public string Text { get; set; }
-		}
-
-		public class ReadableImage : Readable
-		{
-			public string Url { get; set; }
-		}
+		
 
 		private class WebLoader : IIncrementalCollectionLoader<Readable>
 		{
@@ -76,15 +77,16 @@ namespace SnooStream.ViewModel.Content
 
 			public bool HasMore()
 			{
-				return !_hasLoaded;
+				return !_hasLoaded || !string.IsNullOrEmpty(_viewModel._nextUrl);
 			}
 
 			public async Task<IEnumerable<Readable>> LoadMore()
 			{
-				if (!_hasLoaded || string.IsNullOrEmpty(_viewModel._nextUrl))
+				if (!_hasLoaded || !string.IsNullOrEmpty(_viewModel._nextUrl))
 				{
 					var loadResult = await Task.Run(() => _viewModel.LoadOneImpl(_httpClient, _viewModel._nextUrl ?? _viewModel.Url));
 					_viewModel._nextUrl = loadResult.Item1;
+					_hasLoaded = true;
 					return loadResult.Item3;
 				}
 				else

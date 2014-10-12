@@ -123,25 +123,22 @@ namespace SnooStream.ViewModel
 				if (postListing != null)
 				{
 					_linkRiverViewModel.LastRefresh = DateTime.Now;
-					SnooStreamViewModel.SystemServices.RunUIAsync(async () =>
+					var linkIds = new List<string>();
+					foreach (var thing in postListing.Data.Children)
 					{
-						var linkIds = new List<string>();
-						foreach (var thing in postListing.Data.Children)
+						if (thing.Data is Link)
 						{
-							if (thing.Data is Link)
-							{
-								linkIds.Add(((Link)thing.Data).Id);
-								var viewModel = new LinkViewModel(_linkRiverViewModel, thing.Data as Link) { FromMultiReddit = (_linkRiverViewModel.IsMultiReddit || _linkRiverViewModel.Thing.Url == "/") };
-								result.Add(viewModel);
-							}
+							linkIds.Add(((Link)thing.Data).Id);
+							var viewModel = new LinkViewModel(_linkRiverViewModel, thing.Data as Link) { FromMultiReddit = (_linkRiverViewModel.IsMultiReddit || _linkRiverViewModel.Thing.Url == "/") };
+							result.Add(viewModel);
 						}
-						var linkMetadata = (await SnooStreamViewModel.OfflineService.GetLinkMetadata(linkIds)).ToList();
-						for (int i = 0; i < linkMetadata.Count; i++)
-						{
-							result[i].UpdateMetadata(linkMetadata[i]);
-						}
-						_linkRiverViewModel.LastLinkId = postListing.Data.After;
-					});
+					}
+					var linkMetadata = (await SnooStreamViewModel.OfflineService.GetLinkMetadata(linkIds)).ToList();
+					for (int i = 0; i < linkMetadata.Count; i++)
+					{
+						result[i].UpdateMetadata(linkMetadata[i]);
+					}
+					_linkRiverViewModel.LastLinkId = postListing.Data.After;
 				}
 				return result;
 			}

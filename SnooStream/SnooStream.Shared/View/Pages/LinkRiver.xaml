@@ -21,7 +21,10 @@
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                       ContainerContentChanging="linksListView_ContainerContentChanging"
                       ShowsScrollingPlaceholders="True"
-                      IsItemClickEnabled="False">
+                      IsItemClickEnabled="False"
+                      IncrementalLoadingTrigger="Edge"
+                      IncrementalLoadingThreshold="10">
+
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />

@@ -23,5 +23,25 @@ namespace SnooStream.View.Controls.Content
         {
             this.InitializeComponent();
         }
+
+		private async void albumSlideView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			var loader = albumSlideView.ItemsSource as ISupportIncrementalLoading;
+			if (e.AddedItems.Count > 0 && albumSlideView.Items.Count < (albumSlideView.Items.IndexOf(e.AddedItems.First()) + 5) && loader != null)
+			{
+				if (loader.HasMoreItems)
+					await loader.LoadMoreItemsAsync(20);
+			}
+		}
+
+		private async void albumSlideView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+		{
+			var loader = albumSlideView.ItemsSource as ISupportIncrementalLoading;
+			if (albumSlideView.Items.Count == 0 && loader != null)
+			{
+				if (loader.HasMoreItems)
+					await loader.LoadMoreItemsAsync(20);
+			}
+		}
     }
 }

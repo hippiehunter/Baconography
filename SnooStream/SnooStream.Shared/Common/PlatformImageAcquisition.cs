@@ -77,39 +77,52 @@ namespace SnooStream.Common
 			try
 			{
 				var targetFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(onDiskName, CreationCollisionOption.FailIfExists);
-				using (var targetStream = await targetFile.OpenAsync(FileAccessMode.ReadWrite))
+				Exception failed = null;
+				try
 				{
-					cancelToken.ThrowIfCancellationRequested();
-					using (var client = new HttpClient())
+					using (var targetStream = await targetFile.OpenAsync(FileAccessMode.ReadWrite))
 					{
-						var asyncHttpOp = client.GetAsync(new Uri(url), HttpCompletionOption.ResponseContentRead);
-						cancelToken.Register(() =>
-							{
-								try
-								{
-									asyncHttpOp.Cancel();
-								}
-								catch { }
-							});
-						using (var response = await asyncHttpOp)
+						cancelToken.ThrowIfCancellationRequested();
+						using (var client = new HttpClient())
 						{
-							var buffer = await response.Content.ReadAsBufferAsync();
-							cancelToken.ThrowIfCancellationRequested();
-							using (var source = new BufferImageSource(buffer))
-							{
-								var info = await source.GetInfoAsync();
-								if (info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024)
+							var asyncHttpOp = client.GetAsync(new Uri(url), HttpCompletionOption.ResponseContentRead);
+							cancelToken.Register(() =>
 								{
-									var resizedBuffer = await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(buffer, new Nokia.Graphics.Imaging.AutoResizeConfiguration(1024 * 1024 * 2,
-										new Windows.Foundation.Size(1024, 1024), new Windows.Foundation.Size(0, 0), Nokia.Graphics.Imaging.AutoResizeMode.Automatic, 0, Nokia.Graphics.Imaging.ColorSpace.Yuv420));
-									await targetStream.WriteAsync(resizedBuffer);
+									try
+									{
+										asyncHttpOp.Cancel();
+									}
+									catch { }
+								});
+							using (var response = await asyncHttpOp)
+							{
+								var buffer = await response.Content.ReadAsBufferAsync();
+								cancelToken.ThrowIfCancellationRequested();
+								using (var source = new BufferImageSource(buffer))
+								{
+									var info = await source.GetInfoAsync();
+									if (info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024)
+									{
+										var resizedBuffer = await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(buffer, new Nokia.Graphics.Imaging.AutoResizeConfiguration(1024 * 1024 * 2,
+											new Windows.Foundation.Size(1024, 1024), new Windows.Foundation.Size(0, 0), Nokia.Graphics.Imaging.AutoResizeMode.Automatic, 0, Nokia.Graphics.Imaging.ColorSpace.Yuv420));
+										await targetStream.WriteAsync(resizedBuffer);
+									}
+									else
+										await targetStream.WriteAsync(buffer);
 								}
-								else
-									await targetStream.WriteAsync(buffer);
 							}
-						}
 
+						}
 					}
+				}
+				catch(Exception ex)
+				{
+					failed = ex;
+				}
+				if (failed != null)
+				{
+					await targetFile.DeleteAsync();
+					throw failed;
 				}
 
 			}
