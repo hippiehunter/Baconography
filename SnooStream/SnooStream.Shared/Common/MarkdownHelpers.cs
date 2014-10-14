@@ -20,7 +20,7 @@ namespace SnooStream.Common
 
 		public Windows.UI.Xaml.Style RichTextBlockStyle
 		{
-			get { return null; }
+            get { return App.Current.Resources["MarkdownRichTextBlockStyle"] as Style; }
 		}
 
 		public Windows.UI.Xaml.Style RunStyle
