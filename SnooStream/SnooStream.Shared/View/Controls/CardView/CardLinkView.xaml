@@ -24,13 +24,15 @@
                    Text="{Binding Title}"
                    TextTrimming="WordEllipsis"
                    MaxHeight="200"
-                    MinHeight="100">
+                   MinHeight="50">
                 <TextBlock.Foreground>
                     <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
                 </TextBlock.Foreground>
             </TextBlock>
 
-            <ContentControl x:Name="linkMetadata" Grid.Row="1" HorizontalAlignment="Stretch" Content="{Binding Converter={StaticResource linkMetadataConverter}}"/>
+            <ContentControl x:Name="linkMetadata" Grid.Row="1"
+                            Margin="0,5,0,3"
+                            HorizontalAlignment="Stretch" Content="{Binding Converter={StaticResource linkMetadataConverter}}"/>
 
             <Button x:Name="previewSection" Grid.Row="2" Margin="-24,0,-24,0" Height="175"
                     BorderThickness="0"
@@ -73,8 +75,8 @@
 
                 <Button Grid.Column="2"
                         HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
-                        Margin="0,-12,0,0"
-                        BorderThickness="0" Padding="0" 
+                        Margin="0,-12,2,0"
+                        BorderThickness="0" Padding="0,0,0,0" 
                         FontFamily="Segoe UI Symbol"
                         Command="{Binding NavigateToComments}">
                     <Grid>

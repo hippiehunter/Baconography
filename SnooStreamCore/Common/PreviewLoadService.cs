@@ -43,7 +43,7 @@ namespace SnooStream.Common
 			}
 			else if (content is PlainWebViewModel)
 			{
-				result = new PreviewText { ThumbnailUrl = ((PlainWebViewModel)content).RedditThumbnail };
+                result = new PreviewText { ThumbnailUrl = String.IsNullOrEmpty(((PlainWebViewModel)content).RedditThumbnail) ? "ms-appx:///Assets/WebGlyphTile.png" : ((PlainWebViewModel)content).RedditThumbnail };
 				result.FinishLoad = (cancel) => LoadPreview(content as PlainWebViewModel, result as PreviewText, cancel);
 			}
 			else if (content is InternalRedditViewModel)

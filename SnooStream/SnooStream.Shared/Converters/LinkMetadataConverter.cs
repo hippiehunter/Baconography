@@ -22,8 +22,8 @@ namespace SnooStream.Converters
 			rtb.IsTextSelectionEnabled = false;
 			rtb.Blocks.Add(pp);
 			rtb.FontSize = 14;
-			rtb.FontStyle = Windows.UI.Text.FontStyle.Italic;
-			rtb.FontWeight = FontWeights.SemiBold;
+			rtb.FontStyle = Windows.UI.Text.FontStyle.Normal;
+			rtb.FontWeight = FontWeights.Normal;
 			List<Inline> inlinesCollection = new List<Inline>();
 			
 			var subredditLink = new Run { Text = linkViewModel.Link.Subreddit };

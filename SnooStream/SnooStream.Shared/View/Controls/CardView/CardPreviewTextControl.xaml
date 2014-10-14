@@ -11,7 +11,7 @@
 
     <Grid Margin="0,0,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Grid.Background>
-            <ImageBrush ImageSource="{Binding ThumbnailUrl}" Opacity="0.2" Stretch="None" />
+            <ImageBrush ImageSource="{Binding ThumbnailUrl}" Opacity="0.2" Stretch="UniformToFill" />
         </Grid.Background>
 
         <TextBlock Margin="12,6,12,6" Text="{Binding Synopsis}" FontSize="14" MinHeight="100" MaxHeight="225" TextWrapping="Wrap" TextTrimming="WordEllipsis"
