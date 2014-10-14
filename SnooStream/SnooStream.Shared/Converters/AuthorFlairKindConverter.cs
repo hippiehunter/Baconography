@@ -56,6 +56,11 @@ namespace SnooStream.Converters
 
         static ForegroundAuthorFlairKindConverter()
         {
+            
+        }
+
+        public void PopulateBrushes()
+        {
             if (Application.Current.Resources.ContainsKey("PhoneAccentBrush"))
                 fg_none = Application.Current.Resources["PhoneAccentBrush"] as SolidColorBrush;
             else
@@ -72,6 +77,11 @@ namespace SnooStream.Converters
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             var kind = (AuthorFlairKind)value;
+
+            if (fg_none == null)
+            {
+                PopulateBrushes();
+            }
 
             switch (kind)
             {

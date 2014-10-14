@@ -29,22 +29,27 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="90" />
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
                 <!-- General Comment Header -->
-                <Button BorderThickness="0" Margin="3,-10,0,0" Padding="0" HorizontalAlignment="Left"
+                <Button Grid.Column="0" Grid.RowSpan="2" BorderThickness="0" Margin="4,-10,0,0" Padding="0" HorizontalAlignment="Stretch"
                     Command="{Binding MinimizeCommand}" CommandParameter="{Binding}" HorizontalContentAlignment="Left">
                     <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Border Padding="2,0,2,0" Margin="0,0,0,0" BorderThickness="0" Background="{Binding PosterFlair, Converter={StaticResource authorFlairKindConverter}}">
-                                <TextBlock Foreground="{Binding PosterFlair, Converter={StaticResource fgAuthorFlairKindConverter}}" FontSize="16" Margin="0,1,0,0" Text="{Binding PosterName}" />
-                            </Border>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Margin="2,0,2,0" BorderThickness="0" Background="{Binding PosterFlair, Converter={StaticResource authorFlairKindConverter}}">
+                                    <TextBlock Foreground="{Binding PosterFlair, Converter={StaticResource fgAuthorFlairKindConverter}}" FontSize="16" Margin="0,1,0,0" Text="{Binding PosterName}" />
+                                </Border>
 
-                            <TextBlock Opacity="0.6" FontStyle="Italic"
+                                <TextBlock Opacity="0.6" FontStyle="Italic"
                                    FontSize="15" Text="{Binding Path=AuthorFlairText}" Margin="4,2,2,0"
                                    Visibility="{Binding HasAuthorFlair, Converter={StaticResource booleanVisibilityConverter}}"/>
-
-                            <TextBlock Foreground="Gray" FontSize="15" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="5,2,0,0" />
-                        </StackPanel>
+                            </StackPanel>
+                            <TextBlock Foreground="Gray" FontSize="15" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="2,0,0,0" />
+                        </StackPanel>                        
                     </Button.Content>
                 </Button>
 
@@ -70,6 +75,7 @@
                 Markdown="{Binding BodyMD.MarkdownDom}"
                 StyleProvider="{StaticResource markdownHelpers}"
                 CommandFactory="{StaticResource markdownHelpers}"
+                FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
                 HorizontalAlignment="Left"
                 Margin="3,0,0,0"/>
         </Grid>            

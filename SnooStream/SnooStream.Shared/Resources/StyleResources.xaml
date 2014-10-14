@@ -337,15 +337,27 @@
     <Style x:Key="MarkdownTextBlockStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="16" />
         <Setter Property="TextWrapping" Value="WrapWholeWords" />
-        <Setter Property="Margin" Value="3,0,6,0" />
+        <Setter Property="Margin" Value="3,0,12,0" />
     </Style>
 
     <Style x:Key="MarkdownRichTextBlockStyle" TargetType="RichTextBlock">
         <Setter Property="FontSize" Value="16" />
         <Setter Property="TextWrapping" Value="WrapWholeWords" />
-        <Setter Property="Margin" Value="3,0,6,0" />
+        <Setter Property="Margin" Value="3,0,12,0" />
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="FontStyle" Value="Normal" />
+        <Setter Property="FontFamily" Value="Segoe WP" />
+    </Style>
+
+    <Style x:Key="MarkdownRunStyle" TargetType="Run">
+        <Setter Property="FontSize" Value="16" />
+        <!--<Setter Property="Margin" Value="0,0,0,0" />-->
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontStyle" Value="Normal" />
+    </Style>
+
+    <Style x:Key="MarkdownBorderStyle" TargetType="Border">
+        <Setter Property="Margin" Value="0,0,0,0" />
     </Style>
 
     <DataTemplate x:Key="ToggleContent">

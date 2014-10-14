@@ -15,7 +15,7 @@ namespace SnooStream.Common
 
 		public Windows.UI.Xaml.Style BorderStyle
 		{
-			get { return null; }
+            get { return App.Current.Resources["MarkdownBorderStyle"] as Style; }
 		}
 
 		public Windows.UI.Xaml.Style RichTextBlockStyle
@@ -25,7 +25,7 @@ namespace SnooStream.Common
 
 		public Windows.UI.Xaml.Style RunStyle
 		{
-			get { return null; }
+            get { return App.Current.Resources["MarkdownRunStyle"] as Style; }
 		}
 
 		public Windows.UI.Xaml.Style TextBlockStyle
