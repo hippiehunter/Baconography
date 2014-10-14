@@ -52,8 +52,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CaptchaControl.xaml.cs">
       <DependentUpon>CaptchaControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardLinkView.xaml.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardLinkView.xaml.cs">
       <DependentUpon>CardLinkView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardPreviewImageControl.xaml.cs">
+      <DependentUpon>CardPreviewImageControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardPreviewTextControl.xaml.cs">
+      <DependentUpon>CardPreviewTextControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CommentsView.xaml.cs">
       <DependentUpon>CommentsView.xaml</DependentUpon>
@@ -94,12 +100,6 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml.cs">
       <DependentUpon>MoreCommentsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\PreviewImageControl.xaml.cs">
-      <DependentUpon>PreviewImageControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\PreviewTextControl.xaml.cs">
-      <DependentUpon>PreviewTextControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\SelectSortTypeView.xaml.cs">
       <DependentUpon>SelectSortTypeView.xaml</DependentUpon>
@@ -147,7 +147,15 @@
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\CaptchaControl.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\CardLinkView.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardLinkView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardPreviewImageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardPreviewTextControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -193,14 +201,6 @@
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\PreviewImageControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\PreviewTextControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\SelectSortTypeView.xaml">
       <SubType>Designer</SubType>

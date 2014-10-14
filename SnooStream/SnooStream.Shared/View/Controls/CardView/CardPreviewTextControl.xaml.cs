@@ -17,9 +17,9 @@ using Windows.UI.Xaml.Navigation;
 
 namespace SnooStream.View.Controls
 {
-    public sealed partial class PreviewTextControl : UserControl
+    public sealed partial class CardPreviewTextControl : UserControl
     {
-        public PreviewTextControl()
+        public CardPreviewTextControl()
         {
             this.InitializeComponent();
         }

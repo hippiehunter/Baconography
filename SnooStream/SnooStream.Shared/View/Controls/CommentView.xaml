@@ -8,7 +8,7 @@
     mc:Ignorable="d"
     d:DesignHeight="480" d:DesignWidth="480">
 
-    <Grid HorizontalAlignment="Left"
+    <Grid HorizontalAlignment="Stretch"
           Margin="{Binding Path=Depth, Converter={StaticResource commentDepthMarginConverter}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="7" />
@@ -19,43 +19,64 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Grid.Column="0" Background="{Binding Path=Depth, Converter={StaticResource commentDepthColorConverter}}" />
-        <StackPanel Margin="0,0,0,15" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Visibility="{Binding IsMinimized, Converter={StaticResource invertedBooleanVisibilityConverter}}">
-            <Button BorderThickness="0" Margin="-5,-10,0,0" Padding="0" HorizontalAlignment="Left"
-                    Command="{Binding MinimizeCommand}" CommandParameter="{Binding}" HorizontalContentAlignment="Left">
-                <Button.Content>
-                    <StackPanel Orientation="Horizontal">
-                        <Button BorderThickness="0" VerticalAlignment="Top" FontSize="15" Margin="-10,-5,-5,-5" Padding="2,-5,2,2"
-                                Command="{Binding MinimizeCommand}" CommandParameter="{Binding}">[-]</Button>
-                        <TextBlock Foreground="OrangeRed" FontSize="13" Margin="5,3,0,0"
-                                   FontFamily="Segoe UI Symbol" Text="&#xE110; "
-                                   Visibility="{Binding Path=Votable.Like, Converter={StaticResource booleanVisibilityConverter}}"/>
-                        <TextBlock Foreground="LightSkyBlue" FontSize="13" Margin="5,3,0,0"
-                                   FontFamily="Segoe UI Symbol" Text=" &#xE110;"
-                                   Visibility="{Binding Path=Votable.Dislike, Converter={StaticResource booleanVisibilityConverter}}">
-                            <TextBlock.RenderTransform>
-                                <RotateTransform Angle="180" CenterX="9" CenterY="9" />
-                            </TextBlock.RenderTransform>
-                        </TextBlock>
-                        <Border Padding="2,0,2,0" Margin="0,0,0,0" BorderThickness="0" Background="{Binding PosterFlair, Converter={StaticResource authorFlairKindConverter}}">
-                            <TextBlock Foreground="{Binding PosterFlair, Converter={StaticResource fgAuthorFlairKindConverter}}" FontSize="16" Margin="0,1,0,0" Text="{Binding PosterName}" />
-                        </Border>
+        <Grid Margin="0,0,0,15" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Visibility="{Binding IsMinimized, Converter={StaticResource invertedBooleanVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="90" />
+                </Grid.ColumnDefinitions>
 
-                        <TextBlock Opacity="0.6" FontStyle="Italic"
+                <!-- General Comment Header -->
+                <Button BorderThickness="0" Margin="3,-10,0,0" Padding="0" HorizontalAlignment="Left"
+                    Command="{Binding MinimizeCommand}" CommandParameter="{Binding}" HorizontalContentAlignment="Left">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Border Padding="2,0,2,0" Margin="0,0,0,0" BorderThickness="0" Background="{Binding PosterFlair, Converter={StaticResource authorFlairKindConverter}}">
+                                <TextBlock Foreground="{Binding PosterFlair, Converter={StaticResource fgAuthorFlairKindConverter}}" FontSize="16" Margin="0,1,0,0" Text="{Binding PosterName}" />
+                            </Border>
+
+                            <TextBlock Opacity="0.6" FontStyle="Italic"
                                    FontSize="15" Text="{Binding Path=AuthorFlairText}" Margin="4,2,2,0"
                                    Visibility="{Binding HasAuthorFlair, Converter={StaticResource booleanVisibilityConverter}}"/>
 
-                        <TextBlock Foreground="Gray" FontSize="15" Text="{Binding Path=Votable.TotalVotes}" Margin="5,2,0,0" />
-                        <TextBlock Foreground="Gray" FontSize="15" Text="points" Margin="5,2,0,0" />
-                        <TextBlock Foreground="Gray" FontSize="15" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="5,2,0,0" />
+                            <TextBlock Foreground="Gray" FontSize="15" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="5,2,0,0" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+
+                <!-- Votable Section -->
+                <Button Grid.Column="1"
+                    HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
+                    BorderThickness="0" Margin="0,0,0,0" Padding="0"
+                    Command="{Binding Votable.ToggleVote}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0,0,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=1, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol"/>
+                        <TextBlock Margin="-6,4,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=0, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol">
+                            <TextBlock.RenderTransform>
+                                <RotateTransform Angle="180" CenterX="9" CenterY="12" />
+                            </TextBlock.RenderTransform>
+                        </TextBlock>
+                        <TextBlock Margin="-2,0,0,0" FontSize="16"
+                            Text="{Binding Path=Votable.TotalVotes}"
+                            Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, Mode=TwoWay}"/>
                     </StackPanel>
-                </Button.Content>
-            </Button>
-            <snoodom:MarkdownControl Markdown="{Binding BodyMD.MarkdownDom}" StyleProvider="{StaticResource markdownHelpers}" CommandFactory="{StaticResource markdownHelpers}" HorizontalAlignment="Left"
-                              Margin="3,0,0,0"/>
-            <!--<ContentControl Margin="5,0,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch"
-                Content="{Binding ExtendedData, Converter={StaticResource extendedCommentConverter}}"/>-->
-            <!--<ContentControl Content="{Binding ReplyData, Converter={StaticResource replyConverter}}"/>-->
-        </StackPanel>
+                </Button>
+            </Grid>
+            <snoodom:MarkdownControl Grid.Row="1"
+                Markdown="{Binding BodyMD.MarkdownDom}"
+                StyleProvider="{StaticResource markdownHelpers}"
+                CommandFactory="{StaticResource markdownHelpers}"
+                HorizontalAlignment="Left"
+                Margin="3,0,0,0"/>
+        </Grid>            
+        
+        <!--<ContentControl Margin="5,0,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch"
+            Content="{Binding ExtendedData, Converter={StaticResource extendedCommentConverter}}"/>-->
+        <!--<ContentControl Content="{Binding ReplyData, Converter={StaticResource replyConverter}}"/>-->
         <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Visibility="{Binding IsMinimized, Converter={StaticResource booleanVisibilityConverter}}">
             <Button BorderThickness="0" Margin="-5,-10,0,0" Padding="0" HorizontalAlignment="Left"
                     HorizontalContentAlignment="Left" Command="{Binding MinimizeCommand}" CommandParameter="{Binding}">

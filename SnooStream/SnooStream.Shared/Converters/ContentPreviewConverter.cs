@@ -14,7 +14,7 @@ namespace SnooStream.Converters
     {
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{
-			return MakePreviewControl(value as LinkViewModel);
+            return MakePreviewControl(value as LinkViewModel);
 		}
 
 		public static FrameworkElement MakePreviewControl(LinkViewModel linkViewModel)
@@ -22,11 +22,11 @@ namespace SnooStream.Converters
 			var preview = Preview.LoadLinkPreview(linkViewModel.Content);
 			if (preview is PreviewText)
 			{
-				return new PreviewTextControl { DataContext = preview };
+				return new CardPreviewTextControl { DataContext = preview };
 			}
 			else if (preview is PreviewImage)
 			{
-				return new PreviewImageControl { DataContext = preview };
+				return new CardPreviewImageControl { DataContext = preview };
 			}
 			else
 			{

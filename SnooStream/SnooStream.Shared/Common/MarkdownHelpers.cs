@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Windows.UI.Xaml;
 
 namespace SnooStream.Common
 {
@@ -29,7 +30,7 @@ namespace SnooStream.Common
 
 		public Windows.UI.Xaml.Style TextBlockStyle
 		{
-			get { return null; }
+            get { return App.Current.Resources["MarkdownTextBlockStyle"] as Style; }
 		}
 	}
 }
