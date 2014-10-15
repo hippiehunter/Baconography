@@ -34,7 +34,7 @@ namespace SnooStream.ViewModel.Content
 
 		protected override Task StartLoad()
 		{
-			return ImageLoader.ForceLoad(SnooStreamViewModel.Settings.ContentTimeout);
+			return Task.FromResult(true);//ImageLoader.ForceLoad(SnooStreamViewModel.Settings.ContentTimeout);
 		}
 	}
 }

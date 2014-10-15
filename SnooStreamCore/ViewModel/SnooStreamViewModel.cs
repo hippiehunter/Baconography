@@ -109,6 +109,7 @@ namespace SnooStream.ViewModel
         public UploadViewModel UploadHub { get; private set; }
         public string FeaturedImage { get; private set; }
 
+		public static SnooStream.Common.LoggingService Logging = new LoggingService();
         private static CancellationTokenSource _uiContextCancellationSource = new CancellationTokenSource();
         public static CancellationToken UIContextCancellationToken
         {

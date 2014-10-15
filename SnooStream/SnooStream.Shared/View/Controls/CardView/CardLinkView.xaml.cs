@@ -57,24 +57,31 @@ namespace SnooStream.View.Controls
 						args.RegisterUpdateCallback(PhaseLoad);
 						break;
 					case 3:
-						var hqImageUrl = await ((Preview)((UserControl)previewSection.Content).DataContext).FinishLoad(cancelSource.Token);
-						if (string.IsNullOrWhiteSpace(hqImageUrl) || cancelSource.IsCancellationRequested)
-							return;
-
 						try
 						{
-							var previewUrl = PlatformImageAcquisition.ImagePreviewFromUrl(hqImageUrl, cancelSource.Token);
-							args.RegisterUpdateCallback(async (nestedSender, nestedArgs) =>
-								{
-									if (!nestedArgs.InRecycleQueue)
+							var hqImageUrl = await ((Preview)((UserControl)previewSection.Content).DataContext).FinishLoad(cancelSource.Token);
+							if (string.IsNullOrWhiteSpace(hqImageUrl) || cancelSource.IsCancellationRequested)
+								return;
+
+							try
+							{
+								var previewUrl = PlatformImageAcquisition.ImagePreviewFromUrl(hqImageUrl, cancelSource.Token);
+								args.RegisterUpdateCallback(async (nestedSender, nestedArgs) =>
 									{
-										((Preview)((UserControl)previewSection.Content).DataContext).ThumbnailUrl = await previewUrl;
-									}
-								});
+										if (!nestedArgs.InRecycleQueue)
+										{
+											((Preview)((UserControl)previewSection.Content).DataContext).ThumbnailUrl = await previewUrl;
+										}
+									});
+							}
+							catch (OperationCanceledException)
+							{
+								//Do nothing
+							}
 						}
-						catch (OperationCanceledException)
+						catch (Exception ex)
 						{
-							//Do nothing
+							SnooStreamViewModel.Logging.Log(ex);
 						}
 						break;
 				}

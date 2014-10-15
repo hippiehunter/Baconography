@@ -39,21 +39,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SnooStreamBackground.Window
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SnooStreamBackground.WindowsPhone", "SnooStreamBackground\SnooStreamBackground.WindowsPhone\SnooStreamBackground.WindowsPhone.vcxproj", "{D065417F-148C-4421-9034-580A4796D5D8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F6CBD2D0-998C-48C1-B49B-296C1FFF9ADC}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnooSharp", "SnooSharp\SnooSharp.csproj", "{D9BAA749-5BBE-4DAE-B5EA-4D70DEF266FC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonResourceAcquisition", "CommonResourceAcquisition\CommonResourceAcquisition.csproj", "{9316A5E4-85F8-4833-839F-A2E03C97BD67}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{67C56F59-4BBF-482E-875E-579345C917E3}"
-	ProjectSection(SolutionItems) = preProject
-		Performance1.psess = Performance1.psess
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

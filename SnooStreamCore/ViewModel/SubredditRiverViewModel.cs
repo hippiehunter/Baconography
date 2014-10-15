@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
 using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Messages;
@@ -193,7 +194,7 @@ namespace SnooStream.ViewModel
             }
 			Subreddits = CombinedRivers;
             SelectedRiver = CombinedRivers.FirstOrDefault() ?? new LinkRiverViewModel(true, new Subreddit("/"), "hot", null, null);
-            MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
+            Messenger.Default.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
         }
 
         public void SelectSubreddit(LinkRiverViewModel viewModel)

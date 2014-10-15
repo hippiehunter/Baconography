@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,7 +42,13 @@ namespace SnooStream.ViewModel.Content
 
 		static PlainWebViewModel()
 		{
-			_httpClient = new HttpClient();
+			var handler = new HttpClientHandler();
+			if (handler.SupportsAutomaticDecompression)
+			{
+				handler.AutomaticDecompression = DecompressionMethods.GZip |
+												 DecompressionMethods.Deflate;
+			}
+			_httpClient = new HttpClient(handler);
 		}
 
 		public PlainWebViewModel(bool notText, string url, string redditThumbnail)
