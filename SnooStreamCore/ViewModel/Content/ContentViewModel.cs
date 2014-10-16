@@ -42,8 +42,9 @@ namespace SnooStream.ViewModel.Content
 			{
 				result = new InternalRedditViewModel(url);
 			}
-			else if(fileName.EndsWith(".mp4") ||
-				fileName.EndsWith(".gifv"))
+			else if (fileName != null && 
+				(fileName.EndsWith(".mp4") ||
+				fileName.EndsWith(".gifv")))
 			{
 				result = new VideoViewModel(url, redditThumbnail);
 			}
