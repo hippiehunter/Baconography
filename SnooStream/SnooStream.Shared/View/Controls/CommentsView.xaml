@@ -19,7 +19,7 @@
                 <local:MoreCommentsView Visibility="{Binding IsVisible, Converter={StaticResource booleanVisibilityConverter}}"/>
             </DataTemplate>
             <DataTemplate x:Key="HeaderTemplate">
-                <local:CardLinkView DataContext="{Binding Link}" Margin="12,0,12,0" />
+                <local:CardLinkView PhasedLoad="False" DataContext="{Binding Link}" Margin="12,0,12,0" />
 
                 <!--<Grid HorizontalAlignment="Stretch">
                     <Grid.RowDefinitions>
@@ -207,7 +207,7 @@
         </Grid.Resources>
         <ListView x:Name="commentsList" HeaderTemplate="{StaticResource HeaderTemplate}"
                   ItemTemplateSelector="{Binding Path=Selector, Source={StaticResource commentTemplateSelector}}"
-                  ItemsSource="{Binding FlatComments}">
+                  ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />

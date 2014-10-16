@@ -109,39 +109,77 @@ namespace SnooStream.Common
 								});
 							using (var response = await asyncHttpOp)
 							{
-								var buffer = await response.Content.ReadAsBufferAsync();
-								cancelToken.ThrowIfCancellationRequested();
-
-								using (var source = new BufferImageSource(buffer))
+								using (var content = response.Content)
 								{
-									var info = await source.GetInfoAsync();
-									if (info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024)
-									{
-										if (source.ImageFormat == ImageFormat.Jpeg)
-										{
-											var resizedBuffer = await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(buffer, new Nokia.Graphics.Imaging.AutoResizeConfiguration(1024 * 1024 * 2,
-											new Windows.Foundation.Size(1024, 1024), new Windows.Foundation.Size(0, 0), Nokia.Graphics.Imaging.AutoResizeMode.Automatic, 0, Nokia.Graphics.Imaging.ColorSpace.Yuv420));
-											await targetStream.WriteAsync(resizedBuffer);
-										}
-										else
-										{
-											using (var jpegRenderer = new JpegRenderer(source))
-											{
-												// Find aspect ratio for resize
-												var nPercentW = (1024.0 / info.ImageSize.Width);
-												var nPercentH = (1024.0 / info.ImageSize.Height);
-												var nPercent = nPercentH < nPercentW ? nPercentH : nPercentW;
+									ulong length;
+									if (content.TryComputeLength(out length) && length > 1024 * 1024 * 4)
+										throw new OperationCanceledException();
 
-												jpegRenderer.Size = new Windows.Foundation.Size(info.ImageSize.Width * nPercent, info.ImageSize.Height * nPercent);
-												jpegRenderer.OutputOption = OutputOption.PreserveAspectRatio;
-												jpegRenderer.Quality = .75;
-												var renderedJpeg = await jpegRenderer.RenderAsync();
-												await targetStream.WriteAsync(renderedJpeg);
+									var readBufferOp = content.ReadAsBufferAsync();
+									cancelToken.Register(() =>
+									{
+										try
+										{
+											readBufferOp.Cancel();
+										}
+										catch { }
+									});
+									var buffer = await readBufferOp;
+									try
+									{
+										cancelToken.ThrowIfCancellationRequested();
+
+										using (var source = new BufferImageSource(buffer))
+										{
+											var info = await source.GetInfoAsync();
+											
+											if (source.ImageFormat == ImageFormat.Jpeg && info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024)
+											{
+												var resizedBuffer = await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(buffer, new Nokia.Graphics.Imaging.AutoResizeConfiguration(1024 * 1024,
+												new Windows.Foundation.Size(1024, 1024), new Windows.Foundation.Size(0, 0), Nokia.Graphics.Imaging.AutoResizeMode.Automatic, 0, Nokia.Graphics.Imaging.ColorSpace.Yuv420));
+												try
+												{
+													await targetStream.WriteAsync(resizedBuffer);
+												}
+												finally
+												{
+													if (resizedBuffer is IDisposable)
+														((IDisposable)resizedBuffer).Dispose();
+												}
 											}
+											else if(info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024 || source.ImageFormat == ImageFormat.Gif)
+											{
+												using (var jpegRenderer = new JpegRenderer(source))
+												{
+													// Find aspect ratio for resize
+													var nPercentW = (1024.0 / info.ImageSize.Width);
+													var nPercentH = (1024.0 / info.ImageSize.Height);
+													var nPercent = nPercentH < nPercentW ? nPercentH : nPercentW;
+
+													jpegRenderer.Size = new Windows.Foundation.Size(info.ImageSize.Width * nPercent, info.ImageSize.Height * nPercent);
+													jpegRenderer.OutputOption = OutputOption.PreserveAspectRatio;
+													jpegRenderer.Quality = .75;
+													var renderedJpeg = await jpegRenderer.RenderAsync();
+													try
+													{
+														await targetStream.WriteAsync(renderedJpeg);
+													}
+													finally
+													{
+														if (renderedJpeg is IDisposable)
+															((IDisposable)renderedJpeg).Dispose();
+													}
+												}
+											}
+											else
+												await targetStream.WriteAsync(buffer);
 										}
 									}
-									else
-										await targetStream.WriteAsync(buffer);
+									finally
+									{
+										if (buffer is IDisposable)
+											((IDisposable)buffer).Dispose();
+									}
 								}
 							}
 

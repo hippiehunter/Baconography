@@ -137,7 +137,7 @@ namespace SnooStream.Common
 			set
 			{
 				_synopsis = value;
-				RaisePropertyChanged("Synopsis");
+				SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() => RaisePropertyChanged("Synopsis"));
 			}
 		}
 	}

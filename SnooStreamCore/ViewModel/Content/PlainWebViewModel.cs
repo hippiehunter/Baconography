@@ -36,8 +36,8 @@ namespace SnooStream.ViewModel.Content
 		public string Title { get; private set; }
 		public string RedditThumbnail { get; private set; }
 		public ObservableCollection<Readable> WebParts { get; private set; }
+		Lazy<Task<Tuple<string, string, IEnumerable<Readable>>>> _firstResult;
 		private string _nextUrl;
-		Dictionary<string, Lazy<Task<string>>> _pageLoadLookup = new Dictionary<string, Lazy<Task<string>>>();
 		static HttpClient _httpClient;
 
 		static PlainWebViewModel()
@@ -56,10 +56,43 @@ namespace SnooStream.ViewModel.Content
             TextPreview = !notText;
             Url = url;
 			RedditThumbnail = redditThumbnail;
-			_pageLoadLookup.Add(url, new Lazy<Task<string>>(() => _httpClient.GetStringAsync(url)));
+			_firstResult = new Lazy<Task<Tuple<string, string, IEnumerable<Readable>>>>(() => LoadOneImpl(_httpClient, url));
 			WebParts = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new WebLoader(this));
         }
 
+		WeakReference<string> _weakPageData;
+		Task<string> _httpLoad;
+		private async Task<string> GetPageData(string url)
+		{
+			if (_weakPageData != null)
+			{
+				string pageData;
+				if (_weakPageData.TryGetTarget(out pageData))
+					return pageData;
+			}
+			if (_httpLoad != null)
+			{
+				return await _httpLoad;
+			}
+			else
+			{
+				var blobRetrive = await SnooStreamViewModel.OfflineService.RetriveBlob<string>(url, TimeSpan.FromDays(5));
+				if (blobRetrive != null)
+				{
+					_weakPageData = new WeakReference<string>(blobRetrive);
+					return blobRetrive;
+				}
+				else
+				{
+					_httpLoad = _httpClient.GetStringAsync(url);
+					var result = await _httpLoad;
+					_weakPageData = new WeakReference<string>(result);
+					await SnooStreamViewModel.OfflineService.StoreBlob(url, result);
+					_httpLoad = null;
+					return result;
+				}
+			}
+		}
 		
 
 		private class WebLoader : IIncrementalCollectionLoader<Readable>
@@ -121,16 +154,7 @@ namespace SnooStream.ViewModel.Content
 				if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
 					domain = new Uri(url).Authority;
 
-				Lazy<Task<string>> loadTask;
-				lock (this)
-				{
-					if (!_pageLoadLookup.TryGetValue(url, out loadTask))
-					{
-						_pageLoadLookup.Add(url, loadTask = new Lazy<Task<string>>(() => _httpClient.GetStringAsync(url)));
-					}
-				}
-
-				var page = await loadTask.Value;
+				var page = await GetPageData(url);
 				string title;
 				var pageBlocks = ArticleExtractor.INSTANCE.GetTextAndImageBlocks(page, new Uri(url), out title);
 				foreach (var tpl in pageBlocks)
@@ -157,7 +181,7 @@ namespace SnooStream.ViewModel.Content
 
 		internal async Task<string> FirstParagraph()
 		{
-			var onePageResult = await Task.Run(() => LoadOneImpl(_httpClient, Url));
+			var onePageResult = await _firstResult.Value;
 			var result = onePageResult.Item3.FirstOrDefault((rd) => rd is ReadableText) as ReadableText;
 			if(result != null)
 			{
@@ -168,7 +192,7 @@ namespace SnooStream.ViewModel.Content
 
         internal async Task<string> FirstImage()
         {
-            var onePageResult = await Task.Run(() => LoadOneImpl(_httpClient, Url));
+			var onePageResult = await _firstResult.Value;
             var result = onePageResult.Item3.FirstOrDefault((rd) => rd is ReadableImage) as ReadableImage;
             if (result != null)
             {

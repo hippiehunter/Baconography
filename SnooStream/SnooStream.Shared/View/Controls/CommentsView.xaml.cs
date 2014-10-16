@@ -93,5 +93,14 @@ namespace SnooStream.View.Controls
 			//	context.ViewHack = null;
 			//}
 		}
+
+		private void commentsList_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+		{
+			if (args.ItemContainer.ContentTemplateRoot is CardLinkView)
+			{
+				var card = args.ItemContainer.ContentTemplateRoot as CardLinkView;
+				card.PhaseLoad(sender, args);
+			}
+		}
 	}
 }
