@@ -75,10 +75,11 @@ namespace SnooStream.ViewModel.Content
 				{
 					result = new AlbumViewModel(url, title, redditThumbnail);
 				}
-				else if (fileName.EndsWith(".jpg") ||
+				else if (fileName != null && 
+					(fileName.EndsWith(".jpg") ||
 					fileName.EndsWith(".png") ||
 					fileName.EndsWith(".gif") ||
-					fileName.EndsWith(".jpeg"))
+					fileName.EndsWith(".jpeg")))
 				{
 					result = new ImageViewModel(url, title, redditThumbnail);
 				}
