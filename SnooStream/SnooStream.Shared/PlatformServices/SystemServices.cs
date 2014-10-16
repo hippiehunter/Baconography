@@ -518,12 +518,14 @@ namespace SnooStream.PlatformServices
 #endif
 		}
 
-		public void ShowProgress(string notificationText, double progressPercent)
+		public void ShowProgress(string notificationText, double? progressPercent)
 		{
 #if WINDOWS_PHONE_APP
 			QueueNonCriticalUI(() =>
 			{
 				var progressIndicator = StatusBar.GetForCurrentView().ProgressIndicator;
+				progressIndicator.ProgressValue = progressPercent;
+				progressIndicator.Text = notificationText;
 				progressIndicator.ShowAsync();
 			});
 #endif
@@ -547,8 +549,7 @@ namespace SnooStream.PlatformServices
 		DateTime _lastDrained = DateTime.Now;
 		private async void DrainNonCriticalUIQueue()
 		{
-			_lastDrained = DateTime.Now;
-			while ((DateTime.Now - _lastDrained).TotalSeconds < 2 && !SnooStreamViewModel.UIContextCancellationToken.IsCancellationRequested)
+			while (!SnooStreamViewModel.UIContextCancellationToken.IsCancellationRequested)
 			{
 				bool needToRun = false;
 				lock (_queuedNonCritical)

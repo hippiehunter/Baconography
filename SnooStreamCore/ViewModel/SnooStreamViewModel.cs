@@ -36,16 +36,11 @@ namespace SnooStream.ViewModel
 			NotificationService = new Common.NotificationService();
 			CaptchaProvider = new CaptchaService();
 			RedditService = new Reddit(_listingFilter, RedditUserState, OfflineService, CaptchaProvider);
-			LoadQueue = new PriorityLoadQueue();
 
 
 			_listingFilter.Initialize(Settings, OfflineService, RedditService, _initializationBlob.NSFWFilter);
 			CommandDispatcher = new CommandDispatcher();
 			SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
-			if (!IsInDesignMode)
-			{
-				LoadLargeImages();
-			}
 			MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
 		}
 
@@ -55,37 +50,6 @@ namespace SnooStream.ViewModel
             {
                 _initializationBlob.DefaultUser = RedditUserState;
             }
-        }
-
-        private async void LoadLargeImages()
-        {
-            await Task.Delay(1000); //stay away from startup, we've got enough going on as it is
-            if (SystemServices.IsLowPriorityNetworkOk)
-            {
-                await NotificationService.Report("loading secondary images",
-                    PriorityLoadQueue.QueueHelper("main", LoadContextType.Major, async () =>
-                {
-                    //check if there is a LinkRiver for the target subreddit, then cache things 
-                    //into it directly so we arent making 2x the reddit calls
-                    var targetRiver = SubredditRiver.CombinedRivers.FirstOrDefault(lrvm => string.Compare(lrvm.Thing.Url, Settings.LockScreenReddit, StringComparison.CurrentCultureIgnoreCase) == 0);
-                    if (targetRiver == null)
-                    {
-                        targetRiver = new LinkRiverViewModel(true, new Subreddit(Settings.LockScreenReddit), "hot", null, null);
-                    }
-
-
-                    //var loadedContent = await targetRiver.PreloadContent((link) => ImageAcquisition.MightHaveImagesFromUrl(link.Link.Url) && !link.Link.Url.EndsWith(".gif"), 12, BackgroundCancellationToken);
-                    //foreach (var content in loadedContent.OfType<ImageViewModel>())
-                    //{
-                    //    if (content.ImageSource.Dimensions != null)
-                    //    {
-
-                    //    }
-                    //}
-                }));
-
-            }
-
         }
 
         private InitializationBlob _initializationBlob;
@@ -101,7 +65,6 @@ namespace SnooStream.ViewModel
         public static IUserCredentialService UserCredentialService { get; set; }
         public static INavigationService NavigationService { get; set; }
         public static ISystemServices SystemServices { get; set; }
-        public static PriorityLoadQueue LoadQueue { get; set; }
 
         public SettingsViewModel SettingsHub { get; private set; }
         public SubredditRiverViewModel SubredditRiver { get; private set; }

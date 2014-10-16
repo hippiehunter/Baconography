@@ -66,7 +66,7 @@ namespace SnooStream.Common
 						ProgressPercent = Math.Max(0.0, ((double)notificationStack.Sum(notification => notification.Progress) / notificationStack.Count) / 100.0);
 					}
 
-					SnooStreamViewModel.SystemServices.ShowProgress(NotificationText, ProgressPercent);
+					SnooStreamViewModel.SystemServices.ShowProgress(NotificationText, ProgressPercent > 0 ? (double?)ProgressPercent : null);
 					await Task.Delay(500);
 				}
 				SnooStreamViewModel.SystemServices.HideProgress();
@@ -95,25 +95,6 @@ namespace SnooStream.Common
         private void ReprocessForProgress()
         {
 
-        }
-
-        public void Report(string message, Action operation)
-        {
-            var notificationInfo = new NotificationInfo { Text = message, Progress = -1};
-            try
-            {
-                AddNotificationInfo(notificationInfo);
-                operation();
-            }
-            catch(Exception ex)
-            {
-                Debug.WriteLine(ex);
-				SnooStream.ViewModel.SnooStreamViewModel.SystemServices.ShowMessage("error", ex.ToString());
-            }
-            finally
-            {
-                FinishNotificationInfo(notificationInfo);
-            }
         }
 
         public async Task Report(string message, Func<Task> operation)

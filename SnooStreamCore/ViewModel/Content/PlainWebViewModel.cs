@@ -104,6 +104,12 @@ namespace SnooStream.ViewModel.Content
 			{
 				throw new NotImplementedException();
 			}
+
+
+			public string NameForStatus
+			{
+				get { return "readable part"; }
+			}
 		}
 
 		private async Task<Tuple<string, string, IEnumerable<Readable>>> LoadOneImpl(HttpClient httpClient, string url)

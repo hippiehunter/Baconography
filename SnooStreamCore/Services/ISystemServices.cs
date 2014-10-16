@@ -26,7 +26,7 @@ namespace SnooStream.Services
         void ShowMessage(string title, string text);
         bool IsLowPriorityNetworkOk { get; }
         bool IsHighPriorityNetworkOk { get; }
-		void ShowProgress(string notificationText, double progressPercent);
+		void ShowProgress(string notificationText, double? progressPercent);
 		void HideProgress();
 		void QueueNonCriticalUI(Action action);
 		ObservableCollection<T> MakeIncrementalLoadCollection<T>(IIncrementalCollectionLoader<T> loader, int loadIncrement = 20, int auxiliaryTimeout = 2500);
@@ -41,6 +41,7 @@ namespace SnooStream.Services
 		bool HasMore();
 		Task<IEnumerable<T>> LoadMore();
 		Task Refresh(ObservableCollection<T> current, bool onlyNew);
+		string NameForStatus { get; }
 	}
 
 	public interface IWrappedCollectionView

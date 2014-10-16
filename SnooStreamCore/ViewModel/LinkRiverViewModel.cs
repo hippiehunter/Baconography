@@ -233,6 +233,12 @@ namespace SnooStream.ViewModel
 					});
 				}
 			}
+
+
+			public string NameForStatus
+			{
+				get { return "post"; }
+			}
 		}
 
         private void ProcessLinkThings(IEnumerable<Link> links)

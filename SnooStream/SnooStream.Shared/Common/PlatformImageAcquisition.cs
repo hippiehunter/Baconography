@@ -9,7 +9,11 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Graphics.Imaging;
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.Core;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.Web.Http;
 
 namespace SnooStream.Common
@@ -71,9 +75,18 @@ namespace SnooStream.Common
             }
         }
 
+		public static string ComputeMD5(string str)
+		{
+			var alg = HashAlgorithmProvider.OpenAlgorithm("MD5");
+			IBuffer buff = CryptographicBuffer.ConvertStringToBinary(str, BinaryStringEncoding.Utf8);
+			var hashed = alg.HashData(buff);
+			var res = CryptographicBuffer.EncodeToHexString(hashed);
+			return res;
+		}
+
 		public static async Task<String> ImagePreviewFromUrl(string url, CancellationToken cancelToken)
 		{
-			string onDiskName = "snoostream_preview5" + Uri.EscapeDataString(url);
+			string onDiskName = "snoostream_preview" + ComputeMD5(url);
 			try
 			{
 				var targetFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(onDiskName, CreationCollisionOption.FailIfExists);
@@ -98,14 +111,34 @@ namespace SnooStream.Common
 							{
 								var buffer = await response.Content.ReadAsBufferAsync();
 								cancelToken.ThrowIfCancellationRequested();
+
 								using (var source = new BufferImageSource(buffer))
 								{
 									var info = await source.GetInfoAsync();
 									if (info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024)
 									{
-										var resizedBuffer = await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(buffer, new Nokia.Graphics.Imaging.AutoResizeConfiguration(1024 * 1024 * 2,
+										if (source.ImageFormat == ImageFormat.Jpeg)
+										{
+											var resizedBuffer = await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(buffer, new Nokia.Graphics.Imaging.AutoResizeConfiguration(1024 * 1024 * 2,
 											new Windows.Foundation.Size(1024, 1024), new Windows.Foundation.Size(0, 0), Nokia.Graphics.Imaging.AutoResizeMode.Automatic, 0, Nokia.Graphics.Imaging.ColorSpace.Yuv420));
-										await targetStream.WriteAsync(resizedBuffer);
+											await targetStream.WriteAsync(resizedBuffer);
+										}
+										else
+										{
+											using (var jpegRenderer = new JpegRenderer(source))
+											{
+												// Find aspect ratio for resize
+												var nPercentW = (1024.0 / info.ImageSize.Width);
+												var nPercentH = (1024.0 / info.ImageSize.Height);
+												var nPercent = nPercentH < nPercentW ? nPercentH : nPercentW;
+
+												jpegRenderer.Size = new Windows.Foundation.Size(info.ImageSize.Width * nPercent, info.ImageSize.Height * nPercent);
+												jpegRenderer.OutputOption = OutputOption.PreserveAspectRatio;
+												jpegRenderer.Quality = .75;
+												var renderedJpeg = await jpegRenderer.RenderAsync();
+												await targetStream.WriteAsync(renderedJpeg);
+											}
+										}
 									}
 									else
 										await targetStream.WriteAsync(buffer);

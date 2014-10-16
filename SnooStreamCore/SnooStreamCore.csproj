@@ -85,7 +85,6 @@
     <Compile Include="ViewModel\LoadFullCommentsViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MoreViewModel.cs" />
-    <Compile Include="Common\PriorityLoadQueue.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
     <Compile Include="ViewModel\Activities\ActivityViewModel.cs" />
     <Compile Include="ViewModel\Settings\AppearanceSettingsViewModel.cs" />

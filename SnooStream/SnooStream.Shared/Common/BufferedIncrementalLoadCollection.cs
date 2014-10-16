@@ -48,8 +48,12 @@ namespace SnooStream.Common
 			{
 				if (_unloadedBuffer.Count == 0)
 				{
-					var items = await _loader.LoadMore();
-					_unloadedBuffer.AddRange(items);
+					await SnooStreamViewModel.NotificationService.Report(string.Format("loading {0}s", _loader.NameForStatus),
+						async () =>
+						{
+							var items = await _loader.LoadMore();
+							_unloadedBuffer.AddRange(items);
+						});
 				}
 
 				if (_unloadedBuffer.Count > 0)
@@ -95,7 +99,11 @@ namespace SnooStream.Common
 			}
 			try
 			{
-				await _loader.Refresh(this, onlyNew);
+				await SnooStreamViewModel.NotificationService.Report(string.Format("refreshing {0}s", _loader.NameForStatus),
+						async () =>
+						{
+							await _loader.Refresh(this, onlyNew);
+						});
 			}
 			finally
 			{

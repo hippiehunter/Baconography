@@ -408,8 +408,7 @@ namespace SnooStream.ViewModel
         {
             List<ViewModelBase> flatChilden = new List<ViewModelBase>();
             string moreId = null;
-            await SnooStreamViewModel.NotificationService.Report("loading more comments", 
-				PriorityLoadQueue.QueueHelper( async () =>
+            await SnooStreamViewModel.NotificationService.Report("loading more comments", async () =>
                 {
 					var listing = await SnooStreamViewModel.RedditService.GetMoreOnListing(new More { Children = target.Ids, ParentId = target.ParentId, Count = target.Count }, Link.Link.Id, Link.Link.Subreddit);
                     lock(this)
@@ -434,7 +433,7 @@ namespace SnooStream.ViewModel
 							_knownUnloaded.Remove(GetId(child));
 						}
                     }
-                }));
+                });
 
 			if (moreId != null)
 				MergeDisplayChildren(flatChilden, target.Ids);
@@ -510,8 +509,7 @@ namespace SnooStream.ViewModel
         public async Task<List<ViewModelBase>> LoadImpl(bool isContext)
         {
             List<ViewModelBase> flatChildren = new List<ViewModelBase>();
-			await SnooStreamViewModel.NotificationService.Report("loading comments", 
-				PriorityLoadQueue.QueueHelper( async () =>
+			await SnooStreamViewModel.NotificationService.Report("loading comments", async () =>
 			{
 				var listing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(Link.Link.Subreddit, BaseUrl, null);
 				lock(this)
@@ -524,7 +522,7 @@ namespace SnooStream.ViewModel
 					MergeComments(null, listing.Data.Children, 0);
 					InsertIntoFlatList(((Comment)firstChild.Data).Id, flatChildren);
 				}
-			}));
+			});
             return flatChildren;
         }
 

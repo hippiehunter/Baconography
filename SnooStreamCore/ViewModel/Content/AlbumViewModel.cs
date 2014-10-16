@@ -76,6 +76,12 @@ namespace SnooStream.ViewModel.Content
 			{
 				throw new NotImplementedException();
 			}
+
+
+			public string NameForStatus
+			{
+				get { return "images"; }
+			}
 		}
 
 

@@ -174,6 +174,12 @@ namespace SnooStream.ViewModel
 			{
 				throw new NotImplementedException();
 			}
+
+
+			public string NameForStatus
+			{
+				get { return "subreddit search result"; }
+			}
 		}
 
         public SubredditRiverViewModel(SubredditRiverInit initBlob)
