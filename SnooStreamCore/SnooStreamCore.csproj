@@ -83,7 +83,6 @@
     <Compile Include="ViewModel\Content\VideoViewModel.cs" />
     <Compile Include="ViewModel\IRefreshable.cs" />
     <Compile Include="ViewModel\LoadFullCommentsViewModel.cs" />
-    <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MoreViewModel.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
     <Compile Include="ViewModel\Activities\ActivityViewModel.cs" />
@@ -103,7 +102,6 @@
     <Compile Include="ViewModel\SnooStreamViewModel.cs" />
     <Compile Include="ViewModel\SubredditRiverViewModel.cs" />
     <Compile Include="ViewModel\UploadViewModel.cs" />
-    <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="ViewModel\VotableViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
