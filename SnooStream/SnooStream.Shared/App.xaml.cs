@@ -77,8 +77,9 @@ namespace SnooStream
 					var navService = new NavigationService(rootFrame, snooStreamViewModel);
 					SnooStreamViewModel.NavigationService = navService;
 					navService.Finish(snooStreamViewModel.GetNavigationBlob());
+#if WINDOWS_PHONE_APP
 					Windows.Phone.UI.Input.HardwareButtons.BackPressed += HardwareButtons_BackPressed;
-					// TODO: Load state from previously suspended application
+#endif
                 }
 
                 // Place the frame in the current Window
