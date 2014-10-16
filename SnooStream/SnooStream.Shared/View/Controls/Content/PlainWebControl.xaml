@@ -33,5 +33,10 @@
         <ListView.Header>
             <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" FontSize="32" Margin="20" TextWrapping="Wrap"/>
         </ListView.Header>
+        <ListView.ItemContainerStyle>
+            <Style TargetType="ListViewItem">
+                <Setter Property="IsHitTestVisible" Value="False" />
+            </Style>
+        </ListView.ItemContainerStyle>
     </ListView>
 </UserControl>
