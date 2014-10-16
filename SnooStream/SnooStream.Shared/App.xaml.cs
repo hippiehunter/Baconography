@@ -39,6 +39,11 @@ namespace SnooStream
             this.Suspending += this.OnSuspending;
         }
 
+		protected override void OnActivated(IActivatedEventArgs args)
+		{
+			base.OnActivated(args);
+		}
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used when the application is launched to open a specific file, to display
@@ -68,7 +73,12 @@ namespace SnooStream
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    // TODO: Load state from previously suspended application
+					var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
+					var navService = new NavigationService(rootFrame, snooStreamViewModel);
+					SnooStreamViewModel.NavigationService = navService;
+					navService.Finish(snooStreamViewModel.GetNavigationBlob());
+					Windows.Phone.UI.Input.HardwareButtons.BackPressed += HardwareButtons_BackPressed;
+					// TODO: Load state from previously suspended application
                 }
 
                 // Place the frame in the current Window
@@ -93,7 +103,8 @@ namespace SnooStream
 				Windows.Phone.UI.Input.HardwareButtons.BackPressed += HardwareButtons_BackPressed;
 #endif
 				var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
-				SnooStreamViewModel.NavigationService = new NavigationService(rootFrame, null, snooStreamViewModel);
+				SnooStreamViewModel.NavigationService = new NavigationService(rootFrame, snooStreamViewModel);
+				((NavigationService)SnooStreamViewModel.NavigationService).Finish(null);
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
@@ -155,7 +166,7 @@ namespace SnooStream
             var deferral = e.SuspendingOperation.GetDeferral();
 
             var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
-            snooStreamViewModel.DumpInitBlob(snooStreamViewModel.GetNavigationBlob());
+            snooStreamViewModel.DumpInitBlob(((NavigationService)SnooStreamViewModel.NavigationService).DumpState());
             // TODO: Save application state and stop any background activity
             deferral.Complete();
         }

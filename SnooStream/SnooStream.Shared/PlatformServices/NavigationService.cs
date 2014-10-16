@@ -12,6 +12,7 @@ using SnooStream.View.Pages;
 using SnooStream.View.Controls;
 using GalaSoft.MvvmLight.Messaging;
 using SnooStream.Messages;
+using Newtonsoft.Json;
 
 namespace SnooStream.PlatformServices
 {
@@ -21,12 +22,28 @@ namespace SnooStream.PlatformServices
         NavigationStateUtility _navState;
 		SnooStreamViewModel _rootContext;
 
-        public NavigationService(Frame frame, string existingState, SnooStreamViewModel rootContext)
+        public NavigationService(Frame frame, SnooStreamViewModel rootContext)
         {
 			_rootContext = rootContext;
             _frame = frame;
-			_navState = new NavigationStateUtility(existingState, _rootContext);
         }
+
+		public void Finish(string existingState)
+		{
+			try
+			{
+				var serializationTpl = existingState != null ? JsonConvert.DeserializeObject<Tuple<string, string>>(existingState) : Tuple.Create<string, string>(null, null);
+				_navState = new NavigationStateUtility(serializationTpl.Item1, _rootContext);
+				if (serializationTpl.Item2 != null)
+				{
+					_frame.SetNavigationState(serializationTpl.Item2);
+				}
+			}
+			catch
+			{
+				_navState = new NavigationStateUtility("", _rootContext);
+			}
+		}
 
         public void NavigateToComments(CommentsViewModel viewModel)
         {
@@ -114,7 +131,9 @@ namespace SnooStream.PlatformServices
 
         public string DumpState()
         {
-            return _navState.DumpState();
+			var frameState = _frame.GetNavigationState();
+            var navState = _navState.DumpState();
+			return JsonConvert.SerializeObject(Tuple.Create(navState, frameState));
         }
 
 
