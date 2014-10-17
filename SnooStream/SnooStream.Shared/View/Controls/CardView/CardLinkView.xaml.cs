@@ -122,32 +122,36 @@ namespace SnooStream.View.Controls
 					case 3:
 						try
 						{
-							var context = ((Preview)((UserControl)previewSection.Content).DataContext);
-							var hqImageUrl = await Task.Run(() => context.FinishLoad(cancelSource.Token));
-							if (string.IsNullOrWhiteSpace(hqImageUrl) || cancelSource.IsCancellationRequested)
-								return;
+							//make sure its ok to load non essential content
+							if (SnooStreamViewModel.SystemServices.IsLowPriorityNetworkOk)
+							{
+								var context = ((Preview)((UserControl)previewSection.Content).DataContext);
+								var hqImageUrl = await Task.Run(() => context.FinishLoad(cancelSource.Token));
+								if (string.IsNullOrWhiteSpace(hqImageUrl) || cancelSource.IsCancellationRequested)
+									return;
 
-							try
-							{
-								var previewUrl = Task.Run(() => PlatformImageAcquisition.ImagePreviewFromUrl(hqImageUrl, cancelSource.Token));
-								args.RegisterUpdateCallback(async (nestedSender, nestedArgs) =>
-									{
-										if (!nestedArgs.InRecycleQueue)
+								try
+								{
+									var previewUrl = Task.Run(() => PlatformImageAcquisition.ImagePreviewFromUrl(hqImageUrl, cancelSource.Token));
+									args.RegisterUpdateCallback(async (nestedSender, nestedArgs) =>
 										{
-											try
+											if (!nestedArgs.InRecycleQueue)
 											{
-												((Preview)((UserControl)previewSection.Content).DataContext).ThumbnailUrl = await previewUrl;
+												try
+												{
+													((Preview)((UserControl)previewSection.Content).DataContext).ThumbnailUrl = await previewUrl;
+												}
+												catch (OperationCanceledException)
+												{
+													//Do Nothing
+												}
 											}
-											catch (OperationCanceledException)
-											{
-												//Do Nothing
-											}
-										}
-									});
-							}
-							catch (OperationCanceledException)
-							{
-								//Do nothing
+										});
+								}
+								catch (OperationCanceledException)
+								{
+									//Do nothing
+								}
 							}
 						}
 						catch (Exception ex)
