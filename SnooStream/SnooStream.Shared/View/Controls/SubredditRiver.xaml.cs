@@ -47,5 +47,14 @@ namespace SnooStream.View.Controls
 			if(linkRiver != null)
 				SnooStreamViewModel.NavigationService.NavigateToLinkRiver(linkRiver);
 		}
+
+		private void searchBox_TextChanged(object sender, TextChangedEventArgs e)
+		{
+            BindingExpression bindingExpression = ((TextBox)sender).GetBindingExpression(TextBox.TextProperty);
+            if (bindingExpression != null)
+            {
+                bindingExpression.UpdateSource();
+            }
+		}
     }
 }

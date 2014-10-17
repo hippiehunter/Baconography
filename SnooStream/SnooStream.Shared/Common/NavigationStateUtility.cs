@@ -27,7 +27,10 @@ namespace SnooStream.Common
 				ViewModelBase context = rootContext;
                 foreach (var item in serializedItems.Item1.Reverse())
                 {
-					context = RestoreStateItem(serializedItems.Item2[item], context) as ViewModelBase;
+					if (_navState.ContainsKey(serializedItems.Item2[item]))
+					{
+						context = RestoreStateItem(serializedItems.Item2[item], context) as ViewModelBase;
+					}
 					AddState(context, item);
                 }
             }
