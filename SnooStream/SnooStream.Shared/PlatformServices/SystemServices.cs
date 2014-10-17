@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Networking.Connectivity;
+using Windows.Security.Authentication.Web;
 using Windows.Storage.Streams;
 using Windows.System.Threading;
 using Windows.UI.Core;
@@ -821,5 +822,18 @@ namespace SnooStream.PlatformServices
 			return new WrappedCollectionViewSource(source);
 		}
 
+
+
+		public void ShowOAuthBroker()
+		{
+			String RedditURL = string.Format("https://ssl.reddit.com/api/v1/authorize?client_id={0}&response_type={1}&state={2}&redirect_uri={3}&duration={4}&scope={5}",
+				"3m9rQtBinOg_rA", "code", "something", "http://www.google.com", "permanent", "modposts,identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread");
+
+			System.Uri StartUri = new Uri(RedditURL);
+			System.Uri EndUri = new Uri("http://www.google.com");
+#if WINDOWS_PHONE_APP
+			WebAuthenticationBroker.AuthenticateAndContinue(StartUri, EndUri, null, WebAuthenticationOptions.None);
+#endif
+		}
 	}
 }

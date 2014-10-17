@@ -24,6 +24,7 @@ namespace SnooStream.ViewModel
 
         private static string UnselectedUsername = "<None Selected>";
 
+		public bool IsLoggedIn { get; set; }
         private async void LoadStoredCredentials()
         {
 			try
@@ -186,6 +187,20 @@ namespace SnooStream.ViewModel
             }
         }
 
+		private string _errorText;
+		public string ErrorText
+		{
+			get
+			{
+				return _errorText;
+			}
+			set
+			{
+				_errorText = value;
+				RaisePropertyChanged("ErrorText");
+			}
+		}
+
         public void Logout()
         {
             SnooStreamViewModel.RedditUserState.IsGold = false;
@@ -197,60 +212,12 @@ namespace SnooStream.ViewModel
 
         public bool HasStoredLogins { get { return StoredCredentials.Count > 0; } }
 
-        public async void Login()
+        public void Login()
         {
             if (SnooStreamViewModel.SystemServices.IsHighPriorityNetworkOk)
             {
                 Working = true;
-                try
-                {
-                    if (UsingStoredCredential)
-                    {
-                        // TODO: Do login-y things with the currently selected credential
-                    }
-                    else
-                    {
-                        var loggedInUser = await SnooStreamViewModel.RedditService.Login(Username, Password);
-                        if (loggedInUser == null)
-                        {
-                            HasErrors = true;
-                            Working = false;
-                        }
-                        else
-                        {
-                            HasErrors = false;
-                            Working = false;
-                            if (IsRememberLogin)
-                            {
-                                var newCredentials = new UserCredential
-                                {
-                                    IsDefault = IsDefaultLogin,
-                                    LoginCookie = loggedInUser.LoginCookie,
-                                    Username = loggedInUser.Username,
-                                    Me = new Thing { Kind = "t2", Data = loggedInUser.Me }
-                                };
-                                await SnooStreamViewModel.UserCredentialService.AddStoredCredential(newCredentials, Password);
-                                //reload credentials
-                                StoredCredentials.Clear();
-                                LoadStoredCredentials();
-                                SnooStreamViewModel.RedditUserState.Username = loggedInUser.Username;
-                                SnooStreamViewModel.RedditUserState.IsGold = loggedInUser.Me.IsGold;
-                                SnooStreamViewModel.RedditUserState.LoginCookie = loggedInUser.LoginCookie;
-                                SnooStreamViewModel.RedditUserState.ModHash = loggedInUser.Me.ModHash;
-                                SnooStreamViewModel.RedditUserState.NeedsCaptcha = false;
-                                MessengerInstance.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = IsDefaultLogin });
-                            }
-                        }
-                    }
-                }
-                catch (WebException ex)
-                {
-                    SnooStreamViewModel.SystemServices.ShowMessage("error", "Login functionality not available in offline mode");
-                }
-                catch (Exception ex)
-                {
-                    SnooStreamViewModel.SystemServices.ShowMessage("error", ex.ToString());
-                }
+				SnooStreamViewModel.SystemServices.ShowOAuthBroker();
             }
             else
             {
@@ -258,8 +225,31 @@ namespace SnooStream.ViewModel
             }
         }
 
+		public void FailOAuth(string errorText, string responseText)
+		{
+			HasErrors = true;
+			ErrorText = errorText;
+		}
+
+		public async void FinishOAuth(string code)
+		{
+			try
+			{
+				Working = true;
+				var oAuth = await SnooStreamViewModel.RedditService.RequestGrantCode(code);
+				SnooStreamViewModel.RedditUserState.OAuth = oAuth;
+				GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = false });
+			}
+			finally
+			{
+				Working = false;
+			}
+		}
+
         public RelayCommand DoLogout { get { return new RelayCommand(Logout); } }
         public RelayCommand DoLogin { get { return new RelayCommand(Login); } }
-        
-    }
+
+
+		
+	}
 }

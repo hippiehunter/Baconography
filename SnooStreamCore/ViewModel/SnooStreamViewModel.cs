@@ -35,8 +35,8 @@ namespace SnooStream.ViewModel
 			RedditUserState = _initializationBlob.DefaultUser ?? new UserState();
 			NotificationService = new Common.NotificationService();
 			CaptchaProvider = new CaptchaService();
-			RedditService = new Reddit(_listingFilter, RedditUserState, OfflineService, CaptchaProvider);
-
+			RedditService = new Reddit(_listingFilter, RedditUserState, OfflineService, CaptchaProvider, "3m9rQtBinOg_rA", null, "http://www.google.com");
+			Login = new LoginViewModel();
 
 			_listingFilter.Initialize(Settings, OfflineService, RedditService, _initializationBlob.NSFWFilter);
 			CommandDispatcher = new CommandDispatcher();
@@ -66,6 +66,7 @@ namespace SnooStream.ViewModel
         public static INavigationService NavigationService { get; set; }
         public static ISystemServices SystemServices { get; set; }
 
+		public LoginViewModel Login { get; private set; }
         public SettingsViewModel SettingsHub { get; private set; }
         public SubredditRiverViewModel SubredditRiver { get; private set; }
 

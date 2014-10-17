@@ -1,4 +1,5 @@
 ﻿using SnooStream.Common;
+using SnooStream.Messages;
 using SnooStream.PlatformServices;
 using SnooStream.Services;
 using SnooStream.View.Pages;
@@ -42,6 +43,25 @@ namespace SnooStream
 		protected override void OnActivated(IActivatedEventArgs args)
 		{
 			base.OnActivated(args);
+#if WINDOWS_PHONE_APP
+			if (args.Kind == ActivationKind.WebAuthenticationBrokerContinuation)
+			{
+				var wab = args as WebAuthenticationBrokerContinuationEventArgs;
+				if (wab.WebAuthenticationResult.ResponseStatus == Windows.Security.Authentication.Web.WebAuthenticationStatus.Success)
+				{
+					var resultData = wab.WebAuthenticationResult.ResponseData;
+					var decoder = new WwwFormUrlDecoder(new Uri(resultData).Query);
+					var code = decoder.GetFirstValueByName("code");
+					var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
+					snooStreamViewModel.Login.FinishOAuth(code);
+				}
+				else
+				{
+					var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
+					snooStreamViewModel.Login.FailOAuth(wab.WebAuthenticationResult.ResponseStatus.ToString(), wab.WebAuthenticationResult.ResponseData);
+				}
+			}
+#endif
 		}
 
         /// <summary>

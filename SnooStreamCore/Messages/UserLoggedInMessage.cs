@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SnooStream.Messages
 {
-    class UserLoggedInMessage : MessageBase
+    public class UserLoggedInMessage : MessageBase
     {
         public bool IsDefault { get; set; }
     }
