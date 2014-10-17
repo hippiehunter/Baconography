@@ -32,9 +32,10 @@ namespace SnooStream.PlatformServices
 		{
 			try
 			{
-				var serializationTpl = existingState != null ? JsonConvert.DeserializeObject<Tuple<string, string>>(existingState) : Tuple.Create<string, string>(null, null);
-				_navState = new NavigationStateUtility(serializationTpl.Item1, _rootContext);
-				if (serializationTpl.Item2 != null)
+				var serializationTpl = existingState != null ? JsonConvert.DeserializeObject<Tuple<string, string, DateTime>>(existingState) : Tuple.Create<string, string, DateTime>(null, null, DateTime.Now);
+				var navAge = (DateTime.Now - serializationTpl.Item3).TotalHours;
+				_navState = new NavigationStateUtility(navAge < 8 ? serializationTpl.Item1 : null, _rootContext);
+				if (serializationTpl.Item2 != null && navAge < 8)
 				{
 					_frame.SetNavigationState(serializationTpl.Item2);
 				}
@@ -133,7 +134,7 @@ namespace SnooStream.PlatformServices
         {
 			var frameState = _frame.GetNavigationState();
             var navState = _navState.DumpState();
-			return JsonConvert.SerializeObject(Tuple.Create(navState, frameState));
+			return JsonConvert.SerializeObject(Tuple.Create(navState, frameState, DateTime.Now));
         }
 
 

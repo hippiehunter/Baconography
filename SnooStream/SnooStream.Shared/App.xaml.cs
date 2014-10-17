@@ -78,9 +78,21 @@ namespace SnooStream
 					SnooStreamViewModel.NavigationService = navService;
 					navService.Finish(snooStreamViewModel.GetNavigationBlob());
 #if WINDOWS_PHONE_APP
+					// Removes the turnstile navigation for startup.
+					if (rootFrame.ContentTransitions != null)
+					{
+						this.transitions = new TransitionCollection();
+						foreach (var c in rootFrame.ContentTransitions)
+						{
+							this.transitions.Add(c);
+						}
+					}
+
+					rootFrame.ContentTransitions = null;
+					rootFrame.Navigated += this.RootFrame_FirstNavigated;
 					Windows.Phone.UI.Input.HardwareButtons.BackPressed += HardwareButtons_BackPressed;
 #endif
-                }
+				}
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
