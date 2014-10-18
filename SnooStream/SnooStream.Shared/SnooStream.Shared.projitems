@@ -88,9 +88,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\HubSettingsView.xaml.cs">
       <DependentUpon>HubSettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\LargeTextEditor.xaml.cs">
-      <DependentUpon>LargeTextEditor.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\LoadMoreControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
@@ -188,9 +185,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\HubSettingsView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\LargeTextEditor.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\LoginView.xaml">

@@ -46,5 +46,14 @@ namespace SnooStream.View.Controls
                 SnooStreamViewModel.NavigationService.GoBack();
             }
         }
+
+		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			BindingExpression bindingExpression = ((TextBox)sender).GetBindingExpression(TextBox.TextProperty);
+			if (bindingExpression != null)
+			{
+				bindingExpression.UpdateSource();
+			}
+		}
     }
 }
