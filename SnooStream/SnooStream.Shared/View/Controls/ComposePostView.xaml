@@ -59,12 +59,13 @@
                                 <TextBox Margin="50,-2,0,0" Height="40" Style="{StaticResource MessageTextBox}"
                                         BorderThickness="0" Padding="0" FontSize="22" MaxLength="300"
                                         KeyUp="TextBox_KeyUp"
+                                        TextChanged="TextBox_TextChanged"
                                         IsEnabled="{Binding Editing, Converter={StaticResource invertedBooleanConverter}}"
                                         Text="{Binding Path=Title, Mode=TwoWay}" />
                             </Grid>
                             <Grid x:Name="TextInput" Grid.Row="3">
-                                <local:LargeTextEditor Text="{Binding Path=Text, Mode=TwoWay}"
-                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                                <TextBox KeyUp="TextBox_KeyUp" AcceptsReturn="True" IsSpellCheckEnabled="True" TextChanged="TextBox_TextChanged" InputScope="Chat" 
+                                         Text="{Binding Path=Text, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                             </Grid>
                         </Grid>
                     </ScrollViewer>
@@ -110,7 +111,7 @@
                         <TextBox Margin="50,12,0,0" Height="300" Style="{StaticResource MessageTextBox}"
                                     TextWrapping="Wrap" VerticalAlignment="Top" BorderThickness="0" Padding="0"
                                     FontSize="22" MaxLength="300" KeyUp="TextBox_KeyUp"
-                                    Text="{Binding Path=Title, Mode=TwoWay}" InputScope="Text" />
+                                    Text="{Binding Path=Title, Mode=TwoWay}" InputScope="Default"/>
                     </Grid>
                 </Grid>
             </local:TabItem>

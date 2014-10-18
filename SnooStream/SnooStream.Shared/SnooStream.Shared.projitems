@@ -116,6 +116,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\Comments.xaml.cs">
       <DependentUpon>Comments.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Pages\ComposePost.xaml.cs">
+      <DependentUpon>ComposePost.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\ContentRiver.xaml.cs">
       <DependentUpon>ContentRiver.xaml</DependentUpon>
     </Compile>
@@ -213,6 +216,10 @@
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\Comments.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Pages\ComposePost.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\ContentRiver.xaml">
       <SubType>Designer</SubType>

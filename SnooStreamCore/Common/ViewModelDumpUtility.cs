@@ -55,6 +55,24 @@ namespace SnooStream.Common
                     {
                         return new SettingsViewModel(SnooStreamViewModel.Settings);
                     }
+				case "PostViewModel":
+					{
+						var dumpArgs = JsonConvert.DeserializeAnonymousType(stateItem.Item2, new { Editing = false, Kind = "", Subreddit = "", Text = "", Title = "", Url = "" });
+						return new PostViewModel()
+						{
+							Editing = dumpArgs.Editing,
+							Kind = dumpArgs.Kind,
+							Subreddit = dumpArgs.Subreddit,
+							Text = dumpArgs.Text,
+							Title = dumpArgs.Title,
+							Url = dumpArgs.Url,
+						};
+					}
+				case "MessageViewModel":
+					{
+						var postViewModel = new CreateMessageViewModel();
+						return postViewModel;
+					}
                 default:
                     throw new InvalidOperationException();
             }
@@ -88,6 +106,11 @@ namespace SnooStream.Common
             {
                 return JsonConvert.SerializeObject(Tuple.Create("SettingsViewModel", ""));
             }
+			else if (viewModel is PostViewModel)
+			{
+				var postViewModel = viewModel as PostViewModel;
+				return JsonConvert.SerializeObject(new { Editing = postViewModel.Editing, Kind = postViewModel.Kind, Subreddit = postViewModel.Subreddit, Text = postViewModel.Text, Title = postViewModel.Title, Url = postViewModel.Url });
+			}
 			else
 				throw new InvalidOperationException();
         }

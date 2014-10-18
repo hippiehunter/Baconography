@@ -68,12 +68,12 @@ namespace SnooStream.PlatformServices
 
         public void NavigateToMessageReply(CreateMessageViewModel viewModel)
         {
-            throw new NotImplementedException();
+			_frame.Navigate(typeof(ComposeMessageView), "state=" + _navState.AddState(viewModel));
         }
 
         public void NavigateToPost(PostViewModel viewModel)
         {
-            throw new NotImplementedException();
+			_frame.Navigate(typeof(ComposePost), "state=" + _navState.AddState(viewModel));
         }
 
         public void NavigateToUpload(UploadViewModel viewModel)
