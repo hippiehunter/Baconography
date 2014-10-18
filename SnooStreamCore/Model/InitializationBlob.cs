@@ -22,6 +22,7 @@ namespace SnooStream.Common
 
     public class SelfInit
     {
+		public DateTime? LastRefresh { get; set; }
         public string AfterSelfMessage { get; set; }
         public string AfterSelfSentMessage { get; set; }
         public string AfterSelfAction { get; set; }

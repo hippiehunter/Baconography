@@ -41,6 +41,7 @@ namespace SnooStream.Services
 		Task<IEnumerable<T>> LoadMore();
 		Task Refresh(ObservableCollection<T> current, bool onlyNew);
 		string NameForStatus { get; }
+		void Attach(ObservableCollection<T> targetCollection);
 	}
 
 	public interface IWrappedCollectionView

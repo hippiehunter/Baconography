@@ -82,6 +82,9 @@ namespace SnooStream.ViewModel.Content
 			{
 				get { return "images"; }
 			}
+
+
+			public void Attach(ObservableCollection<ImageViewModel> targetCollection) { }
 		}
 
 

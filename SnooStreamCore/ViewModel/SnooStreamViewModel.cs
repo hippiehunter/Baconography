@@ -33,6 +33,7 @@ namespace SnooStream.ViewModel
 			}
 			Settings = new Model.Settings(_initializationBlob.Settings);
 			SettingsHub = new SettingsViewModel(Settings);
+			SelfStream = new SelfStreamViewModel(_initializationBlob.Self);
 			RedditUserState = _initializationBlob.DefaultUser ?? new UserState();
 			NotificationService = new Common.NotificationService();
 			CaptchaProvider = new CaptchaService();
@@ -67,6 +68,7 @@ namespace SnooStream.ViewModel
         public static INavigationService NavigationService { get; set; }
         public static ISystemServices SystemServices { get; set; }
 
+		public SelfStreamViewModel SelfStream { get; private set; }
 		public LoginViewModel Login { get; private set; }
         public SettingsViewModel SettingsHub { get; private set; }
         public SubredditRiverViewModel SubredditRiver { get; private set; }
@@ -96,7 +98,7 @@ namespace SnooStream.ViewModel
         public void DumpInitBlob(string navigationBlob = null)
         {
             _initializationBlob.Settings = Settings.Dump();
-            //_initializationBlob.Self = UserHub.Self.Dump();
+			_initializationBlob.Self = SelfStream.Dump();
 
 			if(RedditUserState.IsDefault)
 				_initializationBlob.DefaultUser = RedditUserState;

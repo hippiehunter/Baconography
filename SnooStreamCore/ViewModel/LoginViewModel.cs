@@ -24,7 +24,13 @@ namespace SnooStream.ViewModel
 
         private static string UnselectedUsername = "<None Selected>";
 
-		public bool IsLoggedIn { get; set; }
+		public bool IsLoggedIn
+		{
+			get
+			{
+				return !string.IsNullOrWhiteSpace(SnooStreamViewModel.RedditUserState.Username);
+			}
+		}
         private async void LoadStoredCredentials()
         {
 			try
@@ -114,6 +120,7 @@ namespace SnooStream.ViewModel
             {
                 _username = value;
                 RaisePropertyChanged("Username");
+				RaisePropertyChanged("IsLoggedIn");
             }
         }
 
@@ -243,7 +250,7 @@ namespace SnooStream.ViewModel
 				SnooStreamViewModel.RedditUserState.LoginCookie = "";
 				SnooStreamViewModel.RedditUserState.ModHash = "";
 				SnooStreamViewModel.RedditUserState.NeedsCaptcha = false;
-				SnooStreamViewModel.RedditUserState.Username = currentAccount.Name;
+				Username = SnooStreamViewModel.RedditUserState.Username = currentAccount.Name;
 				SnooStreamViewModel.RedditUserState.IsDefault = IsDefaultLogin;
 				GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = IsDefaultLogin });
 			}

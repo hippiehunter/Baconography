@@ -103,6 +103,9 @@ namespace SnooStream.ViewModel.Content
 			{
 				_viewModel = viewModel;
 			}
+
+			public void Attach(ObservableCollection<Readable> targetCollection) { }
+
 			public Task AuxiliaryItemLoader(IEnumerable<Readable> items, int timeout)
 			{
 				//nothing to load here

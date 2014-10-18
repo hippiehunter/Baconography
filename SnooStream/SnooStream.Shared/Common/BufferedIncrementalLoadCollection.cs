@@ -20,6 +20,7 @@ namespace SnooStream.Common
 		public BufferedAuxiliaryIncrementalLoadCollection(IIncrementalCollectionLoader<T> loader, int loadIncrement = 20, int auxiliaryTimeout = 2500)
 		{
 			_loader = loader;
+			loader.Attach(this);
 			_locked = false;
 			_loadIncrement = loadIncrement;
 			_auxiliaryTimeout = auxiliaryTimeout;

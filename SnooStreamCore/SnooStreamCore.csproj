@@ -86,6 +86,7 @@
     <Compile Include="ViewModel\MoreViewModel.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
     <Compile Include="ViewModel\Activities\ActivityViewModel.cs" />
+    <Compile Include="ViewModel\SelfStreamViewModel.cs" />
     <Compile Include="ViewModel\Settings\AppearanceSettingsViewModel.cs" />
     <Compile Include="ViewModel\CommentReplyViewModel.cs" />
     <Compile Include="ViewModel\CommentsViewModel.cs" />

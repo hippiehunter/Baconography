@@ -107,6 +107,8 @@ namespace SnooStream.ViewModel
 				_searchString = searchString;
 			}
 
+			public void Attach(ObservableCollection<LinkRiverViewModel> targetCollection) { }
+
 			public Task AuxiliaryItemLoader(IEnumerable<LinkRiverViewModel> items, int timeout)
 			{
 				return Task.FromResult(true);
