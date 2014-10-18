@@ -39,4 +39,12 @@
             </ListView>
         </Grid>
     </Grid>
+    <common:SnooApplicationPage.BottomAppBar>
+        <CommandBar>
+            <AppBarButton Icon="Refresh" Command="{Binding RefreshCommand}"/>
+            <AppBarButton Icon="Sort" Command="{Binding SortPopupCommand}"/>
+            <AppBarButton Icon="Upload" Command="{Binding CreateNewPostCommand}"/>
+            <AppBarButton Icon="Find" Command="{Binding FindInSubredditCommand}"/>
+        </CommandBar>
+    </common:SnooApplicationPage.BottomAppBar>
 </common:SnooApplicationPage>

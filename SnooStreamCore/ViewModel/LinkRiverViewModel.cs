@@ -1,7 +1,9 @@
 ﻿using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Services;
+using SnooStream.ViewModel.Popups;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -295,6 +297,38 @@ namespace SnooStream.ViewModel
 		public void Refresh(bool onlyNew)
 		{
 			((IRefreshable)Links).Refresh(onlyNew);
+		}
+
+		public RelayCommand RefreshCommand
+		{
+			get
+			{
+				return new RelayCommand(() => Refresh(false));
+			}
+		}
+
+		public RelayCommand SortPopupCommand
+		{
+			get
+			{
+				return new RelayCommand(() => SnooStreamViewModel.NavigationService.ShowPopup(new SortLinksViewModel(this)));
+			}
+		}
+
+		public RelayCommand CreateNewPostCommand
+		{
+			get
+			{
+				return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToPost(new PostViewModel()));
+			}
+		}
+
+		public RelayCommand FindInSubredditCommand
+		{
+			get
+			{
+				return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToSearch(new SearchViewModel()));
+			}
 		}
 	}
 }

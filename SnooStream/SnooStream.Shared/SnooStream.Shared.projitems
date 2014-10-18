@@ -85,9 +85,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\Content\VideoControl.xaml.cs">
       <DependentUpon>VideoControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\ExtendedAppBarControl.xaml.cs">
-      <DependentUpon>ExtendedAppBarControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\HubSettingsView.xaml.cs">
       <DependentUpon>HubSettingsView.xaml</DependentUpon>
     </Compile>
@@ -186,9 +183,6 @@
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\Content\VideoControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\ExtendedAppBarControl.xaml">
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\HubSettingsView.xaml">
       <SubType>Designer</SubType>
