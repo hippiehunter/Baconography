@@ -19,7 +19,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <NuGetPackageImportStamp>80898172</NuGetPackageImportStamp>
-    <EnableProjectNCompatibleProfile>false</EnableProjectNCompatibleProfile>
+    <EnableProjectNCompatibleProfile>true</EnableProjectNCompatibleProfile>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
     <AppxBundlePlatforms>x86</AppxBundlePlatforms>

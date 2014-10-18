@@ -238,7 +238,14 @@ namespace SnooStream.ViewModel
 				Working = true;
 				var oAuth = await SnooStreamViewModel.RedditService.RequestGrantCode(code);
 				SnooStreamViewModel.RedditUserState.OAuth = oAuth;
-				GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = false });
+				var currentAccount = await SnooStreamViewModel.RedditService.GetIdentity();
+				SnooStreamViewModel.RedditUserState.IsGold = currentAccount.IsGold;
+				SnooStreamViewModel.RedditUserState.LoginCookie = "";
+				SnooStreamViewModel.RedditUserState.ModHash = "";
+				SnooStreamViewModel.RedditUserState.NeedsCaptcha = false;
+				SnooStreamViewModel.RedditUserState.Username = currentAccount.Name;
+				SnooStreamViewModel.RedditUserState.IsDefault = IsDefaultLogin;
+				GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = IsDefaultLogin });
 			}
 			finally
 			{

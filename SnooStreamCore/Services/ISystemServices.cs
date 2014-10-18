@@ -17,12 +17,9 @@ namespace SnooStream.Services
         void RunAsync(Func<object, Task> action);
 		void RunUIAsync(Func<Task> action);
 		void RunUIIdleAsync(Func<Task> action);
-        Task<string> SendGet(string uri);
         void StartThreadPoolTimer(Func<object, Task> action, TimeSpan timer);
         Task<byte[]> DownloadWithProgress(string uri, Action<int> progress, CancellationToken cancelToken);
 		IImageLoader DownloadImageWithProgress(string uri, Action<int> progress, CancellationToken cancelToken, Action<Exception> errorHandler);
-        Task<byte[]> ResizeImage(byte[] data, int maxWidth, int maxHeight);
-        Stream ResizeImage(Stream source, int maxWidth, int maxHeight);
         void ShowMessage(string title, string text);
         bool IsLowPriorityNetworkOk { get; }
         bool IsHighPriorityNetworkOk { get; }

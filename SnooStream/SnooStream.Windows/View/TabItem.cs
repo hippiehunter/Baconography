@@ -10,18 +10,6 @@ namespace SnooStream.View.Controls
 {
 	public class TabItem : ContentControl
 	{
-		public bool IsEnabled
-		{
-			get { return (bool)GetValue(IsEnabledProperty); }
-			set { SetValue(IsEnabledProperty, value); }
-		}
-
-		// Using a DependencyProperty as the backing store for IsEnabled.  This enables animation, styling, binding, etc...
-		public static readonly DependencyProperty IsEnabledProperty =
-			DependencyProperty.Register("IsEnabled", typeof(bool), typeof(TabItem), new PropertyMetadata(null));
-
-		
-
 		public string Header
 		{
 			get { return (string)GetValue(HeaderProperty); }

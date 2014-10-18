@@ -96,6 +96,10 @@ namespace SnooStream.ViewModel
         {
             _initializationBlob.Settings = Settings.Dump();
             //_initializationBlob.Self = UserHub.Self.Dump();
+
+			if(RedditUserState.IsDefault)
+				_initializationBlob.DefaultUser = RedditUserState;
+
 			_initializationBlob.NavigationBlob = navigationBlob;
 			_initializationBlob.Subreddits = SubredditRiver.Dump();
             OfflineService.StoreInitializationBlob(_initializationBlob);
