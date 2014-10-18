@@ -10,53 +10,25 @@
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
-        <local:TabbedContainer Title="CONTENT" Style="{StaticResource SettingsPivot}">
+        <local:TabbedContainer Title="CONTENT">
             <local:TabItem Margin="0,0,0,24"
 				Header="SETTINGS">
 
                 <ScrollViewer Grid.Row="1" Margin="0,0,0,0" DataContext="{Binding Settings}">
                     <StackPanel Margin="12,12,12,0">
-                        <ToggleSwitch Header="Allow NSFW (over 18) content"
-                                        IsOn="{Binding AllowNSFWContent, Mode=TwoWay}"
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
-                        <ToggleSwitch Header="Only flipview unvisited content"
-                                        IsOn="{Binding OnlyFlipViewUnread, Mode=TwoWay}"
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
-                        <ToggleSwitch Header="Only flipview through images"
-                                        IsOn="{Binding OnlyFlipViewImages, Mode=TwoWay}"
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
-                        <ToggleSwitch Header="Visit web links in app"
-                                        IsOn="{Binding OptimizeWebContent, Mode=TwoWay}"
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Allow NSFW (over 18) content" IsOn="{Binding AllowOver18, Mode=TwoWay}" />
+                        <ToggleSwitch Header="Only flipview unvisited content" IsOn="{Binding OnlyFlipViewUnread, Mode=TwoWay}" />
+                        <ToggleSwitch Header="Only flipview through images" IsOn="{Binding OnlyFlipViewImages, Mode=TwoWay}" />
+                        <ToggleSwitch Header="Visit web links in browser" IsOn="{Binding OpenLinksInBrowser, Mode=TwoWay}"  />
 
                         <TextBlock FontWeight="SemiBold" Text="LAYOUT"/>
-                        <ToggleSwitch Header="Left-handed thumbnail layout"
-                                        IsOn="{Binding LeftHandedMode, Mode=TwoWay}"
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
-                        <ToggleSwitch Header="Use single-reddit layout"
-                                        IsOn="{Binding SimpleLayoutMode, Mode=TwoWay}"
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
-                        <ToggleSwitch Header="Enable one-touch voting"
-                                        IsOn="{Binding OneTouchVoteMode, Mode=TwoWay}"
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
-                        <ToggleSwitch Header="Lock current orientation"
-                                        IsOn="{Binding OrientationLock, Mode=TwoWay}"
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
-                        <ToggleSwitch Header="Tap title for comments"
-                                        IsOn="{Binding TapForComments, Mode=TwoWay}" 
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
-                        <ToggleSwitch Header="Invert system theme"
-                                        IsOn="{Binding InvertSystemTheme, Mode=TwoWay}" 
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
-                        <ToggleSwitch Header="Use multi-color comment margins"
-                                        IsOn="{Binding MultiColorCommentMargins, Mode=TwoWay}" 
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                        <ToggleSwitch Header="Invert system theme" IsOn="{Binding InvertSystemTheme, Mode=TwoWay}" />
+                        <ToggleSwitch Header="Use multi-color comment margins" IsOn="{Binding MultiColorCommentMargins, Mode=TwoWay}" />
 
 
                         <TextBlock FontWeight="SemiBold" Text="BACKGROUND"/>
                         <ToggleSwitch Header="Disable background activity"
-                                        IsOn="{Binding DisableBackground, Mode=TwoWay}" 
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
+                                        IsOn="{Binding DisableBackground, Mode=TwoWay}" />
                         <StackPanel Orientation="Horizontal">
                             <TextBlock HorizontalAlignment="Left" FontWeight="SemiBold" Text="OFFLINE CONTENT"/>
                             <Button 
@@ -67,12 +39,6 @@
                                             Content="&#xE11B;" Style="{StaticResource RoundButtonStyle}"/>
                         </StackPanel>
 
-                        <ToggleSwitch Header="Predictive offline caching"
-                                        IsOn="{Binding AllowPredictiveOfflining, Mode=TwoWay}" 
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
-                        <ToggleSwitch Header="Overnight offline caching"
-                                        IsOn="{Binding EnableOvernightUpdates, Mode=TwoWay}" 
-                                        HeaderTemplate="{StaticResource RadToggleContent}"/>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Margin="12,0,0,0" Text="Cleanup data every"/>
                             <TextBlock Margin="6,0,0,0" Text="{Binding OfflineCacheDays}" />

@@ -32,6 +32,7 @@ namespace SnooStream.ViewModel
 				_initializationBlob = OfflineService.LoadInitializationBlob("");
 			}
 			Settings = new Model.Settings(_initializationBlob.Settings);
+			SettingsHub = new SettingsViewModel(Settings);
 			RedditUserState = _initializationBlob.DefaultUser ?? new UserState();
 			NotificationService = new Common.NotificationService();
 			CaptchaProvider = new CaptchaService();
