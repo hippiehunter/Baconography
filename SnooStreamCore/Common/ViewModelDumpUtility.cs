@@ -38,14 +38,14 @@ namespace SnooStream.Common
 				//	}
 				case "CommentsViewModel":
 					{
-						var dumpArgs = JsonConvert.DeserializeObject<Tuple<Listing, string, string>>(stateItem.Item2);
+						var dumpArgs = JsonConvert.DeserializeObject<Tuple<Listing, string, string, DateTime?>>(stateItem.Item2);
 						LinkViewModel targetContext = null;
 						//if (context is LinkStreamViewModel)
 						//	targetContext = ((LinkStreamViewModel)context).Current; else
 						if (context is LinkRiverViewModel)
 							targetContext = ((LinkRiverViewModel)context).Links.FirstOrDefault(link => link.Link.Id == dumpArgs.Item3);
 
-						var comments = new CommentsViewModel(targetContext, dumpArgs.Item1, dumpArgs.Item2);
+						var comments = new CommentsViewModel(targetContext, dumpArgs.Item1, dumpArgs.Item2, dumpArgs.Item4);
 						if (targetContext != null)
 							targetContext.Comments = comments;
 
@@ -81,7 +81,7 @@ namespace SnooStream.Common
 			else if (viewModel is CommentsViewModel)
 			{
 				var comments = viewModel as CommentsViewModel;
-				return JsonConvert.SerializeObject(Tuple.Create("CommentsViewModel", JsonConvert.SerializeObject(Tuple.Create(comments.DumpListing(), comments.Link.Url, comments.Link.Link.Id))));
+				return JsonConvert.SerializeObject(Tuple.Create("CommentsViewModel", JsonConvert.SerializeObject(Tuple.Create(comments.DumpListing(), comments.Link.Url, comments.Link.Link.Id, comments.LastRefresh))));
 			}
             else if (viewModel is LockScreenViewModel
                 || viewModel is SettingsViewModel)

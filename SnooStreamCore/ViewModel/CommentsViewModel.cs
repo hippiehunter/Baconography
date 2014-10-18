@@ -21,7 +21,7 @@ namespace SnooStream.ViewModel
     
     //this class needs to take care of storing off prior comment sets so we can point the user directly to
     //the comments that have been either edited, added, or deleted
-    public class CommentsViewModel : ViewModelBase
+    public class CommentsViewModel : ViewModelBase, IRefreshable
     {
         private class CommentShell
         {
@@ -65,8 +65,9 @@ namespace SnooStream.ViewModel
             ProcessUrl(url);
         }
 
-		public CommentsViewModel(ViewModelBase context, Listing comments, string url)
+		public CommentsViewModel(ViewModelBase context, Listing comments, string url, DateTime? lastRefresh)
 		{
+			LastRefresh = lastRefresh;
 			_context = context;
 			Link = _context as LinkViewModel;
 			_loadFullSentinel = new LoadFullCommentsViewModel(this);
@@ -133,6 +134,7 @@ namespace SnooStream.ViewModel
         }
         public string BaseUrl { get; private set; }
         public LinkViewModel Link { get; private set; }
+		public DateTime? LastRefresh { get; set; }
 
         public ObservableCollection<ViewModelBase> FlatComments { get; private set; }
 
@@ -610,6 +612,7 @@ namespace SnooStream.ViewModel
 
         public async Task LoadAndMergeFull(bool isContext)
         {
+			LastRefresh = DateTime.Now;
             var flatChildren = await LoadImpl(isContext);
 
             if (flatChildren.Count > 0)
@@ -627,6 +630,20 @@ namespace SnooStream.ViewModel
                 }
             }
         }
+
+		public void SetSort(string sort)
+		{
+			Sort = sort;
+			Refresh(false);
+		}
+
+		public void MaybeRefresh()
+		{
+			if (LastRefresh == null || (DateTime.Now - LastRefresh.Value).TotalMinutes > 30)
+			{
+				Refresh(false);
+			}
+		}
 
         public RelayCommand GotoLink
         {
@@ -651,12 +668,5 @@ namespace SnooStream.ViewModel
                 return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoEditPost(_context, Link));
             }
         }
-
-
-		public void SetSort(string sort)
-		{
-			Sort = sort;
-			Refresh(false);
-		}
 	}
 }
