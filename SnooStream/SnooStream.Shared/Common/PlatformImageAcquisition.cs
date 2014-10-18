@@ -9,6 +9,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Foundation;
 using Windows.Graphics.Imaging;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
@@ -29,6 +30,27 @@ namespace SnooStream.Common
 			return res;
 		}
 
+		private static void RegisterCancel(CancellationToken cancelToken, IAsyncInfo asyncOperation)
+		{
+			WeakReference<IAsyncInfo> _weakRef = new WeakReference<IAsyncInfo>(asyncOperation);
+			cancelToken.Register(() =>
+				{
+					try
+					{
+						IAsyncInfo target;
+						if (_weakRef.TryGetTarget(out target))
+						{
+							target.Cancel();
+						}
+						_weakRef = null;
+					}
+					catch 
+					{
+						_weakRef = null;
+					}
+				});
+		}
+
 		public static async Task<String> ImagePreviewFromUrl(string url, CancellationToken cancelToken)
 		{
 			string onDiskName = "snoostream_preview" + ComputeMD5(url);
@@ -44,14 +66,7 @@ namespace SnooStream.Common
 						using (var client = new HttpClient())
 						{
 							var asyncHttpOp = client.GetAsync(new Uri(url), HttpCompletionOption.ResponseContentRead);
-							cancelToken.Register(() =>
-								{
-									try
-									{
-										asyncHttpOp.Cancel();
-									}
-									catch { }
-								});
+							RegisterCancel(cancelToken, asyncHttpOp);
 							using (var response = await asyncHttpOp)
 							{
 								using (var content = response.Content)
@@ -61,14 +76,7 @@ namespace SnooStream.Common
 										throw new OperationCanceledException();
 
 									var readBufferOp = content.ReadAsBufferAsync();
-									cancelToken.Register(() =>
-									{
-										try
-										{
-											readBufferOp.Cancel();
-										}
-										catch { }
-									});
+									RegisterCancel(cancelToken, readBufferOp);
 									var buffer = await readBufferOp;
 									try
 									{
@@ -77,7 +85,7 @@ namespace SnooStream.Common
 										using (var source = new BufferImageSource(buffer))
 										{
 											var info = await source.GetInfoAsync();
-											
+
 											if (source.ImageFormat == ImageFormat.Jpeg && info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024)
 											{
 												var resizedBuffer = await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(buffer, new Nokia.Graphics.Imaging.AutoResizeConfiguration(1024 * 1024,
@@ -92,7 +100,7 @@ namespace SnooStream.Common
 														((IDisposable)resizedBuffer).Dispose();
 												}
 											}
-											else if(info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024 || source.ImageFormat == ImageFormat.Gif)
+											else if (info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024 || source.ImageFormat == ImageFormat.Gif)
 											{
 												using (var jpegRenderer = new JpegRenderer(source))
 												{
@@ -131,7 +139,7 @@ namespace SnooStream.Common
 						}
 					}
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					failed = ex;
 				}
