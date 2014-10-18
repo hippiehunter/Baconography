@@ -107,8 +107,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
-				SnooStream.ViewModel.SnooStreamViewModel.SystemServices.ShowMessage("error", ex.ToString());
+				SnooStream.ViewModel.SnooStreamViewModel.Logging.Log(ex);
             }
             finally
             {
@@ -131,8 +130,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
-				SnooStream.ViewModel.SnooStreamViewModel.SystemServices.ShowMessage("error", ex.ToString());
+				SnooStream.ViewModel.SnooStreamViewModel.Logging.Log(ex);
             }
             finally
             {
@@ -166,8 +164,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
-                SnooStream.ViewModel.SnooStreamViewModel.SystemServices.ShowMessage("error", ex.ToString());
+				SnooStream.ViewModel.SnooStreamViewModel.Logging.Log(ex);
             }
             finally
             {
