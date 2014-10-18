@@ -14,7 +14,7 @@
         <FlipView x:Name="flipView" ItemsSource="{Binding LinksViewSource.UnderlyingSource.View}" SelectionChanged="flipView_SelectionChanged" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <FlipView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <VirtualizingStackPanel Orientation="Horizontal" VirtualizingStackPanel.VirtualizationMode="Recycling"/>
+                    <VirtualizingStackPanel Orientation="Horizontal" VirtualizingStackPanel.VirtualizationMode="Standard"/>
                 </ItemsPanelTemplate>
             </FlipView.ItemsPanel>
             <FlipView.ItemContainerStyle>
