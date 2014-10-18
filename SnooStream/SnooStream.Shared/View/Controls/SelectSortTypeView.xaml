@@ -7,7 +7,7 @@
     d:DesignHeight="480" d:DesignWidth="480">
 
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-            MinWidth="250" MinHeight="300">
+            MinWidth="250" MinHeight="300" Background="{ThemeResource GridViewItemPlaceholderBackgroundThemeBrush}">
         <Border BorderThickness="1">
             <StackPanel Margin="12,12,0,0">
                 <TextBlock FontWeight="SemiBold">SELECT SORT TYPE</TextBlock>
@@ -21,8 +21,8 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Name="button_ok">OK</Button>
-                    <Button Grid.Column="1" Name="button_cancel">Cancel</Button>
+                    <Button Grid.Column="0" x:FieldModifier="public" Name="button_ok">OK</Button>
+                    <Button Grid.Column="1" x:FieldModifier="public" Name="button_cancel">Cancel</Button>
                 </Grid>
             </StackPanel>
         </Border>

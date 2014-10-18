@@ -84,7 +84,6 @@
     <Compile Include="ViewModel\IRefreshable.cs" />
     <Compile Include="ViewModel\LoadFullCommentsViewModel.cs" />
     <Compile Include="ViewModel\MoreViewModel.cs" />
-    <Compile Include="ViewModel\Popups\SortLinksViewModel.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
     <Compile Include="ViewModel\Activities\ActivityViewModel.cs" />
     <Compile Include="ViewModel\SelfStreamViewModel.cs" />

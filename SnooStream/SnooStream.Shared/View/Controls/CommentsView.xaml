@@ -205,6 +205,22 @@
                     CommentTemplate="{StaticResource CommentViewTemplate}"
                     MoreTemplate="{StaticResource MoreViewTemplate}" />
         </Grid.Resources>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Normal"/>
+                <VisualState x:Name="ShowSortPopup">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames
+                                                Storyboard.TargetName="sortPopup"
+                                                Storyboard.TargetProperty="IsOpen">
+                            <DiscreteObjectKeyFrame
+                                                    KeyTime="0"
+                                                    Value="True" />
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
         <ListView x:Name="commentsList" HeaderTemplate="{StaticResource HeaderTemplate}"
                   ItemTemplateSelector="{Binding Path=Selector, Source={StaticResource commentTemplateSelector}}"
                   ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging">

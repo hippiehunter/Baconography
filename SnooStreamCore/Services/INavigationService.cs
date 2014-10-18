@@ -23,6 +23,8 @@ namespace SnooStream.Services
 		void NavigateToContentSettings(SettingsViewModel viewModel);
 		void NavigateToLockScreenSettings(SettingsViewModel viewModel);
         Task<bool> ShowPopup(ViewModelBase viewModel);
+		void PushVisualState(object sender, string visualState);
+		void PopVisualState();
         void GoBack();
 
         void ValidateStates(HashSet<string> validStates);

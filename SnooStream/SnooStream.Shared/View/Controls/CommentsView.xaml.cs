@@ -61,19 +61,19 @@ namespace SnooStream.View.Controls
 			child.SortOrder = commentsViewModel.Sort;
 			child.Height = height;
 			child.Width = width;
-			//child.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
-			//{
-			//	sortPopup.IsOpen = false;
-			//	commentsViewModel.Sort = child.SortOrder;
-			//};
+			child.button_ok.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
+			{
+				commentsViewModel.SetSort(child.SortOrder);
+				SnooStreamViewModel.NavigationService.PopVisualState();
+			};
 
-			//child.button_cancel.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
-			//{
-			//	sortPopup.IsOpen = false;
-			//};
+			child.button_cancel.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
+			{
+				SnooStreamViewModel.NavigationService.PopVisualState();
+			};
 
 			sortPopup.Child = child;
-			sortPopup.IsOpen = true;
+			SnooStreamViewModel.NavigationService.PushVisualState(LayoutRoot, "ShowSortPopup");
 		}
 
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)

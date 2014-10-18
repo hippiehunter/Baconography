@@ -448,9 +448,9 @@ namespace SnooStream.ViewModel
             return _loadFullTask.Value;
         }
 
-        public Task Refresh()
+        public async void Refresh(bool onlyNew)
         {
-            return LoadAndMergeFull(IsContext);
+            await LoadAndMergeFull(IsContext);
         }
 
 		public IEnumerable<ViewModelBase> Decendents(string id)
@@ -652,5 +652,11 @@ namespace SnooStream.ViewModel
             }
         }
 
-    }
+
+		public void SetSort(string sort)
+		{
+			Sort = sort;
+			Refresh(false);
+		}
+	}
 }

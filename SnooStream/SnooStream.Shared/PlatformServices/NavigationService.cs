@@ -166,5 +166,18 @@ namespace SnooStream.PlatformServices
 		{
 			_frame.Navigate(typeof(ContentRiver), "state=" + _navState.AddState(viewModel));
 		}
+
+
+		public void PushVisualState(object sender, string visualState)
+		{
+			var snooApplicationPage = _frame.Content as SnooApplicationPage;
+			snooApplicationPage.PushNavState(sender, visualState);
+		}
+
+		public void PopVisualState()
+		{
+			var snooApplicationPage = _frame.Content as SnooApplicationPage;
+			snooApplicationPage.PopNavState();
+		}
 	}
 }

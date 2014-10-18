@@ -3,7 +3,6 @@ using GalaSoft.MvvmLight.Command;
 using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Services;
-using SnooStream.ViewModel.Popups;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -149,7 +148,7 @@ namespace SnooStream.ViewModel
 
 			public async Task Refresh(ObservableCollection<LinkViewModel> current, bool onlyNew)
 			{
-				var postListing = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(_linkRiverViewModel.Thing.Url + ".json?sort=" + _linkRiverViewModel.Sort, _linkRiverViewModel.LastLinkId);
+				var postListing = await SnooStreamViewModel.RedditService.GetPostsBySubreddit(_linkRiverViewModel.Thing.Url, _linkRiverViewModel.Sort); 
 				if (postListing != null)
 				{
 					_linkRiverViewModel.LastRefresh = DateTime.Now;
@@ -188,7 +187,7 @@ namespace SnooStream.ViewModel
 					}
 					replace.RemoveAll((tpl) => update.Contains(tpl.Item2) || move.Any(tpl2 => tpl2.Item3 == tpl.Item2));
 
-					SnooStreamViewModel.SystemServices.RunUIAsync(async () =>
+					SnooStreamViewModel.SystemServices.RunUIIdleAsync(async () =>
 					{
 						foreach (var link in update)
 						{
@@ -299,19 +298,17 @@ namespace SnooStream.ViewModel
 			((IRefreshable)Links).Refresh(onlyNew);
 		}
 
+		public async void SetSort(string sort)
+		{
+			Sort = sort;
+			Refresh(false);
+		}
+
 		public RelayCommand RefreshCommand
 		{
 			get
 			{
 				return new RelayCommand(() => Refresh(false));
-			}
-		}
-
-		public RelayCommand SortPopupCommand
-		{
-			get
-			{
-				return new RelayCommand(() => SnooStreamViewModel.NavigationService.ShowPopup(new SortLinksViewModel(this)));
 			}
 		}
 

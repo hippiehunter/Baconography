@@ -34,5 +34,42 @@ namespace SnooStream.View.Pages
 			var card = args.ItemContainer.ContentTemplateRoot as CardLinkView;
 			card.PhaseLoad(sender, args);
 		}
+
+		private void Sort_Click(object sender, RoutedEventArgs e)
+		{
+			double height = 480;
+			double width = 325;
+
+			if (LayoutRoot.ActualHeight <= 480)
+				height = LayoutRoot.ActualHeight;
+
+			sortPopup.Height = height;
+			sortPopup.Width = width;
+
+			var linkRiverViewModel = DataContext as LinkRiverViewModel;
+			if (linkRiverViewModel == null)
+				return;
+
+
+			var child = sortPopup.Child as SelectSortTypeView;
+			if (child == null)
+				child = new SelectSortTypeView();
+			child.SortOrder = linkRiverViewModel.Sort;
+			child.Height = height;
+			child.Width = width;
+			child.button_ok.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
+			{
+				linkRiverViewModel.SetSort(child.SortOrder);
+				PopNavState();
+			};
+
+			child.button_cancel.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
+			{
+				PopNavState();
+			};
+
+			sortPopup.Child = child;
+			PushNavState(this, "ShowSortPopup");
+		}
     }
 }
