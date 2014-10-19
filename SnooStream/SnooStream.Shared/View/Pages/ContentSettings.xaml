@@ -16,7 +16,8 @@
 
                 <ScrollViewer Grid.Row="1" Margin="0,0,0,0" DataContext="{Binding Settings}">
                     <StackPanel Margin="12,12,12,0">
-                        <ToggleSwitch Header="Allow NSFW (over 18) content" IsOn="{Binding AllowOver18, Mode=TwoWay}" />
+                        <ToggleSwitch Header="Allow NSFW (over 18) subreddits" IsOn="{Binding AllowOver18, Mode=TwoWay}" />
+                        <ToggleSwitch Header="Allow NSFW (over 18) content" IsOn="{Binding AllowOver18Items, Mode=TwoWay}" />
                         <ToggleSwitch Header="Only flipview unvisited content" IsOn="{Binding OnlyFlipViewUnread, Mode=TwoWay}" />
                         <ToggleSwitch Header="Only flipview through images" IsOn="{Binding OnlyFlipViewImages, Mode=TwoWay}" />
                         <ToggleSwitch Header="Visit web links in browser" IsOn="{Binding OpenLinksInBrowser, Mode=TwoWay}"  />
