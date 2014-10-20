@@ -33,7 +33,7 @@ namespace SnooStream.ViewModel
 			}
 			Settings = new Model.Settings(_initializationBlob.Settings);
 			SettingsHub = new SettingsViewModel(Settings);
-			SelfStream = new SelfStreamViewModel(_initializationBlob.Self);
+			
 			RedditUserState = _initializationBlob.DefaultUser ?? new UserState();
 			NotificationService = new Common.NotificationService();
 			CaptchaProvider = new CaptchaService();
@@ -43,6 +43,7 @@ namespace SnooStream.ViewModel
 			_listingFilter.Initialize(Settings, OfflineService, RedditService, _initializationBlob.NSFWFilter);
 			CommandDispatcher = new CommandDispatcher();
 			SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
+			SelfStream = new SelfStreamViewModel(_initializationBlob.Self);
 			MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
 		}
 

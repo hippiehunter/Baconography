@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-	public class SelfStreamViewModel : ViewModelBase
+	public class SelfStreamViewModel : ViewModelBase, IRefreshable
 	{
 		public class SelfActivityAggregate : IIncrementalCollectionLoader<ViewModelBase>
 		{
@@ -196,6 +196,7 @@ namespace SnooStream.ViewModel
 				OldestMessage = selfInit.AfterSelfMessage;
 				OldestSentMessage = selfInit.AfterSelfSentMessage;
 				OldestActivity = selfInit.AfterSelfAction;
+				MaybeRefresh();
 			}
 
 			MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
@@ -347,6 +348,21 @@ namespace SnooStream.ViewModel
 				AfterSelfMessage = OldestMessage,
 				AfterSelfSentMessage = OldestSentMessage
 			};
+		}
+
+		public void MaybeRefresh()
+		{
+			if (LastRefresh == null || (DateTime.Now - LastRefresh.Value).TotalMinutes > 30)
+				Refresh(false);
+		}
+
+		public async void Refresh(bool onlyNew)
+		{
+			if (!onlyNew)
+			{
+				Groups.Clear();
+				await PullNew();
+			}
 		}
 	}
 }
