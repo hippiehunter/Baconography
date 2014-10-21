@@ -1,4 +1,5 @@
-﻿using SnooSharp;
+﻿using MetroLog;
+using SnooSharp;
 using SnooStream.Model;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace SnooStream.Common
         Reddit _redditService;
         CacheStore<Task<bool>> _nsfwParentCache = new CacheStore<Task<bool>>();
         Dictionary<string, bool> _initialFilter;
-
+		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<NSFWListingFilter>();
         public void Initialize(Settings settings, OfflineService offlineService, Reddit redditService, Dictionary<string, bool> initialFilter)
         {
             _settings = settings;
@@ -73,7 +74,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("encountered exception while checking NSFW of a subreddit {0}", ex);
+                _logger.Error("encountered exception while checking NSFW of a subreddit", ex);
                 return false;
             }
         }

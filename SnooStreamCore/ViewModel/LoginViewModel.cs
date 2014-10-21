@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using MetroLog;
 using SnooSharp;
 using SnooStream.Messages;
 using SnooStream.Services;
@@ -16,6 +17,7 @@ namespace SnooStream.ViewModel
 {
     public class LoginViewModel : ViewModelBase
     {
+		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<LoginViewModel>();
         public LoginViewModel()
         {
             StoredCredentials = new ObservableCollection<UserCredential>();
@@ -52,7 +54,7 @@ namespace SnooStream.ViewModel
 			}
 			catch(Exception ex)
 			{
-				Debug.WriteLine(ex.ToString());
+				_logger.Error("failed loading stored credentials", ex);
 			}
         }
 

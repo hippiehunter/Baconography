@@ -1,4 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
+using MetroLog;
+using MetroLog.Targets;
 using Nokia.Graphics.Imaging;
 using Nokia.InteropServices.WindowsRuntime;
 using SnooStream.Common;
@@ -32,6 +34,7 @@ namespace SnooStream.PlatformServices
 {
 	class SystemServices : ISystemServices
 	{
+		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SystemServices>();
 		private Task<CoreDispatcher> _uiDispatcher;
 		private TaskCompletionSource<CoreDispatcher> _uiDispatcherSource = new TaskCompletionSource<CoreDispatcher>();
 		public SystemServices()
@@ -373,7 +376,10 @@ namespace SnooStream.PlatformServices
 										_queuedNonCritical.Clear();
 									}
 								}
-								catch { }
+								catch (Exception ex)
+								{
+									_logger.Error("failed draining non critical UI Queue", ex);
+								}
 							});
 				}
 				await Task.Delay(100);
@@ -388,6 +394,7 @@ namespace SnooStream.PlatformServices
 
 		private class ImageLoader : ObservableObject, IImageLoader
 		{
+			static ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<ImageLoader>();
 			private bool _isGif;
 			private string _url;
 			GifRenderer.GifPayload _gifPayload;
@@ -427,6 +434,8 @@ namespace SnooStream.PlatformServices
 								}
 								else
 								{
+									_logger.Error("failed getting Gif Payload for url: " + _url, tsk.Exception);
+
 									if (_errorHandler != null)
 										_errorHandler(tsk.Exception);
 								}
@@ -495,13 +504,13 @@ namespace SnooStream.PlatformServices
 							}
 							catch (Exception ex)
 							{
-								Debug.WriteLine(ex.ToString());
+								_logger.Error("action failed in RunUIAsync", ex);
 							}
 						});
 			}
 			catch (Exception ex)
 			{
-				Debug.WriteLine(ex.ToString());
+				_logger.Error("action failed in RunUIAsync", ex);
 			}
 		}
 
@@ -515,7 +524,7 @@ namespace SnooStream.PlatformServices
 					}
 					catch (Exception ex)
 					{
-						Debug.WriteLine(ex.ToString());
+						_logger.Error("action failed in RunUIIdleAsync", ex);
 					}
 				});
 		}

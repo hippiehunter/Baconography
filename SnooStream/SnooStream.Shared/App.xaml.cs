@@ -1,4 +1,6 @@
-﻿using SnooStream.Common;
+﻿using MetroLog;
+using MetroLog.Targets;
+using SnooStream.Common;
 using SnooStream.Messages;
 using SnooStream.PlatformServices;
 using SnooStream.Services;
@@ -35,9 +37,12 @@ namespace SnooStream
         /// </summary>
         public App()
         {
-			
+			LogManagerFactory.DefaultConfiguration.AddTarget(LogLevel.Trace, LogLevel.Fatal, new FileStreamingTarget());
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
+
+			// setup the global crash handler...
+			GlobalCrashHandler.Configure();
         }
 
 		protected override void OnActivated(IActivatedEventArgs args)

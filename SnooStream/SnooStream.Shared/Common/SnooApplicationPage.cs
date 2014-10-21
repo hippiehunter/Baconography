@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
+using MetroLog;
 using Microsoft.Xaml.Interactivity;
 using SnooStream.Messages;
 using SnooStream.PlatformServices;
@@ -23,6 +24,7 @@ namespace SnooStream.Common
     public class SnooApplicationPage : Page
     {
         OrientationManager _orientationManager;
+		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooApplicationPage>();
         public SnooApplicationPage()
         {
 			try
@@ -117,6 +119,7 @@ namespace SnooStream.Common
             
 			try
 			{
+				_logger.Info("navigating to page " + GetType().Name);
 				var validParameters = Frame.ForwardStack
 					.Concat(Frame.BackStack)
 					.Select(stackEntry => GetStateGuid(stackEntry.Parameter as string))
@@ -135,6 +138,7 @@ namespace SnooStream.Common
 
 				if (_stateGuid != null)
 				{
+					_logger.Info("loading state guid for page " + GetType().Name);
 					SystemServices.WrappedCollectionViewSource._dataBinding = true;
 					DataContext = NavigationStateUtility.GetDataContext(_stateGuid);
 					SystemServices.WrappedCollectionViewSource._dataBinding = false;
@@ -147,9 +151,10 @@ namespace SnooStream.Common
 			}
 			catch(Exception ex)
 			{
-				Debug.WriteLine(ex.ToString());
+				_logger.Error("Failed navigating to page " + GetType().Name, ex);
 			}
 			base.OnNavigatedTo(e);
+			_logger.Info("finished loading page " + GetType().Name);
         }
 
 		public bool PopNavState()
