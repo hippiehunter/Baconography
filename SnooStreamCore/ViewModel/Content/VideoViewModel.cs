@@ -43,7 +43,10 @@ namespace SnooStream.ViewModel.Content
 			var playableStreams = await _videoResult.Value.PlayableStreams(CancelToken.Token);
 			SnooStreamViewModel.SystemServices.RunUIAsync(() =>
 				{
-					BestPlayableUrl = playableStreams.FirstOrDefault().Item1;
+					if (playableStreams != null && playableStreams.Count() > 0)
+					{
+						BestPlayableUrl = playableStreams.FirstOrDefault().Item1;
+					}
 					return Task.FromResult(true);
 				});
 			

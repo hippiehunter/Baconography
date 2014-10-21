@@ -487,7 +487,17 @@ namespace SnooStream.PlatformServices
 					await action();
 				}
 				else
-					await (await _uiDispatcher).RunAsync(CoreDispatcherPriority.Normal, async () => await action());
+					await (await _uiDispatcher).RunAsync(CoreDispatcherPriority.Normal, async () =>
+						{
+							try
+							{
+								await action();
+							}
+							catch (Exception ex)
+							{
+								Debug.WriteLine(ex.ToString());
+							}
+						});
 			}
 			catch (Exception ex)
 			{
@@ -497,7 +507,17 @@ namespace SnooStream.PlatformServices
 
 		public async void RunUIIdleAsync(Func<Task> action)
 		{
-			await (await _uiDispatcher).RunIdleAsync(async (dispArgs) => await action());
+			await (await _uiDispatcher).RunIdleAsync(async (dispArgs) => 
+				{
+					try
+					{
+						await action();
+					}
+					catch (Exception ex)
+					{
+						Debug.WriteLine(ex.ToString());
+					}
+				});
 		}
 
 

@@ -63,22 +63,18 @@ namespace SnooStream.ViewModel
         }
 
         private string _body;
-        public string Body
-        {
-            get
-            {
-                return _body;
-            }
-            set
-            {
-                _body = value;
-                BodyMD = SnooStreamViewModel.MarkdownProcessor.Process(value);
-                RaisePropertyChanged("Body");
-                RaisePropertyChanged("BodyMD");
-            }
-        }
-
-        public object BodyMD { get; private set; }
+		public string Body
+		{
+			get
+			{
+				return _body;
+			}
+			set
+			{
+				_body = value;
+				RaisePropertyChanged("Body");
+			}
+		}
 
         public string PosterName
         {
