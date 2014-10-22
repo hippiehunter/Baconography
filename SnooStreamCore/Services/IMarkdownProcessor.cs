@@ -10,6 +10,7 @@ namespace SnooStream.Services
     {
         MarkdownData Process(string markdown);
 		IEnumerable<KeyValuePair<string, string>> GetLinks(MarkdownData mkd);
+		bool IsPlainText(MarkdownData mdk);
     }
     public class MarkdownData
     {

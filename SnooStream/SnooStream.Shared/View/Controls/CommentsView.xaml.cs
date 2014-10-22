@@ -101,6 +101,16 @@ namespace SnooStream.View.Controls
 				var card = args.ItemContainer.ContentTemplateRoot as CardLinkView;
 				card.PhaseLoad(sender, args);
 			}
+			else if (args.ItemContainer.ContentTemplateRoot is CommentView)
+			{
+				var comment = args.ItemContainer.ContentTemplateRoot as CommentView;
+				comment.DataContext = args.Item;
+				comment.PhaseLoad(sender, args);
+			}
+			else
+			{
+
+			}
 		}
 	}
 }

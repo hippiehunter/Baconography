@@ -32,7 +32,8 @@ namespace SnooStream.View.Pages
 		private void linksListView_ContainerContentChanging(Windows.UI.Xaml.Controls.ListViewBase sender, Windows.UI.Xaml.Controls.ContainerContentChangingEventArgs args)
 		{
 			var card = args.ItemContainer.ContentTemplateRoot as CardLinkView;
-			card.PhaseLoad(sender, args);
+			if(card != null)
+				card.PhaseLoad(sender, args);
 		}
 
 		private void Sort_Click(object sender, RoutedEventArgs e)

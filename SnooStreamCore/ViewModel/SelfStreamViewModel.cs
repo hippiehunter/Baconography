@@ -352,8 +352,11 @@ namespace SnooStream.ViewModel
 
 		public void MaybeRefresh()
 		{
-			if (LastRefresh == null || (DateTime.Now - LastRefresh.Value).TotalMinutes > 30)
-				Refresh(false);
+			if (!string.IsNullOrWhiteSpace(SnooStreamViewModel.RedditUserState.Username))
+			{
+				if (LastRefresh == null || (DateTime.Now - LastRefresh.Value).TotalMinutes > 30)
+					Refresh(false);
+			}
 		}
 
 		public async void Refresh(bool onlyNew)
