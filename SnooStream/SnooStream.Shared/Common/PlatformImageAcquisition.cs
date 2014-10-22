@@ -1,4 +1,5 @@
 ﻿using CommonResourceAcquisition.ImageAcquisition;
+using MetroLog;
 using Nokia.Graphics.Imaging;
 using SnooStream.PlatformServices;
 using System;
@@ -21,6 +22,8 @@ namespace SnooStream.Common
 {
     class PlatformImageAcquisition : ImageAcquisition
     {
+		static protected ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<ImageAcquisition>();
+		
 		public static string ComputeMD5(string str)
 		{
 			var alg = HashAlgorithmProvider.OpenAlgorithm("MD5");
@@ -154,7 +157,11 @@ namespace SnooStream.Common
 			{
 				throw cancel;
 			}
-			catch { }
+			catch(Exception ex) 
+			{
+				if (((uint)ex.HResult) != 0x800700B7)
+					_logger.Error("failed getting image content", ex);
+			}
 			return ApplicationData.Current.TemporaryFolder.Path + "\\" + onDiskName;
 		}
     }

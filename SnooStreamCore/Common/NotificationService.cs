@@ -109,7 +109,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-				SnooStream.ViewModel.SnooStreamViewModel.Logging.Log(ex);
+				_logger.Error("failed getting web content", ex);
             }
             finally
             {
@@ -132,7 +132,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-				SnooStream.ViewModel.SnooStreamViewModel.Logging.Log(ex);
+				_logger.Error("failed getting web content", ex);
             }
             finally
             {
@@ -166,7 +166,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-				_logger.Info("Task Canceled: " + message);
+				_logger.Info("Task Failed: " + message, ex);
             }
             finally
             {

@@ -177,6 +177,7 @@ namespace SnooStream.ViewModel.Content
 			}
 			catch (Exception ex)
 			{
+				_logger.Error("failed getting web content", ex);
 				this.SetErrorStatus(ex.Message);
 				return Tuple.Create("", "", Enumerable.Empty<Readable>());
 			}
