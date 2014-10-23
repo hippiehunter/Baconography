@@ -11,10 +11,10 @@ namespace SnooStream.Services
         MarkdownData Process(string markdown);
 		IEnumerable<KeyValuePair<string, string>> GetLinks(MarkdownData mkd);
 		bool IsPlainText(MarkdownData mdk);
+		string BasicText(MarkdownData mdk);
     }
     public class MarkdownData
     {
         public object MarkdownDom { get; set; }
-		public string BasicText { get; set; }
     }
 }

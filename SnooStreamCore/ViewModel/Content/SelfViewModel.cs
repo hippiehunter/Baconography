@@ -20,7 +20,7 @@ namespace SnooStream.ViewModel.Content
 		{
 			get
 			{
-				return _selfLink.SelfText.BasicText;
+				return SnooStreamViewModel.MarkdownProcessor.BasicText(_selfLink.SelfText);
 			}
 		}
 

@@ -26,5 +26,11 @@ namespace SnooStream.PlatformServices
 		{
 			return ((SnooDom.SnooDom)mkd.MarkdownDom).IsPlainText();
 		}
+
+
+		public string BasicText(MarkdownData mkd)
+		{
+			return ((SnooDom.SnooDom)mkd.MarkdownDom).BasicText();
+		}
 	}
 }
