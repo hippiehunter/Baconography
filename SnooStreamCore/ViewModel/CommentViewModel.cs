@@ -95,34 +95,12 @@ namespace SnooStream.ViewModel
             {
                 _isMinimized = value;
                 RaisePropertyChanged("IsMinimized");
-				Touch();
+				if (_isMinimized)
+					_context.HideDecendents(Id);
+				else
+					_context.ShowDecendents(this);
             }
         }
-
-		// Cause UI to re-evaluate visibility without changing values
-		public void Touch()
-		{
-			var decendents = _context.Decendents(Id);
-			if (decendents != null)
-			{
-				foreach (var child in decendents)
-				{
-					var comment = child as CommentViewModel;
-					var more = child as MoreViewModel;
-					if (comment != null) comment.TouchImpl();
-					if (more != null) more.TouchImpl();
-				}
-				
-			}
-			RaisePropertyChanged("IsVisible");
-
-			if (_context.ViewHack != null)
-				_context.ViewHack(this);
-		}
-		internal void TouchImpl()
-		{
-			RaisePropertyChanged("IsVisible");
-		}
 
 		public CommentViewModel Parent
 		{

@@ -467,6 +467,23 @@ namespace SnooStream.ViewModel
             await LoadAndMergeFull(IsContext);
         }
 
+		public void HideDecendents(string id)
+		{
+			foreach (var vmb in Decendents(id))
+			{
+				FlatComments.Remove(vmb);
+			}
+		}
+
+		public void ShowDecendents(CommentViewModel parent)
+		{
+			var insertionPoint = FlatComments.IndexOf(parent) + 1;
+			foreach (var vmb in Decendents(parent.Id).Reverse())
+			{
+				FlatComments.Insert(insertionPoint, vmb);
+			}
+		}
+
 		public IEnumerable<ViewModelBase> Decendents(string id)
 		{
 			var result = new List<ViewModelBase>();
