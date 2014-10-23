@@ -54,6 +54,7 @@ namespace SnooStream.ViewModel
             _loadFullSentinel = new LoadFullCommentsViewModel(this);
             FlatComments = new ObservableCollection<ViewModelBase>();
             ProcessUrl("http://www.reddit.com" + linkData.Permalink);
+			_commentsContentStream = new Lazy<CommentsContentStreamViewModel>(() => new CommentsContentStreamViewModel(this));
         }
 
         public CommentsViewModel(ViewModelBase context, string url)
@@ -63,6 +64,7 @@ namespace SnooStream.ViewModel
             _loadFullSentinel = new LoadFullCommentsViewModel(this);
             FlatComments = new ObservableCollection<ViewModelBase>();
             ProcessUrl(url);
+			_commentsContentStream = new Lazy<CommentsContentStreamViewModel>(() => new CommentsContentStreamViewModel(this));
         }
 
 		public CommentsViewModel(ViewModelBase context, Listing comments, string url, DateTime? lastRefresh)
@@ -75,6 +77,16 @@ namespace SnooStream.ViewModel
 			ProcessUrl(url);
 			_loadFullTask = new Lazy<Task>(() => Task.FromResult(true));
 			LoadDump(comments);
+			_commentsContentStream = new Lazy<CommentsContentStreamViewModel>(() => new CommentsContentStreamViewModel(this));
+		}
+
+		Lazy<CommentsContentStreamViewModel> _commentsContentStream;
+		public CommentsContentStreamViewModel CommentsContentStream
+		{
+			get
+			{
+				return _commentsContentStream.Value;
+			}
 		}
 
 		public Action<Object> ViewHack {get; set;}
@@ -612,6 +624,7 @@ namespace SnooStream.ViewModel
 
         public async Task LoadAndMergeFull(bool isContext)
         {
+			_commentsContentStream = new Lazy<CommentsContentStreamViewModel>(() => new CommentsContentStreamViewModel(this));
 			LastRefresh = DateTime.Now;
             var flatChildren = await LoadImpl(isContext);
 

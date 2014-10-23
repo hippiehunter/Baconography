@@ -13,7 +13,7 @@ namespace SnooStream.Converters
     {
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{
-			var linkViewModel = value as LinkViewModel;
+			var linkViewModel = value as ILinkViewModel;
 			var content = linkViewModel.Content;
 			content.StartLoad(SnooStreamViewModel.Settings.ContentTimeout);
 			if (content is ImageViewModel)

@@ -17,7 +17,7 @@ namespace SnooStream.ViewModel.Content
 		static protected ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<ContentViewModel>();
 		protected CancellationTokenSource CancelToken = new CancellationTokenSource(SnooStreamViewModel.Settings.ContentTimeout);
 		public string Glyph { get; set; }
-		public static ContentViewModel MakeContentViewModel(string url, string title = null, LinkViewModel selfLink = null, string redditThumbnail = null)
+		public static ContentViewModel MakeContentViewModel(string url, string title = null, ILinkViewModel selfLink = null, string redditThumbnail = null)
 		{
 			ContentViewModel result = null;
 			string targetHost = null;
@@ -32,9 +32,9 @@ namespace SnooStream.ViewModel.Content
 
 			var glyph = LinkGlyphUtility.GetLinkGlyph((selfLink as object) ?? (url as object));
 
-			if (selfLink != null && selfLink.IsSelfPost)
+			if (selfLink is LinkViewModel && ((LinkViewModel)selfLink).IsSelfPost)
 			{
-				result = new SelfViewModel(selfLink);
+				result = new SelfViewModel(((LinkViewModel)selfLink));
 			}
 			else if (LinkGlyphUtility.IsComment(url) ||
 				LinkGlyphUtility.IsCommentsPage(url) ||

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-    public class LinkViewModel : ViewModelBase
+	public class LinkViewModel : ViewModelBase, ILinkViewModel
     {
         public LinkViewModel(ViewModelBase context, Link link)
         {
@@ -202,5 +202,11 @@ namespace SnooStream.ViewModel
         public RelayCommand GotoLink { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoLink(this, Link.Url)); } }
         public RelayCommand GotoSubreddit { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoSubreddit(Subreddit)); } }
         public RelayCommand GotoUserDetails { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoUserDetails(Author)); } }
-    }
+
+
+		public string Id
+		{
+			get { return Link.Id; }
+		}
+	}
 }

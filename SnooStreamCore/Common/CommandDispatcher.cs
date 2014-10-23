@@ -76,8 +76,9 @@ namespace SnooStream.Common
             throw new NotImplementedException();
         }
 
-        public async void GotoLink(ViewModelBase context, string url)
+        public async void GotoLink(object contextObj, string url)
         {
+			var context = contextObj as ViewModelBase;
             if (!Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute))
             {
                 return;
@@ -248,9 +249,17 @@ namespace SnooStream.Common
 					{
 						var linkRiver = ((LinkViewModel)context).Context as LinkRiverViewModel;
 						linkRiver.LinksViewSource.View.MoveCurrentTo(context);
-						//linkRiver.LinksViewSource.View.MoveCurrentTo(context);
-						//linkRiver.LinksViewSource.View.MoveCurrentToFirst();
 						SnooStreamViewModel.NavigationService.NavigateToContentRiver(linkRiver);
+					}
+					else if (contextObj is Tuple<CommentsViewModel, CommentViewModel, string>)
+					{
+						var contextTpl = contextObj as Tuple<CommentsViewModel, CommentViewModel, string>;
+						var contentStream = contextTpl.Item1.CommentsContentStream;
+						var targetContent = contentStream.Links.FirstOrDefault(item => item.Id == contextTpl.Item2.Id && item.Url == contextTpl.Item3);
+						if (targetContent != null)
+							contentStream.LinksViewSource.View.MoveCurrentTo(context);
+
+						SnooStreamViewModel.NavigationService.NavigateToContentRiver(contentStream);
 					}
                 }
             });

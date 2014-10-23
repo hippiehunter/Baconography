@@ -29,7 +29,7 @@ namespace SnooStream.Common
 							result = new LinkRiverViewModel(false, subredditThing.Item1, subredditThing.Item2, subredditThing.Item3, subredditThing.Item4);
 						}
 
-						result.CurrentSelected = result.Links.FirstOrDefault(lnk => lnk.Link.Id == subredditThing.Item5);
+						result.CurrentSelected = result.Links.FirstOrDefault(lnk => lnk.Id == subredditThing.Item5);
 						return result;
                     }
 				//case "LinkStreamViewModel":
@@ -43,7 +43,7 @@ namespace SnooStream.Common
 						//if (context is LinkStreamViewModel)
 						//	targetContext = ((LinkStreamViewModel)context).Current; else
 						if (context is LinkRiverViewModel)
-							targetContext = ((LinkRiverViewModel)context).Links.FirstOrDefault(link => link.Link.Id == dumpArgs.Item3);
+							targetContext = ((LinkRiverViewModel)context).Links.FirstOrDefault(link => link.Id == dumpArgs.Item3) as LinkViewModel;
 
 						var comments = new CommentsViewModel(targetContext, dumpArgs.Item1, dumpArgs.Item2, dumpArgs.Item4);
 						if (targetContext != null)
@@ -85,9 +85,14 @@ namespace SnooStream.Common
                 var linkRiver = viewModel as LinkRiverViewModel;
 				string selectedId = null;
 				if(linkRiver.CurrentSelected != null)
-					selectedId = linkRiver.CurrentSelected.Link.Id;
+					selectedId = linkRiver.CurrentSelected.Id;
 
-				var serializationTpl = new Tuple<Subreddit, string, List<Link>, DateTime, string>(linkRiver.Thing, linkRiver.Sort, linkRiver.Links.Take(100).Select(lvm => lvm.Link).ToList(), linkRiver.LastRefresh ?? DateTime.Now, selectedId);
+				var serializationTpl = new Tuple<Subreddit, string, List<Link>, DateTime, string>(linkRiver.Thing, linkRiver.Sort, 
+					linkRiver.Links
+						.Take(100)
+						.Select(lvm => ((LinkViewModel)lvm).Link)
+						.ToList(), 
+					linkRiver.LastRefresh ?? DateTime.Now, selectedId);
 				var serialized = JsonConvert.SerializeObject(serializationTpl);
                 return JsonConvert.SerializeObject(Tuple.Create("LinkRiverViewModel", serialized));
             }

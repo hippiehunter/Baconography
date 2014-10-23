@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-    public class LinkRiverViewModel : ViewModelBase, IRefreshable
+    public class LinkRiverViewModel : ViewModelBase, IRefreshable, IHasLinks
     {
         //need to come up with an init blob setup for this, meaining a per river blob
         public Subreddit Thing { get; internal set; }
@@ -91,7 +91,7 @@ namespace SnooStream.ViewModel
 			}
 		}
 
-		private class LinksLoader : IIncrementalCollectionLoader<LinkViewModel>
+		private class LinksLoader : IIncrementalCollectionLoader<ILinkViewModel>
 		{
 			LinkRiverViewModel _linkRiverViewModel;
 			public LinksLoader(LinkRiverViewModel linkRiverViewModel)
@@ -99,9 +99,9 @@ namespace SnooStream.ViewModel
 				_linkRiverViewModel = linkRiverViewModel;
 			}
 
-			public void Attach(ObservableCollection<LinkViewModel> targetCollection) { }
+			public void Attach(ObservableCollection<ILinkViewModel> targetCollection) { }
 
-			public Task AuxiliaryItemLoader(IEnumerable<LinkViewModel> items, int timeout)
+			public Task AuxiliaryItemLoader(IEnumerable<ILinkViewModel> items, int timeout)
 			{
 				return Task.FromResult(true);
 			}
@@ -116,7 +116,7 @@ namespace SnooStream.ViewModel
 				return _linkRiverViewModel.Links.Count == 0 || _linkRiverViewModel.LastLinkId != null;
 			}
 
-			public async Task<IEnumerable<LinkViewModel>> LoadMore()
+			public async Task<IEnumerable<ILinkViewModel>> LoadMore()
 			{
 				var result = new List<LinkViewModel>();
 				var postListing = _linkRiverViewModel.LastLinkId != null ?
@@ -146,17 +146,17 @@ namespace SnooStream.ViewModel
 				return result;
 			}
 
-			public async Task Refresh(ObservableCollection<LinkViewModel> current, bool onlyNew)
+			public async Task Refresh(ObservableCollection<ILinkViewModel> current, bool onlyNew)
 			{
 				var postListing = await SnooStreamViewModel.RedditService.GetPostsBySubreddit(_linkRiverViewModel.Thing.Url, _linkRiverViewModel.Sort); 
 				if (postListing != null)
 				{
 					_linkRiverViewModel.LastRefresh = DateTime.Now;
 					var linkIds = new List<string>();
-					var replace = new List<Tuple<int, LinkViewModel>>();
-					var move = new List<Tuple<int, int, LinkViewModel>>();
-					var existing = new Dictionary<string, Tuple<int, LinkViewModel>>();
-					var update = new List<LinkViewModel>();
+					var replace = new List<Tuple<int, ILinkViewModel>>();
+					var move = new List<Tuple<int, int, ILinkViewModel>>();
+					var existing = new Dictionary<string, Tuple<int, ILinkViewModel>>();
+					var update = new List<ILinkViewModel>();
 					for (int i = 0; i < postListing.Data.Children.Count; i++)
 					{
 						var thing = postListing.Data.Children[i];
@@ -164,21 +164,21 @@ namespace SnooStream.ViewModel
 						{
 							linkIds.Add(((Link)thing.Data).Id);
 							var viewModel = new LinkViewModel(_linkRiverViewModel, thing.Data as Link);
-							replace.Add(Tuple.Create(i, viewModel));
+							replace.Add(Tuple.Create<int, ILinkViewModel>(i, viewModel));
 						}
 					}
 
 					for (int i = 0; i < current.Count; i++)
 					{
-						if (!existing.ContainsKey(current[i].Link.Id))
-							existing.Add(current[i].Link.Id, Tuple.Create(i, current[i]));
+						if (!existing.ContainsKey(current[i].Id))
+							existing.Add(current[i].Id, Tuple.Create(i, current[i]));
 					}
 
 					foreach (var link in replace)
 					{
-						if (existing.ContainsKey(link.Item2.Link.Id))
+						if (existing.ContainsKey(link.Item2.Id))
 						{
-							var existingIndex = existing[link.Item2.Link.Id].Item1;
+							var existingIndex = existing[link.Item2.Id].Item1;
 							if (existingIndex == link.Item1)
 								update.Add(link.Item2);
 							else
@@ -191,12 +191,12 @@ namespace SnooStream.ViewModel
 					{
 						foreach (var link in update)
 						{
-							existing[link.Link.Id].Item2.MergeLink(link.Link);
+							((LinkViewModel)existing[link.Id].Item2).MergeLink(((LinkViewModel)link).Link);
 						}
 
 						foreach (var linkTpl in move)
 						{
-							existing[linkTpl.Item3.Link.Id].Item2.MergeLink(linkTpl.Item3.Link);
+							((LinkViewModel)existing[linkTpl.Item3.Id].Item2).MergeLink(((LinkViewModel)linkTpl.Item3).Link);
 						}
 
 						bool unfinished = true;
@@ -230,7 +230,7 @@ namespace SnooStream.ViewModel
 						var linkMetadata = (await SnooStreamViewModel.OfflineService.GetLinkMetadata(linkIds)).ToList();
 						for (int i = 0; i < linkMetadata.Count; i++)
 						{
-							current[i].UpdateMetadata(linkMetadata[i]);
+							((LinkViewModel)current[i]).UpdateMetadata(linkMetadata[i]);
 						}
 						_linkRiverViewModel.LastLinkId = postListing.Data.After;
 					});
@@ -260,9 +260,9 @@ namespace SnooStream.ViewModel
 				return _linksViewSource.Value;
 			}
 		}
-        public ObservableCollection<LinkViewModel> Links { get; set; }
+		public ObservableCollection<ILinkViewModel> Links { get; set; }
 
-		public LinkViewModel CurrentSelected
+		public ILinkViewModel CurrentSelected
 		{
 			get
 			{
@@ -271,7 +271,7 @@ namespace SnooStream.ViewModel
 				else
 					return this.LinksViewSource.View.CurrentItem as LinkViewModel;
 			}
-			internal set
+			set
 			{
 				LinksViewSource.View.MoveCurrentTo(value);
 			}
@@ -283,7 +283,7 @@ namespace SnooStream.ViewModel
 			{
 				DefaultSort = Sort,
 				Thing = Thing,
-				Links = Links.Select(vm => vm.Link).ToList(),
+				Links = Links.Select(vm => ((LinkViewModel)vm).Link).ToList(),
 				LastRefresh = LastRefresh
 			};
 		}
@@ -298,7 +298,7 @@ namespace SnooStream.ViewModel
 			((IRefreshable)Links).Refresh(onlyNew);
 		}
 
-		public async void SetSort(string sort)
+		public void SetSort(string sort)
 		{
 			Sort = sort;
 			Refresh(false);

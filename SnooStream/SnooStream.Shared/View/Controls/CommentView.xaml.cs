@@ -20,82 +20,49 @@ namespace SnooStream.View.Controls
             InitializeComponent();
         }
 
-		int _loadPhase = 0;
-		private MarkdownData _markdownBody;
-		private CancellationTokenSource _loadCancel = new CancellationTokenSource();
-		internal async void PhaseLoad(ListViewBase sender, ContainerContentChangingEventArgs args)
+		internal void PhaseLoad(ListViewBase sender, ContainerContentChangingEventArgs args)
 		{
 			if (!args.InRecycleQueue)
 			{
-				switch (_loadPhase)
+				switch (args.Phase)
 				{
 					case 0:
 						{
 							plainTextControl.Opacity = 0.0;
 							markdownControl.Opacity = 0.0;
-
-							if (args.Item is CommentViewModel)
-							{
-								_loadPhase++;
-								var body = ((CommentViewModel)args.Item).Body;
-								args.Handled = true;
-								args.RegisterUpdateCallback(PhaseLoad);
-								var markdownBody = await Task.Run(() => SnooStreamViewModel.MarkdownProcessor.Process(body), _loadCancel.Token);
-								if (!_loadCancel.IsCancellationRequested)
-									_markdownBody = markdownBody;
-
-								
-							}
-							
+							args.Handled = true;
+							args.RegisterUpdateCallback(PhaseLoad);
 							break;
 						}
 					case 1:
 						{
-							_loadPhase++;
 							plainTextControl.Opacity = 1.0;
 							if(args.Item is CommentViewModel)
 								plainTextControl.Text = ((CommentViewModel)args.Item).Body;
-							
+
+							args.Handled = true;
 							args.RegisterUpdateCallback(PhaseLoad);
 							break;
 						}
 					case 2:
 						{
-							if (_markdownBody != null)
+							if (args.Item is CommentViewModel)
 							{
-								if (!SnooStreamViewModel.MarkdownProcessor.IsPlainText(_markdownBody))
+								var body = ((CommentViewModel)args.Item).Body;
+								args.Handled = true;
+								var markdownBody = SnooStreamViewModel.MarkdownProcessor.Process(body);
+
+								if (!SnooStreamViewModel.MarkdownProcessor.IsPlainText(markdownBody))
 								{
 									plainTextControl.Opacity = 0.0;
 									plainTextControl.Text = "";
 
 									markdownControl.Opacity = 1.0;
-									markdownControl.Markdown = _markdownBody.MarkdownDom as SnooDom.SnooDom;
+									markdownControl.Markdown = markdownBody.MarkdownDom as SnooDom.SnooDom;
 								}
-							}
-							else
-							{
-								args.RegisterUpdateCallback(PhaseLoad);
 							}
 							break;
 						}
-				}
-			}
-			else
-			{
-				try
-				{
-					_loadPhase = 0;
-					_loadCancel.Cancel();
-					_loadCancel = new CancellationTokenSource();
-					if (_markdownBody != null)
-					{
-						_markdownBody.MarkdownDom = null;
-						_markdownBody = null;
-					}
-				}
-				catch
-				{
-					
 				}
 			}
 		}

@@ -73,6 +73,7 @@
     <Compile Include="Services\IUserCredentialService.cs" />
     <Compile Include="ViewModel\AboutUserViewModel.cs" />
     <Compile Include="ViewModel\CaptchaViewModel.cs" />
+    <Compile Include="ViewModel\CommentsContentStreamViewModel.cs" />
     <Compile Include="ViewModel\ContentStreamViewModel.cs" />
     <Compile Include="ViewModel\Content\AlbumViewModel.cs" />
     <Compile Include="ViewModel\Content\ContentViewModel.cs" />
@@ -81,6 +82,8 @@
     <Compile Include="ViewModel\Content\PlainWebViewModel.cs" />
     <Compile Include="ViewModel\Content\SelfViewModel.cs" />
     <Compile Include="ViewModel\Content\VideoViewModel.cs" />
+    <Compile Include="ViewModel\IHasLinks.cs" />
+    <Compile Include="ViewModel\ILinkViewModel.cs" />
     <Compile Include="ViewModel\IRefreshable.cs" />
     <Compile Include="ViewModel\LoadFullCommentsViewModel.cs" />
     <Compile Include="ViewModel\MoreViewModel.cs" />

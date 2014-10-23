@@ -13,6 +13,7 @@ using SnooStream.View.Controls;
 using GalaSoft.MvvmLight.Messaging;
 using SnooStream.Messages;
 using Newtonsoft.Json;
+using GalaSoft.MvvmLight;
 
 namespace SnooStream.PlatformServices
 {
@@ -162,9 +163,9 @@ namespace SnooStream.PlatformServices
             _navState.ValidateParameters(validStates);
         }
 
-		public void NavigateToContentRiver(LinkRiverViewModel viewModel)
+		public void NavigateToContentRiver(IHasLinks viewModel)
 		{
-			_frame.Navigate(typeof(ContentRiver), "state=" + _navState.AddState(viewModel));
+			_frame.Navigate(typeof(ContentRiver), "state=" + _navState.AddState(viewModel as ViewModelBase));
 		}
 
 
