@@ -45,7 +45,7 @@ namespace SnooStream.Common
                     }
                     else if (item.Data is Subreddit)
                     {
-                        _nsfwParentCache.Add(((Subreddit)item.Data).DisplayName, Task.FromResult(((Subreddit)item.Data).Over18));
+                        _nsfwParentCache.Add(((Subreddit)item.Data).DisplayName, Task.FromResult(((Subreddit)item.Data).Over18 ?? false));
                     }
                 }
 
@@ -67,7 +67,7 @@ namespace SnooStream.Common
                 var targetSubreddit = await _offlineService.GetSubreddit(subreddit) ?? await _redditService.GetSubreddit(subreddit);
                 if (targetSubreddit != null && targetSubreddit.Data is Subreddit)
                 {
-                    return ((Subreddit)targetSubreddit.Data).Over18;
+                    return ((Subreddit)targetSubreddit.Data).Over18 ?? false;
                 }
                 else
                     return false;

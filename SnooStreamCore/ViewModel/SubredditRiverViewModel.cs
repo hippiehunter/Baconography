@@ -126,6 +126,7 @@ namespace SnooStream.ViewModel
 
 			public async Task<IEnumerable<LinkRiverViewModel>> LoadMore()
 			{
+				_hasLoaded = true;
 				var result = new List<LinkRiverViewModel>();
 				if (string.IsNullOrWhiteSpace(_afterSearch))
 				{
