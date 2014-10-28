@@ -28,10 +28,20 @@ namespace SnooStream.ViewModel
 					}
 				}
 			}
-			LinksViewSource = SnooStreamViewModel.SystemServices.MakeCollectionViewSource(Links);
 		}
 		public ObservableCollection<ILinkViewModel> Links { get; set; }
-		public IWrappedCollectionViewSource LinksViewSource {get; set;}
+		ILinkViewModel _currentSelected;
+		public ILinkViewModel CurrentSelected
+		{
+			get
+			{
+				return _currentSelected;
+			}
+			set
+			{
+				_currentSelected = value;
+			}
+		}
 		private class CommentLinkViewModel : ILinkViewModel
 		{
 			public CommentLinkViewModel(CommentViewModel context, string url, string title)

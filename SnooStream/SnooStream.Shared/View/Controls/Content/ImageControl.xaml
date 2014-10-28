@@ -8,11 +8,18 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="scrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsHorizontalRailEnabled="True" ZoomMode="Enabled">
 
-    <ScrollViewer x:Name="scrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsHorizontalRailEnabled="True" ZoomMode="Enabled">
+            <Image x:Name="image" HorizontalAlignment="Center" VerticalAlignment="Center" 
+               DataContext="{Binding ImageLoader.ImageData, Converter={StaticResource gifConverter}}" Stretch="UniformToFill" Source="{Binding ImageSource}" SizeChanged="Image_SizeChanged"/>
 
-        <Image x:Name="image" HorizontalAlignment="Center" VerticalAlignment="Center" 
-               DataContext="{Binding ImageLoader.ImageData, Converter={StaticResource gifConverter}}" Stretch="None" Source="{Binding ImageSource}" SizeChanged="Image_SizeChanged"/>
-
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </UserControl>

@@ -34,7 +34,7 @@
         <Grid>
             <ListView x:Name="linksListView" Grid.Column="0"  Margin="12,0,12,0"
                       SelectionMode="None"
-                      ItemsSource="{Binding LinksViewSource.UnderlyingSource.View}"
+                      ItemsSource="{Binding Links}"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                       ContainerContentChanging="linksListView_ContainerContentChanging"
                       ShowsScrollingPlaceholders="True"

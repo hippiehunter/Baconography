@@ -90,6 +90,13 @@ namespace SnooStream.Common
                 var linkContext = context as LinkViewModel;
                 var riverContext = linkContext != null ? linkContext.Context : null;
 
+				if (context is LinkViewModel)
+				{
+					var linkRiver = ((LinkViewModel)context).Context as LinkRiverViewModel;
+					if(linkRiver != null)
+						linkRiver.CurrentSelected = context as ILinkViewModel;
+				}
+
                 if (CommentRegex.IsMatch(url))
                 {
                     var targetLinkThing = sourceLink == null ? await SnooStreamViewModel.RedditService.GetLinkByUrl(url) :
@@ -248,7 +255,6 @@ namespace SnooStream.Common
 					if (context is LinkViewModel)
 					{
 						var linkRiver = ((LinkViewModel)context).Context as LinkRiverViewModel;
-						linkRiver.LinksViewSource.View.MoveCurrentTo(context);
 						SnooStreamViewModel.NavigationService.NavigateToContentRiver(linkRiver);
 					}
 					else if (contextObj is Tuple<CommentsViewModel, CommentViewModel, string>)
@@ -257,7 +263,7 @@ namespace SnooStream.Common
 						var contentStream = contextTpl.Item1.CommentsContentStream;
 						var targetContent = contentStream.Links.FirstOrDefault(item => item.Id == contextTpl.Item2.Id && item.Url == contextTpl.Item3);
 						if (targetContent != null)
-							contentStream.LinksViewSource.View.MoveCurrentTo(context);
+							contentStream.CurrentSelected = context as ILinkViewModel;
 
 						SnooStreamViewModel.NavigationService.NavigateToContentRiver(contentStream);
 					}

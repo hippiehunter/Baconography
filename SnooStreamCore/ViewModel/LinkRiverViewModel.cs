@@ -84,7 +84,6 @@ namespace SnooStream.ViewModel
 			Thing = thing;
 			Sort = sort ?? "hot";
 			Links = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new LinksLoader(this));
-			_linksViewSource = new Lazy<IWrappedCollectionViewSource>(() => SnooStreamViewModel.SystemServices.MakeCollectionViewSource(Links));
 			if (initialLinks != null)
 			{
 				ProcessLinkThings(initialLinks);
@@ -252,16 +251,9 @@ namespace SnooStream.ViewModel
             }
         }
 
-		Lazy<IWrappedCollectionViewSource> _linksViewSource;
-		public IWrappedCollectionViewSource LinksViewSource
-		{
-			get
-			{
-				return _linksViewSource.Value;
-			}
-		}
 		public ObservableCollection<ILinkViewModel> Links { get; set; }
 
+		ILinkViewModel _currentSelected;
 		public ILinkViewModel CurrentSelected
 		{
 			get
@@ -269,11 +261,11 @@ namespace SnooStream.ViewModel
 				if (IsInDesignMode)
 					return new LinkViewModel(this, new Link { Title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras ac tempor erat. Cras sagittis eu urna sed posuere. Proin sit amet fringilla magna. Sed feugiat lorem nibh, ac mollis risus rutrum non. Pellentesque pharetra auctor pellentesque. Maecenas vel lorem sagittis.", Domain = "http://www.google.com", Author = "fredbob", Url = "http://www.google.com", CommentCount = 2453 });
 				else
-					return this.LinksViewSource.View.CurrentItem as LinkViewModel;
+					return _currentSelected;
 			}
 			set
 			{
-				LinksViewSource.View.MoveCurrentTo(value);
+				_currentSelected = value;
 			}
 		}
 

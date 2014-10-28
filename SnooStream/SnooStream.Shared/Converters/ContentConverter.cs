@@ -17,7 +17,11 @@ namespace SnooStream.Converters
 			var content = linkViewModel.Content;
 			content.StartLoad(SnooStreamViewModel.Settings.ContentTimeout);
 			if (content is ImageViewModel)
-				return new ImageControl { DataContext = content };
+			{
+				var container = new ImageContainer();
+				container.containerSlideView.ItemsSource = new List<ContentViewModel> { content };
+				return container;
+			}
 			else if (content is AlbumViewModel)
 				return new AlbumControl { DataContext = content };
 			else if (content is VideoViewModel)

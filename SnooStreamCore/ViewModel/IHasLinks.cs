@@ -11,6 +11,5 @@ namespace SnooStream.ViewModel
 	public interface IHasLinks
 	{
 		ObservableCollection<ILinkViewModel> Links { get; set; }
-		IWrappedCollectionViewSource LinksViewSource { get; }
 	}
 }

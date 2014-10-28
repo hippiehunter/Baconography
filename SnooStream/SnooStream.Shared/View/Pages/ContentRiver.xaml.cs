@@ -1,4 +1,5 @@
 ﻿using SnooStream.Common;
+using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,14 +29,33 @@ namespace SnooStream.View.Pages
             this.InitializeComponent();
         }
 
+		protected override void OnNavigatedTo(NavigationEventArgs e)
+		{
+			base.OnNavigatedTo(e);
+			if(DataContext is LinkRiverViewModel)
+			{
+				var dataContext = DataContext as LinkRiverViewModel;
+				flipView.ItemsSource = dataContext.Links;
+				flipView.SelectedValue = dataContext.CurrentSelected;
+				flipView.SelectionChanged += flipView_SelectionChanged;
+			}
+		}
+
 		private async void flipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			//var loader = flipView.ItemsSource as ISupportIncrementalLoading;
-			//if (flipView.Items.Count < (flipView.Items.IndexOf(e.AddedItems.First()) + 5) && loader != null)
-			//{
-			//	if (loader.HasMoreItems)
-			//		await loader.LoadMoreItemsAsync(20);
-			//}
+			if (e.AddedItems.Count > 0 && DataContext is LinkRiverViewModel)
+			{
+				var dataContext = DataContext as LinkRiverViewModel;
+				dataContext.CurrentSelected = e.AddedItems.First() as ILinkViewModel;
+			}
+			var loader = flipView.ItemsSource as ISupportIncrementalLoading;
+			if (e.AddedItems.Count > 0 && 
+				flipView.Items.Count < (flipView.Items.IndexOf(e.AddedItems.First()) + 5) &&
+				loader != null)
+			{
+				if (loader.HasMoreItems)
+					await loader.LoadMoreItemsAsync(20);
+			}
 		}
     }
 }

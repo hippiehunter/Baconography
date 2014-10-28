@@ -22,11 +22,8 @@ namespace SnooStream.View.Pages
 		protected override void OnNavigatedTo(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
 		{
 			base.OnNavigatedTo(e);
-
-			if (e.NavigationMode == Windows.UI.Xaml.Navigation.NavigationMode.Back)
-			{
-				linksListView.ScrollIntoView(((LinkRiverViewModel)DataContext).LinksViewSource.View.CurrentItem);
-			}
+			if (DataContext is LinkRiverViewModel)
+				linksListView.ScrollIntoView(((LinkRiverViewModel)DataContext).CurrentSelected);
 		}
 
 		private void linksListView_ContainerContentChanging(Windows.UI.Xaml.Controls.ListViewBase sender, Windows.UI.Xaml.Controls.ContainerContentChangingEventArgs args)
