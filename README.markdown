@@ -1,16 +1,12 @@
 # Welcome to Baconography
-Baconography is an open source reddit client built from the ground up to provide an excellent user experience on Windows 8 regardless of the status of your internet connection.
+Baconography is an open source reddit client built from the ground up to provide an excellent user experience on Windows 8.1 regardless of the status of your internet connection.
 
 # Prerequisites for building
-*   Visual Studio 2012 (Express should work)
-*   Windows 8
-*   [KitaroDB SDK & KitaroDB WP8 SDK](http://kitarodb.com/kitarodb-for-winrt/)
-*   [Microsoft Player Framework](http://playerframework.codeplex.com/)
+*   Visual Studio 2013 (Express should work)
+*   Windows 8.1
 
 # Instructions for building
-Open the solution file with Visual Studio 2012. If you don't already have one, you will be prompted for a developer license; all it takes is a Microsoft Live account.
-
-Once it's opened you need to restore the NuGet packages. The easiest way to do that is to right click on the project and go to "Manage NuGet Packages...". There should be a button to restore the packages at the top of that dialog.
+Open the solution file with Visual Studio 2013. If you don't already have one, you will be prompted for a developer license; all it takes is a Microsoft Live account.
 
 Now that everything is set up, you can build, deploy, and debug the solution
 
@@ -20,41 +16,33 @@ Now that everything is set up, you can build, deploy, and debug the solution
 *   Send messages on reddit to either hippiehunter or madkatalpha
 
 # Things we can do right now
-*   Store Links and Comments for offline viewing [Using KitaroDB](http://www.kitarodb.com)
 *   Infinite scrolling everywhere
 *   Support for browsing reddit while not logged in
-*   Support for multiple saved account credentials for rapid switching
+*   Support for OAuth 2.0
 *   Voting, saving, reporting and all the things you expect to do to a link or comment
-*   Integration with Windows Search, Share and File Picker (pick photos directly from reddit links)
-*   Ability to pin subreddits to the start screen
 *   Integrated markdown preview when creating a reply
 *   Launch links in the app or open them in a browser
 *   Optional filtering of NSFW content
 *   Use the imgur api (and the other domains supported by RES) to download and display images/albums directly
-*   On WinRT Show images inline RES style (including gifs), for links as well as comments
-*   Get it on Windows Phone 8
+*   Flip view everywhere, flip through the content for a subreddit or through all of the content that has been linked in comments
+*   Universal App supports windows 8.1 and Windows Phone 8.1
 *   Optimize web content using a modified version of NBoilerpipe
 *   Render all kinds of markdown including tables
 *   Subreddit flair text
+*   In app video player for Youtube, Liveleak, Vimeo, Gfycat and imgur gifv
 *   Subreddit sidebar including subscribe and unsubscribe functionality
 
 # Things left on the Todo list
-*   ~~keep track of links that have already been shown in never ending reddit, don't show them further down~~
-*   ~~Get it in the Windows 8 Store~~
-*   ~~Show Images inline RES style~~
-*   ~~Use the imgur api (and the other domains supported by RES) to download and display images/albums directly~~
-*   ~~Use NBoilerpipe to generate offline versions of (non image) links~~
-*   ~~Add drop down tick for 'sort by' in RedditView and CommentsView~~
-*   ~~If nothing in offline cache when we're in offline mode show a message letting the user know there isnt anything there~~
-*   ~~Implement messaging~~
-*   ~~Add support for a lockscreen indicator to show messages/replys~~
-*   ~~Fix layout for 1/4 and 3/4 snapped view~~
-*   ~~Multi-Reddit selector~~
-*   ~~Add support for Posting~~
-*   Add in RES style keyboard shortcuts
-*   ~~Integrate Animated gif renderer (Windows 8 Xaml doesnt allow animated gif's in the Image control)~~
-*   ~~Get it on Windows Phone 8~~
-*   ~~Implement inline renderer for videos~~
+*   remove duplicate links
+*   implement Nokia Image SDK powered High Res image viewer (to allow 512mb devices to flipview in subreddits with super large images)
+*   put back multireddits in the subreddit list
+*   add support for local favorite subreddits
+*   add support for multireddit creation
+*   add support for Livethreads (with notifications?)
+*   implement pure nokia image sdk based live tile renderer
+*   integrate octokit for reporting bugs directly to github issues
+*   Hero image on SnooHubMk2
+*   finish activity/messaging, reply and context needs to work well here for all types of activity
 
 # License
 Copyright (c) 2012 Synergex International Corporation
