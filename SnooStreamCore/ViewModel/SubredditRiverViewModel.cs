@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
+using MetroLog;
 using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Messages;
@@ -17,6 +18,7 @@ namespace SnooStream.ViewModel
 {
     public class SubredditRiverViewModel : ViewModelBase
     {
+		static ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooStreamViewModel>();
         static public string SmallGroupNameSelector(LinkRiverViewModel viewModel)
         {
             return viewModel.IsLocal ? "favorites" : "subscribed";
@@ -259,43 +261,49 @@ namespace SnooStream.ViewModel
                 else
                     await Task.Delay(10000);
             }
-
-            var subscribedListing = await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing();
-
-			var newRivers = new Dictionary<string, Subreddit>();
-			foreach (var subreddit in subscribedListing.Data.Children)
+			try
 			{
-				if(subreddit.Data is Subreddit && !newRivers.ContainsKey(((Subreddit)subreddit.Data).Id))
-					newRivers.Add(((Subreddit)subreddit.Data).Id, ((Subreddit)subreddit.Data));
+				var subscribedListing = await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing();
+
+				var newRivers = new Dictionary<string, Subreddit>();
+				foreach (var subreddit in subscribedListing.Data.Children)
+				{
+					if (subreddit.Data is Subreddit && !newRivers.ContainsKey(((Subreddit)subreddit.Data).Id))
+						newRivers.Add(((Subreddit)subreddit.Data).Id, ((Subreddit)subreddit.Data));
+				}
+
+				var missingRivers = new List<LinkRiverViewModel>();
+				var existingRivers = new Dictionary<string, LinkRiverViewModel>();
+				foreach (var river in CombinedRivers)
+				{
+					//ignore the frontpage
+					if (string.IsNullOrWhiteSpace(river.Thing.Id))
+						continue;
+
+					if (!existingRivers.ContainsKey(river.Thing.Id))
+						existingRivers.Add(river.Thing.Id, river);
+
+					if (!river.IsLocal && !newRivers.ContainsKey(river.Thing.Id))
+						missingRivers.Add(river);
+					else if (newRivers.ContainsKey(river.Thing.Id))
+						river.Thing = newRivers[river.Thing.Id];
+				}
+
+
+				foreach (var subredditTpl in newRivers)
+				{
+					if (!existingRivers.ContainsKey(subredditTpl.Key))
+						CombinedRivers.Add(new LinkRiverViewModel(false, subredditTpl.Value, "hot", null, null));
+				}
+
+				foreach (var missingRiver in missingRivers)
+				{
+					CombinedRivers.Remove(missingRiver);
+				}
 			}
-
-			var missingRivers = new List<LinkRiverViewModel>();
-			var existingRivers = new Dictionary<string, LinkRiverViewModel>();
-			foreach (var river in CombinedRivers)
+			catch (Exception ex)
 			{
-				//ignore the frontpage
-				if (string.IsNullOrWhiteSpace(river.Thing.Id))
-					continue;
-
-				if (!existingRivers.ContainsKey(river.Thing.Id))
-					existingRivers.Add(river.Thing.Id, river);
-
-				if(!river.IsLocal && !newRivers.ContainsKey(river.Thing.Id))
-					missingRivers.Add(river);
-				else if(newRivers.ContainsKey(river.Thing.Id))
-					river.Thing = newRivers[river.Thing.Id];
-			}
-
-			
-			foreach (var subredditTpl in newRivers)
-			{
-				if(!existingRivers.ContainsKey(subredditTpl.Key))
-					CombinedRivers.Add(new LinkRiverViewModel(false, subredditTpl.Value,  "hot", null, null));
-			}
-
-			foreach (var missingRiver in missingRivers)
-			{
-				CombinedRivers.Remove(missingRiver);
+				_logger.Error("failed refreshing subscribed subreddits", ex);
 			}
         }
 
