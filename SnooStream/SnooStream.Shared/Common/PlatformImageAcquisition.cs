@@ -160,7 +160,10 @@ namespace SnooStream.Common
 			catch(Exception ex) 
 			{
 				if (((uint)ex.HResult) != 0x800700B7)
+				{
 					_logger.Error("failed getting image content", ex);
+					return null;
+				}
 			}
 			return ApplicationData.Current.TemporaryFolder.Path + "\\" + onDiskName;
 		}
