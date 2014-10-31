@@ -16,6 +16,7 @@ Now that everything is set up, you can build, deploy, and debug the solution
 *   Send messages on reddit to either hippiehunter or madkatalpha
 
 # Things we can do right now
+*   Nokia Image SDK powered High Res image viewer (to allow 512mb devices to flipview in subreddits with super large images)
 *   Infinite scrolling everywhere
 *   Support for browsing reddit while not logged in
 *   Support for OAuth 2.0
@@ -34,7 +35,6 @@ Now that everything is set up, you can build, deploy, and debug the solution
 
 # Things left on the Todo list
 *   remove duplicate links
-*   implement Nokia Image SDK powered High Res image viewer (to allow 512mb devices to flipview in subreddits with super large images)
 *   put back multireddits in the subreddit list
 *   add support for local favorite subreddits
 *   add support for multireddit creation
