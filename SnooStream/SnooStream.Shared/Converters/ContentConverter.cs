@@ -27,7 +27,7 @@ namespace SnooStream.Converters
 			else if (content is VideoViewModel)
 				return new VideoControl { DataContext = content };
 			else if (content is PlainWebViewModel)
-                return new ImageContainer();//return new PlainWebControl { DataContext = content };
+                return new PlainWebControl { DataContext = content };
 			else if (content is SelfViewModel)
 				return new CommentsView { DataContext = content };
 			else
