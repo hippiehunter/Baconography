@@ -208,7 +208,8 @@ namespace SnooStream.ViewModel.Content
 		protected override Task StartLoad()
 		{
 			//TODO maybe this should do a full load, not sure
-			return Task.Run(() => FirstParagraph());
+			//return Task.Run(() => FirstParagraph());
+            return Task.FromResult(true);
 		}
 	}
 }

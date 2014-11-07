@@ -123,7 +123,7 @@
       <Name>CommonResourceAcquisition</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\GifRenderer\GifRenderer.WindowsPhone\GifRenderer.WindowsPhone.vcxproj">
-      <Project>{57985df4-90bc-4b9f-b1fc-291a30a48156}</Project>
+      <Project>{36b78bff-2723-4932-b8f0-b19b231bf73c}</Project>
       <Name>GifRenderer.WindowsPhone</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\SnooDom\SnooDom.WindowsPhone\SnooDom.WindowsPhone.vcxproj">

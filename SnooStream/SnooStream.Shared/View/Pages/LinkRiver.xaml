@@ -12,7 +12,7 @@
     mc:Ignorable="d"
     d:DataContext="{Binding SubredditRiver.SelectedRiver, Source={StaticResource SnooStream}}"
     x:Name="root"
-    NavigationCacheMode="Required">
+    NavigationCacheMode="Disabled">
     
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <VisualStateManager.VisualStateGroups>

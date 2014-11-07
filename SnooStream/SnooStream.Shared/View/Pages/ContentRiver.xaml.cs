@@ -1,4 +1,5 @@
 ﻿using SnooStream.Common;
+using SnooStream.View.Controls.Content;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,20 @@ namespace SnooStream.View.Pages
 
 		private async void flipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
+            //if (e.RemovedItems.Count > 0)
+            //{
+            //    var flipIndex = flipView.Items.IndexOf(e.RemovedItems.First());
+            //    if (flipIndex > 0)
+            //    {
+            //        var generatorPosition = flipView.ItemContainerGenerator.GeneratorPositionFromIndex(flipIndex);
+            //        var container = flipView.ContainerFromIndex(flipIndex) as FlipViewItem;
+            //        if (container != null)
+            //        {
+            //            var contentRoot = container.ContentTemplateRoot as ContentControl;
+            //            contentRoot.DataContext = null;
+            //        }
+            //    }
+            //}
 			if (e.AddedItems.Count > 0 && DataContext is LinkRiverViewModel)
 			{
 				var dataContext = DataContext as LinkRiverViewModel;
