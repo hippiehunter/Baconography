@@ -28,10 +28,13 @@ namespace SnooStream.Converters
 				return new VideoControl { DataContext = content };
 			else if (content is PlainWebViewModel)
                 return new PlainWebControl { DataContext = content };
-			else if (content is SelfViewModel)
-				return new CommentsView { DataContext = content };
-			else
-				throw new NotImplementedException();
+            else if (content is SelfViewModel)
+            {
+                var selfViewModel = content as SelfViewModel;
+                return new CommentsView { DataContext = selfViewModel.Comments };
+            }
+            else
+                throw new NotImplementedException();
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, string language)
