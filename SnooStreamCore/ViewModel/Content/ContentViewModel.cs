@@ -17,6 +17,7 @@ namespace SnooStream.ViewModel.Content
 		static protected ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<ContentViewModel>();
 		protected CancellationTokenSource CancelToken = new CancellationTokenSource(SnooStreamViewModel.Settings.ContentTimeout);
 		public string Glyph { get; set; }
+        protected bool UIThreadLoad { get; set; }
 		public static ContentViewModel MakeContentViewModel(string url, string title = null, ILinkViewModel selfLink = null, string redditThumbnail = null)
 		{
 			ContentViewModel result = null;
@@ -128,7 +129,15 @@ namespace SnooStream.ViewModel.Content
 			CancelToken = new CancellationTokenSource(timeout ?? SnooStreamViewModel.Settings.ContentTimeout);
 			try
 			{
-				await Task.Run((Func<Task>)StartLoad);
+                if (UIThreadLoad)
+                {
+                    await StartLoad();
+                }
+                else
+                {
+                    await Task.Run((Func<Task>)StartLoad);
+                }
+				
 			}
 			catch (Exception ex)
 			{
