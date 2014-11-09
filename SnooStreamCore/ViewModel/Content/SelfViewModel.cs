@@ -14,7 +14,17 @@ namespace SnooStream.ViewModel.Content
 		public SelfViewModel(LinkViewModel selfLink)
 		{
 			_selfLink = selfLink;
+            UIThreadLoad = true;
 		}
+
+
+        public CommentsViewModel Comments
+        {
+            get
+            {
+                return _selfLink.Comments;
+            }
+        }
 
 		public string SelfText
 		{
