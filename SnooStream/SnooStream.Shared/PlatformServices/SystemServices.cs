@@ -459,6 +459,7 @@ namespace SnooStream.PlatformServices
 			{
 				HttpClient client = new HttpClient();
 				var response = await client.GetAsync(new Uri(_url), HttpCompletionOption.ResponseHeadersRead);
+				ulong expectedBytes = response.Content.Headers.ContentLength ?? 0;
 				var responseStream = await response.Content.ReadAsInputStreamAsync();
 				var initialBuffer = await responseStream.ReadAsync(new Windows.Storage.Streams.Buffer(4096), 4096, InputStreamOptions.ReadAhead);
 				if (initialBuffer.Length == 0)
@@ -474,8 +475,8 @@ namespace SnooStream.PlatformServices
 						 (bufferBytes[4] == 0x39 || bufferBytes[4] == 0x37) && // 9 or 7
 						 bufferBytes[5] == 0x61;   // a
 
-
-				return new GifRenderer.GifPayload { initialData = bufferBytes.ToList(), inputStream = responseStream, url = _url };
+				
+				return new GifRenderer.GifPayload { initialData = bufferBytes.ToList(), inputStream = responseStream, url = _url, expectedSize = (int)expectedBytes };
 			}
 
 			public bool Loaded { get; set; }
