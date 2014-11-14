@@ -21,17 +21,6 @@ namespace SnooStream.ViewModel.Content
 			RedditThumbnail = linkThumbnailUrl;
 		}
 
-		public IImageLoader ImageLoader
-		{
-			get
-			{
-				return SnooStreamViewModel.SystemServices.DownloadImageWithProgress(Url, (progress) => { }, CancelToken.Token, (ex) =>
-				{
-					SetErrorStatus(ex.Message);
-				});
-			}
-		}
-
 		protected override Task StartLoad()
 		{
 			return Task.FromResult(true);//ImageLoader.ForceLoad(SnooStreamViewModel.Settings.ContentTimeout);

@@ -27,7 +27,7 @@
             </FlipView.ItemContainerStyle>
             <FlipView.ItemTemplate>
                 <DataTemplate>
-                    <gif:ZoomableImageControl DataContext="{Binding ImageLoader.ImageData}"/>
+                    <gif:ZoomableImageControl DataContext="{Binding Url}"/>
                 </DataTemplate>
             </FlipView.ItemTemplate>
         </FlipView>
