@@ -10,9 +10,9 @@ namespace SnooStream.ViewModel.Content
 {
 	public class ImageViewModel : ContentViewModel
 	{
-		public string Url;
-		public string Title;
-		public string RedditThumbnail;
+		public string Url {get; set;}
+		public string Title {get; set;}
+		public string RedditThumbnail {get; set;}
 
 		public ImageViewModel(string url, string title, string linkThumbnailUrl)
 		{
