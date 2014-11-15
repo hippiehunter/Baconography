@@ -8,7 +8,7 @@ namespace SnooStream.ViewModel
 {
     public interface IRefreshable
     {
-        void MaybeRefresh();
-        void Refresh(bool onlyNew);
+		Task MaybeRefresh();
+        Task Refresh(bool onlyNew);
     }
 }

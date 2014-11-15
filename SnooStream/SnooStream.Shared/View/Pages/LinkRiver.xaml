@@ -12,7 +12,7 @@
     mc:Ignorable="d"
     d:DataContext="{Binding SubredditRiver.SelectedRiver, Source={StaticResource SnooStream}}"
     x:Name="root"
-    NavigationCacheMode="Disabled">
+    NavigationCacheMode="Required">
     
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <VisualStateManager.VisualStateGroups>
@@ -59,7 +59,7 @@
     </Grid>
     <common:SnooApplicationPage.BottomAppBar>
         <CommandBar>
-            <AppBarButton Icon="Refresh" Command="{Binding RefreshCommand}"/>
+            <AppBarButton Icon="Refresh" Click="Refresh_Click"/>
             <AppBarButton Icon="Sort" Click="Sort_Click"/>
             <AppBarButton Icon="Upload" Command="{Binding CreateNewPostCommand}"/>
             <AppBarButton Icon="Find" Command="{Binding FindInSubredditCommand}"/>

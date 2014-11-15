@@ -462,7 +462,7 @@ namespace SnooStream.ViewModel
             return _loadFullTask.Value;
         }
 
-        public async void Refresh(bool onlyNew)
+        public async Task Refresh(bool onlyNew)
         {
             await LoadAndMergeFull(IsContext);
         }
@@ -661,17 +661,17 @@ namespace SnooStream.ViewModel
             }
         }
 
-		public void SetSort(string sort)
+		public async void SetSort(string sort)
 		{
 			Sort = sort;
-			Refresh(false);
+			await Refresh(false);
 		}
 
-		public void MaybeRefresh()
+		public async Task MaybeRefresh()
 		{
 			if (LastRefresh == null || (DateTime.Now - LastRefresh.Value).TotalMinutes > 30)
 			{
-				Refresh(false);
+				await Refresh(false);
 			}
 		}
 
