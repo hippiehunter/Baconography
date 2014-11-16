@@ -8,8 +8,28 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     x:Name="root">
-
+    <common:SnooApplicationPage.Resources>
+        <Storyboard x:Name="fadeInOverlay">
+            <DoubleAnimation
+                    Storyboard.TargetName="overlay"
+                    Storyboard.TargetProperty="Opacity"
+                    Duration="0:0:0.25"
+                    From="0" To="1"/>
+        </Storyboard>
+        <Storyboard x:Name="fadeOutOverlay">
+            <DoubleAnimation
+                    Storyboard.TargetName="overlay"
+                    Storyboard.TargetProperty="Opacity"
+                    Duration="0:0:0.25"
+                    From="1" To="0"/>
+        </Storyboard>
+    </common:SnooApplicationPage.Resources>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid x:Name="overlay" VerticalAlignment="Top" Background="{StaticResource PhoneChromeBrush}">
+            <TextBlock HorizontalAlignment="Right" Margin="12,36,12,6" FontSize="22" TextTrimming="WordEllipsis"
+                        Text="{Binding SelectedItem.Title, ElementName=flipView}" TextWrapping="Wrap" MaxHeight="400"
+                        x:Name="caption"/>
+        </Grid>
         <FlipView x:Name="flipView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <FlipView.ItemsPanel>
                 <ItemsPanelTemplate>

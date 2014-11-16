@@ -66,9 +66,14 @@ namespace SnooStream.View.Pages
 			}
 		}
 
+		private bool _overlayVisible = true;
 		private void Overlay_Click(object sender, RoutedEventArgs e)
 		{
-
+			_overlayVisible = !_overlayVisible;
+			if (_overlayVisible) 
+				fadeInOverlay.Begin();
+			else 
+				fadeOutOverlay.Begin();
 		}
-    }
+	}
 }
