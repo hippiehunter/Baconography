@@ -89,8 +89,6 @@ namespace SnooStream.ViewModel
 			}
 		}
 
-		public Action<Object> ViewHack {get; set;}
-
 		public CommentViewModel GetById (string id)
 		{
 			CommentShell shell;

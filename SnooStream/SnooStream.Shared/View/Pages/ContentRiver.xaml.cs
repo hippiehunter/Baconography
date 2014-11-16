@@ -36,26 +36,33 @@ namespace SnooStream.View.Pages
 			if(DataContext is IHasLinks)
 			{
 				var dataContext = DataContext as IHasLinks;
-				flipView.ItemsSource = dataContext.Links;
+				flipView.ItemsSource = ContentStreamViewModel.MakeFilteredContentStream(dataContext.Links, dataContext.CurrentSelected);
 				flipView.SelectedValue = dataContext.CurrentSelected;
+				if (dataContext.CurrentSelected != null)
+					SnooStreamViewModel.OfflineService.AddHistory(dataContext.CurrentSelected.Url);
 				flipView.SelectionChanged += flipView_SelectionChanged;
 			}
 		}
 
 		private async void flipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (e.AddedItems.Count > 0 && DataContext is LinkRiverViewModel)
+			var dataContext = DataContext as IHasLinks;
+			if (dataContext != null)
 			{
-				var dataContext = DataContext as IHasLinks;
-				dataContext.CurrentSelected = e.AddedItems.First() as ILinkViewModel;
-			}
-			var loader = flipView.ItemsSource as ISupportIncrementalLoading;
-			if (e.AddedItems.Count > 0 && 
-				flipView.Items.Count < (flipView.Items.IndexOf(e.AddedItems.First()) + 5) &&
-				loader != null)
-			{
-				if (loader.HasMoreItems)
-					await loader.LoadMoreItemsAsync(20);
+				if (e.AddedItems.Count > 0)
+				{
+					dataContext.CurrentSelected = e.AddedItems.First() as ILinkViewModel;
+					if (dataContext.CurrentSelected != null)
+						SnooStreamViewModel.OfflineService.AddHistory(dataContext.CurrentSelected.Url);
+				}
+				var loader = dataContext.Links as ISupportIncrementalLoading;
+				if (e.AddedItems.Count > 0 &&
+					flipView.Items.Count < (flipView.Items.IndexOf(e.AddedItems.First()) + 5) &&
+					loader != null)
+				{
+					if (loader.HasMoreItems)
+						await loader.LoadMoreItemsAsync(20);
+				}
 			}
 		}
 
