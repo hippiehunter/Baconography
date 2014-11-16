@@ -30,14 +30,10 @@
                 SelectionMode="None"
                 IsSwipeEnabled="False"
                 HorizontalContentAlignment="Stretch"
-                ItemTemplateSelector="{StaticResource articleTemplateSelector}">
+                ItemTemplateSelector="{StaticResource articleTemplateSelector}"
+                ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
         <ListView.Header>
             <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" FontSize="32" Margin="20" TextWrapping="Wrap"/>
         </ListView.Header>
-        <ListView.ItemContainerStyle>
-            <Style TargetType="ListViewItem">
-                <Setter Property="IsHitTestVisible" Value="False" />
-            </Style>
-        </ListView.ItemContainerStyle>
     </ListView>
 </UserControl>

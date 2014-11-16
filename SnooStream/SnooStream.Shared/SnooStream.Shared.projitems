@@ -137,10 +137,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\UserActivityTemplateSelector.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="$(MSBuildThisFileDirectory)Resources\StyleResources.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\CaptchaControl.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -234,5 +230,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)Assets\WebGlyphTile.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Resources\" />
   </ItemGroup>
 </Project>

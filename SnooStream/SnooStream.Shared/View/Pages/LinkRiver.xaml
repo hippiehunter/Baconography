@@ -40,13 +40,8 @@
                       ShowsScrollingPlaceholders="True"
                       IsItemClickEnabled="False"
                       IncrementalLoadingTrigger="Edge"
-                      IncrementalLoadingThreshold="10">
-
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    </Style>
-                </ListView.ItemContainerStyle>
+                      IncrementalLoadingThreshold="10" 
+                      ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
                 
                 <ListView.ItemTemplate>
                     <DataTemplate>

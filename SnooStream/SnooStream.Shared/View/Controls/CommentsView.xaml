@@ -223,12 +223,8 @@
         </VisualStateManager.VisualStateGroups>
         <ListView x:Name="commentsList" HeaderTemplate="{StaticResource HeaderTemplate}"
                   ItemTemplateSelector="{Binding Path=Selector, Source={StaticResource commentTemplateSelector}}"
-                  ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
+                  ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging"
+                  ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
         </ListView>
         <Popup x:Name="sortPopup" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
