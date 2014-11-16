@@ -11,5 +11,6 @@ namespace SnooStream.ViewModel
 	public interface IHasLinks
 	{
 		ObservableCollection<ILinkViewModel> Links { get; set; }
+		ILinkViewModel CurrentSelected { get; set; }
 	}
 }

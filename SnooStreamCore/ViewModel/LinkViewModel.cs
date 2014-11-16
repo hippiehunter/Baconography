@@ -188,7 +188,7 @@ namespace SnooStream.ViewModel
             RaisePropertyChanged("Metadata");
         }
 
-        public RelayCommand NavigateToComments 
+        public RelayCommand GotoComments 
         { 
             get 
             { 
@@ -199,6 +199,7 @@ namespace SnooStream.ViewModel
                 });
             }
         }
+		public RelayCommand GotoWeb { get { return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToWeb(Link.Url)); } }
         public RelayCommand GotoLink { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoLink(this, Link.Url)); } }
         public RelayCommand GotoSubreddit { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoSubreddit(Subreddit)); } }
         public RelayCommand GotoUserDetails { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoUserDetails(Author)); } }

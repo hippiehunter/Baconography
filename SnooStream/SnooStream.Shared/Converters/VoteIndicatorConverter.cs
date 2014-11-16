@@ -56,4 +56,31 @@ namespace SnooStream.Converters
             throw new NotImplementedException();
         }
     }
+
+	public class VoteSymbolConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, string language)
+		{
+			var votable = value as VotableViewModel;
+			//These are the wrong icons but they will work for now
+			if (votable != null && votable.LikeStatus != 0)
+			{
+				if (votable.LikeStatus == 1)
+				{
+					return new SymbolIcon(Symbol.Like);
+				}
+				else 
+				{
+					return new SymbolIcon(Symbol.Dislike);
+				}
+			}
+			else
+				return new SymbolIcon(Symbol.LikeDislike);
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, string language)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

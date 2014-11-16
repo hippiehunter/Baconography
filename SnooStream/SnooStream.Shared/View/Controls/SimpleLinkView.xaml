@@ -52,7 +52,7 @@
             <Button Grid.Column="0" Grid.Row="1"
                     BorderThickness="0" Margin="0" Padding="0" HorizontalContentAlignment="Center"
                     FontFamily="Segoe UI Symbol" HorizontalAlignment="Center"
-                    Command="{Binding NavigateToComments}">
+                    Command="{Binding GotoComments}">
                 <Grid>
                     <TextBlock Margin="0,0,0,0" FontSize="40" Text="&#xE200;" />
                     <TextBlock Margin="2,14,0,0" Foreground="{ThemeResource FlyoutBackgroundThemeBrush}" Text="{Binding Path=CommentCount}"

@@ -29,4 +29,13 @@
             </FlipView.ItemTemplate>
         </FlipView>
     </Grid>
+    <common:SnooApplicationPage.BottomAppBar>
+        <CommandBar>
+            <AppBarButton DataContext="{Binding CurrentSelected}" Icon="{Binding Votable, Converter={StaticResource voteSymbolConverter}}" Label="Vote"  Command="{Binding Votable.ToggleVote}"/>
+            <AppBarButton DataContext="{Binding CurrentSelected}" Icon="Globe" Label="Browser" Command="{Binding GotoWeb}"/>
+            <AppBarButton DataContext="{Binding CurrentSelected}" Icon="Comment" Label="Comments" Command="{Binding GotoComments}"/>
+            <AppBarButton Icon="View" Label="Overlay" Click="Overlay_Click"/>
+            <AppBarButton DataContext="{Binding CurrentSelected}" Icon="OtherUser" Label="OP" Command="{Binding GotoUserDetails}"/>
+        </CommandBar>
+    </common:SnooApplicationPage.BottomAppBar>
 </common:SnooApplicationPage>

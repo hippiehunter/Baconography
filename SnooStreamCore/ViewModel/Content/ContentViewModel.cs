@@ -2,6 +2,7 @@
 using CommonResourceAcquisition.VideoAcquisition;
 using GalaSoft.MvvmLight;
 using MetroLog;
+using SnooSharp;
 using SnooStream.Model;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,11 @@ namespace SnooStream.ViewModel.Content
 		static protected ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<ContentViewModel>();
 		protected CancellationTokenSource CancelToken = new CancellationTokenSource(SnooStreamViewModel.Settings.ContentTimeout);
 		public string Glyph { get; set; }
+		public string Title { get; set; }
         protected bool UIThreadLoad { get; set; }
+
+		VotableViewModel Votable { get; set; }
+
 		public static ContentViewModel MakeContentViewModel(string url, string title = null, ILinkViewModel selfLink = null, string redditThumbnail = null)
 		{
 			ContentViewModel result = null;
@@ -91,6 +96,11 @@ namespace SnooStream.ViewModel.Content
 			}
 
 			result.Glyph = glyph;
+			if(selfLink != null)
+			{
+				result.Votable = selfLink.Votable;
+				result.Title = selfLink.Title;
+			}
 
 			return result;
 		}

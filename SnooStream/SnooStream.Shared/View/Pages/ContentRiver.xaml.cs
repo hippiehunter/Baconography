@@ -33,9 +33,9 @@ namespace SnooStream.View.Pages
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
 			base.OnNavigatedTo(e);
-			if(DataContext is LinkRiverViewModel)
+			if(DataContext is IHasLinks)
 			{
-				var dataContext = DataContext as LinkRiverViewModel;
+				var dataContext = DataContext as IHasLinks;
 				flipView.ItemsSource = dataContext.Links;
 				flipView.SelectedValue = dataContext.CurrentSelected;
 				flipView.SelectionChanged += flipView_SelectionChanged;
@@ -44,23 +44,9 @@ namespace SnooStream.View.Pages
 
 		private async void flipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-            //if (e.RemovedItems.Count > 0)
-            //{
-            //    var flipIndex = flipView.Items.IndexOf(e.RemovedItems.First());
-            //    if (flipIndex > 0)
-            //    {
-            //        var generatorPosition = flipView.ItemContainerGenerator.GeneratorPositionFromIndex(flipIndex);
-            //        var container = flipView.ContainerFromIndex(flipIndex) as FlipViewItem;
-            //        if (container != null)
-            //        {
-            //            var contentRoot = container.ContentTemplateRoot as ContentControl;
-            //            contentRoot.DataContext = null;
-            //        }
-            //    }
-            //}
 			if (e.AddedItems.Count > 0 && DataContext is LinkRiverViewModel)
 			{
-				var dataContext = DataContext as LinkRiverViewModel;
+				var dataContext = DataContext as IHasLinks;
 				dataContext.CurrentSelected = e.AddedItems.First() as ILinkViewModel;
 			}
 			var loader = flipView.ItemsSource as ISupportIncrementalLoading;
@@ -71,6 +57,11 @@ namespace SnooStream.View.Pages
 				if (loader.HasMoreItems)
 					await loader.LoadMoreItemsAsync(20);
 			}
+		}
+
+		private void Overlay_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
     }
 }
