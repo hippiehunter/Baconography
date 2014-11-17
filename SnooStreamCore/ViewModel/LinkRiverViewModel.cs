@@ -234,6 +234,8 @@ namespace SnooStream.ViewModel
 						_linkRiverViewModel.LastLinkId = postListing.Data.After;
 					});
 				}
+				if(_linkRiverViewModel != null)
+					_linkRiverViewModel.CurrentSelected = _linkRiverViewModel.Links.FirstOrDefault();
 			}
 
 
@@ -266,6 +268,7 @@ namespace SnooStream.ViewModel
 			set
 			{
 				_currentSelected = value;
+				RaisePropertyChanged("CurrentSelected");
 			}
 		}
 
@@ -280,20 +283,20 @@ namespace SnooStream.ViewModel
 			};
 		}
 
-		public void MaybeRefresh()
+		public async Task MaybeRefresh()
 		{
-			((IRefreshable)Links).MaybeRefresh();
+			await ((IRefreshable)Links).MaybeRefresh();
 		}
 
-		public void Refresh(bool onlyNew)
+		public async Task Refresh(bool onlyNew)
 		{
-			((IRefreshable)Links).Refresh(onlyNew);
+			await ((IRefreshable)Links).Refresh(onlyNew);
 		}
 
-		public void SetSort(string sort)
+		public async void SetSort(string sort)
 		{
 			Sort = sort;
-			Refresh(false);
+			await Refresh(false);
 		}
 
 		public RelayCommand RefreshCommand

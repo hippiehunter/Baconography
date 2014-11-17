@@ -18,6 +18,10 @@ namespace SnooStream.Common
             var stateItem = JsonConvert.DeserializeObject<Tuple<string, string>>(dump);
             switch (stateItem.Item1)
             {
+				//case "CommentsContentStreamViewModel":
+				//	{
+				//		break;
+				//	}
                 case "LinkRiverViewModel":
                     {
 						Debug.Assert(context is SnooStreamViewModel);
@@ -32,16 +36,10 @@ namespace SnooStream.Common
 						result.CurrentSelected = result.Links.FirstOrDefault(lnk => lnk.Id == subredditThing.Item5);
 						return result;
                     }
-				//case "LinkStreamViewModel":
-				//	{
-				//		return new LinkStreamViewModel(context, stateItem.Item2);
-				//	}
 				case "CommentsViewModel":
 					{
 						var dumpArgs = JsonConvert.DeserializeObject<Tuple<Listing, string, string, DateTime?>>(stateItem.Item2);
 						LinkViewModel targetContext = null;
-						//if (context is LinkStreamViewModel)
-						//	targetContext = ((LinkStreamViewModel)context).Current; else
 						if (context is LinkRiverViewModel)
 							targetContext = ((LinkRiverViewModel)context).Links.FirstOrDefault(link => link.Id == dumpArgs.Item3) as LinkViewModel;
 
@@ -74,7 +72,7 @@ namespace SnooStream.Common
 						return postViewModel;
 					}
                 default:
-                    throw new InvalidOperationException();
+					throw new InvalidOperationException(stateItem.Item1);
             }
         }
 
@@ -96,11 +94,6 @@ namespace SnooStream.Common
 				var serialized = JsonConvert.SerializeObject(serializationTpl);
                 return JsonConvert.SerializeObject(Tuple.Create("LinkRiverViewModel", serialized));
             }
-			//else if (viewModel is ContentStreamViewModel)
-			//{
-			//	var contentStream = viewModel as ContentStreamViewModel;
-			//	return JsonConvert.SerializeObject(Tuple.Create("ContentStreamViewModel", ((LinkViewModel)contentStream.).Link.Id));
-			//}
 			else if (viewModel is CommentsViewModel)
 			{
 				var comments = viewModel as CommentsViewModel;
@@ -116,8 +109,17 @@ namespace SnooStream.Common
 				var postViewModel = viewModel as PostViewModel;
 				return JsonConvert.SerializeObject(new { Editing = postViewModel.Editing, Kind = postViewModel.Kind, Subreddit = postViewModel.Subreddit, Text = postViewModel.Text, Title = postViewModel.Title, Url = postViewModel.Url });
 			}
+			//else if(viewModel is CommentsContentStreamViewModel)
+			//{
+			//	var contentStream = viewModel as CommentsContentStreamViewModel;
+			//	var currentSelectedUrl = contentStream.CurrentSelected.Url;
+			//	var currentSelectedId = contentStream.CurrentSelected.Id;
+
+
+
+			//}
 			else
-				throw new InvalidOperationException();
+				throw new InvalidOperationException(viewModel.GetType().FullName);
         }
     }
 }

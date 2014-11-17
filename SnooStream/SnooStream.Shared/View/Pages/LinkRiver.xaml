@@ -40,14 +40,9 @@
                       ShowsScrollingPlaceholders="True"
                       IsItemClickEnabled="False"
                       IncrementalLoadingTrigger="Edge"
-                      IncrementalLoadingThreshold="10">
-
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-                
+                      IncrementalLoadingThreshold="10" 
+                      VirtualizingStackPanel.VirtualizationMode="Standard"
+                      ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <local:CardLinkView/>
@@ -59,7 +54,7 @@
     </Grid>
     <common:SnooApplicationPage.BottomAppBar>
         <CommandBar>
-            <AppBarButton Icon="Refresh" Command="{Binding RefreshCommand}"/>
+            <AppBarButton Icon="Refresh" Click="Refresh_Click"/>
             <AppBarButton Icon="Sort" Click="Sort_Click"/>
             <AppBarButton Icon="Upload" Command="{Binding CreateNewPostCommand}"/>
             <AppBarButton Icon="Find" Command="{Binding FindInSubredditCommand}"/>

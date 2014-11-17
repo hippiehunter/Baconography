@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using SnooStream.Services;
 using SnooStream.ViewModel.Content;
 using System;
@@ -53,6 +54,17 @@ namespace SnooStream.ViewModel
 				Url = url;
 				CreatedUTC = context.Thing.CreatedUTC;
 				Id = context.Thing.Id;
+				Votable = context.Votable;
+				GotoWeb = new RelayCommand(() =>
+					{
+						SnooStreamViewModel.NavigationService.NavigateToWeb(Url);
+					});
+				GotoComments = new RelayCommand(() => 
+					{
+						var localTemp = Url;
+						SnooStreamViewModel.NavigationService.GoBack();
+					});
+				GotoUserDetails = context.GotoUserDetails;
 				LazyContent = new Lazy<ContentViewModel>(() => SnooStream.ViewModel.Content.ContentViewModel.MakeContentViewModel(url, title, this, null));
 			}
 
@@ -82,6 +94,11 @@ namespace SnooStream.ViewModel
 					return LazyContent.Value;
 				}
 			}
+
+			public VotableViewModel Votable { get; set; }
+			public RelayCommand GotoWeb { get; set; }
+			public RelayCommand GotoComments { get; set; }
+			public RelayCommand GotoUserDetails { get; set; }
 		}
 	}
 }

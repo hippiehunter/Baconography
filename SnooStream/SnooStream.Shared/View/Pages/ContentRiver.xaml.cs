@@ -1,4 +1,5 @@
 ﻿using SnooStream.Common;
+using SnooStream.View.Controls.Content;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -32,30 +33,47 @@ namespace SnooStream.View.Pages
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
 			base.OnNavigatedTo(e);
-			if(DataContext is LinkRiverViewModel)
+			if(DataContext is IHasLinks)
 			{
-				var dataContext = DataContext as LinkRiverViewModel;
-				flipView.ItemsSource = dataContext.Links;
+				var dataContext = DataContext as IHasLinks;
+				flipView.ItemsSource = ContentStreamViewModel.MakeFilteredContentStream(dataContext.Links, dataContext.CurrentSelected);
 				flipView.SelectedValue = dataContext.CurrentSelected;
+				if (dataContext.CurrentSelected != null)
+					SnooStreamViewModel.OfflineService.AddHistory(dataContext.CurrentSelected.Url);
 				flipView.SelectionChanged += flipView_SelectionChanged;
 			}
 		}
 
 		private async void flipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (e.AddedItems.Count > 0 && DataContext is LinkRiverViewModel)
+			var dataContext = DataContext as IHasLinks;
+			if (dataContext != null)
 			{
-				var dataContext = DataContext as LinkRiverViewModel;
-				dataContext.CurrentSelected = e.AddedItems.First() as ILinkViewModel;
-			}
-			var loader = flipView.ItemsSource as ISupportIncrementalLoading;
-			if (e.AddedItems.Count > 0 && 
-				flipView.Items.Count < (flipView.Items.IndexOf(e.AddedItems.First()) + 5) &&
-				loader != null)
-			{
-				if (loader.HasMoreItems)
-					await loader.LoadMoreItemsAsync(20);
+				if (e.AddedItems.Count > 0)
+				{
+					dataContext.CurrentSelected = e.AddedItems.First() as ILinkViewModel;
+					if (dataContext.CurrentSelected != null)
+						SnooStreamViewModel.OfflineService.AddHistory(dataContext.CurrentSelected.Url);
+				}
+				var loader = dataContext.Links as ISupportIncrementalLoading;
+				if (e.AddedItems.Count > 0 &&
+					flipView.Items.Count < (flipView.Items.IndexOf(e.AddedItems.First()) + 5) &&
+					loader != null)
+				{
+					if (loader.HasMoreItems)
+						await loader.LoadMoreItemsAsync(20);
+				}
 			}
 		}
-    }
+
+		private bool _overlayVisible = true;
+		private void Overlay_Click(object sender, RoutedEventArgs e)
+		{
+			_overlayVisible = !_overlayVisible;
+			if (_overlayVisible) 
+				fadeInOverlay.Begin();
+			else 
+				fadeOutOverlay.Begin();
+		}
+	}
 }

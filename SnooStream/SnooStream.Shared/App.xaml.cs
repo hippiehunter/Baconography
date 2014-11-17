@@ -8,9 +8,11 @@ using SnooStream.View.Pages;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -68,7 +70,7 @@ namespace SnooStream
 			}
 #endif
 		}
-
+        Timer timer;
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used when the application is launched to open a specific file, to display
@@ -81,6 +83,13 @@ namespace SnooStream
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 this.DebugSettings.EnableFrameRateCounter = true;
+#if WINDOWS_PHONE_APP
+                //timer = new Timer((state) =>
+                //{
+                //    Debug.WriteLine(Windows.System.MemoryManager.AppMemoryUsageLimit.ToString() + " | " +
+                //        Windows.System.MemoryManager.AppMemoryUsage.ToString());
+                //}, null, 0, 500);
+#endif
             }
 #endif
 

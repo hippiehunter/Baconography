@@ -81,15 +81,15 @@ namespace SnooStream.Common
 			}
 		}
 
-		public void MaybeRefresh()
+		public async Task MaybeRefresh()
 		{
 			if (_loader.IsStale)
 			{
-				Refresh(false);
+				await Refresh(false);
 			}
 		}
 
-		public async void Refresh(bool onlyNew)
+		public async Task Refresh(bool onlyNew)
 		{
 			lock (this)
 			{

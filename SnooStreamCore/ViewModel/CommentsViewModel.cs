@@ -53,7 +53,9 @@ namespace SnooStream.ViewModel
             Link = _context as LinkViewModel;
             _loadFullSentinel = new LoadFullCommentsViewModel(this);
             FlatComments = new ObservableCollection<ViewModelBase>();
-            ProcessUrl("http://www.reddit.com" + linkData.Permalink);
+            ProcessUrl((linkData.Permalink.Contains("://") && linkData.Permalink.Contains("reddit.com")) ?
+				linkData.Permalink :
+				"http://www.reddit.com" + linkData.Permalink);
 			_commentsContentStream = new Lazy<CommentsContentStreamViewModel>(() => new CommentsContentStreamViewModel(this));
         }
 
@@ -88,8 +90,6 @@ namespace SnooStream.ViewModel
 				return _commentsContentStream.Value;
 			}
 		}
-
-		public Action<Object> ViewHack {get; set;}
 
 		public CommentViewModel GetById (string id)
 		{
@@ -462,7 +462,7 @@ namespace SnooStream.ViewModel
             return _loadFullTask.Value;
         }
 
-        public async void Refresh(bool onlyNew)
+        public async Task Refresh(bool onlyNew)
         {
             await LoadAndMergeFull(IsContext);
         }
@@ -661,17 +661,17 @@ namespace SnooStream.ViewModel
             }
         }
 
-		public void SetSort(string sort)
+		public async void SetSort(string sort)
 		{
 			Sort = sort;
-			Refresh(false);
+			await Refresh(false);
 		}
 
-		public void MaybeRefresh()
+		public async Task MaybeRefresh()
 		{
 			if (LastRefresh == null || (DateTime.Now - LastRefresh.Value).TotalMinutes > 30)
 			{
-				Refresh(false);
+				await Refresh(false);
 			}
 		}
 

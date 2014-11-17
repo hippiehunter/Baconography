@@ -19,8 +19,7 @@ namespace SnooStream.Services
 		void RunUIIdleAsync(Func<Task> action);
         void StartThreadPoolTimer(Func<object, Task> action, TimeSpan timer);
         Task<byte[]> DownloadWithProgress(string uri, Action<int> progress, CancellationToken cancelToken);
-		IImageLoader DownloadImageWithProgress(string uri, Action<int> progress, CancellationToken cancelToken, Action<Exception> errorHandler);
-        void ShowMessage(string title, string text);
+		void ShowMessage(string title, string text);
         bool IsLowPriorityNetworkOk { get; }
         bool IsHighPriorityNetworkOk { get; }
 		void ShowProgress(string notificationText, double? progressPercent);

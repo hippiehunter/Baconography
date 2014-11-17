@@ -31,7 +31,19 @@ namespace SnooStream.ViewModel.Content
 		public bool NoPreview { get; private set; }
 		public bool TextPreview { get; private set; }
 		public bool ImagePreview { get; private set; }
-		public bool NotText { get; private set; }
+        bool _notText;
+        public bool NotText
+        {
+            get
+            {
+                return _notText;
+            }
+            set
+            {
+                _notText = value;
+                RaisePropertyChanged("NotText");
+            }
+        }
 		public string Url { get; private set; }
 		public string Title { get; private set; }
 		public string RedditThumbnail { get; private set; }
@@ -53,6 +65,7 @@ namespace SnooStream.ViewModel.Content
 
 		public PlainWebViewModel(bool notText, string url, string redditThumbnail)
         {
+            NotText = true;
             TextPreview = !notText;
             Url = url;
 			RedditThumbnail = redditThumbnail;
@@ -84,7 +97,29 @@ namespace SnooStream.ViewModel.Content
 				}
 				else
 				{
-					_httpLoad = _httpClient.GetStringAsync(url);
+                    TaskCompletionSource<string> stringCompletionSource = new TaskCompletionSource<string>();
+                    _httpLoad = stringCompletionSource.Task;
+
+                    var responseMessage = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                    IEnumerable<string> contentType;
+                    if (responseMessage.Content.Headers.TryGetValues("content-type", out contentType) &&
+                        contentType.Select(type => type.ToLower())
+                            .Any((type) => type.Contains("image") || type.Contains("binary") || type.Contains("jpeg") || type.Contains("octet-stream")))
+                    {
+                        stringCompletionSource.SetResult("");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            stringCompletionSource.SetResult(await responseMessage.Content.ReadAsStringAsync());
+                        }
+                        catch (Exception ex)
+                        {
+                            stringCompletionSource.TrySetException(ex);
+                        }
+                    }
+
 					var result = await _httpLoad;
 					_weakPageData = new WeakReference<string>(result);
 					await SnooStreamViewModel.OfflineService.StoreBlob(url, result);
@@ -129,8 +164,12 @@ namespace SnooStream.ViewModel.Content
 				{
 					var loadResult = await Task.Run(() => _viewModel.LoadOneImpl(_httpClient, _viewModel._nextUrl ?? _viewModel.Url));
 					_viewModel._nextUrl = loadResult.Item1;
-					_hasLoaded = true;
-					return loadResult.Item3;
+                    if (!_hasLoaded && loadResult.Item3 == null || loadResult.Item3.Count() == 0)
+                    {
+                        _viewModel.NotText = true;
+                    }
+                    _hasLoaded = true;
+                    return loadResult.Item3;
 				}
 				else
 					return Enumerable.Empty<Readable>();
@@ -158,22 +197,26 @@ namespace SnooStream.ViewModel.Content
 					domain = new Uri(url).Authority;
 
 				var page = await GetPageData(url);
-				string title;
-				var pageBlocks = ArticleExtractor.INSTANCE.GetTextAndImageBlocks(page, new Uri(url), out title);
-				foreach (var tpl in pageBlocks)
-				{
-					if (!string.IsNullOrEmpty(tpl.Item2))
-					{
-						result.Add(new ReadableImage { Url = tpl.Item2 });
-					}
+                if (!string.IsNullOrWhiteSpace(page))
+                {
+                    string title;
+                    var pageBlocks = ArticleExtractor.INSTANCE.GetTextAndImageBlocks(page, new Uri(url), out title);
+                    foreach (var tpl in pageBlocks)
+                    {
+                        if (!string.IsNullOrEmpty(tpl.Item2))
+                        {
+                            result.Add(new ReadableImage { Url = tpl.Item2 });
+                        }
 
-					if (!string.IsNullOrEmpty(tpl.Item1))
-					{
-						result.Add(new ReadableText { Text = tpl.Item1 });
-					}
-				}
-				var nextPageUrl = MultiPageUtils.FindNextPageLink(SgmlDomBuilder.GetBody(SgmlDomBuilder.BuildDocument(page)), url);
-				return Tuple.Create(nextPageUrl, title, (IEnumerable<Readable>)result);
+                        if (!string.IsNullOrEmpty(tpl.Item1))
+                        {
+                            result.Add(new ReadableText { Text = tpl.Item1 });
+                        }
+                    }
+                    var nextPageUrl = MultiPageUtils.FindNextPageLink(SgmlDomBuilder.GetBody(SgmlDomBuilder.BuildDocument(page)), url);
+                    return Tuple.Create(nextPageUrl, title, (IEnumerable<Readable>)result);
+                }
+                return Tuple.Create("", "", (IEnumerable<Readable>)result);
 			}
 			catch (Exception ex)
 			{
@@ -208,7 +251,8 @@ namespace SnooStream.ViewModel.Content
 		protected override Task StartLoad()
 		{
 			//TODO maybe this should do a full load, not sure
-			return Task.Run(() => FirstParagraph());
+			//return Task.Run(() => FirstParagraph());
+            return Task.FromResult(true);
 		}
 	}
 }

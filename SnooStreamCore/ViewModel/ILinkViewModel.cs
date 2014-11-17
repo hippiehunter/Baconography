@@ -1,4 +1,5 @@
-﻿using SnooSharp;
+﻿using GalaSoft.MvvmLight.Command;
+using SnooSharp;
 using SnooStream.ViewModel.Content;
 using System;
 using System.Collections.Generic;
@@ -20,5 +21,9 @@ namespace SnooStream.ViewModel
 		DateTime CreatedUTC { get; }
 		string Id { get; }
 		ContentViewModel Content { get; }
+		VotableViewModel Votable { get; }
+		RelayCommand GotoWeb { get; }
+		RelayCommand GotoComments { get; }
+		RelayCommand GotoUserDetails { get; }
 	}
 }

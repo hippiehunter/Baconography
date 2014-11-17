@@ -115,14 +115,10 @@ namespace SnooStream.Common
                 {
                     if (sourceLink != null)
                     {
-                        var targetLinkPermalink = sourceLink.Url.Substring(sourceLink.Url.IndexOf("reddit.com") + "reddit.com".Length);
-                        if (!targetLinkPermalink.Contains(url))
+                        var realTarget = await SnooStreamViewModel.RedditService.GetLinkByUrl(url);
+                        if (realTarget != null)
                         {
-                            var realTarget = await SnooStreamViewModel.RedditService.GetLinkByUrl(url);
-                            if (realTarget != null)
-                            {
-                                sourceLink = realTarget.Data as Link;
-                            }
+                            sourceLink = realTarget.Data as Link;
                         }
                     }
 
@@ -263,7 +259,7 @@ namespace SnooStream.Common
 						var contentStream = contextTpl.Item1.CommentsContentStream;
 						var targetContent = contentStream.Links.FirstOrDefault(item => item.Id == contextTpl.Item2.Id && item.Url == contextTpl.Item3);
 						if (targetContent != null)
-							contentStream.CurrentSelected = context as ILinkViewModel;
+							contentStream.CurrentSelected = targetContent as ILinkViewModel;
 
 						SnooStreamViewModel.NavigationService.NavigateToContentRiver(contentStream);
 					}

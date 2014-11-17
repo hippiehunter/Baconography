@@ -78,7 +78,7 @@
                         Margin="0,-12,2,0"
                         BorderThickness="0" Padding="0,0,0,0" 
                         FontFamily="Segoe UI Symbol"
-                        Command="{Binding NavigateToComments}">
+                        Command="{Binding GotoComments}">
                     <Grid>
                         <TextBlock Margin="0,0,0,0" FontSize="36" Text="&#xE200;" />
                         <TextBlock Margin="1,11,0,0" Text="{Binding Path=CommentCount}" Foreground="Black" HorizontalAlignment="Center"/>

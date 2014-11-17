@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream.View.Controls.Content"
+    xmlns:gif="using:GifRenderer"
     xmlns:selectors="using:SnooStream.View.Selectors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -15,7 +16,7 @@
             <TextBlock HorizontalAlignment="Left" FontSize="20" Padding="0" Margin="10" Text="{Binding Text}" TextWrapping="Wrap"/>
         </DataTemplate>
         <DataTemplate x:Key="Type:ReadableImage">
-            <Image Source="{Binding Url}" Stretch="Uniform" Margin="10"/>
+            <gif:ZoomableImageControl DataContext="{Binding Url}" HorizontalAlignment="Stretch" Margin="10"/>
         </DataTemplate>
         <selectors:TypedTemplateSelector x:Name="articleTemplateSelector" />
     </UserControl.Resources>
@@ -29,14 +30,10 @@
                 SelectionMode="None"
                 IsSwipeEnabled="False"
                 HorizontalContentAlignment="Stretch"
-                ItemTemplateSelector="{StaticResource articleTemplateSelector}">
+                ItemTemplateSelector="{StaticResource articleTemplateSelector}"
+                ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
         <ListView.Header>
             <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" FontSize="32" Margin="20" TextWrapping="Wrap"/>
         </ListView.Header>
-        <ListView.ItemContainerStyle>
-            <Style TargetType="ListViewItem">
-                <Setter Property="IsHitTestVisible" Value="False" />
-            </Style>
-        </ListView.ItemContainerStyle>
     </ListView>
 </UserControl>

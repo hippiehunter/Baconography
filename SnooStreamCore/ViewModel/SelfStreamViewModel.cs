@@ -350,16 +350,16 @@ namespace SnooStream.ViewModel
 			};
 		}
 
-		public void MaybeRefresh()
+		public async Task MaybeRefresh()
 		{
 			if (!string.IsNullOrWhiteSpace(SnooStreamViewModel.RedditUserState.Username))
 			{
 				if (LastRefresh == null || (DateTime.Now - LastRefresh.Value).TotalMinutes > 30)
-					Refresh(false);
+					await Refresh(false);
 			}
 		}
 
-		public async void Refresh(bool onlyNew)
+		public async Task Refresh(bool onlyNew)
 		{
 			if (!onlyNew)
 			{

@@ -110,6 +110,7 @@ namespace SnooStream.ViewModel
 			_initializationBlob.NavigationBlob = navigationBlob;
 			_initializationBlob.Subreddits = SubredditRiver.Dump();
             OfflineService.StoreInitializationBlob(_initializationBlob);
+			OfflineService.StoreHistory();
 			_logger.Info("dump init blob finished");
         }
 
