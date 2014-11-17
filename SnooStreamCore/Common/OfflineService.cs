@@ -433,7 +433,7 @@ namespace SnooStream.Common
         private Dictionary<string, DateTime> LoadHistory()
         {
             //this needs to remove history elements that are too old
-            return RetriveBlobImpl<Dictionary<string, DateTime>>("history", TimeSpan.FromDays(4096), false) ?? new Dictionary<string, DateTime>();
+            return RetriveBlobImpl<Dictionary<string, DateTime>>("history", TimeSpan.FromDays(4096), true) ?? new Dictionary<string, DateTime>();
         }
 
         public void StoreHistory()

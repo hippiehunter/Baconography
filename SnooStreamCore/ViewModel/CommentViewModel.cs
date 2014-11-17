@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using NBoilerpipePortable.Util;
 using SnooSharp;
 using SnooStream.Model;
 using SnooStream.Services;
@@ -27,7 +28,7 @@ namespace SnooStream.ViewModel
             Depth = depth;
             AuthorFlair = SnooStreamViewModel.RedditService.GetUsernameModifiers(_comment.Author, _linkId, _comment.Subreddit);
             AuthorFlairText = _comment.AuthorFlairText;
-            Body = _comment.Body;
+			Body = HttpUtility.HtmlDecode(_comment.Body);
         }
 
         public string Id

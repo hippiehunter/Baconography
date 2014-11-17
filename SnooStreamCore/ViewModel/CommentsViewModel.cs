@@ -53,7 +53,9 @@ namespace SnooStream.ViewModel
             Link = _context as LinkViewModel;
             _loadFullSentinel = new LoadFullCommentsViewModel(this);
             FlatComments = new ObservableCollection<ViewModelBase>();
-            ProcessUrl("http://www.reddit.com" + linkData.Permalink);
+            ProcessUrl((linkData.Permalink.Contains("://") && linkData.Permalink.Contains("reddit.com")) ?
+				linkData.Permalink :
+				"http://www.reddit.com" + linkData.Permalink);
 			_commentsContentStream = new Lazy<CommentsContentStreamViewModel>(() => new CommentsContentStreamViewModel(this));
         }
 

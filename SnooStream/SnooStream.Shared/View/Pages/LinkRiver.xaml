@@ -41,8 +41,8 @@
                       IsItemClickEnabled="False"
                       IncrementalLoadingTrigger="Edge"
                       IncrementalLoadingThreshold="10" 
+                      VirtualizingStackPanel.VirtualizationMode="Standard"
                       ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
-                
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <local:CardLinkView/>

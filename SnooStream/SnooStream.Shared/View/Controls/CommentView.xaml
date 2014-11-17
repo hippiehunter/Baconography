@@ -10,7 +10,7 @@
 
     <Grid HorizontalAlignment="Stretch"
           Margin="{Binding Path=Depth, Converter={StaticResource commentDepthMarginConverter}}"
-          MinHeight="75">
+          MinHeight="50">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="7" />
             <ColumnDefinition Width="*" />
@@ -72,15 +72,15 @@
                     </StackPanel>
                 </Button>
             </Grid>
-            <TextBlock Grid.Row="1" Opacity="0" x:Name="plainTextControl"
+            <TextBlock Grid.Row="1" x:Name="plainTextControl"
                        FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
                         HorizontalAlignment="Left" TextWrapping="WrapWholeWords"
                         Margin="3,0,0,0"/>
-            <snoodom:MarkdownControl x:Name="markdownControl" Opacity="0" Grid.Row="1"
+            <snoodom:MarkdownControl x:Name="markdownControl" Grid.Row="1"
                 StyleProvider="{StaticResource markdownHelpers}"
                 CommandFactory="{StaticResource markdownHelpers}"
                 FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
-                HorizontalAlignment="Left"
+                HorizontalAlignment="Stretch"
                 Margin="3,0,0,0"/>
         </Grid>            
         

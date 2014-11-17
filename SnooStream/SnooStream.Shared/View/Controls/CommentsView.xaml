@@ -224,6 +224,7 @@
         <ListView x:Name="commentsList" HeaderTemplate="{StaticResource HeaderTemplate}"
                   ItemTemplateSelector="{Binding Path=Selector, Source={StaticResource commentTemplateSelector}}"
                   ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging"
+                  VirtualizingStackPanel.VirtualizationMode="Standard"
                   ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
         </ListView>
         <Popup x:Name="sortPopup" HorizontalAlignment="Center" VerticalAlignment="Center" />

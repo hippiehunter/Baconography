@@ -115,14 +115,10 @@ namespace SnooStream.Common
                 {
                     if (sourceLink != null)
                     {
-                        var targetLinkPermalink = sourceLink.Url.Substring(sourceLink.Url.IndexOf("reddit.com") + "reddit.com".Length);
-                        if (!targetLinkPermalink.Contains(url))
+                        var realTarget = await SnooStreamViewModel.RedditService.GetLinkByUrl(url);
+                        if (realTarget != null)
                         {
-                            var realTarget = await SnooStreamViewModel.RedditService.GetLinkByUrl(url);
-                            if (realTarget != null)
-                            {
-                                sourceLink = realTarget.Data as Link;
-                            }
+                            sourceLink = realTarget.Data as Link;
                         }
                     }
 

@@ -28,16 +28,17 @@ namespace SnooStream.View.Controls
 				{
 					case 0:
 						{
-							plainTextControl.Opacity = 0.0;
-							markdownControl.Opacity = 0.0;
+							plainTextControl.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+							markdownControl.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+							markdownControl.Markdown = null;
 							args.Handled = true;
 							args.RegisterUpdateCallback(PhaseLoad);
 							break;
 						}
 					case 1:
 						{
-							plainTextControl.Opacity = 1.0;
-							if(args.Item is CommentViewModel)
+							plainTextControl.Visibility = Windows.UI.Xaml.Visibility.Visible;
+							if (args.Item is CommentViewModel)
 								plainTextControl.Text = ((CommentViewModel)args.Item).Body;
 
 							args.Handled = true;
@@ -54,16 +55,19 @@ namespace SnooStream.View.Controls
 
 								if (!SnooStreamViewModel.MarkdownProcessor.IsPlainText(markdownBody))
 								{
-									plainTextControl.Opacity = 0.0;
+									plainTextControl.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 									plainTextControl.Text = "";
 
-									markdownControl.Opacity = 1.0;
+									markdownControl.Visibility = Windows.UI.Xaml.Visibility.Visible;
 									markdownControl.Markdown = markdownBody.MarkdownDom as SnooDom.SnooDom;
 								}
 							}
 							break;
 						}
 				}
+			}
+			else
+			{
 			}
 		}
 	}
