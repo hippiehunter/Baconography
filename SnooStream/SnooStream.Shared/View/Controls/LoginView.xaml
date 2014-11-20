@@ -20,19 +20,20 @@
                         <TranslateTransform x:Name="headerTransform"/>
                     </ContentControl.RenderTransform>
                 </ContentControl>
-                <local:ComboBoxOrPicker Visibility="{Binding HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}" 
-                                  Header="stored logins" 
-                                  ItemsSource="{Binding StoredCredentials}"
-                                  SelectedItem="{Binding SelectedCredential, Mode=TwoWay}"/>
-                
-                <TextBox Header="username" Text="{Binding Username, Mode=TwoWay}"/>
-                <PasswordBox Header="password" 
-                             Password="{Binding Password, Mode=TwoWay}"
-                             IsEnabled="{Binding UsingStoredCredential, Converter={StaticResource invertedBooleanConverter}}"/>
-                <CheckBox Margin="0,0,0,0" Content="save this login"
-                          IsChecked="{Binding IsRememberLogin, Mode=TwoWay}"/>
-                <CheckBox Margin="0,0,0,0" Content="login automatically"
-                          IsChecked="{Binding IsDefaultLogin, Mode=TwoWay}" />
+                <StackPanel Visibility="{Binding HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}">
+                    <ListView
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Margin="-12,0,-12,0" ItemsSource="{Binding StoredCredentials}">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        
+                    </ListView>
+                </StackPanel>
                 <ProgressBar IsIndeterminate="{Binding Working}"
                              Visibility="{Binding Working, Converter={StaticResource booleanVisibilityConverter}}"/>
                 <Border Margin="0,20,0,10" Visibility="{Binding HasErrors, Mode=TwoWay, Converter={StaticResource booleanVisibilityConverter}}">

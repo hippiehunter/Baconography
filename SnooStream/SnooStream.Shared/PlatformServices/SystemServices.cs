@@ -551,8 +551,13 @@ namespace SnooStream.PlatformServices
 
 		public void ShowOAuthBroker()
 		{
-			String RedditURL = string.Format("https://ssl.reddit.com/api/v1/authorize?client_id={0}&response_type={1}&state={2}&redirect_uri={3}&duration={4}&scope={5}",
+#if WINDOWS_PHONE_APP
+			String RedditURL = string.Format("https://ssl.reddit.com/api/v1/authorize.compact?client_id={0}&response_type={1}&state={2}&redirect_uri={3}&duration={4}&scope={5}",
 				"3m9rQtBinOg_rA", "code", "something", "http://www.google.com", "permanent", "modposts,identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread");
+#else
+            String RedditURL = string.Format("https://ssl.reddit.com/api/v1/authorize?client_id={0}&response_type={1}&state={2}&redirect_uri={3}&duration={4}&scope={5}",
+                "3m9rQtBinOg_rA", "code", "something", "http://www.google.com", "permanent", "modposts,identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread");
+#endif
 
 			System.Uri StartUri = new Uri(RedditURL);
 			System.Uri EndUri = new Uri("http://www.google.com");
