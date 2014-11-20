@@ -180,6 +180,14 @@ namespace SnooStream.Common
             return false;
 		}
 
+        public int NavStateCount
+        {
+            get
+            {
+                return _navState != null ? _navState.Count : 0;
+            }
+        }
+
         Stack<Tuple<object, string>> _navState = new Stack<Tuple<object, string>>();
         internal void PushNavState(object sender, string pushedState)
         {
