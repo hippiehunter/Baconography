@@ -415,15 +415,22 @@ namespace SnooStreamBackground
                 return create_task(MakeLiveTileImages(vector < String^ > {}, liveTileImageUrls, 150, 310))
                     .then([=](vector<String^> liveTileImageUrls)
                 {
+                    auto tileUpdater = Windows::UI::Notifications::TileUpdateManager::CreateTileUpdaterForApplication();
+                    tileUpdater->EnableNotificationQueue(true);
+                    tileUpdater->Clear();
+                    int tagId = 0;
                     for (auto&& liveTileImageUrl : liveTileImageUrls)
                     {
-                        auto tileUpdater = Windows::UI::Notifications::TileUpdateManager::CreateTileUpdaterForApplication();
-                        tileUpdater->EnableNotificationQueue(true);
-                        tileUpdater->Clear();
                         auto tileTemplate = Windows::UI::Notifications::TileUpdateManager::GetTemplateContent(Windows::UI::Notifications::TileTemplateType::TileWide310x150Image);
                         auto tileAttributes = tileTemplate->GetElementsByTagName("image");
                         tileAttributes->GetAt(0)->Attributes->GetNamedItem("src")->InnerText = "ms-appdata:///local/" + liveTileImageUrl;
-                        tileUpdater->Update(ref new Windows::UI::Notifications::TileNotification(tileTemplate));
+                        auto tile = ref new Windows::UI::Notifications::TileNotification(tileTemplate);
+                        auto tagString = std::to_wstring(tagId);
+                        tile->Tag = ref new Platform::String(tagString.c_str(), tagString.size());
+                        tileUpdater->Update(tile);
+                        if (tagId++ > 4)
+                            break;
+
                     }
 
                 });
