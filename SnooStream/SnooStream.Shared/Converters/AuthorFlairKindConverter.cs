@@ -21,8 +21,8 @@ namespace SnooStream.Converters
 
         static AuthorFlairKindConverter()
         {
-            if (Application.Current.Resources.ContainsKey("PhoneAccentBrush"))
-                bg_op = Application.Current.Resources["PhoneAccentBrush"] as SolidColorBrush;
+            if (Application.Current.Resources.ContainsKey("SystemColorControlAccentColor"))
+                bg_op = Application.Current.Resources["SystemColorControlAccentColor"] as SolidColorBrush;
             else
                 bg_op = Utility.GetColorFromHexa("#FFDAA520");
         }
@@ -61,8 +61,8 @@ namespace SnooStream.Converters
 
         public void PopulateBrushes()
         {
-            if (Application.Current.Resources.ContainsKey("PhoneAccentBrush"))
-                fg_none = Application.Current.Resources["PhoneAccentBrush"] as SolidColorBrush;
+            if (Application.Current.Resources.ContainsKey("SystemColorControlAccentColor"))
+                fg_none = Application.Current.Resources["SystemColorControlAccentColor"] as SolidColorBrush;
             else
                 fg_none = Utility.GetColorFromHexa("#FFDAA520");
 

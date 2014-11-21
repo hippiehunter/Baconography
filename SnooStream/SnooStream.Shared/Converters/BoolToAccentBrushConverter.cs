@@ -19,7 +19,7 @@ namespace SnooStream.Converters
         {
             if (PhoneAccentBrush == null || PhoneForegroundBrush == null)
             {
-                PhoneAccentBrush = Application.Current.Resources["PhoneAccentBrush"] as Brush;
+                PhoneAccentBrush = Application.Current.Resources["SystemColorControlAccentColor"] as Brush;
                 PhoneForegroundBrush = Application.Current.Resources["PhoneForegroundBrush"] as Brush;
             }
 
