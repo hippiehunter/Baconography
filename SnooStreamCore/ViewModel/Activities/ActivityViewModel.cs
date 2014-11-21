@@ -99,8 +99,8 @@ namespace SnooStream.ViewModel
                 }
                 else if(string.IsNullOrEmpty(messageThing.Author))
                 {
-                    //TODO: this is wrong need to find the subreddit name for this thing and set it as the author
-                    messageThing.Author = "mod";
+                    //this is a deleted sender
+                    messageThing.Author = "[deleted]";
                     return new MessageActivityViewModel(messageThing);
                 }
                 else
