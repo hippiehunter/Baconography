@@ -16,7 +16,11 @@ namespace SnooStream.ViewModel
             public int Compare(ActivityGroupViewModel x, ActivityGroupViewModel y)
             {
                 //invert the sort
-                return y.CreatedUTC.CompareTo(x.CreatedUTC);
+                var result = y.CreatedUTC.CompareTo(x.CreatedUTC);
+                if (result == 0 && ((ThingData)y.FirstActivity.GetThing().Data).Id != ((ThingData)x.FirstActivity.GetThing().Data).Id)
+                    return 1;
+                else
+                    return result;
             }
         }
 
