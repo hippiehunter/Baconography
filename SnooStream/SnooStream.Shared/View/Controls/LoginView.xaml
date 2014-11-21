@@ -14,33 +14,44 @@
                 <ContentControl x:Name="header"
                                 CharacterSpacing="-10"
                                 FontSize="40"
-                                HorizontalAlignment="Left" Margin="12,6,0,24"
+                                HorizontalAlignment="Left" Margin="0,6,0,24"
                                 Content="login">
                     <ContentControl.RenderTransform>
                         <TranslateTransform x:Name="headerTransform"/>
                     </ContentControl.RenderTransform>
                 </ContentControl>
-                <local:ComboBoxOrPicker Visibility="{Binding HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}" 
-                                  Header="stored logins" 
-                                  ItemsSource="{Binding StoredCredentials}"
-                                  SelectedItem="{Binding SelectedCredential, Mode=TwoWay}"/>
-                
-                <TextBox Header="username" Text="{Binding Username, Mode=TwoWay}"/>
-                <PasswordBox Header="password" 
-                             Password="{Binding Password, Mode=TwoWay}"
-                             IsEnabled="{Binding UsingStoredCredential, Converter={StaticResource invertedBooleanConverter}}"/>
-                <CheckBox Margin="0,0,0,0" Content="save this login"
-                          IsChecked="{Binding IsRememberLogin, Mode=TwoWay}"/>
-                <CheckBox Margin="0,0,0,0" Content="login automatically"
-                          IsChecked="{Binding IsDefaultLogin, Mode=TwoWay}" />
+                <StackPanel Visibility="{Binding HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}">
+                    <ListView
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Margin="-12,0,-12,0" ItemsSource="{Binding StoredCredentials}">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        
+                    </ListView>
+                </StackPanel>
                 <ProgressBar IsIndeterminate="{Binding Working}"
                              Visibility="{Binding Working, Converter={StaticResource booleanVisibilityConverter}}"/>
                 <Border Margin="0,20,0,10" Visibility="{Binding HasErrors, Mode=TwoWay, Converter={StaticResource booleanVisibilityConverter}}">
                     <TextBlock Foreground="Red" HorizontalAlignment="Center" Text="Login Failed: incorrect username or password"/>
                 </Border>
-                <Button Content="login"
-                                Visibility="{Binding Working, Converter={StaticResource invertedBooleanVisibilityConverter}}"
-                                Command="{Binding DoLogin}"/>
+                <Button Style="{StaticResource SubtextButton}"
+                        Visibility="{Binding Working, Converter={StaticResource invertedBooleanVisibilityConverter}}"
+                        Command="{Binding DoLogin}"
+                        Margin="12,0,0,-8">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            LOGIN
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Login via OAuth on reddit.com
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </ScrollViewer>
     </Grid>

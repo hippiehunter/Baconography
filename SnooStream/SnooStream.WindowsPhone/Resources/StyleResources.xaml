@@ -497,14 +497,14 @@
     </Style>
 
     <Style x:Key="SubtextButtonTitleTextBlock" TargetType="TextBlock">
-        <!--<Setter Property="FontFamily" Value="{StaticResource FontFamilyBold}" />
-        <Setter Property="FontSize" Value="{StaticResource FontSizeMediumLarge}" />-->
+        <Setter Property="FontFamily" Value="Segoe UI Semibold" />
+        <Setter Property="FontSize" Value="22" />
     </Style>
 
     <Style x:Key="SubtextButtonSubtextTextBlock" TargetType="TextBlock">
-        <!--<Setter Property="FontFamily" Value="{StaticResource FontFamilyNormal}" />
-        <Setter Property="FontSize" Value="{StaticResource FontSizeSmall}" />
-        <Setter Property="Foreground" Value="{StaticResource SubtleBrush}" />-->
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="19" />
+        <Setter Property="Foreground" Value="#99FFFFFF" />
     </Style>
 
     <Style x:Key="SubtextButton" TargetType="Button">

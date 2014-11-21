@@ -21,7 +21,7 @@ namespace SnooStream.Converters
         static SolidColorBrush accentBrush = null;
         private void PopulateBrushes()
         {
-            var currentAccentBrush = Application.Current.Resources["PhoneAccentBrush"] as SolidColorBrush;
+            var currentAccentBrush = Application.Current.Resources["SystemColorControlAccentColor"] as SolidColorBrush;
             if (accentBrush != null && currentAccentBrush.Color == accentBrush.Color)
                 return;
 

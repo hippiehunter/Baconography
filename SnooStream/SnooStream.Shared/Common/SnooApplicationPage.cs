@@ -32,18 +32,30 @@ namespace SnooStream.Common
 				_orientationManager = Application.Current.Resources["orientationManager"] as OrientationManager;
 				Messenger.Default.Register<SettingsChangedMessage>(this, OnSettingsChanged);
 				OnSettingsChanged(null);
+                this.LayoutUpdated += SnooApplicationPage_LayoutUpdated;
 			}
 			catch
 			{
 			}
         }
 
+        async void SnooApplicationPage_LayoutUpdated(object sender, object e)
+        {
+            var orientation = ApplicationView.GetForCurrentView().Orientation;
+            if (orientation != LastOrientation)
+            {
+                LastOrientation = orientation;
+                await AdjustForOrientation(orientation);
+            }
+        }
+
         public virtual bool DefaultSystray { get { return true; } }
+        private ApplicationViewOrientation LastOrientation { get; set; }
 
 #if WINDOWS_PHONE_APP
-        protected virtual async void AdjustForOrientation(ApplicationViewOrientation orientation)
+        protected virtual async Task AdjustForOrientation(ApplicationViewOrientation orientation)
 #else
-        protected virtual void AdjustForOrientation(ApplicationViewOrientation orientation)
+        protected virtual async Task AdjustForOrientation(ApplicationViewOrientation orientation)
 #endif
         {
             switch (orientation)
@@ -167,6 +179,14 @@ namespace SnooStream.Common
             }
             return false;
 		}
+
+        public int NavStateCount
+        {
+            get
+            {
+                return _navState != null ? _navState.Count : 0;
+            }
+        }
 
         Stack<Tuple<object, string>> _navState = new Stack<Tuple<object, string>>();
         internal void PushNavState(object sender, string pushedState)
