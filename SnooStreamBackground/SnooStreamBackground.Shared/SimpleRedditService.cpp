@@ -83,7 +83,8 @@ concurrency::task<RedditOAuth> RefreshToken(Platform::String^ refreshToken)
 {
     //we're messing with the headers here so use a different client
     auto httpClient = ref new HttpClient();
-    httpClient->DefaultRequestHeaders->Authorization = ref new Windows::Web::Http::Headers::HttpCredentialsHeaderValue(L"Basic", toPlatformString(toBase64("3m9rQtBinOg_rA:")));
+    httpClient->DefaultRequestHeaders->UserAgent->ParseAdd("SnooStream/1.0");
+    httpClient->DefaultRequestHeaders->Authorization = ref new Windows::Web::Http::Headers::HttpCredentialsHeaderValue(L"Basic", L"M205clF0QmluT2dfckE6");
     auto encodedContent = ref new Platform::Collections::Map<Platform::String^, Platform::String^>();
     encodedContent->Insert(L"grant_type", L"refresh_token");
     encodedContent->Insert(L"refresh_token", refreshToken);
@@ -129,30 +130,90 @@ concurrency::task<RedditOAuth> RefreshToken(Platform::String^ refreshToken)
 concurrency::task<Platform::String^> SimpleRedditService::SendGet(String^ url)
 {
   auto httpClient = ref new HttpClient();
+  httpClient->DefaultRequestHeaders->UserAgent->ParseAdd("SnooStream/1.0");
 
   //see if we need to refresh the token
-  if (_oAuth.AccessToken != nullptr && (_oAuth.Created + std::chrono::seconds(_oAuth.ExpiresIn)) < std::chrono::seconds(time(nullptr)))
+  if (_oAuth.AccessToken != nullptr)
   {
       return create_task(RefreshToken(_oAuth.RefreshToken))
           .then([=](RedditOAuth oAuth)
       {
-          //this thing is a value type so we cant return null in error conditions, just check this member
+          auto localUrl = url;
           if (oAuth.AccessToken != nullptr)
           {
               _oAuth = oAuth;
               httpClient->DefaultRequestHeaders->Authorization = ref new Windows::Web::Http::Headers::HttpCredentialsHeaderValue("Bearer", _oAuth.AccessToken);
-              return create_task(httpClient->GetStringAsync(ref new Uri(url)));
+              localUrl = "https://oauth.reddit.com" + localUrl;
           }
           else
-              return task_from_result<Platform::String^>(nullptr);
+          {
+              localUrl = "http://reddit.com" + localUrl;
+          }
+
+          return create_task(httpClient->GetAsync(ref new Uri(localUrl)))
+              .then([=](task<Windows::Web::Http::HttpResponseMessage^> responseTask)
+          {
+              try
+              {
+                  auto response = responseTask.get();
+                  return create_task(response->Content->ReadAsStringAsync())
+                      .then([=](task<Platform::String^> resultTask)
+                  {
+                      try
+                      {
+                          auto result = resultTask.get();
+                          return result;
+                      }
+                      catch (...)
+                      {
+                          return (Platform::String^)nullptr;
+                      }
+                  });
+              }
+              catch (...)
+              {
+                  return concurrency::task_from_result((Platform::String^)nullptr);
+              }
+          });
       });
   }
   else
   {
       if (_oAuth.AccessToken != nullptr)
-        httpClient->DefaultRequestHeaders->Authorization = ref new Windows::Web::Http::Headers::HttpCredentialsHeaderValue("Bearer", _oAuth.AccessToken);
+      {
+          httpClient->DefaultRequestHeaders->Authorization = ref new Windows::Web::Http::Headers::HttpCredentialsHeaderValue("Bearer", _oAuth.AccessToken);
+          url = "https://oauth.reddit.com" + url;
+      }
+      else
+      {
+          url = "http://reddit.com" + url;
+      }
 
-      return create_task(httpClient->GetStringAsync(ref new Uri(url)));
+      return create_task(httpClient->GetAsync(ref new Uri(url)))
+          .then([=](task<Windows::Web::Http::HttpResponseMessage^> responseTask)
+      {
+          try
+          {
+              auto response = responseTask.get();
+              return create_task(response->Content->ReadAsStringAsync())
+                .then([=](task<Platform::String^> resultTask)
+              {
+                  try
+                  {
+                      auto result = resultTask.get();
+                      return result;
+                  }
+                  catch (...)
+                  {
+                      return (Platform::String^)nullptr;
+                  }
+              });
+          }
+          catch (...)
+          {
+              return concurrency::task_from_result((Platform::String^)nullptr);
+          }
+      });
   }
 }
 
@@ -163,7 +224,7 @@ SimpleRedditService::SimpleRedditService(RedditOAuth oAuth)
 
 task<bool> SimpleRedditService::HasMail()
 {
-  return SendGet("https://oauth.reddit.com/api/me.json")
+  return SendGet("/api/me.json")
     .then([](String^ meResponse)
 	{
         if (meResponse != nullptr)
@@ -180,7 +241,7 @@ task<bool> SimpleRedditService::HasMail()
 
 task<vector<String^>> SimpleRedditService::GetNewMessages()
 {
-  return SendGet("https://oauth.reddit.com/message/unread/.json")
+  return SendGet("/message/unread/.json")
     .then([&](String^ unreadResponse)
 	{
 		vector<String^> existingMessages;
@@ -249,7 +310,7 @@ task<vector<String^>> SimpleRedditService::GetNewMessages()
 task<vector<tuple<String^, String^>>> SimpleRedditService::GetPostsBySubreddit(String^ subreddit, int limit)
 {
 	auto httpClient = ref new HttpClient();
-	auto targetUrl = (boost::wformat(L"http://www.reddit.com%1%.json?limit=%2%") % subreddit->Data() % limit).str();
+	auto targetUrl = (boost::wformat(L"%1%.json?limit=%2%") % subreddit->Data() % limit).str();
   return SendGet(ref new String(targetUrl.data(), targetUrl.size()))
     .then([&](String^ postsResponse)
 	{

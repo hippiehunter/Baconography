@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Background;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 
@@ -38,17 +39,73 @@ namespace SnooStream.Common
                     JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState.OAuth) : "";
                 lsSettings.Store();
 
-                Task.Delay(10000).ContinueWith((tskTop) => 
+                Task.Delay(10000).ContinueWith(async (tskTop) => 
                     {
+                        var status = BackgroundExecutionManager.GetAccessStatus();
+                        if (status == BackgroundAccessStatus.Unspecified)
+                        {
+                            status = await BackgroundExecutionManager.RequestAccessAsync();
+                        }
+
+                        if (status != BackgroundAccessStatus.Denied)
+                        {
+                            TimeTrigger timeTrigger = new TimeTrigger(30, false);
+                            SystemCondition userCondition = new SystemCondition(SystemConditionType.UserPresent);
+                            string entryPoint = "SnooStreamBackground.UpdateBackgroundTask";
+                            string taskName = "Background task for updating live tile and displaying message notifications from reddit";
+
+                            BackgroundTaskRegistration task = RegisterBackgroundTask(entryPoint, taskName, timeTrigger, userCondition);
+                        }
+
                         SystemServices.RunUIIdleAsync(() =>
                             {
                                 UpdateBackgroundTask tsk = new UpdateBackgroundTask();
-                                tsk.RunExternal();
+                                try
+                                {
+                                    tsk.RunExternal();
+                                }
+                                catch { }
                                 return Task.FromResult(true);
                             });
                     });
                 
             }
 		}
+        public static BackgroundTaskRegistration RegisterBackgroundTask(
+                                                string taskEntryPoint,
+                                                string name,
+                                                IBackgroundTrigger trigger,
+                                                IBackgroundCondition condition)
+        {
+
+            foreach (var cur in BackgroundTaskRegistration.AllTasks)
+            {
+
+                if (cur.Value.Name == name)
+                {
+                    // 
+                    // The task is already registered.
+                    // 
+
+                    return (BackgroundTaskRegistration)(cur.Value);
+                }
+            }
+
+            var builder = new BackgroundTaskBuilder();
+
+            builder.Name = name;
+            builder.TaskEntryPoint = taskEntryPoint;
+            builder.SetTrigger(trigger);
+
+            if (condition != null)
+            {
+
+                builder.AddCondition(condition);
+            }
+
+            BackgroundTaskRegistration task = builder.Register();
+
+            return task;
+        }
     }
 }
