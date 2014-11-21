@@ -27,7 +27,7 @@ LockScreenHistory::LockScreenHistory()
   wstringstream fileContents;
   wstring fileLine;
 
-  while (!settingsFile.eof())
+  while (settingsFile.is_open() && !settingsFile.eof())
   {
     settingsFile >> fileLine;
     fileContents << fileLine;
@@ -35,43 +35,46 @@ LockScreenHistory::LockScreenHistory()
   settingsFile.close();
 
   auto fileStr = fileContents.str();
-  auto parsedFileObject = JsonObject::Parse(ref new String(fileStr.data(), fileStr.size()));
-
-  auto currentTileImages = parsedFileObject->GetNamedArray("CurrentTileImages");
-  auto imageHistory = parsedFileObject->GetNamedArray("ImageHistory");
-  auto lockScreenImages = parsedFileObject->GetNamedArray("LockScreenImages");
-  _history = ref new Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>();
-  for each (auto&& image in imageHistory)
+  if (fileStr.size() > 0)
   {
-    auto imageObject = image->GetObject();
-    auto originalUrl = imageObject->GetNamedString("OriginalUrl");
-    auto lastShown = imageObject->GetNamedString("LastShown");
+      auto parsedFileObject = JsonObject::Parse(ref new String(fileStr.data(), fileStr.size()));
 
-    if (!_history->HasKey(originalUrl))
-    {
-      _history->Insert(originalUrl, lastShown);
-    }
-  } 
+      auto currentTileImages = parsedFileObject->GetNamedArray("CurrentTileImages");
+      auto imageHistory = parsedFileObject->GetNamedArray("ImageHistory");
+      auto lockScreenImages = parsedFileObject->GetNamedArray("LockScreenImages");
+      _history = ref new Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>();
+      for each (auto&& image in imageHistory)
+      {
+          auto imageObject = image->GetObject();
+          auto originalUrl = imageObject->GetNamedString("OriginalUrl");
+          auto lastShown = imageObject->GetNamedString("LastShown");
 
-  CurrentTileImages = ref new Platform::Collections::Vector<LockScreenImageInfo^>();
-  LockScreenImages = ref new Platform::Collections::Vector<LockScreenImageInfo^>();
+          if (!_history->HasKey(originalUrl))
+          {
+              _history->Insert(originalUrl, lastShown);
+          }
+      }
 
-  for each (auto&& image in currentTileImages)
-  {
-    auto imageObject = image->GetObject();
-    auto originalUrl = imageObject->GetNamedString("OriginalUrl");
-    auto lastShown = imageObject->GetNamedString("LastShown");
-    auto localUrl = imageObject->GetNamedString("LocalUrl");
-    CurrentTileImages->Append(ref new LockScreenImageInfo(originalUrl, localUrl, lastShown));
-  }
+      CurrentTileImages = ref new Platform::Collections::Vector<LockScreenImageInfo^>();
+      LockScreenImages = ref new Platform::Collections::Vector<LockScreenImageInfo^>();
 
-  for each (auto&& image in lockScreenImages)
-  {
-    auto imageObject = image->GetObject();
-    auto originalUrl = imageObject->GetNamedString("OriginalUrl");
-    auto lastShown = imageObject->GetNamedString("LastShown");
-    auto localUrl = imageObject->GetNamedString("LocalUrl");
-    LockScreenImages->Append(ref new LockScreenImageInfo(originalUrl, localUrl, lastShown));
+      for each (auto&& image in currentTileImages)
+      {
+          auto imageObject = image->GetObject();
+          auto originalUrl = imageObject->GetNamedString("OriginalUrl");
+          auto lastShown = imageObject->GetNamedString("LastShown");
+          auto localUrl = imageObject->GetNamedString("LocalUrl");
+          CurrentTileImages->Append(ref new LockScreenImageInfo(originalUrl, localUrl, lastShown));
+      }
+
+      for each (auto&& image in lockScreenImages)
+      {
+          auto imageObject = image->GetObject();
+          auto originalUrl = imageObject->GetNamedString("OriginalUrl");
+          auto lastShown = imageObject->GetNamedString("LastShown");
+          auto localUrl = imageObject->GetNamedString("LocalUrl");
+          LockScreenImages->Append(ref new LockScreenImageInfo(originalUrl, localUrl, lastShown));
+      }
   }
 }                               
 
@@ -124,7 +127,7 @@ void LockScreenHistory::Store()
   auto serializedString = serializedObject->Stringify();
   wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
   localPath += L"bgtaskHistory.txt";
-  wofstream settingsFile(localPath);
+  wofstream settingsFile(localPath, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
   wstring settingsFileString(serializedString->Data(), serializedString->Length());
   settingsFile << settingsFileString;
   settingsFile.close();

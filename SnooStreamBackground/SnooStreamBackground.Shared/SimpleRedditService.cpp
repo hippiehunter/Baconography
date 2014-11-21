@@ -3,11 +3,19 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <chrono>
+#include <sstream>
 #include "boost\format.hpp"
+#include "boost\archive\iterators\base64_from_binary.hpp"
+#include "boost\archive\iterators\ostream_iterator.hpp"
+#include "boost\archive\iterators\transform_width.hpp"
+
 
 using Windows::Web::Http::HttpClient;
 using namespace SnooStreamBackground;
 using concurrency::task;
+using concurrency::task_from_result;
+using concurrency::create_task;
 using Platform::String;
 using Windows::Foundation::Uri;
 using Windows::Data::Json::JsonObject;
@@ -21,37 +29,166 @@ using std::wifstream;
 using std::wofstream;
 using std::getline;
 
+std::string toStdString(Platform::String^ str)
+{
+    std::string result;
+    result.resize(str->Length() * 2);
+    auto length = WideCharToMultiByte(CP_UTF8, 0, str->Data(), str->Length(), (char*) &result[0], result.size(), NULL, NULL);
+    result.resize(length);
+    return result;
+}
+
+std::string toBase64(const std::string& str)
+{
+    std::stringstream os;
+    typedef boost::archive::iterators::base64_from_binary<boost::archive::iterators::transform_width<const char *, 6, 8>> base64_text;
+    std::copy(base64_text(str.c_str()), base64_text(str.c_str()), boost::archive::iterators::ostream_iterator<char>(os));
+    return os.str();
+}
+
+Platform::String^ toPlatformString(const std::string& str)
+{
+    int len;
+    int slength = (int) str.length() + 1;
+    len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), slength, 0, 0);
+    wchar_t* buf = new wchar_t[len];
+    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), slength, buf, len);
+    auto result = ref new Platform::String(buf, len);
+    delete [] buf;
+    return result;
+}
+
+RedditOAuth RedditOAuth::Deserialize(Platform::String^ data)
+{
+    if (data->Length() > 0)
+    {
+        auto oAuthObject = JsonObject::Parse(data);
+
+        return RedditOAuth
+        {
+            oAuthObject->GetNamedString("access_token"),
+            oAuthObject->GetNamedString("token_type"),
+            static_cast<int>(oAuthObject->GetNamedNumber("expires_in")),
+            std::chrono::seconds(static_cast<int>(oAuthObject->GetNamedNumber("created"))),
+            oAuthObject->GetNamedString("scope"),
+            oAuthObject->GetNamedString("refresh_token")
+        };
+    }
+    else
+        return RedditOAuth {};
+}
+
+
+concurrency::task<RedditOAuth> RefreshToken(Platform::String^ refreshToken)
+{
+    //we're messing with the headers here so use a different client
+    auto httpClient = ref new HttpClient();
+    httpClient->DefaultRequestHeaders->Authorization = ref new Windows::Web::Http::Headers::HttpCredentialsHeaderValue(L"Basic", toPlatformString(toBase64("3m9rQtBinOg_rA:")));
+    auto encodedContent = ref new Platform::Collections::Map<Platform::String^, Platform::String^>();
+    encodedContent->Insert(L"grant_type", L"refresh_token");
+    encodedContent->Insert(L"refresh_token", refreshToken);
+
+    return create_task(httpClient->PostAsync(ref new Uri(L"https://ssl.reddit.com/api/v1/access_token"), ref new Windows::Web::Http::HttpFormUrlEncodedContent(encodedContent)))
+        .then([=](task<Windows::Web::Http::HttpResponseMessage^> responseTask)
+    {
+        try
+        {
+            auto response = responseTask.get();
+            return create_task(response->Content->ReadAsStringAsync())
+                .then([=](task<Platform::String^> stringResultTask)
+            {
+                try
+                {
+                    auto stringResult = stringResultTask.get();
+                    auto oAuthObject = JsonObject::Parse(stringResult);
+
+                    return RedditOAuth
+                    {
+                        oAuthObject->GetNamedString("access_token"),
+                        oAuthObject->GetNamedString("token_type"),
+                        static_cast<int>(oAuthObject->GetNamedNumber("expires_in")),
+                        std::chrono::seconds(time(nullptr)),
+                        oAuthObject->GetNamedString("scope"),
+                        refreshToken
+                    };
+                }
+                catch (...)
+                {
+                    return RedditOAuth{};
+                }
+            });
+        }
+        catch (...)
+        {
+            return task_from_result(RedditOAuth{});
+        }
+    });
+}
+
+
 concurrency::task<Platform::String^> SimpleRedditService::SendGet(String^ url)
 {
   auto httpClient = ref new HttpClient();
-  httpClient->DefaultRequestHeaders->Cookie->Append(ref new Windows::Web::Http::Headers::HttpCookiePairHeaderValue("reddit_session", _cookie));
-  return task<String^>(httpClient->GetStringAsync(ref new Uri(url)));
+
+  //see if we need to refresh the token
+  if (_oAuth.AccessToken != nullptr && (_oAuth.Created + std::chrono::seconds(_oAuth.ExpiresIn)) < std::chrono::seconds(time(nullptr)))
+  {
+      return create_task(RefreshToken(_oAuth.RefreshToken))
+          .then([=](RedditOAuth oAuth)
+      {
+          //this thing is a value type so we cant return null in error conditions, just check this member
+          if (oAuth.AccessToken != nullptr)
+          {
+              _oAuth = oAuth;
+              httpClient->DefaultRequestHeaders->Authorization = ref new Windows::Web::Http::Headers::HttpCredentialsHeaderValue("Bearer", _oAuth.AccessToken);
+              return create_task(httpClient->GetStringAsync(ref new Uri(url)));
+          }
+          else
+              return task_from_result<Platform::String^>(nullptr);
+      });
+  }
+  else
+  {
+      if (_oAuth.AccessToken != nullptr)
+        httpClient->DefaultRequestHeaders->Authorization = ref new Windows::Web::Http::Headers::HttpCredentialsHeaderValue("Bearer", _oAuth.AccessToken);
+
+      return create_task(httpClient->GetStringAsync(ref new Uri(url)));
+  }
 }
-SimpleRedditService::SimpleRedditService(String^ loginCookie)
+
+SimpleRedditService::SimpleRedditService(RedditOAuth oAuth)
 {
-  _cookie = loginCookie;
+    _oAuth = oAuth;
 }
 
 task<bool> SimpleRedditService::HasMail()
 {
-  return SendGet("https://www.reddit.com/api/me.json")
+  return SendGet("https://oauth.reddit.com/api/me.json")
     .then([](String^ meResponse)
 	{
-		auto meObject = JsonObject::Parse(meResponse);
-		auto dataObject = meObject->GetNamedObject("data");
-		return dataObject->GetNamedBoolean("has_mail");
+        if (meResponse != nullptr)
+        {
+            auto meObject = JsonObject::Parse(meResponse);
+            auto dataObject = meObject->GetNamedObject("data");
+            return dataObject->GetNamedBoolean("has_mail");
+        }
+        else
+            return false;
 	});
 }
 
 
 task<vector<String^>> SimpleRedditService::GetNewMessages()
 {
-  return SendGet("https://www.reddit.com/message/unread/.json")
+  return SendGet("https://oauth.reddit.com/message/unread/.json")
     .then([&](String^ unreadResponse)
 	{
 		vector<String^> existingMessages;
 		vector<String^> newMessages;
 		vector<String^> displayTitles;
+
+        if (unreadResponse == nullptr)
+            return newMessages;
 
 		try
 		{
