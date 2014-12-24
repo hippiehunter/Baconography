@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="2f9e6ba7-132a-450f-86e5-bf02718edca8" Publisher="CN=hippi_000" Version="1.0.0.0" />
+  <Identity Name="2f9e6ba7-132a-450f-86e5-bf02718edca8" Publisher="CN=hippi_000" Version="1.0.0.1" />
   <mp:PhoneIdentity PhoneProductId="2f9e6ba7-132a-450f-86e5-bf02718edca8" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>SnooStream</DisplayName>
@@ -17,6 +17,7 @@
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="SnooStream.WindowsPhone.App">
       <m3:VisualElements DisplayName="SnooStream" Square150x150Logo="Assets\Logo.png" Square44x44Logo="Assets\SmallLogo.png" Description="SnooStream.WindowsPhone" ForegroundText="light" BackgroundColor="transparent" ToastCapable="true">
+        <m3:LockScreen Notification="badge" BadgeLogo="Assets\BadgeLogo.png" />
         <m3:DefaultTile Wide310x150Logo="Assets\WideLogo.png" Square71x71Logo="Assets\Square71x71Logo.png">
         </m3:DefaultTile>
         <m3:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#000000" />
@@ -30,12 +31,6 @@
         <Extension Category="windows.backgroundTasks" EntryPoint="SnooStreamBackground.UpdateBackgroundTask">
           <BackgroundTasks>
             <Task Type="timer" />
-            <m2:Task Type="deviceUse" />
-          </BackgroundTasks>
-        </Extension>
-        <Extension Category="windows.backgroundTasks" EntryPoint="SnooStream">
-          <BackgroundTasks>
-            <Task Type="systemEvent" />
           </BackgroundTasks>
         </Extension>
       </Extensions>

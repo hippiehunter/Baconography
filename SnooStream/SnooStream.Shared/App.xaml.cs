@@ -15,6 +15,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Background;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -39,17 +40,17 @@ namespace SnooStream
         /// </summary>
         public App()
         {
-			LogManagerFactory.DefaultConfiguration.AddTarget(LogLevel.Trace, LogLevel.Fatal, new FileStreamingTarget());
+            LogManagerFactory.DefaultConfiguration.AddTarget(LogLevel.Trace, LogLevel.Fatal, new FileStreamingTarget());
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
 
-			// setup the global crash handler...
-			GlobalCrashHandler.Configure();
+            // setup the global crash handler...
+            GlobalCrashHandler.Configure();
         }
 
-		protected override void OnActivated(IActivatedEventArgs args)
-		{
-			base.OnActivated(args);
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            base.OnActivated(args);
 #if WINDOWS_PHONE_APP
 			if (args.Kind == ActivationKind.WebAuthenticationBrokerContinuation)
 			{
@@ -69,7 +70,7 @@ namespace SnooStream
 				}
 			}
 #endif
-		}
+        }
         Timer timer;
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
@@ -77,7 +78,7 @@ namespace SnooStream
         /// search results, and so forth.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
@@ -107,10 +108,10 @@ namespace SnooStream
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-					var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
-					var navService = new NavigationService(rootFrame, snooStreamViewModel);
-					SnooStreamViewModel.NavigationService = navService;
-					navService.Finish(snooStreamViewModel.GetNavigationBlob());
+                    var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
+                    var navService = new NavigationService(rootFrame, snooStreamViewModel);
+                    SnooStreamViewModel.NavigationService = navService;
+                    navService.Finish(snooStreamViewModel.GetNavigationBlob());
 #if WINDOWS_PHONE_APP
 					// Removes the turnstile navigation for startup.
 					if (rootFrame.ContentTransitions != null)
@@ -126,7 +127,7 @@ namespace SnooStream
 					rootFrame.Navigated += this.RootFrame_FirstNavigated;
 					Windows.Phone.UI.Input.HardwareButtons.BackPressed += HardwareButtons_BackPressed;
 #endif
-				}
+                }
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
@@ -149,9 +150,9 @@ namespace SnooStream
                 rootFrame.Navigated += this.RootFrame_FirstNavigated;
 				Windows.Phone.UI.Input.HardwareButtons.BackPressed += HardwareButtons_BackPressed;
 #endif
-				var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
-				SnooStreamViewModel.NavigationService = new NavigationService(rootFrame, snooStreamViewModel);
-				((NavigationService)SnooStreamViewModel.NavigationService).Finish(null);
+                var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
+                SnooStreamViewModel.NavigationService = new NavigationService(rootFrame, snooStreamViewModel);
+                ((NavigationService)SnooStreamViewModel.NavigationService).Finish(null);
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
@@ -201,7 +202,7 @@ namespace SnooStream
 		}
 #endif
 
-		/// <summary>
+        /// <summary>
         /// Invoked when application execution is being suspended.  Application state is saved
         /// without knowing whether the application will be terminated or resumed with the contents
         /// of memory still intact.

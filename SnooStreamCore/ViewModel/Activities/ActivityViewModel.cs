@@ -20,7 +20,11 @@ namespace SnooStream.ViewModel
                 else
                 {
                     //invert the sort
-                    return y.CreatedUTC.CompareTo(x.CreatedUTC);
+                    var result = y.CreatedUTC.CompareTo(x.CreatedUTC);
+                    if (result == 0 && ((ThingData)y.GetThing().Data).Id != ((ThingData)x.GetThing().Data).Id)
+                        return 1;
+                    else
+                        return result;
                 }
             }
         }
@@ -92,6 +96,12 @@ namespace SnooStream.ViewModel
                 else if (messageThing.Author == "reddit")
                 {
                     return new ModeratorMessageActivityViewModel(messageThing);
+                }
+                else if(string.IsNullOrEmpty(messageThing.Author))
+                {
+                    //this is a deleted sender
+                    messageThing.Author = "[deleted]";
+                    return new MessageActivityViewModel(messageThing);
                 }
                 else
                 {
