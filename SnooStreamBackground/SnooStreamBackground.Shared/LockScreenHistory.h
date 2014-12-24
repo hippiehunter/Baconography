@@ -5,34 +5,42 @@
 
 namespace SnooStreamBackground
 {
-  public ref class LockScreenImageInfo sealed
-  {
-  public:
-    property Platform::String^ OriginalUrl;
-    property Platform::String^ LocalUrl;
-    property Platform::String^ LastShown;
-    LockScreenImageInfo(Platform::String^ originalUrl, Platform::String^ localUrl, Platform::String^ lastShown)
+    public ref class ImageInfo sealed
     {
-      OriginalUrl = originalUrl;
-      LocalUrl = localUrl;
-      LastShown = lastShown;
-    }
-  };
+    public:
+        property Platform::String^ OriginalUrl;
+        property Platform::String^ LocalSmallSquareUrl;
+        property Platform::String^ LocalLargeSquareUrl;
+        property Platform::String^ LocalWideUrl;
+        property int LastShown;
+        property Platform::String^ Title;
+        ImageInfo(Platform::String^ originalUrl, Platform::String^ localSmallSquareUrl, Platform::String^ localLargeSquareUrl, Platform::String^ localWideUrl, int lastShown, Platform::String^ title)
+        {
+            OriginalUrl = originalUrl;
 
-  public ref class LockScreenHistory sealed
-  {
-  private:
-    Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _toasted;
-    Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _history;
-    Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _toastedMessages;
-  public:
-    property Windows::Foundation::Collections::IVector<LockScreenImageInfo^>^ CurrentTileImages;
-    property Windows::Foundation::Collections::IVector<LockScreenImageInfo^>^ LockScreenImages;
-    property Platform::String^ LastLockScreenUpdate;
+            LocalSmallSquareUrl = localSmallSquareUrl;
+            LocalLargeSquareUrl = localLargeSquareUrl;
+            LocalWideUrl = localWideUrl;
+
+            LastShown = lastShown;
+            Title = title;
+        }
+    };
+
+    public ref class LockScreenHistory sealed
+    {
+    private:
+        Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _toasted;
+        Platform::Collections::UnorderedMap<Platform::String^, int>^ _history;
+        Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _toastedMessages;
+    public:
+        property Windows::Foundation::Collections::IVector<ImageInfo^>^ CurrentTileImages;
+        property Windows::Foundation::Collections::IVector<ImageInfo^>^ LockScreenImages;
+        property Platform::String^ LastLockScreenUpdate;
 
 
-    bool HasHistory(Platform::String^ url);
-    LockScreenHistory();
-    void Store();
-  };
+        int Age(Platform::String^ url);
+        LockScreenHistory();
+        void Store();
+    };
 }

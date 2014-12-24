@@ -8,6 +8,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)SimpleRedditService.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenSettings.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenHistory.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ImageUtilities.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetworkUtilities.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)LiveTileUtilities.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ActivityManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
@@ -19,6 +23,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)SimpleRedditService.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenSettings.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenHistory.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ImageUtilities.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetworkUtilities.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)LiveTileUtilities.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ActivityManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)LockScreenItemView.xaml" />

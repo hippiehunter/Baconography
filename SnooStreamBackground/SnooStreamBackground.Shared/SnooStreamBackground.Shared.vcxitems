@@ -14,6 +14,8 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ImageUtilities.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)LiveTileUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenHistory.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenItemView.xaml.h">
       <DependentUpon>$(MSBuildThisFileDirectory)LockScreenItemView.xaml</DependentUpon>
@@ -23,10 +25,14 @@
       <DependentUpon>$(MSBuildThisFileDirectory)LockScreenViewControl.xaml</DependentUpon>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenViewModel.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)ActivityManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetworkUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SimpleRedditService.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ImageUtilities.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)LiveTileUtilities.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenHistory.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenItemView.xaml.cpp">
       <DependentUpon>$(MSBuildThisFileDirectory)LockScreenItemView.xaml</DependentUpon>
@@ -35,6 +41,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenViewControl.xaml.cpp">
       <DependentUpon>$(MSBuildThisFileDirectory)LockScreenViewControl.xaml</DependentUpon>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)ActivityManager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetworkUtilities.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
