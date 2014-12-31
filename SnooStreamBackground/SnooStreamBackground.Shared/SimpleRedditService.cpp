@@ -271,6 +271,7 @@ task<vector<tuple<String^, String^>>> SimpleRedditService::GetNewMessages()
 			for (auto&& message : messageArray)
 			{
 				auto messageObject = message->GetObject();
+                auto messageId = message->GetString("id");
 				auto messageData = messageObject->GetNamedObject("data");
 				auto messageNew = messageData->GetNamedBoolean("new");
 				auto messageName = messageData->GetNamedString("name");
@@ -280,7 +281,7 @@ task<vector<tuple<String^, String^>>> SimpleRedditService::GetNewMessages()
 					if (std::find(begin(existingMessages), end(existingMessages), messageName) != end(existingMessages))
 						continue;
 
-					newMessages.push_back(messageName);
+					newMessages.push_back(std::make_tuple(messageId, messageName);
 					auto messageSubject = messageObject->GetNamedString("subject");
 					auto messageWasComment = messageObject->GetNamedBoolean("was_comment");
 					if (messageWasComment)
@@ -298,7 +299,7 @@ task<vector<tuple<String^, String^>>> SimpleRedditService::GetNewMessages()
 			wofstream existingMessagesOutputFile(localPath);
 			for (auto newMessage : newMessages)
 			{
-				existingMessagesOutputFile << newMessage->Data();
+				existingMessagesOutputFile << std::get<1>(newMessage)->Data();
 			}
 			existingMessagesOutputFile.close();
 		}

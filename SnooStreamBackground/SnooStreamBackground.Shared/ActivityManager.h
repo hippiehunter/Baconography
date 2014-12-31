@@ -1,23 +1,28 @@
 #pragma once
 
-#include <unordered_set>
+#include <vector>
 
 namespace SnooStreamBackground
 {
+    ref class SimpleRedditService;
     public ref class ActivityManager sealed
     {
     private:
-        std::unordered_set<std::wstring> _alreadyToasted;
+       std::vector<Platform::String^> _alreadyToasted;
+       chrono::seconds _lastUpdate;
+       SimpleRedditService^ _redditService;
+
+       void MakeToast(Platform::String^ id, Platform::String^ text, Windows::Foundation::TypedEventHandler<Windows::UI::Notifications::ToastNotification^, Object^>^ activatedHandler);
     public:
-        ActivityManager();
-        property Platform::String^ ActivityBlob
-        {
-            Platform::String^ get();
-        }
+        ActivityManager(SimpleRedditService^ redditService);
+        property Platform::String^ SentBlob;
+        property Platform::String^ RecivedBlob;
+        property Platform::String^ ActivityBlob;
         property bool NeedsRefresh
         {
             bool get();
         }
+        property int UpdateCountSinceToast;
         Windows::Foundation::IAsyncAction^ Refresh(Windows::Foundation::TypedEventHandler<Windows::UI::Notifications::ToastNotification^, Object^>^ activatedHandler);
     };
 }

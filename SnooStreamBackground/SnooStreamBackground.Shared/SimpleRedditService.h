@@ -20,6 +20,13 @@ namespace SnooStreamBackground
         Platform::String^ RefreshToken;
     };
 
+    class Activities
+    {
+    public:
+        Platform::String^ Blob;
+        Platform::Collections::Map<Platform::String^, Platform::String^>^ Toastables;
+    };
+
     class SimpleRedditService
     {
     private:
@@ -28,7 +35,9 @@ namespace SnooStreamBackground
     public:
         SimpleRedditService(RedditOAuth oAuth);
         concurrency::task<bool> HasMail();
-        concurrency::task<std::vector<std::tuple<Platform::String^, Platform::String^>>> GetNewMessages();
+        concurrency::task<Activities> GetMessages();
+        concurrency::task<Activities> GetActivity();
+        concurrency::task<Activities> GetSent();
         concurrency::task<std::vector<std::tuple<Platform::String^, Platform::String^>>> GetPostsBySubreddit(Platform::String^ subreddit, int limit);
 
     };
