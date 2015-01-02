@@ -54,6 +54,13 @@ void LiveTileUtilities::MakeLiveTile(LockScreenHistory^ history, LiveTileSetting
 				}
 				case LiveTileStyle::Text:
 				{
+					tileTemplate = Windows::UI::Notifications::TileUpdateManager::GetTemplateContent(Windows::UI::Notifications::TileTemplateType::TileWide310x150Text04);
+					tileTemplate->GetElementsByTagName("text")->Item(0)->AppendChild(tileTemplate->CreateTextNode(option->Title));
+					auto squareTemplate = Windows::UI::Notifications::TileUpdateManager::GetTemplateContent(Windows::UI::Notifications::TileTemplateType::TileSquare150x150Text04);
+					squareTemplate->GetElementsByTagName("text")->Item(0)->AppendChild(squareTemplate->CreateTextNode(option->Title));
+
+					auto node = tileTemplate->ImportNode(squareTemplate->GetElementsByTagName("binding")->Item(0), true);
+					tileTemplate->GetElementsByTagName("visual")->Item(0)->AppendChild(node);
 					break;
 				}
 				case LiveTileStyle::TextImage:
