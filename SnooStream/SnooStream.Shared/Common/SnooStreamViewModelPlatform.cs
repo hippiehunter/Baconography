@@ -33,7 +33,7 @@ namespace SnooStream.Common
                 LockScreenSettings lsSettings = new LockScreenSettings();
                 lsSettings.LiveTileSettings = new List<LiveTileSettings>
                 {
-                    new LiveTileSettings { CurrentImages = new List<string>(), LiveTileItemsReddit = "/", LiveTileStyle = LiveTileStyle.Image}
+                    new LiveTileSettings { CurrentImages = new List<string>(), LiveTileItemsReddit = "/", LiveTileStyle = LiveTileStyle.TextImage}
                 };
                 lsSettings.RedditOAuth = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.OAuth != null ?
                     JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
