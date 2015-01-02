@@ -63,7 +63,7 @@ RedditOAuth RedditOAuth::Deserialize(Platform::String^ data)
     if (data->Length() > 0)
     {
         auto userObject = JsonObject::Parse(data);
-        auto oAuthObject = userObject->GetNamedObject("oAuth");
+        auto oAuthObject = userObject->GetNamedObject("OAuth");
         return RedditOAuth
         {
             userObject->GetNamedString("Username"),
@@ -252,25 +252,31 @@ concurrency::task<Activities> SimpleRedditService::GetMessages()
 
         for (auto&& message : messageArray)
         {
-            auto messageObject = message->GetObject();
-            auto messageId = messageObject->GetNamedString("id");
-            auto messageData = messageObject->GetNamedObject("data");
-            auto messageNew = messageData->GetNamedBoolean("new");
-            auto messageName = messageData->GetNamedString("name");
+			try
+			{
 
-            if (messageNew)
-            {
-                String^ toastableContent = nullptr;
-                auto messageSubject = messageObject->GetNamedString("subject");
-                auto messageWasComment = messageObject->GetNamedBoolean("was_comment");
-                if (messageWasComment)
-                    toastableContent = messageObject->GetNamedString("link_title");
-                else
-                    toastableContent = messageSubject;
 
-                toastables->Insert(messageId, toastableContent);
-                
-            }
+				auto messageObject = message->GetObject();
+				auto messageData = messageObject->GetNamedObject("data");
+				auto messageId = messageData->GetNamedString("id");
+				auto messageNew = messageData->GetNamedBoolean("new");
+				auto messageName = messageData->GetNamedString("name");
+
+				if (messageNew)
+				{
+					String^ toastableContent = nullptr;
+					auto messageWasComment = messageData->GetNamedBoolean("was_comment");
+					if (messageWasComment)
+						toastableContent = messageData->GetNamedString("link_title");
+					else
+						toastableContent = messageData->GetNamedString("subject");
+
+					toastables->Insert(messageId, toastableContent);
+
+				}
+			}
+			//ignore bad messages (probably an odd thing type in the listing)
+			catch (...) {}
         }
         Activities result = { response, toastables };
         return result;

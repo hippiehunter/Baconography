@@ -80,7 +80,9 @@ void ActivityManager::StoreState()
 //if our last update pulled a toast notification
 bool ActivityManager::NeedsRefresh::get()
 {
-    auto updatePeriod = _lastUpdate - chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch());
+    auto updatePeriod = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()) - _lastUpdate;
+	if (_lastUpdate.count() == 0)
+		return true;
     if (chrono::duration_cast<chrono::minutes>(updatePeriod).count() > 60)
         return true;
     else if (chrono::duration_cast<chrono::minutes>(updatePeriod).count() > ((UpdateCountSinceActivity * 5) + 5))
@@ -152,7 +154,7 @@ IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHa
                 ReceivedBlob = resultActivities.Blob;
                 for (auto toastTpl : resultActivities.Toastables)
                 {
-                    if (toastedLookup.find(toastTpl->Key) != toastedLookup.end())
+                    if (toastedLookup.find(toastTpl->Key) == toastedLookup.end())
                     {
                         UpdateCountSinceActivity = 0;
                         MakeToast(toastTpl->Key, toastTpl->Value, activatedHandler);
@@ -160,7 +162,7 @@ IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHa
                         _alreadyToasted.insert(_alreadyToasted.begin(), toastTpl->Key);
                     }
                 }
-
+				_lastUpdate = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch());
                 StoreState();
             }
             catch (...)

@@ -104,7 +104,7 @@ namespace SnooStream
                 rootFrame = new Frame();
 
                 // TODO: change this value to a cache size that is appropriate for your application
-                rootFrame.CacheSize = 1;
+                rootFrame.CacheSize = 4;
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {

@@ -20,6 +20,7 @@ namespace SnooStream.ViewModel
 		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<LoginViewModel>();
         public LoginViewModel()
         {
+            IsDefaultLogin = true;
             StoredCredentials = new ObservableCollection<UserCredential>();
             LoadStoredCredentials();
         }

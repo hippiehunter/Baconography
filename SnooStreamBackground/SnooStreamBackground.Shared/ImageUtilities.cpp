@@ -157,6 +157,7 @@ task<String^> ImageUtilities::MakeTileSizedImage(IImageProvider^ imageSource, St
                     try
                     {
                         auto jpegBuffer = jpegBufferTask.get();
+						delete filter;
                         auto widthString = to_wstring((int)width);
                         auto heightString = to_wstring((int)height);
                         auto targetFileName = L"LiveTile" + ref new String(widthString.data(), widthString.size()) + "x" +
@@ -165,6 +166,7 @@ task<String^> ImageUtilities::MakeTileSizedImage(IImageProvider^ imageSource, St
                         _stat64i32 stat;
                         if (_wstat((ApplicationData::Current->LocalFolder->Path + L"\\" + targetFileName)->Data(), &stat) == 0)
                         {
+							
                             return task_from_result<String^>(targetFileName);
                         }
                         else
