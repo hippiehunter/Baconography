@@ -154,7 +154,7 @@ namespace SnooStream.ViewModel
 
 			public async Task Refresh(System.Collections.ObjectModel.ObservableCollection<ViewModelBase> current, bool onlyNew)
 			{
-				await _selfStream.PullNew();
+				await _selfStream.PullNew(!onlyNew);
 			}
 
 			public string NameForStatus
@@ -207,7 +207,7 @@ namespace SnooStream.ViewModel
 			RaisePropertyChanged("IsLoggedIn");
 			RaisePropertyChanged("Activities");
 			Groups.Clear();
-			await PullNew();
+			await PullNew(true);
 		}
 
 		public bool IsLoggedIn
@@ -234,35 +234,22 @@ namespace SnooStream.ViewModel
 		public DateTime? LastRefresh { get; set; }
 		public ObservableSortedUniqueCollection<string, ActivityGroupViewModel> Groups { get; private set; }
 		public ObservableCollection<ViewModelBase> Activities { get; private set; }
-		public async Task PullNew()
+		public async Task PullNew(bool force)
 		{
 			LastRefresh = DateTime.Now;
 			if (!IsLoggedIn)
 				throw new InvalidOperationException("User must be logged in to do this");
 
-			Listing inbox = null;
-			Listing outbox = null;
-			Listing activity = null;
+            if (SnooStreamViewModel.ActivityManager.NeedsRefresh() || force)
+                await SnooStreamViewModel.ActivityManager.Refresh();
 
-			await SnooStreamViewModel.NotificationService.Report("refreshing inbox", async () =>
-			{
-				inbox = await SnooStreamViewModel.RedditService.GetMessages(null);
-			});
+            Listing inbox = SnooStreamViewModel.ActivityManager.Received;
+			Listing outbox = SnooStreamViewModel.ActivityManager.Sent;
+			Listing activity = SnooStreamViewModel.ActivityManager.Activity;
+
 
 			OldestMessage = ProcessListing(inbox, OldestMessage);
-
-			await SnooStreamViewModel.NotificationService.Report("refreshing outbox", async () =>
-			{
-				outbox = await SnooStreamViewModel.RedditService.GetSentMessages(null);
-			});
-
 			OldestSentMessage = ProcessListing(outbox, OldestSentMessage);
-
-			await SnooStreamViewModel.NotificationService.Report("refreshing activity", async () =>
-			{
-				activity = await SnooStreamViewModel.RedditService.GetPostsByUser(SnooStreamViewModel.RedditService.CurrentUserName, null);
-			});
-
 			OldestActivity = ProcessListing(activity, OldestActivity);
 		}
 
@@ -364,7 +351,7 @@ namespace SnooStream.ViewModel
 			if (!onlyNew)
 			{
 				Groups.Clear();
-				await PullNew();
+				await PullNew(true);
 			}
 		}
 	}

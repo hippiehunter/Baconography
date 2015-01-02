@@ -5,7 +5,7 @@
     <HasSharedItems>true</HasSharedItems>
     <ItemsProjectGuid>{462a08ba-a466-47e9-bdbe-a2d3247ae88a}</ItemsProjectGuid>
     <ItemsRootNamespace>SnooDomBackground</ItemsRootNamespace>
-    <ItemsProjectName>SnooDomBackground.Shared</ItemsProjectName>
+    <ItemsProjectName>SnooStreamBackground.Shared</ItemsProjectName>
     <CodeSharingProject>248F659F-DAC5-46E8-AC09-60EC9FC95053</CodeSharingProject>
   </PropertyGroup>
   <ItemDefinitionGroup>

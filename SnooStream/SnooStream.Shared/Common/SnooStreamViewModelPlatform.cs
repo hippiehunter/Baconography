@@ -6,6 +6,7 @@ using SnooStreamBackground;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Windows.UI.Core;
@@ -17,19 +18,21 @@ namespace SnooStream.Common
     {
 		public SnooStreamViewModelPlatform()
 		{
-			SnooStreamViewModel.SystemServices = new SystemServices();
+            
+            SnooStreamViewModel.SystemServices = new SystemServices();
 			SnooStreamViewModel.MarkdownProcessor = new MarkdownProvider();
-
-			if (!IsInDesignMode)
+            SnooStreamViewModel.ActivityManager = new SnooStream.PlatformServices.ActivityManager();
+            if (!IsInDesignMode)
 			{
 				((SystemServices)SnooStreamViewModel.SystemServices).FinishInitialization(Windows.ApplicationModel.Core.CoreApplication.MainView.Dispatcher);
 				SnooStreamViewModel.CWD = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
 				SnooStreamViewModel.UserCredentialService = new DefaultUserCredentialService();
-			}
+                
+            }
 			FinishInit();
 
             if (!IsInDesignMode)
-			{
+            {
                 LockScreenSettings lsSettings = new LockScreenSettings();
                 lsSettings.LiveTileSettings = new List<LiveTileSettings>
                 {
@@ -37,9 +40,12 @@ namespace SnooStream.Common
                 };
                 lsSettings.RedditOAuth = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.OAuth != null ?
                     JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
+
+                
+
                 lsSettings.Store();
 
-                Task.Delay(10000).ContinueWith(async (tskTop) => 
+                Task.Delay(10000).ContinueWith(async (tskTop) =>
                     {
                         var status = BackgroundExecutionManager.GetAccessStatus();
                         if (status == BackgroundAccessStatus.Unspecified)
@@ -59,20 +65,21 @@ namespace SnooStream.Common
 
                         SystemServices.RunUIIdleAsync(() =>
                             {
-								return Task.Run(() =>
-									{
-										UpdateBackgroundTask tsk = new UpdateBackgroundTask();
-										try
-										{
-											tsk.RunExternal();
-										}
-										catch { }
-									});
+                                return Task.Run(() =>
+                                    {
+                                        UpdateBackgroundTask tsk = new UpdateBackgroundTask();
+                                        try
+                                        {
+                                            tsk.RunExternal();
+                                        }
+                                        catch { }
+                                    });
                             });
                     });
-                
+
             }
 		}
+
         public static BackgroundTaskRegistration RegisterBackgroundTask(
                                                 string taskEntryPoint,
                                                 string name,

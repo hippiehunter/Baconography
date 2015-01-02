@@ -59,10 +59,12 @@ namespace SnooStreamBackground
     {
     private:
         std::unique_ptr<SimpleRedditService> redditService;
+		bool _external;
     public:
 
         void RunExternal()
         {
+			_external = true;
 #ifdef WINDOWS_PHONE
             OnRun(nullptr);
 #else
@@ -215,7 +217,7 @@ namespace SnooStreamBackground
                     return task<void>();
             };
             
-            if (activityManager->NeedsRefresh)
+            if (!_external && activityManager->NeedsRefresh)
             {
                 return create_task(activityManager->Refresh(settings->RedditOAuth, nullptr))
                     .then([=]()

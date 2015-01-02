@@ -285,7 +285,7 @@ concurrency::task<Activities> SimpleRedditService::GetMessages()
 
 concurrency::task<Activities> SimpleRedditService::GetActivity()
 {
-    return SendGet("/message/sent/.json")
+    return SendGet("/user/" + _oAuth.Username + "/.json")
         .then([&](String^ response)
     {
         Activities result = { response, nullptr };
@@ -295,7 +295,7 @@ concurrency::task<Activities> SimpleRedditService::GetActivity()
 
 concurrency::task<Activities> SimpleRedditService::GetSent()
 {
-    return SendGet("/user/" + _oAuth.AccessToken + "/.json")
+    return SendGet("/message/sent/.json")
         .then([&](String^ response)
     {
         Activities result = { response, nullptr };

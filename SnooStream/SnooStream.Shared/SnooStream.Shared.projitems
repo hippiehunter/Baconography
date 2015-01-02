@@ -46,6 +46,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\VisitedLinkConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\VoteColorConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\VoteIndicatorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlatformServices\ActivityManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlatformServices\MarkdownProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlatformServices\NavigationService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlatformServices\SystemServices.cs" />

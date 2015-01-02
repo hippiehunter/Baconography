@@ -1,6 +1,7 @@
 ﻿using CommonResourceAcquisition.ImageAcquisition;
 using GalaSoft.MvvmLight;
 using MetroLog;
+using Newtonsoft.Json;
 using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Messages;
@@ -36,7 +37,11 @@ namespace SnooStream.ViewModel
 			SettingsHub = new SettingsViewModel(Settings);
 			
 			RedditUserState = _initializationBlob.DefaultUser ?? new UserState();
-			NotificationService = new Common.NotificationService();
+
+            SnooStreamViewModel.ActivityManager.OAuth = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.OAuth != null ?
+                    JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
+
+            NotificationService = new Common.NotificationService();
 			CaptchaProvider = new CaptchaService();
 			RedditService = new Reddit(_listingFilter, RedditUserState, OfflineService, CaptchaProvider, "3m9rQtBinOg_rA", null, "http://www.google.com");
 			Login = new LoginViewModel();
@@ -70,8 +75,9 @@ namespace SnooStream.ViewModel
         public static IUserCredentialService UserCredentialService { get; set; }
         public static INavigationService NavigationService { get; set; }
         public static ISystemServices SystemServices { get; set; }
+        public static IActivityManager ActivityManager { get; set; }
 
-		public SelfStreamViewModel SelfStream { get; private set; }
+        public SelfStreamViewModel SelfStream { get; private set; }
 		public LoginViewModel Login { get; private set; }
         public SettingsViewModel SettingsHub { get; private set; }
         public SubredditRiverViewModel SubredditRiver { get; private set; }
