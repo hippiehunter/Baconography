@@ -1,28 +1,31 @@
 #pragma once
 
 #include <vector>
+#include <chrono>
 
 namespace SnooStreamBackground
 {
-    ref class SimpleRedditService;
+    class SimpleRedditService;
     public ref class ActivityManager sealed
     {
     private:
        std::vector<Platform::String^> _alreadyToasted;
-       chrono::seconds _lastUpdate;
-       SimpleRedditService^ _redditService;
+       std::chrono::seconds _lastUpdate;
 
        void MakeToast(Platform::String^ id, Platform::String^ text, Windows::Foundation::TypedEventHandler<Windows::UI::Notifications::ToastNotification^, Object^>^ activatedHandler);
+    internal:
+        ActivityManager();
     public:
-        ActivityManager(SimpleRedditService^ redditService);
+        
         property Platform::String^ SentBlob;
-        property Platform::String^ RecivedBlob;
+        property Platform::String^ ReceivedBlob;
         property Platform::String^ ActivityBlob;
         property bool NeedsRefresh
         {
             bool get();
         }
-        property int UpdateCountSinceToast;
-        Windows::Foundation::IAsyncAction^ Refresh(Windows::Foundation::TypedEventHandler<Windows::UI::Notifications::ToastNotification^, Object^>^ activatedHandler);
+        property int UpdateCountSinceActivity;
+        Windows::Foundation::IAsyncAction^ Refresh(Platform::String^ oAuthBlob, Windows::Foundation::TypedEventHandler<Windows::UI::Notifications::ToastNotification^, Object^>^ activatedHandler);
+        void StoreState();
     };
 }

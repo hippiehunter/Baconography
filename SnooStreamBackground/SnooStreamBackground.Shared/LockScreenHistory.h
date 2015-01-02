@@ -30,9 +30,7 @@ namespace SnooStreamBackground
     public ref class LockScreenHistory sealed
     {
     private:
-        Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _toasted;
         Platform::Collections::UnorderedMap<Platform::String^, int>^ _history;
-        Platform::Collections::UnorderedMap<Platform::String^, Platform::String^>^ _toastedMessages;
     public:
         property Windows::Foundation::Collections::IVector<ImageInfo^>^ CurrentTileImages;
         property Windows::Foundation::Collections::IVector<ImageInfo^>^ LockScreenImages;

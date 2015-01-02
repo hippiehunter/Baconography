@@ -41,7 +41,7 @@ namespace SnooStream.View.Pages
 				if (taskHistory.LockScreenImages.Count >= 1)
                 {
 					BackgroundTaskManager.Shuffle(taskHistory.LockScreenImages);
-					vm.LockScreen.SelectedImage = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + taskHistory.LockScreenImages.First().LocalUrl;
+					vm.LockScreen.SelectedImage = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + taskHistory.LockScreenImages.First().OriginalUrl;
                 }
                 else
                 {

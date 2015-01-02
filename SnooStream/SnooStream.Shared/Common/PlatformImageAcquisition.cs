@@ -59,7 +59,12 @@ namespace SnooStream.Common
 			string onDiskName = "snoostream_preview" + ComputeMD5(url);
 			try
 			{
-				var targetFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(onDiskName, CreationCollisionOption.FailIfExists);
+                if (SnooStreamBackground.ImageUtilities.FileExists(ApplicationData.Current.TemporaryFolder.Path + "\\" + onDiskName))
+                {
+                    return ApplicationData.Current.TemporaryFolder.Path + "\\" + onDiskName;
+                }
+
+                var targetFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(onDiskName, CreationCollisionOption.FailIfExists);
 				Exception failed = null;
 				try
 				{

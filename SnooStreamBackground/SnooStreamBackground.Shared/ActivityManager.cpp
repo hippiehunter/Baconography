@@ -5,7 +5,6 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <chrono>
 #include <unordered_set>
 
 using namespace std;
@@ -15,7 +14,7 @@ using namespace Platform;
 using namespace Windows::Foundation;
 using namespace Windows::UI::Notifications;
 
-ActivityManager::ActivityManager(SimpleRedditService^ redditService)
+ActivityManager::ActivityManager()
 {
     //grab activity blob from disk
     wstring activityPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
@@ -39,12 +38,42 @@ ActivityManager::ActivityManager(SimpleRedditService^ redditService)
     {
         auto parsedFileObject = JsonObject::Parse(ref new String(fileStr.data(), fileStr.size()));
         auto toastedArray = parsedFileObject->GetNamedArray("toasted");
-        RecivedBlob = parsedFileObject->GetNamedString("recived");
+        ReceivedBlob = parsedFileObject->GetNamedString("received");
         SentBlob = parsedFileObject->GetNamedString("sent");
         ActivityBlob = parsedFileObject->GetNamedString("activity");
-        UpdateCountSinceToast = (int)parsedFileObject->GetNamedNumber("updateSinceToast");
+        UpdateCountSinceActivity = (int)parsedFileObject->GetNamedNumber("updateSinceActivity");
         _lastUpdate = chrono::seconds((long long)parsedFileObject->GetNamedNumber("lastUpdate"));
+        for (auto toasted : toastedArray)
+        {
+            _alreadyToasted.push_back(toasted->GetString());
+        }
     }
+}
+
+void ActivityManager::StoreState()
+{
+    auto serializedObject = ref new JsonObject();
+    auto toastHistory = ref new JsonArray();
+    for (auto toast : _alreadyToasted)
+    {
+        if (toastHistory->Size < 100)
+            toastHistory->Append(JsonValue::CreateStringValue(toast));
+    }
+
+    serializedObject->SetNamedValue("toasted", toastHistory);
+    serializedObject->SetNamedValue("received", JsonValue::CreateStringValue(ReceivedBlob));
+    serializedObject->SetNamedValue("sent", JsonValue::CreateStringValue(SentBlob));
+    serializedObject->SetNamedValue("activity", JsonValue::CreateStringValue(ActivityBlob));
+    serializedObject->SetNamedValue("updateSinceActivity", JsonValue::CreateNumberValue(UpdateCountSinceActivity));
+    serializedObject->SetNamedValue("lastUpdate", JsonValue::CreateNumberValue(_lastUpdate.count()));
+
+    auto serializedString = serializedObject->Stringify();
+    wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
+    localPath += L"\\bgtaskActivity.txt";
+    wofstream activityFile(localPath, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc, _SH_DENYRW);
+    wstring activityFileString(serializedString->Data(), serializedString->Length());
+    activityFile << activityFileString;
+    activityFile.close();
 }
 
 //grab new data if its been at least 60 minutes since the last time we checked or 5 minutes (increasing by 5 minutes each refresh without a toast)
@@ -54,7 +83,7 @@ bool ActivityManager::NeedsRefresh::get()
     auto updatePeriod = _lastUpdate - chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch());
     if (chrono::duration_cast<chrono::minutes>(updatePeriod).count() > 60)
         return true;
-    else if (chrono::duration_cast<chrono::minutes>(updatePeriod).count() > ((UpdateCountSinceToast * 5) + 5))
+    else if (chrono::duration_cast<chrono::minutes>(updatePeriod).count() > ((UpdateCountSinceActivity * 5) + 5))
         return true;
     else
         return false;
@@ -78,61 +107,67 @@ void ActivityManager::MakeToast(String^ id, String^ text, TypedEventHandler<Toas
     notifier->Show(notification);
 }
 
-IAsyncAction^ ActivityManager::Refresh(TypedEventHandler<ToastNotification^, Object^>^ activatedHandler)
+IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHandler<ToastNotification^, Object^>^ activatedHandler)
 {
-    UpdateCountSinceToast++;
+    std::shared_ptr<SimpleRedditService> redditService = make_shared<SimpleRedditService>(RedditOAuth::Deserialize(oAuthBlob));
+    UpdateCountSinceActivity++;
     //grab new data
-    concurrency::create_async(_redditService->GetActivity()
-        .then([=](concurrency::task<Activities> result)
+    return concurrency::create_async([=]()
     {
-        try 
+        return redditService->GetActivity()
+            .then([=](concurrency::task<Activities> result)
         {
-            auto resultActivities = result.get();
-            ActivityBlob = resultActivities.Blob;
-            return _redditService->GetSent();
-        }
-        catch (...)
-        {
-            return result;
-        }
-        
-    })
-        .then([=](concurrency::task<Activities> result)
-    {
-        try
-        {
-            auto resultActivities = result.get();
-            SentBlob = resultActivities.Blob;
-
-            return _redditService->GetMessages();
-        }
-        catch (...)
-        {
-            return result;
-        }
-    }))
-        .then([=](concurrency::task<Activities> result)
-    {
-        try
-        {
-            std::unordered_set<Platform::String^> toastedLookup(_alreadyToasted.begin(), _alreadyToasted.end());
-            auto resultActivities = result.get();
-            RecivedBlob = resultActivities.Blob;
-            for (auto toastTpl : resultActivities.Toastables)
+            try
             {
-                if (toastedLookup.find(toastTpl->Key) != toastedLookup.end())
-                {
-                    UpdateCountSinceToast = 0;
-                    MakeToast(toastTpl->Key, toastTpl->Value, activatedHandler);
-                    toastedLookup.insert(toastTpl->Key);
-                    _alreadyToasted.insert(_alreadyToasted.begin(), toastTpl->Key);
-                }
+                auto resultActivities = result.get();
+                ActivityBlob = resultActivities.Blob;
+                return redditService->GetSent();
+            }
+            catch (...)
+            {
+                return result;
             }
 
-            StoreState();
-        }
-        catch (...)
-        {            
-        }
+        })
+            .then([=](concurrency::task<Activities> result)
+        {
+            try
+            {
+                auto resultActivities = result.get();
+                SentBlob = resultActivities.Blob;
+
+                return redditService->GetMessages();
+            }
+            catch (...)
+            {
+                return result;
+            }
+        })
+            .then([=](concurrency::task<Activities> result)
+        {
+            try
+            {
+                std::unordered_set<Platform::String^> toastedLookup(_alreadyToasted.begin(), _alreadyToasted.end());
+                auto resultActivities = result.get();
+                ReceivedBlob = resultActivities.Blob;
+                for (auto toastTpl : resultActivities.Toastables)
+                {
+                    if (toastedLookup.find(toastTpl->Key) != toastedLookup.end())
+                    {
+                        UpdateCountSinceActivity = 0;
+                        MakeToast(toastTpl->Key, toastTpl->Value, activatedHandler);
+                        toastedLookup.insert(toastTpl->Key);
+                        _alreadyToasted.insert(_alreadyToasted.begin(), toastTpl->Key);
+                    }
+                }
+
+                StoreState();
+            }
+            catch (...)
+            {
+            }
+        });
     });
 }
+
+

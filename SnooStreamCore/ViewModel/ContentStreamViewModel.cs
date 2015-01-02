@@ -37,7 +37,7 @@ namespace SnooStream.ViewModel
 					switch (e.Action)
 					{
 						case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-							filteredCollection.Insert(e.NewStartingIndex, e.NewItems[0] as ILinkViewModel);
+							filteredCollection.Add(e.NewItems[0] as ILinkViewModel);
 							break;
 						case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
 							filteredCollection.Move(e.OldStartingIndex, e.NewStartingIndex);

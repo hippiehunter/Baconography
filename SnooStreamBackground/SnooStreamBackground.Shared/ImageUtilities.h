@@ -11,7 +11,7 @@ namespace SnooStreamBackground
     public ref class ImageUtilities sealed
     {
     public:
-
+		static bool FileExists(Platform::String^ fileName);
     internal:
         static concurrency::task<std::vector<ImageInfo^>> MakeLiveTileImages(std::vector<ImageInfo^> liveTileFiles, LockScreenHistory^ history, std::vector<std::tuple<Platform::String^, Platform::String^>> liveTileTpls, int targetCount, int targetIndex = 0);
         static concurrency::task<Nokia::Graphics::Imaging::IImageProvider^> GetImageSource(Platform::String^ url);

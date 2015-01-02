@@ -33,10 +33,10 @@ namespace SnooStream.Common
                 LockScreenSettings lsSettings = new LockScreenSettings();
                 lsSettings.LiveTileSettings = new List<LiveTileSettings>
                 {
-                    new LiveTileSettings { CurrentImages = new List<string>(), LiveTileItemsReddit = "/", LiveTileStyle = LiveTileStyle.Default}
+                    new LiveTileSettings { CurrentImages = new List<string>(), LiveTileItemsReddit = "/", LiveTileStyle = LiveTileStyle.Image}
                 };
                 lsSettings.RedditOAuth = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.OAuth != null ?
-                    JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState.OAuth) : "";
+                    JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
                 lsSettings.Store();
 
                 Task.Delay(10000).ContinueWith(async (tskTop) => 
@@ -59,13 +59,15 @@ namespace SnooStream.Common
 
                         SystemServices.RunUIIdleAsync(() =>
                             {
-                                UpdateBackgroundTask tsk = new UpdateBackgroundTask();
-                                try
-                                {
-                                    tsk.RunExternal();
-                                }
-                                catch { }
-                                return Task.FromResult(true);
+								return Task.Run(() =>
+									{
+										UpdateBackgroundTask tsk = new UpdateBackgroundTask();
+										try
+										{
+											tsk.RunExternal();
+										}
+										catch { }
+									});
                             });
                     });
                 

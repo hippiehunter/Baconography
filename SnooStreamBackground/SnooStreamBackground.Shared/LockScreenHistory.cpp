@@ -35,6 +35,8 @@ LockScreenHistory::LockScreenHistory()
     settingsFile.close();
 
     auto fileStr = fileContents.str();
+
+    _history = ref new Platform::Collections::UnorderedMap<Platform::String^, int>();
     if (fileStr.size() > 0)
     {
         auto parsedFileObject = JsonObject::Parse(ref new String(fileStr.data(), fileStr.size()));
@@ -42,12 +44,11 @@ LockScreenHistory::LockScreenHistory()
         auto currentTileImages = parsedFileObject->GetNamedArray("CurrentTileImages");
         auto imageHistory = parsedFileObject->GetNamedArray("ImageHistory");
         auto lockScreenImages = parsedFileObject->GetNamedArray("LockScreenImages");
-        _history = ref new Platform::Collections::UnorderedMap<Platform::String^, int>();
         for each (auto&& image in imageHistory)
         {
             auto imageObject = image->GetObject();
             auto originalUrl = imageObject->GetNamedString("OriginalUrl");
-            auto lastShown = static_cast<int>(imageObject->GetNamedNumber("LastShown"));
+            auto lastShown = static_cast<int>(imageObject->GetNamedNumber("LastShown", 0));
 
             if (!_history->HasKey(originalUrl))
             {
@@ -61,14 +62,18 @@ LockScreenHistory::LockScreenHistory()
 
             for each (auto&& image in targetArray)
             {
-                auto imageObject = image->GetObject();
-                auto originalUrl = imageObject->GetNamedString("OriginalUrl");
-                auto lastShown = static_cast<int>(imageObject->GetNamedNumber("LastShown"));
-                auto localSmallSquareUrl = imageObject->GetNamedString("LocalSmallSquareUrl", nullptr);
-                auto localLargeSquareUrl = imageObject->GetNamedString("LocalLargeSquareUrl", nullptr);
-                auto localWideUrl = imageObject->GetNamedString("LocalWideUrl", nullptr);
-                auto title = imageObject->GetNamedString("Title");
-                result->Append(ref new ImageInfo(originalUrl, localSmallSquareUrl, localLargeSquareUrl, localWideUrl, lastShown, title));
+                try
+                {
+                    auto imageObject = image->GetObject();
+                    auto originalUrl = imageObject->GetNamedString("OriginalUrl");
+                    auto lastShown = static_cast<int>(imageObject->GetNamedNumber("LastShown", 0));
+                    auto localSmallSquareUrl = imageObject->GetNamedString("LocalSmallSquareUrl", nullptr);
+                    auto localLargeSquareUrl = imageObject->GetNamedString("LocalLargeSquareUrl", nullptr);
+                    auto localWideUrl = imageObject->GetNamedString("LocalWideUrl", nullptr);
+                    auto title = imageObject->GetNamedString("Title", "");
+                    result->Append(ref new ImageInfo(originalUrl, localSmallSquareUrl, localLargeSquareUrl, localWideUrl, lastShown, title));
+                }
+                catch (...) { }
             }
             return result;
         };
@@ -98,7 +103,7 @@ void LockScreenHistory::Store()
         auto serializedImage = ref new JsonObject();
 
         serializedImage->Insert("OriginalUrl", JsonValue::CreateStringValue(imageTpl->Key));
-        serializedImage->Insert("LastShown", JsonValue::CreateStringValue(imageTpl->Value.ToString()));
+        serializedImage->Insert("LastShown", JsonValue::CreateNumberValue(imageTpl->Value));
         imageHistory->Append(serializedImage);
     }
 
@@ -107,21 +112,28 @@ void LockScreenHistory::Store()
         auto serializedImage = ref new JsonObject();
 
         serializedImage->Insert("OriginalUrl", JsonValue::CreateStringValue(image->OriginalUrl));
+        serializedImage->Insert("Title", JsonValue::CreateStringValue(image->Title));
         serializedImage->Insert("LocalWideUrl", JsonValue::CreateStringValue(image->LocalWideUrl));
         serializedImage->Insert("LocalLargeSquareUrl", JsonValue::CreateStringValue(image->LocalLargeSquareUrl));
         serializedImage->Insert("LocalSmallSquareUrl", JsonValue::CreateStringValue(image->LocalSmallSquareUrl));
-        serializedImage->Insert("LastShown", JsonValue::CreateStringValue(image->LastShown.ToString()));
+        serializedImage->Insert("LastShown", JsonValue::CreateNumberValue(image->LastShown));
         targetArray->Append(serializedImage);
     };
 
-    for each(auto image in CurrentTileImages)
+    if (CurrentTileImages != nullptr)
     {
-        serializeImageInfo(image, currentTileImages);
+        for each(auto image in CurrentTileImages)
+        {
+            serializeImageInfo(image, currentTileImages);
+        }
     }
 
-    for each(auto&& image in LockScreenImages)
+    if (LockScreenImages != nullptr)
     {
-        serializeImageInfo(image, imageHistory);
+        for each(auto&& image in LockScreenImages)
+        {
+            serializeImageInfo(image, imageHistory);
+        }
     }
 
     serializedObject->Insert("ImageHistory", imageHistory);

@@ -12,6 +12,7 @@ namespace SnooStreamBackground
         static RedditOAuth Deserialize(Platform::String^ json);
         static Platform::String^ Serialize(RedditOAuth oAuth);
 
+        Platform::String^ Username;
         Platform::String^ AccessToken;
         Platform::String^ TokenType;
         int ExpiresIn;

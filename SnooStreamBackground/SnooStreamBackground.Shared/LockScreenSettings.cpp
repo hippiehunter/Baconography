@@ -39,8 +39,8 @@ LockScreenSettings::LockScreenSettings()
 
         RedditOAuth = parsedFileObject->GetNamedString("RedditOAuth", RedditOAuth);
         LockScreenOverlayRoundedEdges = parsedFileObject->GetNamedBoolean("LockScreenOverlayRoundedEdges", LockScreenOverlayRoundedEdges);
-        LockScreenOverlayOpacity = parsedFileObject->GetNamedNumber("LockScreenOverlayOpacity", LockScreenOverlayOpacity);
-        LockScreenOverlayItemsCount = parsedFileObject->GetNamedNumber("LockScreenOverlayItemsCount", LockScreenOverlayItemsCount);
+        LockScreenOverlayOpacity = (int)parsedFileObject->GetNamedNumber("LockScreenOverlayOpacity", LockScreenOverlayOpacity);
+        LockScreenOverlayItemsCount = (int)parsedFileObject->GetNamedNumber("LockScreenOverlayItemsCount", LockScreenOverlayItemsCount);
         LockScreenOverlayItemsReddit = parsedFileObject->GetNamedString("LockScreenOverlayItemsReddit", LockScreenOverlayItemsReddit);
         auto liveTileSettings = parsedFileObject->GetNamedArray("LiveTileSettings");
         if (liveTileSettings != nullptr)

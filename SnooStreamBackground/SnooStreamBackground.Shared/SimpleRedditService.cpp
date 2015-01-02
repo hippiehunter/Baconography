@@ -62,10 +62,11 @@ RedditOAuth RedditOAuth::Deserialize(Platform::String^ data)
 {
     if (data->Length() > 0)
     {
-        auto oAuthObject = JsonObject::Parse(data);
-
+        auto userObject = JsonObject::Parse(data);
+        auto oAuthObject = userObject->GetNamedObject("oAuth");
         return RedditOAuth
         {
+            userObject->GetNamedString("Username"),
             oAuthObject->GetNamedString("access_token"),
             oAuthObject->GetNamedString("token_type"),
             static_cast<int>(oAuthObject->GetNamedNumber("expires_in")),
@@ -79,7 +80,7 @@ RedditOAuth RedditOAuth::Deserialize(Platform::String^ data)
 }
 
 
-concurrency::task<RedditOAuth> RefreshToken(Platform::String^ refreshToken)
+concurrency::task<RedditOAuth> RefreshToken(Platform::String^ refreshToken, Platform::String^ username)
 {
     //we're messing with the headers here so use a different client
     auto httpClient = ref new HttpClient();
@@ -105,6 +106,7 @@ concurrency::task<RedditOAuth> RefreshToken(Platform::String^ refreshToken)
 
                     return RedditOAuth
                     {
+                        username,
                         oAuthObject->GetNamedString("access_token"),
                         oAuthObject->GetNamedString("token_type"),
                         static_cast<int>(oAuthObject->GetNamedNumber("expires_in")),
@@ -135,7 +137,7 @@ concurrency::task<Platform::String^> SimpleRedditService::SendGet(String^ url)
   //see if we need to refresh the token
   if (_oAuth.AccessToken != nullptr)
   {
-      return create_task(RefreshToken(_oAuth.RefreshToken))
+      return create_task(RefreshToken(_oAuth.RefreshToken, _oAuth.Username))
           .then([=](RedditOAuth oAuth)
       {
           auto localUrl = url;
@@ -239,73 +241,60 @@ task<bool> SimpleRedditService::HasMail()
 }
 
 
-task<vector<tuple<String^, String^>>> SimpleRedditService::GetNewMessages()
+concurrency::task<Activities> SimpleRedditService::GetMessages()
 {
-  return SendGet("/message/unread/.json")
-    .then([&](String^ unreadResponse)
-	{
-		vector<String^> existingMessages;
-		vector<tuple<String^, String^>> newMessages;
-		vector<String^> displayTitles;
+    return SendGet("/message/inbox/.json")
+        .then([&](String^ response)
+    {
+        auto toastables = ref new Platform::Collections::Map<Platform::String^, Platform::String^>();
+        auto messages = JsonObject::Parse(response);
+        auto messageArray = messages->GetNamedObject("data")->GetNamedArray("children");
 
-        if (unreadResponse == nullptr)
-            return newMessages;
+        for (auto&& message : messageArray)
+        {
+            auto messageObject = message->GetObject();
+            auto messageId = messageObject->GetNamedString("id");
+            auto messageData = messageObject->GetNamedObject("data");
+            auto messageNew = messageData->GetNamedBoolean("new");
+            auto messageName = messageData->GetNamedString("name");
 
-		try
-		{
-			wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
-			localPath += L"bgtaskMessages.txt";
-			wifstream existingMessagesFile(localPath);
-			wstring existingMessageLine;
-			while (getline(existingMessagesFile, existingMessageLine))
-			{
-				auto newMessageId = ref new String(existingMessageLine.data(), existingMessageLine.size());
-				if (find(begin(existingMessages), end(existingMessages), newMessageId) == end(existingMessages))
-					existingMessages.push_back(newMessageId);
-			}
-			existingMessagesFile.close();
+            if (messageNew)
+            {
+                String^ toastableContent = nullptr;
+                auto messageSubject = messageObject->GetNamedString("subject");
+                auto messageWasComment = messageObject->GetNamedBoolean("was_comment");
+                if (messageWasComment)
+                    toastableContent = messageObject->GetNamedString("link_title");
+                else
+                    toastableContent = messageSubject;
 
-			auto messages = JsonObject::Parse(unreadResponse);
-			auto messageArray = messages->GetNamedObject("data")->GetNamedArray("children");
+                toastables->Insert(messageId, toastableContent);
+                
+            }
+        }
+        Activities result = { response, toastables };
+        return result;
+    });
+}
 
-			for (auto&& message : messageArray)
-			{
-				auto messageObject = message->GetObject();
-                auto messageId = message->GetString("id");
-				auto messageData = messageObject->GetNamedObject("data");
-				auto messageNew = messageData->GetNamedBoolean("new");
-				auto messageName = messageData->GetNamedString("name");
+concurrency::task<Activities> SimpleRedditService::GetActivity()
+{
+    return SendGet("/message/sent/.json")
+        .then([&](String^ response)
+    {
+        Activities result = { response, nullptr };
+        return result;
+    });
+}
 
-				if (messageNew)
-				{
-					if (std::find(begin(existingMessages), end(existingMessages), messageName) != end(existingMessages))
-						continue;
-
-					newMessages.push_back(std::make_tuple(messageId, messageName);
-					auto messageSubject = messageObject->GetNamedString("subject");
-					auto messageWasComment = messageObject->GetNamedBoolean("was_comment");
-					if (messageWasComment)
-					{
-						displayTitles.push_back(messageObject->GetNamedString("link_title"));
-					}
-					else
-					{
-						displayTitles.push_back(messageSubject);
-
-					}
-				}
-			}
-
-			wofstream existingMessagesOutputFile(localPath);
-			for (auto newMessage : newMessages)
-			{
-				existingMessagesOutputFile << std::get<1>(newMessage)->Data();
-			}
-			existingMessagesOutputFile.close();
-		}
-		catch(...) {}
-		return newMessages;
-	});
+concurrency::task<Activities> SimpleRedditService::GetSent()
+{
+    return SendGet("/user/" + _oAuth.AccessToken + "/.json")
+        .then([&](String^ response)
+    {
+        Activities result = { response, nullptr };
+        return result;
+    });
 }
 
 task<vector<tuple<String^, String^>>> SimpleRedditService::GetPostsBySubreddit(String^ subreddit, int limit)

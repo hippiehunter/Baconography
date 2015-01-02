@@ -19,38 +19,76 @@ using namespace Windows::Security::Cryptography;
 using namespace Windows::Foundation;
 using Windows::Web::Http::HttpClient;
 
-chrono::duration<chrono::system_clock> toDuration(DateTime dt)
+chrono::seconds toDuration(DateTime dt)
 {
-    return chrono::seconds(dt.UniversalTime / 10000000ULL - 11644473600ULL);
+    return chrono::seconds((dt.UniversalTime - 116444736000000000LL) / 10000000ULL);
 }
 
-DateTime toFileTime(const chrono::duration<chrono::system_clock>& point)
+bool starts_with(std::wstring const &fullString, std::wstring const &start)
 {
-    long long unixTime = std::chrono::duration_cast<std::chrono::seconds>(point).count();
-    DateTime result;
-    result.UniversalTime = unixTime * 10000000ULL + 11644473600ULL;
-    return result;
+    if (fullString.length() >= start.length())
+    {
+        return (0 == fullString.compare(0, start.length(), start));
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool ends_with(std::wstring const &fullString, std::wstring const &ending)
+{
+    if (fullString.length() >= ending.length())
+    {
+        return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool ImageUtilities::FileExists(Platform::String^ fileName)
+{
+	_stat64i32 stat;
+	return _wstat(fileName->Data(), &stat) == 0;
 }
 
 task<void> ImageUtilities::ClearOldTempImages()
 {
-    auto oldFileQuery = ApplicationData::Current->TemporaryFolder->CreateFileQuery();
-    return create_task(oldFileQuery->GetFilesAsync())
+    return create_task(ApplicationData::Current->TemporaryFolder->GetFilesAsync())
         .then([=](task<Windows::Foundation::Collections::IVectorView<StorageFile^>^> filesTask)
     {
         try
         {
-            auto cutoff = chrono::system_clock::now().time_since_epoch() - chrono::hours(96);
+            auto cutoff = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch() - chrono::hours(96));
             for (auto file : filesTask.get())
             {
                 auto dateCreated = toDuration(file->DateCreated);
-                if (dateCreated < cutoff)
+                if (dateCreated < cutoff || starts_with(wstring(file->Name->Data()), L"deleteme"))
                     create_task(file->DeleteAsync()).then([](task<void> deleteResult) { try { deleteResult.get(); } catch (...) {} });
             }
+
+            //clean up the live tiles
+            return create_task(ApplicationData::Current->LocalFolder->GetFilesAsync())
+                .then([=](task<Windows::Foundation::Collections::IVectorView<StorageFile^>^> filesTask)
+            {
+                for (auto file : filesTask.get())
+                {
+                    auto fileName = wstring(file->Name->Data());
+                    if (ends_with(fileName, L".jpg") && starts_with(fileName, L"LiveTile"))
+                    {
+                        auto dateCreated = toDuration(file->DateCreated);
+                        if (dateCreated < cutoff)
+                            create_task(file->DeleteAsync()).then([](task<void> deleteResult) { try { deleteResult.get(); } catch (...) {} });
+                    }
+                }
+            });
         }
         catch (...)
         {
         }
+		return task<void>();
     });
 }
 
@@ -119,31 +157,40 @@ task<String^> ImageUtilities::MakeTileSizedImage(IImageProvider^ imageSource, St
                     try
                     {
                         auto jpegBuffer = jpegBufferTask.get();
-                        auto widthString = to_wstring(width);
-                        auto heightString = to_wstring(height);
-                        auto targetFileName = L"LiveTile" + ref new String(widthString.data(), widthString.size()) + "x" + 
+                        auto widthString = to_wstring((int)width);
+                        auto heightString = to_wstring((int)height);
+                        auto targetFileName = L"LiveTile" + ref new String(widthString.data(), widthString.size()) + "x" +
                             ref new String(heightString.data(), heightString.size()) + ComputeMD5(url) + ".jpg";
-                        return create_task(ApplicationData::Current->LocalFolder->CreateFileAsync(targetFileName, CreationCollisionOption::FailIfExists))
-                            .then([=](task<StorageFile^> targetFileTask)
+                        
+                        _stat64i32 stat;
+                        if (_wstat((ApplicationData::Current->LocalFolder->Path + L"\\" + targetFileName)->Data(), &stat) == 0)
                         {
-                            try
+                            return task_from_result<String^>(targetFileName);
+                        }
+                        else
+                        {
+                            return create_task(ApplicationData::Current->LocalFolder->CreateFileAsync(targetFileName, CreationCollisionOption::FailIfExists))
+                                .then([=](task<StorageFile^> targetFileTask)
                             {
-                                auto targetFile = targetFileTask.get();
-                                return create_task(targetFile->OpenAsync(FileAccessMode::ReadWrite))
-                                    .then([=](IRandomAccessStream^ targetStream)
+                                try
                                 {
-                                    return create_task(targetStream->WriteAsync(jpegBuffer))
-                                        .then([=](unsigned int bytesWriten)
+                                    auto targetFile = targetFileTask.get();
+                                    return create_task(targetFile->OpenAsync(FileAccessMode::ReadWrite))
+                                        .then([=](IRandomAccessStream^ targetStream)
                                     {
-                                        return targetFile->DisplayName;
+                                        return create_task(targetStream->WriteAsync(jpegBuffer))
+                                            .then([=](unsigned int bytesWriten)
+                                        {
+                                            return targetFile->DisplayName;
+                                        });
                                     });
-                                });
-                            }
-                            catch (Exception^ ex)
-                            {
-                                return task_from_result<String^>(targetFileName);
-                            }
-                        });
+                                }
+                                catch (Exception^ ex)
+                                {
+                                    return task_from_result<String^>(targetFileName);
+                                }
+                            });
+                        }
                     }
                     catch (...)
                     {
@@ -170,20 +217,21 @@ task<vector<ImageInfo^>> ImageUtilities::MakeLiveTileImages(vector<ImageInfo^> l
         auto targetUrl = get<1>(liveTileTpls[targetIndex]);
         auto targetTitle = get<0>(liveTileTpls[targetIndex]);
         wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
-        auto widthString = to_wstring(150);
-        auto heightString = to_wstring(310);
+        auto widthString = to_wstring(310);
+        auto heightString = to_wstring(150);
         auto wideFileName = L"LiveTile" + ref new String(widthString.data(), widthString.size()) + "x" +
             ref new String(heightString.data(), heightString.size()) + ComputeMD5(targetUrl) + ".jpg";
 
-        auto squareFileName = L"LiveTile" + ref new String(widthString.data(), widthString.size()) + "x" +
-            ref new String(widthString.data(), widthString.size()) + ComputeMD5(targetUrl) + ".jpg";
+        auto squareFileName = L"LiveTile" + ref new String(heightString.data(), heightString.size()) + "x" +
+            ref new String(heightString.data(), heightString.size()) + ComputeMD5(targetUrl) + ".jpg";
 
         auto madeImageInfo = ref new ImageInfo(targetUrl, squareFileName, nullptr, wideFileName, history->Age(targetUrl), targetTitle);
-
-        wofstream settingsFile(localPath, std::ios_base::in | std::ios_base::binary);
-        if (settingsFile.is_open())
+        liveTileFiles.push_back(madeImageInfo);
+        auto wideFilePath = localPath + L"\\" + wstring(wideFileName->Data());
+        auto squareFilePath = localPath + L"\\" + wstring(squareFileName->Data());
+        _stat64i32 stat;
+        if (_wstat(wideFilePath.c_str(), &stat) == 0 && _wstat(squareFilePath.c_str(), &stat) == 0)
         {
-            settingsFile.close();
             return MakeLiveTileImages(liveTileFiles, history, liveTileTpls, targetCount, targetIndex + 1);
         }
         else
@@ -196,11 +244,9 @@ task<vector<ImageInfo^>> ImageUtilities::MakeLiveTileImages(vector<ImageInfo^> l
                     return MakeTileSizedImage(imageSource, targetUrl, 150, 310)
                         .then([=](String^ filePath)
                     {
-                        liveTileFiles[targetIndex]->LocalWideUrl = filePath;
                         return MakeTileSizedImage(imageSource, targetUrl, 150, 150)
                             .then([=](String^ smallFilePath)
                         {
-                            liveTileFiles[targetIndex]->LocalSmallSquareUrl = smallFilePath;
                             return MakeLiveTileImages(liveTileFiles, history, liveTileTpls, targetCount, targetIndex + 1);
                         });
                     });

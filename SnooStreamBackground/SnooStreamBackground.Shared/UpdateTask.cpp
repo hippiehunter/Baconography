@@ -8,6 +8,7 @@
 #include "ImageUtilities.h"
 #include "NetworkUtilities.h"
 #include "LiveTileUtilities.h"
+#include "ActivityManager.h"
 #include <vector>
 #include <tuple>
 #include <iostream>
@@ -87,7 +88,12 @@ namespace SnooStreamBackground
 
             redditService = std::make_unique<SimpleRedditService>(RedditOAuth::Deserialize(lockScreenSettings->RedditOAuth));
 
-            auto tileUpdateTask = RunTileUpdater(lockScreenSettings, lockScreenHistory).then([=]()
+            auto tileUpdateTask = RunTileUpdater(lockScreenSettings, lockScreenHistory)
+                .then([=]()
+            {
+                return ImageUtilities::ClearOldTempImages();
+            })
+                .then([=]()
             {
                 lockScreenHistory->Store();
                 if (taskInstance != nullptr)
@@ -110,27 +116,6 @@ namespace SnooStreamBackground
             }
         }
 
-        bool Toast(Platform::String^ messageId, Platform::String^ text)
-        {
-            auto toastNotifier = Windows::UI::Notifications::ToastNotificationManager::CreateToastNotifier();
-            ToastTemplateType toastTemplate = ToastTemplateType::ToastImageAndText01;
-            XmlDocument^ toastXml = ToastNotificationManager::GetTemplateContent(toastTemplate);
-
-            XmlNodeList^ toastTextElements = toastXml->GetElementsByTagName("text");
-            toastTextElements->Item(0)->InnerText = text;
-
-            XmlNodeList^ toastImageAttributes = toastXml->GetElementsByTagName("image");
-            static_cast<XmlElement^>(toastImageAttributes->Item(0))->SetAttribute("src", "ms-appx:///assets/redWide.png");
-            static_cast<XmlElement^>(toastImageAttributes->Item(0))->SetAttribute("alt", "red graphic");
-
-            IXmlNode^ toastNode = toastXml->SelectSingleNode("/toast");
-            static_cast<XmlElement^>(toastNode)->SetAttribute("launch", "{\"type\":\"toast\",\"param1\":\"12345\",\"param2\":\"67890\"}");
-
-            auto toastNotification = ref new Windows::UI::Notifications::ToastNotification(toastXml);
-            toastNotifier->Show(toastNotification);
-            return true;
-        }
-
         task<void> UpdateLockScreen(String^ lockScreenImagePath)
         {
 #ifdef WINDOWS_PHONE
@@ -147,18 +132,18 @@ namespace SnooStreamBackground
         {
             if (isPrimary)
             {
-                if (!NetworkUtilities::IsHighPriorityNetworkOk)
+                if (!NetworkUtilities::IsHighPriorityNetworkOk())
                     return 0;
-                else if (NetworkUtilities::LowPriorityNetworkOk)
+                else if (NetworkUtilities::LowPriorityNetworkOk())
                     return 20;
                 else
                     return 5;
             }
             else
             {
-                if (!NetworkUtilities::IsHighPriorityNetworkOk)
+                if (!NetworkUtilities::IsHighPriorityNetworkOk())
                     return 0;
-                else if (NetworkUtilities::LowPriorityNetworkOk)
+                else if (NetworkUtilities::LowPriorityNetworkOk())
                     return 5;
                 else
                     return 0;
@@ -185,16 +170,16 @@ namespace SnooStreamBackground
                 //check history to see if we've already shown this tile in the past if so, penalize it and prefer other tiles
                 //need to do cleanup on LockScreen*.jpg files with older creation dates, after sucessfully building the live tiles
 
-                std::sort(liveTileImageUrls.begin(), liveTileImageUrls.end(), [&](String^ option1, String^ option2)
+                std::sort(liveTileImageUrls.begin(), liveTileImageUrls.end(), [&](tuple<String^, String^> option1, tuple<String^, String^> option2)
                 {
-                    return history->Age(option1) > history->Age(option2);
+                    return history->Age(std::get<1>(option1)) > history->Age(std::get<1>(option2));
                 });
 
                 return create_task(ImageUtilities::MakeLiveTileImages(vector<ImageInfo^> {}, history, liveTileImageUrls, GetTileCountTarget(true)))
                     .then([=](vector<ImageInfo^> liveTileImageUrls)
                 {
                     auto tileUpdater = Windows::UI::Notifications::TileUpdateManager::CreateTileUpdaterForApplication();
-
+                    history->CurrentTileImages = ref new Platform::Collections::Vector<ImageInfo^>(liveTileImageUrls);
                     LiveTileUtilities::MakeLiveTile(history, liveTile, liveTileImageUrls, tileUpdater);
                 });
             });
@@ -207,15 +192,10 @@ namespace SnooStreamBackground
 
         task<void> RunTileUpdater(LockScreenSettings^ settings, LockScreenHistory^ history)
         {
-            return redditService->GetNewMessages().then([=](vector<tuple<String^, String^>> messages)
+            auto activityManager = ref new ActivityManager();
+            
+            auto runTilePart = [=]()
             {
-                if (messages.size() > 0)
-                {
-                    for (auto message : messages)
-                    {
-                        Toast(get<0>(message), get<1>(message));
-                    }
-                }
 
                 if (settings->LiveTileSettings != nullptr && settings->LiveTileSettings->Size == 1)
                     return RunPrimaryTileUpdater(settings, history, settings->LiveTileSettings->GetAt(0));
@@ -233,7 +213,19 @@ namespace SnooStreamBackground
                 }
                 else
                     return task<void>();
-            });
+            };
+            
+            if (activityManager->NeedsRefresh)
+            {
+                return create_task(activityManager->Refresh(settings->RedditOAuth, nullptr))
+                    .then([=]()
+                {
+                    activityManager->StoreState();
+                    return runTilePart();
+                });
+            }
+            else
+                return runTilePart();
         }
     };
 }
