@@ -266,7 +266,7 @@ namespace SnooStream.ViewModel
         }
         public override void Tapped()
         {
-            SnooStreamViewModel.NavigationService.NavigateToComments(new CommentsViewModel(null, Message.Context));
+            SnooStreamViewModel.NavigationService.NavigateToComments(new CommentsViewModel(null, "http://reddit.com" + Message.Context));
         }
     }
 
