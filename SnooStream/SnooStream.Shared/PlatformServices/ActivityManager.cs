@@ -21,8 +21,8 @@ namespace SnooStream.PlatformServices
         {
             get
             {
-                return _activityManager.SentBlob != null ?
-                    JsonConvert.DeserializeObject<Listing>(_activityManager.SentBlob) :
+                return _activityManager.ActivityBlob != null ?
+                    JsonConvert.DeserializeObject<Listing>(_activityManager.ActivityBlob) :
                     new Listing { Data = new ListingData { Children = new List<Thing>() } };
             }
         }
@@ -32,7 +32,7 @@ namespace SnooStream.PlatformServices
             get
             {
                 return _activityManager.ReceivedBlob != null ?
-                    JsonConvert.DeserializeObject<Listing>(_activityManager.ReceivedBlob) :
+                    JsonConvert.DeserializeObject<Listing>(_activityManager.ReceivedBlob.Replace("\"kind\": \"t1\"", "\"kind\": \"t4\"")) :
                     new Listing { Data = new ListingData { Children = new List<Thing>() } };
             }
         }
@@ -41,8 +41,8 @@ namespace SnooStream.PlatformServices
         {
             get
             {
-                return _activityManager.ActivityBlob != null ?
-                    JsonConvert.DeserializeObject<Listing>(_activityManager.ActivityBlob) :
+                return _activityManager.SentBlob != null ?
+                    JsonConvert.DeserializeObject<Listing>(_activityManager.SentBlob) :
                     new Listing { Data = new ListingData { Children = new List<Thing>() } };
             }
         }

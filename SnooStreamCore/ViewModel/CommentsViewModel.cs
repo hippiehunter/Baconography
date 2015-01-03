@@ -348,17 +348,29 @@ namespace SnooStream.ViewModel
             //origin type so we can display the differences caused by the load
 
             var replacementsList = replacements.ToList();
+
+            //get rid of the load full sentinels since we're filling in the real versions, only if this is actually a context change
+            if (isFull)
+                while (FlatComments.Remove(_loadFullSentinel)) { }
+
+
             var firstExistingId = GetId(FlatComments.First());
             var lastExistingId = GetId(FlatComments.Last());
 
 
-            var aboveComments = replacements.TakeWhile((vm) => GetId(vm) != firstExistingId).ToList();
-            var mergableComments = replacements.SkipWhile((vm) => GetId(vm) != firstExistingId).TakeWhile((vm) => GetId(vm) != lastExistingId).ToList();
+            var aboveComments = replacements.TakeWhile((vm) => GetId(vm) != firstExistingId).Reverse();
+
+            List<ViewModelBase> mergableComments = new List<ViewModelBase>();
+            foreach (var item in replacements.SkipWhile((vm) => GetId(vm) != firstExistingId))
+            {
+                mergableComments.Add(item);
+                if (GetId(item) == lastExistingId)
+                    break;
+            }
+
             var belowComments = replacements.SkipWhile((vm) => GetId(vm) != lastExistingId).Skip(1).ToList();
 
-            //get rid of the load full sentinels since we're filling in the real versions, only if this is actually a context change
-            if(isFull)
-                while (FlatComments.Remove(_loadFullSentinel)) { }
+            
 
             if (mergableComments.Count != FlatComments.Count) //otherwise nothing to do, just add in the above and below
             {
@@ -557,7 +569,7 @@ namespace SnooStream.ViewModel
                 else
                     subreddit = Link.Link.Subreddit;
 
-                var listing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(subreddit, (isContext) ? BaseUrl + ContextTargetID : BaseUrl, null);
+                var listing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(subreddit, (isContext) ? BaseUrl + ContextTargetID + "?context=3" : BaseUrl, null);
 				lock(this)
 				{
 					var firstChild = listing.Data.Children.FirstOrDefault(thing => thing.Data is Comment);

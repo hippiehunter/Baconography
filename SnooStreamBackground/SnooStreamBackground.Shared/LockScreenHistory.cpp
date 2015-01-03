@@ -33,48 +33,58 @@ LockScreenHistory::LockScreenHistory()
     _history = ref new Platform::Collections::UnorderedMap<Platform::String^, int>();
     if (fileStr.size() > 0)
     {
-        auto parsedFileObject = JsonObject::Parse(ref new String(fileStr.data(), fileStr.size()));
+		JsonObject^ parsedFileObject = nullptr;
+		try
+		{
+			parsedFileObject = JsonObject::Parse(ref new String(fileStr.data(), fileStr.size()));
+		}
+		catch(...)
+		{
+			//bad file kill and start over
+			_wremove(localPath.c_str());
+		}
+		if (parsedFileObject != nullptr)
+		{
+			auto currentTileImages = parsedFileObject->GetNamedArray("CurrentTileImages");
+			auto imageHistory = parsedFileObject->GetNamedArray("ImageHistory");
+			auto lockScreenImages = parsedFileObject->GetNamedArray("LockScreenImages");
+			for each (auto&& image in imageHistory)
+			{
+				auto imageObject = image->GetObject();
+				auto originalUrl = imageObject->GetNamedString("OriginalUrl");
+				auto lastShown = static_cast<int>(imageObject->GetNamedNumber("LastShown", 0));
 
-        auto currentTileImages = parsedFileObject->GetNamedArray("CurrentTileImages");
-        auto imageHistory = parsedFileObject->GetNamedArray("ImageHistory");
-        auto lockScreenImages = parsedFileObject->GetNamedArray("LockScreenImages");
-        for each (auto&& image in imageHistory)
-        {
-            auto imageObject = image->GetObject();
-            auto originalUrl = imageObject->GetNamedString("OriginalUrl");
-            auto lastShown = static_cast<int>(imageObject->GetNamedNumber("LastShown", 0));
+				if (!_history->HasKey(originalUrl))
+				{
+					_history->Insert(originalUrl, lastShown);
+				}
+			}
 
-            if (!_history->HasKey(originalUrl))
-            {
-                _history->Insert(originalUrl, lastShown);
-            }
-        }
+			auto makeTileImage = [](JsonArray^ targetArray)
+			{
+				auto result = ref new Platform::Collections::Vector<ImageInfo^>();
 
-        auto makeTileImage = [](JsonArray^ targetArray)
-        {
-            auto result = ref new Platform::Collections::Vector<ImageInfo^>();
+				for each (auto&& image in targetArray)
+				{
+					try
+					{
+						auto imageObject = image->GetObject();
+						auto originalUrl = imageObject->GetNamedString("OriginalUrl");
+						auto lastShown = static_cast<int>(imageObject->GetNamedNumber("LastShown", 0));
+						auto localSmallSquareUrl = imageObject->GetNamedString("LocalSmallSquareUrl", nullptr);
+						auto localLargeSquareUrl = imageObject->GetNamedString("LocalLargeSquareUrl", nullptr);
+						auto localWideUrl = imageObject->GetNamedString("LocalWideUrl", nullptr);
+						auto title = imageObject->GetNamedString("Title", "");
+						result->Append(ref new ImageInfo(originalUrl, localSmallSquareUrl, localLargeSquareUrl, localWideUrl, lastShown, title));
+					}
+					catch (...) {}
+				}
+				return result;
+			};
 
-            for each (auto&& image in targetArray)
-            {
-                try
-                {
-                    auto imageObject = image->GetObject();
-                    auto originalUrl = imageObject->GetNamedString("OriginalUrl");
-                    auto lastShown = static_cast<int>(imageObject->GetNamedNumber("LastShown", 0));
-                    auto localSmallSquareUrl = imageObject->GetNamedString("LocalSmallSquareUrl", nullptr);
-                    auto localLargeSquareUrl = imageObject->GetNamedString("LocalLargeSquareUrl", nullptr);
-                    auto localWideUrl = imageObject->GetNamedString("LocalWideUrl", nullptr);
-                    auto title = imageObject->GetNamedString("Title", "");
-                    result->Append(ref new ImageInfo(originalUrl, localSmallSquareUrl, localLargeSquareUrl, localWideUrl, lastShown, title));
-                }
-                catch (...) { }
-            }
-            return result;
-        };
-
-        CurrentTileImages = makeTileImage(currentTileImages);
-        LockScreenImages = makeTileImage(lockScreenImages);
-
+			CurrentTileImages = makeTileImage(currentTileImages);
+			LockScreenImages = makeTileImage(lockScreenImages);
+		}
     }
 }
 

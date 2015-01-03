@@ -238,7 +238,7 @@ namespace SnooStream.ViewModel
             CreatedUTC = messageThing.CreatedUTC;
             Body = Message.Body;
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
-			PreviewTitle = Elipsis(messageThing.Subject, 50);
+			PreviewTitle = Elipsis(Subject, 50);
         }
         public string Body
         {

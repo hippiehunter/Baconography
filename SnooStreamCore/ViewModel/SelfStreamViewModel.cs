@@ -101,7 +101,7 @@ namespace SnooStream.ViewModel
 						var followingGroup = collection.GetElementFollowing(e.NewItems[0] as ActivityGroupViewModel);
 						if (followingGroup != null)
 						{
-							_targetCollection.Insert(Math.Max(0, _targetCollection.IndexOf(followingGroup) - 1), e.NewItems[0] as ActivityGroupViewModel);
+							_targetCollection.Insert(Math.Max(0, _targetCollection.IndexOf(followingGroup)), e.NewItems[0] as ActivityGroupViewModel);
 						}
 						else
 						{
@@ -177,6 +177,7 @@ namespace SnooStream.ViewModel
 			Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SelfActivityAggregate(this), 100);
 			if (selfInit != null)
 			{
+                ProcessActivityManager();
                 RunActivityUpdater();
             }
 
@@ -223,23 +224,28 @@ namespace SnooStream.ViewModel
 		public ObservableSortedUniqueCollection<string, ActivityGroupViewModel> Groups { get; private set; }
 		public ObservableCollection<ViewModelBase> Activities { get; private set; }
 		public async Task PullNew(bool force)
-		{
-			LastRefresh = DateTime.Now;
-			if (!IsLoggedIn)
-				throw new InvalidOperationException("User must be logged in to do this");
+        {
+            LastRefresh = DateTime.Now;
+            if (!IsLoggedIn)
+                throw new InvalidOperationException("User must be logged in to do this");
 
             if (SnooStreamViewModel.ActivityManager.NeedsRefresh() || force)
                 await SnooStreamViewModel.ActivityManager.Refresh();
 
+            ProcessActivityManager();
+        }
+
+        private void ProcessActivityManager()
+        {
             Listing inbox = SnooStreamViewModel.ActivityManager.Received;
-			Listing outbox = SnooStreamViewModel.ActivityManager.Sent;
-			Listing activity = SnooStreamViewModel.ActivityManager.Activity;
+            Listing outbox = SnooStreamViewModel.ActivityManager.Sent;
+            Listing activity = SnooStreamViewModel.ActivityManager.Activity;
 
 
-			OldestMessage = ProcessListing(inbox, OldestMessage);
-			OldestSentMessage = ProcessListing(outbox, OldestSentMessage);
-			OldestActivity = ProcessListing(activity, OldestActivity);
-		}
+            OldestMessage = ProcessListing(inbox, OldestMessage);
+            OldestSentMessage = ProcessListing(outbox, OldestSentMessage);
+            OldestActivity = ProcessListing(activity, OldestActivity);
+        }
 
         bool _runningActivityUpdater = false;
         public async void RunActivityUpdater()
@@ -248,7 +254,7 @@ namespace SnooStream.ViewModel
             try
             {
                 var cancelToken = SnooStreamViewModel.BackgroundCancellationToken;
-                await PullNew(false);
+                await PullNew(true);
                 while (!cancelToken.IsCancellationRequested)
                 {
                     //check every 5 minutes since that is the minimum time we might refresh at
