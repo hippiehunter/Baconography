@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using Newtonsoft.Json;
 using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Messages;
@@ -113,7 +114,8 @@ namespace SnooStream.ViewModel
 					case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
 						var removedGroup = e.OldItems[0] as ActivityGroupViewModel;
 						UnregisterGroup(removedGroup);
-						if (removedGroup.IsExpanded)
+                        _targetCollection.Remove(removedGroup);
+                        if (removedGroup.IsExpanded)
 						{
 							foreach (var item in removedGroup.Activities)
 								_targetCollection.Remove(item);
@@ -175,39 +177,25 @@ namespace SnooStream.ViewModel
 			Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SelfActivityAggregate(this), 100);
 			if (selfInit != null)
 			{
-				if (selfInit.SelfThings != null)
-				{
-					foreach (var thing in selfInit.SelfThings)
-					{
-						var thingName = ActivityViewModel.GetActivityGroupName(thing);
-						ActivityGroupViewModel existingGroup;
-						if (Groups.TryGetValue(thingName, out existingGroup))
-						{
-							existingGroup.Merge(thing);
-						}
-						else
-						{
-							Groups.Add(thingName, ActivityGroupViewModel.MakeActivityGroup(thing));
-						}
-					}
-				}
-
-				LastRefresh = selfInit.LastRefresh;
-				OldestMessage = selfInit.AfterSelfMessage;
-				OldestSentMessage = selfInit.AfterSelfSentMessage;
-				OldestActivity = selfInit.AfterSelfAction;
-				MaybeRefresh();
-			}
+                RunActivityUpdater();
+            }
 
 			MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
 		}
 
 		private async void OnUserLoggedIn(UserLoggedInMessage obj)
 		{
-			RaisePropertyChanged("IsLoggedIn");
+            SnooStreamViewModel.ActivityManager.OAuth = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.OAuth != null ?
+                    JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
+            RaisePropertyChanged("IsLoggedIn");
 			RaisePropertyChanged("Activities");
 			Groups.Clear();
-			await PullNew(true);
+            await PullNew(true);
+            if (!_runningActivityUpdater)
+            {
+                RunActivityUpdater();
+            }
+			
 		}
 
 		public bool IsLoggedIn
@@ -253,6 +241,28 @@ namespace SnooStream.ViewModel
 			OldestActivity = ProcessListing(activity, OldestActivity);
 		}
 
+        bool _runningActivityUpdater = false;
+        public async void RunActivityUpdater()
+        {
+            _runningActivityUpdater = true;
+            try
+            {
+                var cancelToken = SnooStreamViewModel.BackgroundCancellationToken;
+                await PullNew(false);
+                while (!cancelToken.IsCancellationRequested)
+                {
+                    //check every 5 minutes since that is the minimum time we might refresh at
+                    if (SnooStreamViewModel.ActivityManager.NeedsRefresh())
+                    {
+                        await PullNew(true);
+                    }
+                    await Task.Delay(1000 * 60 * 5, cancelToken);
+                }
+            }
+            catch (OperationCanceledException) { }
+            _runningActivityUpdater = false;
+        }
+
 		private string ProcessListing(Listing listing, string after)
 		{
 			if (listing != null)
@@ -269,10 +279,13 @@ namespace SnooStream.ViewModel
 						}
 						else
 							existingGroup.Merge(child);
+
+                        Groups.Remove(childName);
+                        Groups.Add(childName, existingGroup);
 					}
 					else
 					{
-						Groups.Add(childName, ActivityGroupViewModel.MakeActivityGroup(child));
+						Groups.Add(childName, ActivityGroupViewModel.MakeActivityGroup(childName, child));
 					}
 				}
 

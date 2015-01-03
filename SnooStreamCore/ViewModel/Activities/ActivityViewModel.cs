@@ -131,6 +131,8 @@ namespace SnooStream.ViewModel
             }
         }
 
+        public abstract void Tapped();
+
         public bool IsNew { get; protected set; }
     }
 
@@ -156,6 +158,11 @@ namespace SnooStream.ViewModel
         public override Thing GetThing()
         {
             return new Thing { Kind = "t3", Data = Link };
+        }
+
+        public override void Tapped()
+        {
+            SnooStreamViewModel.NavigationService.NavigateToContentRiver(new SoloContentStreamViewModel(LinkVM));
         }
     }
 
@@ -189,14 +196,34 @@ namespace SnooStream.ViewModel
             Comment = comment;
             CreatedUTC = comment.CreatedUTC;
             Body = Comment.Body;
-            Subject = Comment.Body.Substring(0, Math.Min(Comment.Body.Length, 30));
+            Subject = PreviewTitle = Elipsis(comment.LinkTitle, 50);
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
-			PreviewTitle = Elipsis(comment.Author, 50);
         }
 
         public override Thing GetThing()
         {
             return new Thing { Kind = "t1", Data = Comment };
+        }
+
+        public override async void Tapped()
+        {
+            
+                await SnooStreamViewModel.NotificationService.ModalReportWithCancelation("navigating to context", async (token) =>
+                {
+                    if (Comment.Context != null)
+                    {
+                        var targetLinkThing = await SnooStreamViewModel.RedditService.GetLinkByUrl("http://reddit.com" + Comment.Context.Remove(Comment.Context.LastIndexOf('/')));
+                        SnooStreamViewModel.NavigationService.NavigateToComments(new CommentsViewModel(new LinkViewModel(null, targetLinkThing.Data as Link),
+                            "http://reddit.com" + ((Link)targetLinkThing.Data).Permalink + Comment.Id + "?context=3"));
+                    }
+                    else
+                    {
+                        var targetLinkThing = await SnooStreamViewModel.RedditService.GetThingById(Comment.LinkId);
+                        SnooStreamViewModel.NavigationService.NavigateToComments(new CommentsViewModel(new LinkViewModel(null, targetLinkThing.Data as Link),
+                            "http://reddit.com" + ((Link)targetLinkThing.Data).Permalink + Comment.Id + "?context=3"));
+                    }
+                });
+            
         }
     }
 
@@ -211,7 +238,7 @@ namespace SnooStream.ViewModel
             CreatedUTC = messageThing.CreatedUTC;
             Body = Message.Body;
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
-			PreviewTitle = Elipsis(messageThing.Author, 50);
+			PreviewTitle = Elipsis(messageThing.Subject, 50);
         }
         public string Body
         {
@@ -236,6 +263,10 @@ namespace SnooStream.ViewModel
         public override Thing GetThing()
         {
             return new Thing { Kind = "t4", Data = Message };
+        }
+        public override void Tapped()
+        {
+            SnooStreamViewModel.NavigationService.NavigateToComments(new CommentsViewModel(null, Message.Context));
         }
     }
 
@@ -273,6 +304,11 @@ namespace SnooStream.ViewModel
         {
             return new Thing { Kind = "t4", Data = Message };
         }
+
+        public override void Tapped()
+        {
+            SnooStreamViewModel.NavigationService.NavigateToComments(new CommentsViewModel(null, Message.Context));
+        }
     }
 
     public class MessageActivityViewModel : ActivityViewModel
@@ -287,7 +323,7 @@ namespace SnooStream.ViewModel
             Body = messageThing.Body;
             IsNew = MessageThing.New;
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
-			PreviewTitle = Elipsis(messageThing.Author, 50);
+			PreviewTitle = Elipsis(messageThing.Subject, 50);
         }
         public string Body
         {
@@ -313,6 +349,11 @@ namespace SnooStream.ViewModel
         public object BodyMD { get; private set; }
         public string Subject { get { return MessageThing.Subject; } }
         public string ParentId { get { return MessageThing.ParentId; } }
+
+        public override void Tapped()
+        {
+            SnooStreamViewModel.NavigationService.NavigateToConversation(ActivityViewModel.GetActivityGroupName(GetThing()));
+        }
     }
 
     public class ModeratorActivityViewModel :ActivityViewModel
@@ -329,6 +370,11 @@ namespace SnooStream.ViewModel
         {
             return new Thing { Kind = "modaction", Data = ModAction };
         }
+
+        public override void Tapped()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class ModeratorMessageActivityViewModel :ActivityViewModel
@@ -340,12 +386,17 @@ namespace SnooStream.ViewModel
             CreatedUTC = messageThing.CreatedUTC;
             MessageThing = messageThing;
 			PreviewBody = messageThing.Body.Length > 100 ? messageThing.Body.Remove(100) : messageThing.Body;
-			PreviewTitle = Elipsis(messageThing.Author, 50);
+			PreviewTitle = Elipsis(messageThing.Subject, 50);
         }
 
         public override Thing GetThing()
         {
             return new Thing { Kind = "t4", Data = MessageThing };
+        }
+
+        public override void Tapped()
+        {
+            throw new NotImplementedException();
         }
     }
 }

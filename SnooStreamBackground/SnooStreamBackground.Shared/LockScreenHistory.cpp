@@ -7,10 +7,7 @@
 #include <sstream>
 
 using namespace SnooStreamBackground;
-using std::wstring;
-using std::wifstream;
-using std::wofstream;
-using std::wstringstream;
+using namespace std;
 using Windows::Data::Json::JsonObject;
 using Windows::Data::Json::JsonValue;
 using Windows::Data::Json::JsonArray;
@@ -24,17 +21,14 @@ LockScreenHistory::LockScreenHistory()
     wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
     localPath += L"\\bgtaskHistory.txt";
     wifstream settingsFile(localPath, std::ios_base::in | std::ios_base::binary, _SH_DENYRW);
-    wstringstream fileContents;
-    wstring fileLine;
 
-    while (settingsFile.is_open() && !settingsFile.eof())
-    {
-        settingsFile >> fileLine;
-        fileContents << fileLine;
-    }
+	wstring fileStr;
+	if (settingsFile.is_open())
+	{
+		fileStr = wstring(istreambuf_iterator<wchar_t>(settingsFile), istreambuf_iterator<wchar_t>());
+	}
+
     settingsFile.close();
-
-    auto fileStr = fileContents.str();
 
     _history = ref new Platform::Collections::UnorderedMap<Platform::String^, int>();
     if (fileStr.size() > 0)

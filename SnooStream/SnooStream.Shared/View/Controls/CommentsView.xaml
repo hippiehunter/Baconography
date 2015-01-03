@@ -201,9 +201,13 @@
                     </Border>
                 </Grid>-->
             </DataTemplate>
+            <DataTemplate x:Key="LoadFullyTemplate">
+                <Button Tapped="LoadFully_Tapped" Content="Load full context" BorderThickness="0" Margin="0"/>
+            </DataTemplate>
             <selectors:CommentTemplateSelector x:Name="commentTemplateSelector"
                     CommentTemplate="{StaticResource CommentViewTemplate}"
-                    MoreTemplate="{StaticResource MoreViewTemplate}" />
+                    MoreTemplate="{StaticResource MoreViewTemplate}"
+                    LoadFullyTemplate="{StaticResource LoadFullyTemplate}"/>
         </Grid.Resources>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>

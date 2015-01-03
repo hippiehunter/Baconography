@@ -24,19 +24,20 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public static ActivityGroupViewModel MakeActivityGroup(Thing thing)
+        public static ActivityGroupViewModel MakeActivityGroup(string activityGroupName, Thing thing)
         {
             if (thing == null)
                 throw new ArgumentNullException();
 
-            var group = new ActivityGroupViewModel();
+            var group = new ActivityGroupViewModel(activityGroupName);
 
             group.Merge(thing);
             return group;
         }
 
-        public ActivityGroupViewModel()
+        public ActivityGroupViewModel(string activityGroupName)
         {
+            Id = activityGroupName;
             Activities = new ObservableSortedUniqueCollection<string, ActivityViewModel>(new ActivityViewModel.ActivityAgeComparitor());
         }
 
@@ -76,7 +77,7 @@ namespace SnooStream.ViewModel
             if (currentFirstActivity != FirstActivity)
                 RaisePropertyChanged("FirstActivity");
         }
-
+        public string Id { get; set; }
         public DateTime CreatedUTC {get; protected set;}
         private ActivityViewModel _innerFirstActivity;
         private string _innerFirstActivityName;
@@ -112,6 +113,16 @@ namespace SnooStream.ViewModel
             else
             {
                 things.Add(_innerFirstActivity.GetThing());
+            }
+        }
+        public void Tapped()
+        {
+            if (IsConversation)
+                IsExpanded = !IsExpanded;
+            else
+            {
+                //nav to detailed activity page
+                FirstActivity.Tapped();
             }
         }
     }

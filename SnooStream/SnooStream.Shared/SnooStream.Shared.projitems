@@ -93,6 +93,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\MessageControl.xaml.cs">
+      <DependentUpon>MessageControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml.cs">
       <DependentUpon>MoreCommentsView.xaml</DependentUpon>
     </Compile>
@@ -122,6 +125,9 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\ContentSettings.xaml.cs">
       <DependentUpon>ContentSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Pages\Conversation.xaml.cs">
+      <DependentUpon>Conversation.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\LinkRiver.xaml.cs">
       <DependentUpon>LinkRiver.xaml</DependentUpon>
@@ -187,6 +193,10 @@
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\LoginView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\MessageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -218,6 +228,10 @@
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\ContentSettings.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Pages\Conversation.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\LinkRiver.xaml">
       <SubType>Designer</SubType>

@@ -16,5 +16,23 @@ namespace SnooStream.View.Controls
         {
             InitializeComponent();
         }
+
+        private void Grid_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var activityGroup = (sender as Grid).DataContext as ActivityGroupViewModel;
+            if (activityGroup != null)
+            {
+                activityGroup.Tapped();
+            }
+            else
+            {
+                var activity = (sender as Grid).DataContext as ActivityViewModel;
+                if (activity != null)
+                {
+                    activity.Tapped();
+                }
+            }
+            
+        }
     }
 }

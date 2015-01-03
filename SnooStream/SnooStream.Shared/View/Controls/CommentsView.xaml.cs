@@ -112,5 +112,11 @@ namespace SnooStream.View.Controls
 
 			}
 		}
-	}
+
+        private void LoadFully_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var loadFullVM = (sender as Button).DataContext as LoadFullCommentsViewModel;
+            loadFullVM.LoadFully();
+        }
+    }
 }

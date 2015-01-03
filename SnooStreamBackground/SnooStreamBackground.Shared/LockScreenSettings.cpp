@@ -8,10 +8,7 @@
 
 
 using namespace SnooStreamBackground;
-using std::wstring;
-using std::wifstream;
-using std::wofstream;
-using std::wstringstream;
+using namespace std;
 using Windows::Data::Json::JsonObject;
 using Windows::Data::Json::JsonValue;
 using Windows::Data::Json::JsonArray;
@@ -21,18 +18,15 @@ LockScreenSettings::LockScreenSettings()
 {
     wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
     localPath += L"\\bgtaskSettings.txt";
-    wifstream settingsFile(localPath, std::ios_base::in | std::ios_base::binary, _SH_DENYRW);
-    wstringstream fileContents;
-    wstring fileLine;
+	wifstream settingsFile(localPath, std::ios_base::in | std::ios_base::binary, _SH_DENYRW);
 
-    while (settingsFile.is_open() && !settingsFile.eof())
-    {
-        settingsFile >> fileLine;
-        fileContents << fileLine;
-    }
-    settingsFile.close();
+	wstring fileStr;
+	if (settingsFile.is_open())
+	{
+		fileStr = wstring(istreambuf_iterator<wchar_t>(settingsFile), istreambuf_iterator<wchar_t>());
+	}
 
-    auto fileStr = fileContents.str();
+	settingsFile.close();
     if (fileStr.size() > 0)
     {
         auto parsedFileObject = JsonObject::Parse(ref new String(fileStr.data(), fileStr.size()));

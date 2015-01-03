@@ -21,8 +21,8 @@ namespace SnooStream.Converters
         static SolidColorBrush accentBrush = null;
         private void PopulateBrushes()
         {
-            var currentAccentBrush = Application.Current.Resources["SystemColorControlAccentColor"] as SolidColorBrush;
-            if (accentBrush != null && currentAccentBrush.Color == accentBrush.Color)
+            var currentAccentColor = Application.Current.Resources["SystemColorControlAccentColor"] as Nullable<Windows.UI.Color> ?? Colors.AliceBlue;
+            if (accentBrush != null && currentAccentColor == accentBrush.Color)
                 return;
 
             depthBrushes.Clear();
@@ -31,43 +31,43 @@ namespace SnooStream.Converters
             {
                 if (i < 1)
                 {
-                    int r = currentAccentBrush.Color.R;
+                    int r = currentAccentColor.R;
                     r = (int)(r == 0 ? 10 * i : r * i);
                     r = r > 255 ? 255 : r;
-                    int g = currentAccentBrush.Color.G;
+                    int g = currentAccentColor.G;
                     g = (int)(g == 0 ? 10 * i : g * i);
                     g = g > 255 ? 255 : g;
-                    int b = currentAccentBrush.Color.B;
+                    int b = currentAccentColor.B;
                     b = (int)(b == 0 ? 10 * i : b * i);
                     b = b > 255 ? 255 : b;
                     depthBrushes.Add(new SolidColorBrush(Color.FromArgb((byte)255, (byte)r, (byte)g, (byte)b)));
                 }
                 else if (i == 1)
                 {
-                    depthBrushes.Add(currentAccentBrush);
+                    depthBrushes.Add(new SolidColorBrush(currentAccentColor));
                 }
                 else
                 {
-                    double r = (255 - currentAccentBrush.Color.R);
+                    double r = (255 - currentAccentColor.R);
                     r = r == 0 ? 10 : r;
                     r *= (i - 1);
-                    r += currentAccentBrush.Color.R;
+                    r += currentAccentColor.R;
                     r = r > 255 ? 255 : r;
-                    double g = (255 - currentAccentBrush.Color.G);
+                    double g = (255 - currentAccentColor.G);
                     g = g == 0 ? 10 : g;
                     g *= (i - 1);
-                    g += currentAccentBrush.Color.G;
+                    g += currentAccentColor.G;
                     g = g > 255 ? 255 : g;
-                    double b = (255 - currentAccentBrush.Color.B);
+                    double b = (255 - currentAccentColor.B);
                     b = b == 0 ? 10 : b;
                     b *= (i - 1);
-                    b += currentAccentBrush.Color.B;
+                    b += currentAccentColor.B;
                     b = b > 255 ? 255 : b;
                     depthBrushes.Add(new SolidColorBrush(Color.FromArgb((byte)255, (byte)r, (byte)g, (byte)b)));
                 }
             }
 
-            accentBrush = currentAccentBrush;
+            accentBrush = new SolidColorBrush(currentAccentColor);
         }
 
         public object Convert(object value, Type targetType, object parameter, string language)

@@ -254,8 +254,6 @@ concurrency::task<Activities> SimpleRedditService::GetMessages()
         {
 			try
 			{
-
-
 				auto messageObject = message->GetObject();
 				auto messageData = messageObject->GetNamedObject("data");
 				auto messageId = messageData->GetNamedString("id");
@@ -271,7 +269,7 @@ concurrency::task<Activities> SimpleRedditService::GetMessages()
 					else
 						toastableContent = messageData->GetNamedString("subject");
 
-					toastables->Insert(messageId, toastableContent);
+					toastables->Insert(messageName, toastableContent);
 
 				}
 			}

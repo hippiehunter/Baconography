@@ -116,5 +116,20 @@ namespace SnooStream.Common
 
             return task;
         }
+
+        public override void Suspend()
+        {
+            _backgroundCancellationTokenSource.Cancel();
+            DumpInitBlob(((NavigationService)SnooStreamViewModel.NavigationService).DumpState());
+        }
+
+        public override void Resume()
+        {
+            if(!_backgroundCancellationTokenSource.IsCancellationRequested)
+                _backgroundCancellationTokenSource.Cancel();
+
+            _backgroundCancellationTokenSource = new CancellationTokenSource();
+            SelfStream.RunActivityUpdater();
+        }
     }
 }

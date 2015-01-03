@@ -22,17 +22,14 @@ ActivityManager::ActivityManager()
 
 
     wifstream activityFile(activityPath, std::ios_base::in | std::ios_base::binary, _SH_DENYRW);
-    wstringstream fileContents;
-    wstring fileLine;
+    wstring fileStr;
 
-    while (activityFile.is_open() && !activityFile.eof())
+    if (activityFile.is_open())
     {
-        activityFile >> fileLine;
-        fileContents << fileLine;
+		fileStr = wstring(istreambuf_iterator<wchar_t>(activityFile), istreambuf_iterator<wchar_t>());
     }
     activityFile.close();
 
-    auto fileStr = fileContents.str();
 
     if (fileStr.size() > 0)
     {

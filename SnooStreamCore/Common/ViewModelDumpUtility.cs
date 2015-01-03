@@ -13,7 +13,7 @@ namespace SnooStream.Common
 {
     public class ViewModelDumpUtility
     {
-        public static ViewModelBase LoadFromDump(string dump, ViewModelBase context)
+        public static ViewModelBase LoadFromDump(string dump, ViewModelBase context, SnooStreamViewModel rootContext)
         {
             var stateItem = JsonConvert.DeserializeObject<Tuple<string, string>>(dump);
             switch (stateItem.Item1)
@@ -24,10 +24,9 @@ namespace SnooStream.Common
 				//	}
                 case "LinkRiverViewModel":
                     {
-						Debug.Assert(context is SnooStreamViewModel);
-						var snooStreamViewModel = (SnooStreamViewModel)context;
+						Debug.Assert(context is SnooStreamViewModel);;
 						var subredditThing = JsonConvert.DeserializeObject<Tuple<Subreddit, string, List<Link>, DateTime, string>>(stateItem.Item2);
-						var result = snooStreamViewModel.SubredditRiver.CombinedRivers.FirstOrDefault(vm => vm.Thing.Id == subredditThing.Item1.Id);
+						var result = rootContext.SubredditRiver.CombinedRivers.FirstOrDefault(vm => vm.Thing.Id == subredditThing.Item1.Id);
 						if (result == null)
 						{
 							result = new LinkRiverViewModel(false, subredditThing.Item1, subredditThing.Item2, subredditThing.Item3, subredditThing.Item4);
@@ -71,6 +70,16 @@ namespace SnooStream.Common
 						var postViewModel = new CreateMessageViewModel();
 						return postViewModel;
 					}
+                case "ConversationViewModel":
+                    {
+                        ActivityGroupViewModel targetGroup;
+                        if (rootContext.SelfStream.Groups.TryGetValue(stateItem.Item2, out targetGroup))
+                        {
+                            return new ConversationViewModel(targetGroup, rootContext.SelfStream);
+                        }
+                        else
+                            throw new InvalidOperationException(stateItem.Item1);
+                    }
                 default:
 					throw new InvalidOperationException(stateItem.Item1);
             }
@@ -81,45 +90,50 @@ namespace SnooStream.Common
             if (viewModel is LinkRiverViewModel)
             {
                 var linkRiver = viewModel as LinkRiverViewModel;
-				string selectedId = null;
-				if(linkRiver.CurrentSelected != null)
-					selectedId = linkRiver.CurrentSelected.Id;
+                string selectedId = null;
+                if (linkRiver.CurrentSelected != null)
+                    selectedId = linkRiver.CurrentSelected.Id;
 
-				var serializationTpl = new Tuple<Subreddit, string, List<Link>, DateTime, string>(linkRiver.Thing, linkRiver.Sort, 
-					linkRiver.Links
-						.Take(100)
-						.Select(lvm => ((LinkViewModel)lvm).Link)
-						.ToList(), 
-					linkRiver.LastRefresh ?? DateTime.Now, selectedId);
-				var serialized = JsonConvert.SerializeObject(serializationTpl);
+                var serializationTpl = new Tuple<Subreddit, string, List<Link>, DateTime, string>(linkRiver.Thing, linkRiver.Sort,
+                    linkRiver.Links
+                        .Take(100)
+                        .Select(lvm => ((LinkViewModel)lvm).Link)
+                        .ToList(),
+                    linkRiver.LastRefresh ?? DateTime.Now, selectedId);
+                var serialized = JsonConvert.SerializeObject(serializationTpl);
                 return JsonConvert.SerializeObject(Tuple.Create("LinkRiverViewModel", serialized));
             }
-			else if (viewModel is CommentsViewModel)
-			{
-				var comments = viewModel as CommentsViewModel;
-				return JsonConvert.SerializeObject(Tuple.Create("CommentsViewModel", JsonConvert.SerializeObject(Tuple.Create(comments.DumpListing(), comments.Link.Url, comments.Link.Link.Id, comments.LastRefresh))));
-			}
+            else if (viewModel is CommentsViewModel)
+            {
+                var comments = viewModel as CommentsViewModel;
+                return JsonConvert.SerializeObject(Tuple.Create("CommentsViewModel", JsonConvert.SerializeObject(Tuple.Create(comments.DumpListing(), comments.Link.Url, comments.Link.Link.Id, comments.LastRefresh))));
+            }
             else if (viewModel is LockScreenViewModel
                 || viewModel is SettingsViewModel)
             {
                 return JsonConvert.SerializeObject(Tuple.Create("SettingsViewModel", ""));
             }
-			else if (viewModel is PostViewModel)
-			{
-				var postViewModel = viewModel as PostViewModel;
-				return JsonConvert.SerializeObject(new { Editing = postViewModel.Editing, Kind = postViewModel.Kind, Subreddit = postViewModel.Subreddit, Text = postViewModel.Text, Title = postViewModel.Title, Url = postViewModel.Url });
-			}
-			//else if(viewModel is CommentsContentStreamViewModel)
-			//{
-			//	var contentStream = viewModel as CommentsContentStreamViewModel;
-			//	var currentSelectedUrl = contentStream.CurrentSelected.Url;
-			//	var currentSelectedId = contentStream.CurrentSelected.Id;
+            else if (viewModel is PostViewModel)
+            {
+                var postViewModel = viewModel as PostViewModel;
+                return JsonConvert.SerializeObject(Tuple.Create("PostViewModel", JsonConvert.SerializeObject(new { Editing = postViewModel.Editing, Kind = postViewModel.Kind, Subreddit = postViewModel.Subreddit, Text = postViewModel.Text, Title = postViewModel.Title, Url = postViewModel.Url })));
+            }
+            else if (viewModel is ConversationViewModel)
+            {
+                var conversationViewModel = viewModel as ConversationViewModel;
+                return JsonConvert.SerializeObject(Tuple.Create("ConversationViewModel", conversationViewModel.CurrentGroup.Id));
+            }
+            //else if(viewModel is CommentsContentStreamViewModel)
+            //{
+            //	var contentStream = viewModel as CommentsContentStreamViewModel;
+            //	var currentSelectedUrl = contentStream.CurrentSelected.Url;
+            //	var currentSelectedId = contentStream.CurrentSelected.Id;
 
 
 
-			//}
-			else
-				throw new InvalidOperationException(viewModel.GetType().FullName);
+            //}
+            else
+                throw new InvalidOperationException(viewModel.GetType().FullName);
         }
     }
 }

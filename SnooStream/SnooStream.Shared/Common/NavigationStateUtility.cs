@@ -16,9 +16,11 @@ namespace SnooStream.Common
 		Dictionary<string, ViewModelBase> _navState;
 		Dictionary<string, int> _navDuplicates;
 		Stack<string> _navStateInsertionOrder;
+        SnooStreamViewModel _rootContext;
         public NavigationStateUtility(string existingState, SnooStreamViewModel rootContext)
         {
-			_navDuplicates = new Dictionary<string, int>();
+            _rootContext = rootContext;
+            _navDuplicates = new Dictionary<string, int>();
 			_navState = new Dictionary<string, ViewModelBase>();
 			_navStateInsertionOrder = new Stack<string>();
             if (!string.IsNullOrEmpty(existingState))
@@ -120,7 +122,7 @@ namespace SnooStream.Common
 
 		private ViewModelBase RestoreStateItem(string state, ViewModelBase context)
         {
-			return ViewModelDumpUtility.LoadFromDump(state, context);
+			return ViewModelDumpUtility.LoadFromDump(state, context, _rootContext);
         }
 
         public ViewModelBase this[string guid]

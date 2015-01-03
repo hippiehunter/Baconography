@@ -46,6 +46,7 @@ namespace SnooStream.ViewModel
         private string _firstChild;
         private LoadFullCommentsViewModel _loadFullSentinel;
         private ViewModelBase _context;
+        private bool _isLimitedContext = false;
 
         public CommentsViewModel(ViewModelBase context, Link linkData)
         {
@@ -61,6 +62,7 @@ namespace SnooStream.ViewModel
 
         public CommentsViewModel(ViewModelBase context, string url)
         {
+            _isLimitedContext = true;
             _context = context;
             Link = _context as LinkViewModel;
             _loadFullSentinel = new LoadFullCommentsViewModel(this);
@@ -113,7 +115,6 @@ namespace SnooStream.ViewModel
                 if (queryParts.ContainsKey("context"))
                 {
                     IsContext = true;
-                    ContextTargetID = queryParts["context"];
                 }
                 else
                     IsContext = false;
@@ -124,7 +125,12 @@ namespace SnooStream.ViewModel
                     Sort = "hot";
 
                 BaseUrl = url.Substring(0, url.Length - uri.Query.Length);
-
+                if (IsContext)
+                {
+                    var lastSlash = BaseUrl.LastIndexOf('/');
+                    ContextTargetID = BaseUrl.Substring(lastSlash + 1);
+                    BaseUrl = BaseUrl.Remove(lastSlash + 1);
+                }
                 _loadFullTask = new Lazy<Task>(() => LoadAndMergeFull(IsContext));
             }
         }
@@ -542,7 +548,16 @@ namespace SnooStream.ViewModel
             List<ViewModelBase> flatChildren = new List<ViewModelBase>();
 			await SnooStreamViewModel.NotificationService.Report("loading comments", async () =>
 			{
-				var listing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(Link.Link.Subreddit, BaseUrl, null);
+                string subreddit = null;
+                if (Link == null)
+                {
+                    var splitUrl = BaseUrl.Split('/');
+                    subreddit = splitUrl[Array.IndexOf(splitUrl, "r") + 1];
+                }
+                else
+                    subreddit = Link.Link.Subreddit;
+
+                var listing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(subreddit, (isContext) ? BaseUrl + ContextTargetID : BaseUrl, null);
 				lock(this)
 				{
 					var firstChild = listing.Data.Children.FirstOrDefault(thing => thing.Data is Comment);
@@ -649,6 +664,9 @@ namespace SnooStream.ViewModel
             {
                 if (FlatComments.Count == 0)
                 {
+                    if (isContext)
+                        FlatComments.Add(_loadFullSentinel);
+
                     foreach (var comment in flatChildren)
                     {
                         FlatComments.Add(comment);

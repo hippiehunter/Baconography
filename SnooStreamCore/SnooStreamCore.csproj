@@ -83,6 +83,7 @@
     <Compile Include="ViewModel\Content\PlainWebViewModel.cs" />
     <Compile Include="ViewModel\Content\SelfViewModel.cs" />
     <Compile Include="ViewModel\Content\VideoViewModel.cs" />
+    <Compile Include="ViewModel\ConversationViewModel.cs" />
     <Compile Include="ViewModel\IHasLinks.cs" />
     <Compile Include="ViewModel\ILinkViewModel.cs" />
     <Compile Include="ViewModel\IRefreshable.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="ViewModel\Activities\ActivityGroupViewModel.cs" />
     <Compile Include="ViewModel\Settings\SettingsViewModel.cs" />
     <Compile Include="ViewModel\SnooStreamViewModel.cs" />
+    <Compile Include="ViewModel\SoloContentStreamViewModel.cs" />
     <Compile Include="ViewModel\SubredditRiverViewModel.cs" />
     <Compile Include="ViewModel\UploadViewModel.cs" />
     <Compile Include="ViewModel\VotableViewModel.cs" />

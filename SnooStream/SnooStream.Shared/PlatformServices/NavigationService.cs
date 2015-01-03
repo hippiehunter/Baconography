@@ -157,6 +157,10 @@ namespace SnooStream.PlatformServices
             }
         }
 
+        public void NavigateToConversation(string conversationId)
+        {
+            _frame.Navigate(typeof(Conversation), "state=" + _navState.AddState(new ConversationViewModel(_rootContext.SelfStream.Groups[conversationId], _rootContext.SelfStream)));
+        }
 
         public void ValidateStates(HashSet<string> validStates)
         {
@@ -180,5 +184,7 @@ namespace SnooStream.PlatformServices
 			var snooApplicationPage = _frame.Content as SnooApplicationPage;
 			snooApplicationPage.PopNavState();
 		}
-	}
+
+        
+    }
 }

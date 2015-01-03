@@ -43,9 +43,16 @@ namespace SnooStream
             LogManagerFactory.DefaultConfiguration.AddTarget(LogLevel.Trace, LogLevel.Fatal, new FileStreamingTarget());
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
+            this.Resuming += App_Resuming;
 
             // setup the global crash handler...
             GlobalCrashHandler.Configure();
+        }
+
+        private void App_Resuming(object sender, object e)
+        {
+            var snooStreamViewModel = Resources["SnooStream"] as SnooStreamViewModel;
+            snooStreamViewModel.Resume();
         }
 
         protected override void OnActivated(IActivatedEventArgs args)
@@ -214,7 +221,7 @@ namespace SnooStream
             var deferral = e.SuspendingOperation.GetDeferral();
 
             var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
-            snooStreamViewModel.DumpInitBlob(((NavigationService)SnooStreamViewModel.NavigationService).DumpState());
+            snooStreamViewModel.Suspend();
             // TODO: Save application state and stop any background activity
             deferral.Complete();
         }

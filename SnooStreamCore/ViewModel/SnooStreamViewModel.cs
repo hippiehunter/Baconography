@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-    public class SnooStreamViewModel : ViewModelBase
+    public abstract class SnooStreamViewModel : ViewModelBase
     {
         public static string CWD { get; set; }
 		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooStreamViewModel>();
@@ -86,7 +86,7 @@ namespace SnooStream.ViewModel
         public string FeaturedImage { get; private set; }
 
 		public static SnooStream.Common.LoggingService Logging = new LoggingService();
-        private static CancellationTokenSource _uiContextCancellationSource = new CancellationTokenSource();
+        protected static CancellationTokenSource _uiContextCancellationSource = new CancellationTokenSource();
         public static CancellationToken UIContextCancellationToken
         {
             get
@@ -95,7 +95,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        private static CancellationTokenSource _backgroundCancellationTokenSource = new CancellationTokenSource();
+        protected static CancellationTokenSource _backgroundCancellationTokenSource = new CancellationTokenSource();
         public static CancellationToken BackgroundCancellationToken
         {
             get
@@ -121,5 +121,8 @@ namespace SnooStream.ViewModel
         }
 
 		public string GetNavigationBlob() {  return _initializationBlob.NavigationBlob; }
+
+        public abstract void Suspend();
+        public abstract void Resume();
     }
 }
