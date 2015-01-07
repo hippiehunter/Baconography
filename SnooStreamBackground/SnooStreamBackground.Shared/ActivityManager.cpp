@@ -88,14 +88,37 @@ bool ActivityManager::NeedsRefresh::get()
         return false;
 }
 
-void ActivityManager::MakeToast(String^ id, String^ text, TypedEventHandler<ToastNotification^, Object^>^ activatedHandler)
+Platform::String^ ActivityManager::ContextForId(Platform::String^ id)
+{
+    wstring localPath((Windows::Storage::ApplicationData::Current->TemporaryFolder->Path + L"\\activity_context" + id)->Data());
+    wifstream contextFile(localPath, std::ios_base::binary | std::ios_base::in, _SH_DENYRW);
+    if (contextFile.is_open())
+    {
+        auto contextStr = wstring(istreambuf_iterator<wchar_t>(contextFile), istreambuf_iterator<wchar_t>());
+        contextFile.close();
+        return ref new String(contextStr.c_str(), contextStr.length());
+    }
+    else
+        return L"";
+}
+
+void ActivityManager::MakeToast(String^ id, String^ text, String^ context, TypedEventHandler<ToastNotification^, Object^>^ activatedHandler)
 {
     auto notifier = ToastNotificationManager::CreateToastNotifier();
     auto toastXml = ToastNotificationManager::GetTemplateContent(ToastTemplateType::ToastText01);
     auto toastTextElements = toastXml->GetElementsByTagName("text");
     toastTextElements->Item(0)->InnerText = text;
     auto toastNode = toastXml->SelectSingleNode("/toast");
-    static_cast<Windows::Data::Xml::Dom::XmlElement^>(toastNode)->SetAttribute("launch", "?activityid=" + id);
+
+    if (context != nullptr)
+    {
+        wstring localPath((Windows::Storage::ApplicationData::Current->TemporaryFolder->Path + L"\\activity_context" + id)->Data());
+        wofstream contextFile(localPath, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc, _SH_DENYRW);
+        wstring wContext(context->Data());
+        contextFile << wContext;
+        contextFile.close();
+    }
+    static_cast<Windows::Data::Xml::Dom::XmlElement^>(toastNode)->SetAttribute("launch", "{'activityid':'" + id + "'}");
     auto notification = ref new ToastNotification(toastXml);
     if (activatedHandler != nullptr)
         notification->Activated += activatedHandler;
@@ -154,7 +177,7 @@ IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHa
                     if (toastedLookup.find(toastTpl->Key) == toastedLookup.end())
                     {
                         UpdateCountSinceActivity = 0;
-                        MakeToast(toastTpl->Key, toastTpl->Value, activatedHandler);
+                        MakeToast(toastTpl->Key, toastTpl->Value, resultActivities.ContextBlobs->HasKey(toastTpl->Key) ? resultActivities.ContextBlobs->Lookup(toastTpl->Key) : nullptr, activatedHandler);
                         toastedLookup.insert(toastTpl->Key);
                         _alreadyToasted.insert(_alreadyToasted.begin(), toastTpl->Key);
                     }

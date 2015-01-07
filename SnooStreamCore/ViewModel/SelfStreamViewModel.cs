@@ -175,7 +175,7 @@ namespace SnooStream.ViewModel
 			//load up the activities
 			Groups = new ObservableSortedUniqueCollection<string, ActivityGroupViewModel>(new ActivityGroupViewModel.ActivityAgeComparitor());
 			Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SelfActivityAggregate(this), 100);
-			if (selfInit != null)
+            if (selfInit != null)
 			{
                 ProcessActivityManager();
                 RunActivityUpdater();
@@ -223,6 +223,7 @@ namespace SnooStream.ViewModel
 		public DateTime? LastRefresh { get; set; }
 		public ObservableSortedUniqueCollection<string, ActivityGroupViewModel> Groups { get; private set; }
 		public ObservableCollection<ViewModelBase> Activities { get; private set; }
+        public static Dictionary<string, ActivityViewModel> ActivityLookup = new Dictionary<string, ActivityViewModel>();
 		public async Task PullNew(bool force)
         {
             LastRefresh = DateTime.Now;

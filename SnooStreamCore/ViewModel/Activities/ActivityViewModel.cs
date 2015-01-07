@@ -81,39 +81,47 @@ namespace SnooStream.ViewModel
 
         public static ActivityViewModel CreateActivity(Thing thing)
         {
-            if (thing.Data is Link)
-                return new PostedLinkActivityViewModel(thing.Data as Link);
-            else if (thing.Data is Comment)
-                return new PostedCommentActivityViewModel(thing.Data as Comment);
-            else if (thing.Data is Message)
+            ActivityViewModel result;
+            if (!SelfStreamViewModel.ActivityLookup.TryGetValue(((ThingData)thing.Data).Name, out result))
             {
-                var messageThing = thing.Data as Message;
-                if (messageThing.WasComment)
+                if (thing.Data is Link)
+                    result = new PostedLinkActivityViewModel(thing.Data as Link);
+                else if (thing.Data is Comment)
+                    result = new PostedCommentActivityViewModel(thing.Data as Comment);
+                else if (thing.Data is Message)
                 {
-                    return new RecivedCommentReplyActivityViewModel(messageThing);
+                    var messageThing = thing.Data as Message;
+                    if (messageThing.WasComment)
+                    {
+                        result = new RecivedCommentReplyActivityViewModel(messageThing);
+                    }
+                    //check if its actually mod mail
+                    else if (messageThing.Author == "reddit")
+                    {
+                        result = new ModeratorMessageActivityViewModel(messageThing);
+                    }
+                    else if (string.IsNullOrEmpty(messageThing.Author))
+                    {
+                        //this is a deleted sender
+                        messageThing.Author = "[deleted]";
+                        result = new MessageActivityViewModel(messageThing);
+                    }
+                    else
+                    {
+                        result = new MessageActivityViewModel(messageThing);
+                    }
                 }
-                //check if its actually mod mail
-                else if (messageThing.Author == "reddit")
+                else if (thing.Data is ModAction)
                 {
-                    return new ModeratorMessageActivityViewModel(messageThing);
-                }
-                else if(string.IsNullOrEmpty(messageThing.Author))
-                {
-                    //this is a deleted sender
-                    messageThing.Author = "[deleted]";
-                    return new MessageActivityViewModel(messageThing);
+                    result = new ModeratorActivityViewModel(thing.Data as ModAction);
                 }
                 else
-                {
-                    return new MessageActivityViewModel(messageThing);
-                }
+                    throw new ArgumentOutOfRangeException();
+
+                SelfStreamViewModel.ActivityLookup.Add(((ThingData)thing.Data).Name, result);
+
             }
-            else if (thing.Data is ModAction)
-            {
-                return new ModeratorActivityViewModel(thing.Data as ModAction);
-            }
-            else
-                throw new ArgumentOutOfRangeException();
+            return result;
         }
 
         public static void FixupFirstActivity(ActivityViewModel activity, IEnumerable<ActivityViewModel> siblings)

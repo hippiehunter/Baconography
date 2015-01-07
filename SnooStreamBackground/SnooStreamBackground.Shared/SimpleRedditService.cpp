@@ -240,45 +240,82 @@ task<bool> SimpleRedditService::HasMail()
 	});
 }
 
+concurrency::task<Activities> SimpleRedditService::ProcContext(concurrency::task<Activities> activitiesTask)
+{
+    try
+    {
+        auto activities = activitiesTask.get();
+        for (auto context : activities.ContextBlobs)
+        {
+            if (context->Value->Length() == 0)
+            {
+                return SendGet(activities.NameContextMapping->Lookup(context->Key))
+                    .then([=](String^ response)
+                {
+                    activities.ContextBlobs->Remove(context->Key);
+                    if (response != nullptr && response->Length() > 0)
+                        activities.ContextBlobs->Insert(context->Key, response);
+
+                    return concurrency::task_from_result(activities);
+                }).then([=](concurrency::task<Activities> placeholder) { return ProcContext(placeholder); });
+            }
+        }
+        return concurrency::task_from_result(activities);
+    }
+    catch (...)
+    {
+        return activitiesTask;
+    }
+}
 
 concurrency::task<Activities> SimpleRedditService::GetMessages()
 {
+    auto contextBlobs = ref new Platform::Collections::Map<Platform::String^, Platform::String^>();
+    auto nameContextBlob = ref new Platform::Collections::Map<Platform::String^, Platform::String^>();
     return SendGet("/message/inbox/.json")
-        .then([&](String^ response)
+        .then([=](String^ response)
     {
+        
         auto toastables = ref new Platform::Collections::Map<Platform::String^, Platform::String^>();
-        auto messages = JsonObject::Parse(response);
-        auto messageArray = messages->GetNamedObject("data")->GetNamedArray("children");
-
-        for (auto&& message : messageArray)
+        if (response != nullptr)
         {
-			try
-			{
-				auto messageObject = message->GetObject();
-				auto messageData = messageObject->GetNamedObject("data");
-				auto messageId = messageData->GetNamedString("id");
-				auto messageNew = messageData->GetNamedBoolean("new");
-				auto messageName = messageData->GetNamedString("name");
+            auto messages = JsonObject::Parse(response);
+            auto messageArray = messages->GetNamedObject("data")->GetNamedArray("children");
 
-				if (messageNew)
-				{
-					String^ toastableContent = nullptr;
-					auto messageWasComment = messageData->GetNamedBoolean("was_comment");
-					if (messageWasComment)
-						toastableContent = messageData->GetNamedString("link_title");
-					else
-						toastableContent = messageData->GetNamedString("subject");
+            for (auto&& message : messageArray)
+            {
+                try
+                {
+                    auto messageObject = message->GetObject();
+                    auto messageData = messageObject->GetNamedObject("data");
+                    auto messageId = messageData->GetNamedString("id");
+                    auto messageNew = messageData->GetNamedBoolean("new");
+                    auto messageName = messageData->GetNamedString("name");
 
-					toastables->Insert(messageName, toastableContent);
+                    if (messageNew)
+                    {
+                        String^ toastableContent = nullptr;
+                        auto messageWasComment = messageData->GetNamedBoolean("was_comment");
+                        if (messageWasComment)
+                        {
+                            contextBlobs->Insert(messageName, "");
+                            nameContextBlob->Insert(messageName, messageData->GetNamedString("context"));
+                            toastableContent = messageData->GetNamedString("link_title");
+                        }
+                        else
+                            toastableContent = messageData->GetNamedString("subject");
 
-				}
-			}
-			//ignore bad messages (probably an odd thing type in the listing)
-			catch (...) {}
+                        toastables->Insert(messageName, toastableContent);
+
+                    }
+                }
+                //ignore bad messages (probably an odd thing type in the listing)
+                catch (...) {}
+            }
         }
-        Activities result = { response, toastables };
+        Activities result = { response, toastables, nameContextBlob, contextBlobs};
         return result;
-    });
+    }).then([=](concurrency::task<Activities> placeholder) { return ProcContext(placeholder); });
 }
 
 concurrency::task<Activities> SimpleRedditService::GetActivity()

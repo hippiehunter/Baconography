@@ -26,6 +26,8 @@ namespace SnooStreamBackground
     public:
         Platform::String^ Blob;
         Platform::Collections::Map<Platform::String^, Platform::String^>^ Toastables;
+        Platform::Collections::Map<Platform::String^, Platform::String^>^ NameContextMapping;
+        Platform::Collections::Map<Platform::String^, Platform::String^>^ ContextBlobs;
     };
 
     class SimpleRedditService
@@ -33,6 +35,7 @@ namespace SnooStreamBackground
     private:
         RedditOAuth _oAuth;
         concurrency::task<Platform::String^> SendGet(Platform::String^ url);
+        concurrency::task<Activities> ProcContext(concurrency::task<Activities> activitiesTask);
     public:
         SimpleRedditService(RedditOAuth oAuth);
         concurrency::task<bool> HasMail();

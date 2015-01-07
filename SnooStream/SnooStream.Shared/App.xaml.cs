@@ -1,5 +1,7 @@
 ﻿using MetroLog;
 using MetroLog.Targets;
+using Newtonsoft.Json;
+using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Messages;
 using SnooStream.PlatformServices;
@@ -76,6 +78,10 @@ namespace SnooStream
 					snooStreamViewModel.Login.FailOAuth(wab.WebAuthenticationResult.ResponseStatus.ToString(), wab.WebAuthenticationResult.ResponseData);
 				}
 			}
+            else if (args.Kind == ActivationKind.Launch)
+            {
+
+            }
 #endif
         }
         Timer timer;
@@ -155,7 +161,7 @@ namespace SnooStream
 
                 rootFrame.ContentTransitions = null;
                 rootFrame.Navigated += this.RootFrame_FirstNavigated;
-				Windows.Phone.UI.Input.HardwareButtons.BackPressed += HardwareButtons_BackPressed;
+                Windows.Phone.UI.Input.HardwareButtons.BackPressed += HardwareButtons_BackPressed;
 #endif
                 var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
                 SnooStreamViewModel.NavigationService = new NavigationService(rootFrame, snooStreamViewModel);
@@ -163,14 +169,45 @@ namespace SnooStream
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                if (!rootFrame.Navigate(typeof(SnooHubMark2), e.Arguments))
-                {
-                    throw new Exception("Failed to create initial page");
-                }
+                DispatchToInitialPage(rootFrame, e.Arguments);
+                
+            }
+            else if(!string.IsNullOrWhiteSpace(e.Arguments))
+            {
+                DispatchToInitialPage(rootFrame, e.Arguments);
             }
 
             // Ensure the current window is active
             Window.Current.Activate();
+        }
+
+        void DispatchToInitialPage(Frame rootFrame, string launchArgs)
+        {
+            if (string.IsNullOrWhiteSpace(launchArgs))
+            {
+                if (!rootFrame.Navigate(typeof(SnooHubMark2), launchArgs))
+                {
+                    throw new Exception("Failed to create initial page");
+                }
+            }
+            else
+            {
+                try
+                {
+                    var activityParams = JsonConvert.DeserializeAnonymousType(launchArgs, new { activityid = "" });
+                    var targetActivity = SelfStreamViewModel.ActivityLookup.ContainsKey(activityParams.activityid) ? SelfStreamViewModel.ActivityLookup[activityParams.activityid] : null;
+                    if(targetActivity != null)
+                        targetActivity.Tapped();
+                }
+                catch (Exception)
+                {
+                    if (!rootFrame.Navigate(typeof(SnooHubMark2), launchArgs))
+                    {
+                        throw new Exception("Failed to create initial page");
+                    }
+                }
+            }
+            
         }
 
 #if WINDOWS_PHONE_APP
