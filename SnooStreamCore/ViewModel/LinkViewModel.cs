@@ -46,6 +46,8 @@ namespace SnooStream.ViewModel
         internal void MergeLink(Link link)
         {
 			Votable.MergeVotable(link);
+            Link.CommentCount = link.CommentCount;
+            RaisePropertyChanged("CommentCount");
         }
 
 		MarkdownData _selfText;

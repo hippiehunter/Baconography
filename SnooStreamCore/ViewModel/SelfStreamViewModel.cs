@@ -175,7 +175,7 @@ namespace SnooStream.ViewModel
 			//load up the activities
 			Groups = new ObservableSortedUniqueCollection<string, ActivityGroupViewModel>(new ActivityGroupViewModel.ActivityAgeComparitor());
 			Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SelfActivityAggregate(this), 100);
-            if (selfInit != null)
+            if (selfInit != null && IsLoggedIn)
 			{
                 ProcessActivityManager();
                 RunActivityUpdater();
@@ -191,10 +191,13 @@ namespace SnooStream.ViewModel
             RaisePropertyChanged("IsLoggedIn");
 			RaisePropertyChanged("Activities");
 			Groups.Clear();
-            await PullNew(true);
-            if (!_runningActivityUpdater)
+            if (IsLoggedIn)
             {
-                RunActivityUpdater();
+                await PullNew(true);
+                if (!_runningActivityUpdater)
+                {
+                    RunActivityUpdater();
+                }
             }
 			
 		}
@@ -203,7 +206,9 @@ namespace SnooStream.ViewModel
 		{
 			get
 			{
-				return !String.IsNullOrWhiteSpace(SnooStreamViewModel.RedditService.CurrentUserName);
+				return !String.IsNullOrWhiteSpace(SnooStreamViewModel.RedditService.CurrentUserName) && 
+                    SnooStreamViewModel.RedditUserState.OAuth != null &&
+                    !String.IsNullOrWhiteSpace(SnooStreamViewModel.RedditUserState.OAuth.RefreshToken);
 			}
 		}
 

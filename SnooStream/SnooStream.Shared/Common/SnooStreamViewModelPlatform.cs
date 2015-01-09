@@ -136,7 +136,8 @@ namespace SnooStream.Common
                 _backgroundCancellationTokenSource.Cancel();
 
             _backgroundCancellationTokenSource = new CancellationTokenSource();
-            SelfStream.RunActivityUpdater();
+            if(SelfStream.IsLoggedIn)
+                SelfStream.RunActivityUpdater();
         }
     }
 }

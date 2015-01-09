@@ -65,7 +65,7 @@ namespace SnooStream.ViewModel
                 contextListing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(link.Subreddit, link.Permalink + commentId + "?context=3", null);
             }
 
-            return Tuple.Create(contextListing, targetLinkThing);
+            return Tuple.Create(contextListing, targetLinkThing); 
         }
 
         public static async void NavigateToCommentContext(string contextUrl, string commentName, string commentId, string linkId)
