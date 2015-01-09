@@ -18,65 +18,72 @@ namespace SnooStream.Common
     {
 		public SnooStreamViewModelPlatform()
 		{
-            
-            SnooStreamViewModel.SystemServices = new SystemServices();
-			SnooStreamViewModel.MarkdownProcessor = new MarkdownProvider();
-            SnooStreamViewModel.ActivityManager = new SnooStream.PlatformServices.ActivityManager();
-            if (!IsInDesignMode)
-			{
-				((SystemServices)SnooStreamViewModel.SystemServices).FinishInitialization(Windows.ApplicationModel.Core.CoreApplication.MainView.Dispatcher);
-				SnooStreamViewModel.CWD = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
-				SnooStreamViewModel.UserCredentialService = new DefaultUserCredentialService();
-                
-            }
-			FinishInit();
-
-            if (!IsInDesignMode)
+            try
             {
-                LockScreenSettings lsSettings = new LockScreenSettings();
-                lsSettings.LiveTileSettings = new List<LiveTileSettings>
+                SnooStreamViewModel.SystemServices = new SystemServices();
+                SnooStreamViewModel.MarkdownProcessor = new MarkdownProvider();
+                SnooStreamViewModel.ActivityManager = new SnooStream.PlatformServices.ActivityManager();
+                if (!IsInDesignMode)
+                {
+                    ((SystemServices)SnooStreamViewModel.SystemServices).FinishInitialization(Windows.ApplicationModel.Core.CoreApplication.MainView.Dispatcher);
+                    SnooStreamViewModel.CWD = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+                    SnooStreamViewModel.UserCredentialService = new DefaultUserCredentialService();
+
+                }
+                FinishInit();
+
+                if (!IsInDesignMode)
+                {
+                    LockScreenSettings lsSettings = new LockScreenSettings();
+                    lsSettings.LiveTileSettings = new List<LiveTileSettings>
                 {
                     new LiveTileSettings { CurrentImages = new List<string>(), LiveTileItemsReddit = "/", LiveTileStyle = LiveTileStyle.TextImage}
                 };
-                lsSettings.RedditOAuth = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.OAuth != null ?
-                    JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
+                    lsSettings.RedditOAuth = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.OAuth != null ?
+                        JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
 
-                
 
-                lsSettings.Store();
 
-                Task.Delay(10000).ContinueWith(async (tskTop) =>
-                    {
-                        var status = BackgroundExecutionManager.GetAccessStatus();
-                        if (status == BackgroundAccessStatus.Unspecified)
+                    lsSettings.Store();
+
+                    Task.Delay(10000).ContinueWith(async (tskTop) =>
                         {
-                            status = await BackgroundExecutionManager.RequestAccessAsync();
-                        }
-
-                        if (status != BackgroundAccessStatus.Denied)
-                        {
-                            TimeTrigger timeTrigger = new TimeTrigger(30, false);
-                            SystemCondition userCondition = new SystemCondition(SystemConditionType.UserPresent);
-                            string entryPoint = "SnooStreamBackground.UpdateBackgroundTask";
-                            string taskName = "Background task for updating live tile and displaying message notifications from reddit";
-
-                            BackgroundTaskRegistration task = RegisterBackgroundTask(entryPoint, taskName, timeTrigger, userCondition);
-                        }
-
-                        SystemServices.RunUIIdleAsync(() =>
+                            var status = BackgroundExecutionManager.GetAccessStatus();
+                            if (status == BackgroundAccessStatus.Unspecified)
                             {
-                                return Task.Run(() =>
-                                    {
-                                        UpdateBackgroundTask tsk = new UpdateBackgroundTask();
-                                        try
-                                        {
-                                            tsk.RunExternal();
-                                        }
-                                        catch { }
-                                    });
-                            });
-                    });
+                                status = await BackgroundExecutionManager.RequestAccessAsync();
+                            }
 
+                            if (status != BackgroundAccessStatus.Denied)
+                            {
+                                TimeTrigger timeTrigger = new TimeTrigger(30, false);
+                                SystemCondition userCondition = new SystemCondition(SystemConditionType.UserPresent);
+                                string entryPoint = "SnooStreamBackground.UpdateBackgroundTask";
+                                string taskName = "Background task for updating live tile and displaying message notifications from reddit";
+
+                                BackgroundTaskRegistration task = RegisterBackgroundTask(entryPoint, taskName, timeTrigger, userCondition);
+                            }
+
+                            SystemServices.RunUIIdleAsync(() =>
+                                {
+                                    return Task.Run(() =>
+                                        {
+                                            UpdateBackgroundTask tsk = new UpdateBackgroundTask();
+                                            try
+                                            {
+                                                tsk.RunExternal();
+                                            }
+                                            catch { }
+                                        });
+                                });
+                        });
+
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Fatal("fetal error during initialization", ex);
+                throw ex;
             }
 		}
 

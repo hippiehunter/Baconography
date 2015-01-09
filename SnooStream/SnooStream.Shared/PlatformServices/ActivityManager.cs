@@ -75,5 +75,29 @@ namespace SnooStream.PlatformServices
             });
             
         }
+
+
+        public Listing ContextForId(string id)
+        {
+            var result = _activityManager.ContextForId(id);
+            if (string.IsNullOrWhiteSpace(result))
+                return new Listing { Data = new ListingData { Children = new List<Thing>() } };
+            else
+            {
+                var resultList = new List<Thing>();
+                var resultListing = new Listing { Data = new ListingData { Children = resultList } };
+                var listings = JsonConvert.DeserializeObject<Listing[]>(result);
+                foreach(var listing in listings)
+                {
+                    resultList.AddRange(listing.Data.Children);
+                    if (listing.Data.After != null)
+                        resultListing.Data.After = listing.Data.After;
+
+                    if (listing.Data.Before != null)
+                        resultListing.Data.Before = listing.Data.Before;
+                }
+                return resultListing;
+            }
+        }
     }
 }

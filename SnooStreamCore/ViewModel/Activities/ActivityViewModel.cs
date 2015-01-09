@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
@@ -41,6 +42,47 @@ namespace SnooStream.ViewModel
 			else
 				return text;
 		}
+
+        public static async Task<Tuple<Listing, Thing>> FindTargetLink(string contextUrl, string linkId, string commentId, string commentName)
+        {
+            var contextListing = SnooStreamViewModel.ActivityManager.ContextForId(commentName);
+            if (contextListing.Data.Children.Count == 0 && !string.IsNullOrWhiteSpace(contextUrl))
+            {
+                var splitUrl = contextUrl.Split('/');
+                var subreddit = splitUrl[Array.IndexOf(splitUrl, "r") + 1];
+                contextListing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(subreddit, contextUrl, null);
+            }
+            Thing targetLinkThing = contextListing != null ? contextListing.Data.Children.FirstOrDefault(thing => thing.Data is Link) : null;
+            if(targetLinkThing == null && !string.IsNullOrWhiteSpace(linkId))
+            {
+                targetLinkThing = await SnooStreamViewModel.RedditService.GetThingById(linkId);
+            }
+
+
+            if (contextListing == null && targetLinkThing != null && targetLinkThing.Data is Link)
+            {
+                var link = targetLinkThing.Data as Link;
+                contextListing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(link.Subreddit, link.Permalink + commentId + "?context=3", null);
+            }
+
+            return Tuple.Create(contextListing, targetLinkThing);
+        }
+
+        public static async void NavigateToCommentContext(string contextUrl, string commentName, string commentId, string linkId)
+        {
+            await SnooStreamViewModel.NotificationService.ModalReportWithCancelation("navigating to context", async (token) =>
+            {
+                var targetInfo = await FindTargetLink(contextUrl, linkId, commentId, commentName);
+                if (targetInfo.Item1 == null)
+                {
+                    throw new ArgumentException("unable to get context for contextUrl: " + contextUrl + " or linkId: " + linkId);
+                }
+                var linkViewModel = new LinkViewModel(null, targetInfo.Item2 != null ? targetInfo.Item2.Data as Link : null);
+                var commentsViewModel = new CommentsViewModel(linkViewModel, targetInfo.Item1, contextUrl, null, true);
+
+                SnooStreamViewModel.NavigationService.NavigateToComments(commentsViewModel);
+            });
+        }
 
         public static string GetActivityGroupName(Thing thing)
         {
@@ -155,6 +197,7 @@ namespace SnooStream.ViewModel
             LinkVM = new LinkViewModel(this, link);
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
 			PreviewTitle = Elipsis(Link.Title, 50);
+            IsNew = false;
         }
 
         public string Author { get { return Link.Author; } }
@@ -206,6 +249,7 @@ namespace SnooStream.ViewModel
             Body = Comment.Body;
             Subject = PreviewTitle = Elipsis(comment.LinkTitle, 50);
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
+            IsNew = false;
         }
 
         public override Thing GetThing()
@@ -213,25 +257,9 @@ namespace SnooStream.ViewModel
             return new Thing { Kind = "t1", Data = Comment };
         }
 
-        public override async void Tapped()
+        public override void Tapped()
         {
-            
-                await SnooStreamViewModel.NotificationService.ModalReportWithCancelation("navigating to context", async (token) =>
-                {
-                    if (Comment.Context != null)
-                    {
-                        var targetLinkThing = await SnooStreamViewModel.RedditService.GetLinkByUrl("http://reddit.com" + Comment.Context.Remove(Comment.Context.LastIndexOf('/')));
-                        SnooStreamViewModel.NavigationService.NavigateToComments(new CommentsViewModel(new LinkViewModel(null, targetLinkThing.Data as Link),
-                            "http://reddit.com" + ((Link)targetLinkThing.Data).Permalink + Comment.Id + "?context=3"));
-                    }
-                    else
-                    {
-                        var targetLinkThing = await SnooStreamViewModel.RedditService.GetThingById(Comment.LinkId);
-                        SnooStreamViewModel.NavigationService.NavigateToComments(new CommentsViewModel(new LinkViewModel(null, targetLinkThing.Data as Link),
-                            "http://reddit.com" + ((Link)targetLinkThing.Data).Permalink + Comment.Id + "?context=3"));
-                    }
-                });
-            
+            ActivityViewModel.NavigateToCommentContext(Comment.LinkUrl + Comment.Id + "?context=3", Comment.Name, Comment.Id, Comment.LinkId);
         }
     }
 
@@ -247,6 +275,7 @@ namespace SnooStream.ViewModel
             Body = Message.Body;
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
 			PreviewTitle = Elipsis(Subject, 50);
+            IsNew = Message.New;
         }
         public string Body
         {
@@ -274,7 +303,7 @@ namespace SnooStream.ViewModel
         }
         public override void Tapped()
         {
-            SnooStreamViewModel.NavigationService.NavigateToComments(new CommentsViewModel(null, "http://reddit.com" + Message.Context));
+            ActivityViewModel.NavigateToCommentContext("http://reddit.com" + Message.Context, Message.Name, Message.Id, null);
         }
     }
 
@@ -372,6 +401,7 @@ namespace SnooStream.ViewModel
         {
             ModAction = modAction;
             CreatedUTC = modAction.CreatedUTC;
+            IsNew = false;
         }
 
         public override Thing GetThing()
@@ -395,6 +425,7 @@ namespace SnooStream.ViewModel
             MessageThing = messageThing;
 			PreviewBody = messageThing.Body.Length > 100 ? messageThing.Body.Remove(100) : messageThing.Body;
 			PreviewTitle = Elipsis(messageThing.Subject, 50);
+            IsNew = MessageThing.New;
         }
 
         public override Thing GetThing()

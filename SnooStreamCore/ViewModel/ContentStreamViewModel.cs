@@ -37,16 +37,32 @@ namespace SnooStream.ViewModel
 					switch (e.Action)
 					{
 						case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-							filteredCollection.Add(e.NewItems[0] as ILinkViewModel);
+                            if (filterFunc(e.NewItems[0] as ILinkViewModel))
+							    filteredCollection.Add(e.NewItems[0] as ILinkViewModel);
 							break;
 						case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-							filteredCollection.Move(e.OldStartingIndex, e.NewStartingIndex);
+                            if (filteredCollection.Contains(e.OldItems[0] as ILinkViewModel) &&
+                                filteredCollection.Contains(e.NewItems[0] as ILinkViewModel))
+                            {
+                                filteredCollection.Move(filteredCollection.IndexOf(e.OldItems[0] as ILinkViewModel),
+                                    filteredCollection.IndexOf(e.NewItems[0] as ILinkViewModel));
+                            }
 							break;
 						case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-							filteredCollection.RemoveAt(e.OldStartingIndex);
+                            if (filteredCollection.Contains(e.OldItems[0] as ILinkViewModel))
+                            {
+                                filteredCollection.Remove(e.OldItems[0] as ILinkViewModel);
+                            }
 							break;
 						case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-							filteredCollection[e.NewStartingIndex] = e.NewItems[0] as ILinkViewModel;
+                            if (filterFunc(e.NewItems[0] as ILinkViewModel))
+                            {
+                                filteredCollection[filteredCollection.IndexOf(e.OldItems[0] as ILinkViewModel)] = e.NewItems[0] as ILinkViewModel;
+                            }
+                            else if (filteredCollection.Contains(e.OldItems[0] as ILinkViewModel))
+                            {
+                                filteredCollection.Remove(e.OldItems[0] as ILinkViewModel);
+                            }
 							break;
 						case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
 							filteredCollection.Clear();

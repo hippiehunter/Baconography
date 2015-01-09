@@ -20,7 +20,7 @@ namespace SnooStream.ViewModel
     public abstract class SnooStreamViewModel : ViewModelBase
     {
         public static string CWD { get; set; }
-		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooStreamViewModel>();
+		protected ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooStreamViewModel>();
 		protected void FinishInit()
 		{
 			_listingFilter = new NSFWListingFilter();

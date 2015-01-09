@@ -71,8 +71,9 @@ namespace SnooStream.ViewModel
 			_commentsContentStream = new Lazy<CommentsContentStreamViewModel>(() => new CommentsContentStreamViewModel(this));
         }
 
-		public CommentsViewModel(ViewModelBase context, Listing comments, string url, DateTime? lastRefresh)
+		public CommentsViewModel(ViewModelBase context, Listing comments, string url, DateTime? lastRefresh, bool isLimitedContext = false)
 		{
+            _isLimitedContext = isLimitedContext;
 			LastRefresh = lastRefresh;
 			_context = context;
 			Link = _context as LinkViewModel;
@@ -605,7 +606,15 @@ namespace SnooStream.ViewModel
 
 		public Listing DumpListing()
 		{
-			return DumpListing(_firstChild);
+            if (_firstChild != null)
+            {
+                return DumpListing(_firstChild);
+            }
+            else
+            {
+                return new Listing { Data = new ListingData { Children = new List<Thing>() } };
+            }
+			
 		}
 
 		public void LoadDump(Listing comments)

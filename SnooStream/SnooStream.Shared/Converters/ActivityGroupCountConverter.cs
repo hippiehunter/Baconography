@@ -56,7 +56,7 @@ namespace SnooStream.Converters
 
             foreach (var activity in group.Activities)
             {
-                readCount = activity.IsNew ? readCount + 1 : readCount;
+                readCount = activity.IsNew ? readCount : readCount + 1;
             }
 
             var adjustedCount = group.FirstActivity is PostedLinkActivityViewModel ? group.Activities.Count - 1 : group.Activities.Count;

@@ -15,5 +15,6 @@ namespace SnooStream.Services
         Listing Sent { get; }
         Listing Received { get; }
         Listing Activity { get; }
+        Listing ContextForId(string id);
     }
 }
