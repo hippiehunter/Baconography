@@ -27,7 +27,7 @@ namespace SnooStream.Services
 		void QueueNonCriticalUI(Action action);
 		ObservableCollection<T> MakeIncrementalLoadCollection<T>(IIncrementalCollectionLoader<T> loader, int loadIncrement = 20, int auxiliaryTimeout = 2500);
 		IWrappedCollectionViewSource MakeCollectionViewSource(object source);
-
+        void ShareLink(string url, string title, string description);
 		void ShowOAuthBroker();
 	}
 

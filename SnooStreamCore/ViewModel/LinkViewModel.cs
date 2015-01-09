@@ -199,13 +199,23 @@ namespace SnooStream.ViewModel
                 });
             }
         }
-		public RelayCommand GotoWeb { get { return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToWeb(Link.Url)); } }
+
+        public RelayCommand Share { get { return new RelayCommand(() => SnooStreamViewModel.SystemServices.ShareLink(Url, Title, "posted by " + Author + " to " + Subreddit)); } }
+        public RelayCommand GotoWeb { get { return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToWeb(Link.Url)); } }
         public RelayCommand GotoLink { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoLink(this, Link.Url)); } }
         public RelayCommand GotoSubreddit { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoSubreddit(Subreddit)); } }
         public RelayCommand GotoUserDetails { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoUserDetails(Author)); } }
+        public RelayCommand Report { get { return new RelayCommand(() => SnooStreamViewModel.RedditService.AddReportOnThing(Link.Name)); } }
+        public RelayCommand Hide { get { return new RelayCommand(async () =>
+        {
+            var linkRiverContext = Context as LinkRiverViewModel;
+            if (linkRiverContext != null)
+                linkRiverContext.Links.Remove(this);
 
-
-		public string Id
+            await SnooStreamViewModel.RedditService.HideThing(Link.Name);
+        }); } }
+        public RelayCommand Save { get { return new RelayCommand(() => SnooStreamViewModel.RedditService.AddSavedThing(Link.Name)); } }
+        public string Id
 		{
 			get { return Link.Id; }
 		}

@@ -17,6 +17,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Networking.Connectivity;
 using Windows.Security.Authentication.Web;
@@ -565,5 +566,20 @@ namespace SnooStream.PlatformServices
 			WebAuthenticationBroker.AuthenticateAndContinue(StartUri, EndUri, null, WebAuthenticationOptions.None);
 #endif
 		}
-	}
+
+        public void ShareLink(string url, string title, string description)
+        {
+            DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
+            dataTransferManager.DataRequested += new TypedEventHandler<DataTransferManager,
+                DataRequestedEventArgs>((sender, e) =>
+                {
+                    DataRequest request = e.Request;
+                    request.Data.Properties.Title = title;
+                    request.Data.Properties.Description = description;
+                    request.Data.SetWebLink(new Uri(url));
+                });
+
+            Windows.ApplicationModel.DataTransfer.DataTransferManager.ShowShareUI();
+        }
+    }
 }

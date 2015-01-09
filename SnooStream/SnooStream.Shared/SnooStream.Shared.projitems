@@ -62,6 +62,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardPreviewTextControl.xaml.cs">
       <DependentUpon>CardPreviewTextControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\LinkMoreControl.xaml.cs">
+      <DependentUpon>LinkMoreControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CommentsView.xaml.cs">
       <DependentUpon>CommentsView.xaml</DependentUpon>
     </Compile>
@@ -156,6 +159,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardPreviewTextControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\CardView\LinkMoreControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

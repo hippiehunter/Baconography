@@ -10,6 +10,7 @@
         
     <Grid>
         <local:CommentsView/>
+        <Popup x:Name="morePopup" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
     
 </common:SnooApplicationPage>

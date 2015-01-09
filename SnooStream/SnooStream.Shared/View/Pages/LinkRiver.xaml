@@ -29,6 +29,17 @@
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
+                <VisualState x:Name="ShowMorePopup">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames
+                                                Storyboard.TargetName="morePopup"
+                                                Storyboard.TargetProperty="IsOpen">
+                            <DiscreteObjectKeyFrame
+                                                    KeyTime="0"
+                                                    Value="True" />
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid>
@@ -45,12 +56,13 @@
                       ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <local:CardLinkView/>
+                        <local:CardLinkView MoreClick="CardLinkView_MoreClick"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
         </Grid>
         <Popup x:Name="sortPopup" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <Popup x:Name="morePopup" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
     <common:SnooApplicationPage.BottomAppBar>
         <CommandBar>

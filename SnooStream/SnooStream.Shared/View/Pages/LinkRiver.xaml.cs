@@ -10,6 +10,7 @@ using GalaSoft.MvvmLight.Messaging;
 using SnooStream.Messages;
 using Windows.UI.Xaml;
 using SnooStream.View.Controls;
+using SnooStream.View.Controls.CardView;
 
 namespace SnooStream.View.Pages
 {
@@ -96,5 +97,36 @@ namespace SnooStream.View.Pages
 				linksListView.ScrollIntoView(((LinkRiverViewModel)DataContext).Links.FirstOrDefault());
 			}
 		}
+
+        private void CardLinkView_MoreClick(object sender, EventArgs e)
+        {
+            double height = 480;
+            double width = 325;
+
+            if (LayoutRoot.ActualHeight <= 480)
+                height = LayoutRoot.ActualHeight;
+
+            morePopup.Height = height;
+            morePopup.Width = width;
+
+            var linkViewModel = ((FrameworkElement)sender).DataContext as LinkViewModel;
+            if (linkViewModel == null)
+                return;
+
+
+            var child = new LinkMoreControl { DataContext = linkViewModel };
+            child.Tapped += LinkMoreItem_Tapped;
+            child.Height = height;
+            child.Width = width;
+
+            morePopup.Child = child;
+            PushNavState(this, "ShowMorePopup");
+        }
+
+        private void LinkMoreItem_Tapped(object sender, EventArgs e)
+        {
+            PopNavState();
+            morePopup.Child = null;
+        }
     }
 }
