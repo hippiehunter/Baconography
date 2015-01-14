@@ -12,6 +12,8 @@ using SnooStream.Common;
 using SnooStream.ViewModel.Popups;
 using Windows.UI.Xaml.Media;
 using Windows.Foundation;
+using Windows.UI.Xaml.Data;
+using SnooStream.Converters;
 
 namespace SnooStream.View.Controls
 {
@@ -97,24 +99,46 @@ namespace SnooStream.View.Controls
 			//	context.ViewHack = null;
 			//}
 		}
+        private static BooleanVisibilityConverter booleanVisiblityConverter = new BooleanVisibilityConverter();
 
 		private void commentsList_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
 		{
-			if (args.ItemContainer.ContentTemplateRoot is CardLinkView)
-			{
-				var card = args.ItemContainer.ContentTemplateRoot as CardLinkView;
-				card.PhaseLoad(sender, args);
-			}
-			else if (args.ItemContainer.ContentTemplateRoot is CommentView)
-			{
-				var comment = args.ItemContainer.ContentTemplateRoot as CommentView;
-				comment.DataContext = args.Item;
-				comment.PhaseLoad(sender, args);
-			}
-			else
-			{
-
-			}
+            if (args.InRecycleQueue)
+            {
+                args.ItemContainer.ContentTemplate = null;
+            }
+            else if (args.ItemContainer.ContentTemplateRoot == null)
+            {
+                args.RegisterUpdateCallback(commentsList_ContainerContentChanging);
+            }
+            else
+            {
+                if (args.Item is LoadFullCommentsViewModel)
+                {
+                    args.ItemContainer.ContentTemplate = Resources["LoadFullyTemplate"] as DataTemplate;
+                }
+                else if (args.Item is MoreViewModel)
+                {
+                    //args.ItemContainer.ContentTemplate = Resources["MoreViewTemplate"] as DataTemplate;
+                    var more = new MoreCommentsView { DataContext = args.Item };
+                    more.SetBinding(UIElement.VisibilityProperty, new Binding { Path = new PropertyPath("IsVisible"), Converter = booleanVisiblityConverter });
+                    var contentControl = args.ItemContainer.ContentTemplateRoot as ContentControl;
+                    contentControl.Content = more;
+                }
+                else if (args.Item is CommentViewModel)
+                {
+                    var comment = new CommentView { DataContext = args.Item };
+                    comment.SetBinding(UIElement.VisibilityProperty, new Binding { Path = new PropertyPath("IsVisible"), Converter = booleanVisiblityConverter });
+                    var contentControl = args.ItemContainer.ContentTemplateRoot as ContentControl;
+                    contentControl.Content = comment;
+                    comment.Phase0Load(sender, args);
+                    
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
 		}
 
         private void LoadFully_Tapped(object sender, TappedRoutedEventArgs e)

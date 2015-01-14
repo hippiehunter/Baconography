@@ -20,55 +20,59 @@ namespace SnooStream.View.Controls
             InitializeComponent();
         }
 
-		internal void PhaseLoad(ListViewBase sender, ContainerContentChangingEventArgs args)
-		{
-			if (!args.InRecycleQueue)
-			{
-				switch (args.Phase)
-				{
-					case 0:
-						{
-                            contentControl.ContentTemplate = null;
-                            contentControl.Content = null;
-							//markdownControl.Markdown = null;
-							args.Handled = true;
-							args.RegisterUpdateCallback(PhaseLoad);
-							break;
-						}
-					case 1:
-						{
-                            //plainTextControl.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                            if (args.Item is CommentViewModel)
-                            {
-                                contentControl.ContentTemplate = Resources["textTemplate"] as DataTemplate;
-                                contentControl.Content = ((CommentViewModel)args.Item).Body;
-                            }
+        internal void Phase0Load(ListViewBase sender, ContainerContentChangingEventArgs args)
+        {
+            if (!args.InRecycleQueue)
+            {
+                contentControl.ContentTemplate = null;
+                contentControl.Content = null;
+                args.Handled = true;
+                args.RegisterUpdateCallback(Phase1Load);
+            }
+        }
 
-							args.Handled = true;
-							args.RegisterUpdateCallback(PhaseLoad);
-							break;
-						}
-					case 2:
-						{
-                            if (args.Item is CommentViewModel)
-                            {
-                                var body = ((CommentViewModel)args.Item).Body;
-                                args.Handled = true;
-                                var markdownBody = SnooStreamViewModel.MarkdownProcessor.Process(body);
+        internal void Phase1Load(ListViewBase sender, ContainerContentChangingEventArgs args)
+        {
+            if (!args.InRecycleQueue)
+            {
+                if (args.Item is CommentViewModel)
+                {
+                    contentControl.ContentTemplate = Resources["textTemplate"] as DataTemplate;
+                    contentControl.Content = ((CommentViewModel)args.Item).Body;
+                    args.Handled = true;
+                    args.RegisterUpdateCallback(10, Phase2Load);
+                }
+                else
+                    throw new NotImplementedException();
+            }
+        }
 
-                                if (!SnooStreamViewModel.MarkdownProcessor.IsPlainText(markdownBody))
-                                {
-                                    contentControl.ContentTemplate = Resources["markdownTemplate"] as DataTemplate;
-                                    contentControl.Content = markdownBody.MarkdownDom;
-                                }
-                            }
-							break;
-						}
-				}
-			}
-			else
-			{
-			}
-		}
+        internal void Phase2Load(ListViewBase sender, ContainerContentChangingEventArgs args)
+        {
+            if (!args.InRecycleQueue)
+            {
+                if (args.Item is CommentViewModel)
+                {
+                    var body = ((CommentViewModel)args.Item).Body;
+                    var markdownBody = SnooStreamViewModel.MarkdownProcessor.Process(body);
+
+                    if (!SnooStreamViewModel.MarkdownProcessor.IsPlainText(markdownBody))
+                    {
+                        contentControl.ContentTemplate = Resources["markdownTemplate"] as DataTemplate;
+                        contentControl.Content = markdownBody.MarkdownDom;
+                        args.Handled = true;
+                    }
+                    else if (contentControl.Content == null)
+                    {
+                        var textContent = (Resources["textTemplate"] as DataTemplate).LoadContent() as FrameworkElement;
+                        textContent.DataContext = ((CommentViewModel)args.Item).Body;
+                        contentControl.Content = textContent;
+                        args.Handled = true;
+                    }
+                }
+                else
+                    throw new NotImplementedException();
+            }
+        }
 	}
 }

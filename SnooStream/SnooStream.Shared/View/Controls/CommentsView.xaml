@@ -10,9 +10,8 @@
     mc:Ignorable="d"
     d:DesignHeight="480" d:DesignWidth="480" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
 
-    <Grid x:Name="LayoutRoot">
-        <Grid.Resources>
-            <DataTemplate x:Key="CommentViewTemplate">
+    <UserControl.Resources>
+        <DataTemplate x:Key="CommentViewTemplate">
                 <local:CommentView Visibility="{Binding IsVisible, Converter={StaticResource booleanVisibilityConverter}}"/>
             </DataTemplate>
             <DataTemplate x:Key="MoreViewTemplate">
@@ -24,11 +23,8 @@
             <DataTemplate x:Key="LoadFullyTemplate">
                 <Button Tapped="LoadFully_Tapped" Content="Load full context" BorderThickness="0" Margin="0"/>
             </DataTemplate>
-            <selectors:CommentTemplateSelector x:Name="commentTemplateSelector"
-                    CommentTemplate="{StaticResource CommentViewTemplate}"
-                    MoreTemplate="{StaticResource MoreViewTemplate}"
-                    LoadFullyTemplate="{StaticResource LoadFullyTemplate}"/>
-        </Grid.Resources>
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState x:Name="Normal"/>
@@ -46,10 +42,14 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <ListView x:Name="commentsList" HeaderTemplate="{StaticResource HeaderTemplate}"
-                  ItemTemplateSelector="{Binding Path=Selector, Source={StaticResource commentTemplateSelector}}"
                   ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging"
                   VirtualizingStackPanel.VirtualizationMode="Standard"
                   ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" MinHeight="25" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
         </ListView>
         <Popup x:Name="sortPopup" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
