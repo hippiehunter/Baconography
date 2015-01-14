@@ -53,8 +53,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CaptchaControl.xaml.cs">
       <DependentUpon>CaptchaControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardCommentView.xaml.cs">
+      <DependentUpon>CardCommentView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardLinkView.xaml.cs">
       <DependentUpon>CardLinkView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardMarkdownControl.xaml.cs">
+      <DependentUpon>CardMarkdownControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardPreviewImageControl.xaml.cs">
       <DependentUpon>CardPreviewImageControl.xaml</DependentUpon>
@@ -62,8 +68,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardPreviewTextControl.xaml.cs">
       <DependentUpon>CardPreviewTextControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\LinkMoreControl.xaml.cs">
-      <DependentUpon>LinkMoreControl.xaml</DependentUpon>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CommandPopup.xaml.cs">
+      <DependentUpon>CommandPopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CommentsView.xaml.cs">
       <DependentUpon>CommentsView.xaml</DependentUpon>
@@ -150,7 +156,15 @@
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\CaptchaControl.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardCommentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardLinkView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardMarkdownControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -162,7 +176,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\CardView\LinkMoreControl.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\CommandPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

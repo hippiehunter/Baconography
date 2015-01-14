@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="SnooStream.View.Controls.CardLinkView"
+    x:Class="SnooStream.View.Controls.CardCommentView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream.View.Controls"
@@ -9,11 +9,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DataContext="{Binding Source={StaticResource SnooStream}, Path=SubredditRiver.SelectedRiver.CurrentSelected}"
-    MinHeight="300">
+    DataContextChanged="UserControl_DataContextChanged">
 
     <Border HorizontalAlignment="Stretch" Background="#FF1F1F1F" Margin="0,0,0,24">
         <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0">
-            
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -26,7 +26,6 @@
                    Style="{StaticResource SubheaderTextBlockStyle}"
                    Text="{Binding Title}"
                    TextTrimming="WordEllipsis"
-                   MaxHeight="200"
                    MinHeight="50">
                 <TextBlock.Foreground>
                     <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
@@ -37,12 +36,7 @@
                             Margin="0,5,0,3"
                             HorizontalAlignment="Stretch" Content="{Binding Converter={StaticResource linkMetadataConverter}}"/>
 
-            <Button x:Name="previewSection" Grid.Row="2" Margin="-24,0,-24,0" Height="175"
-                    BorderThickness="0"
-                    VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
-                    HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" 
-                    Command="{Binding GotoLink}">
-            </Button>
+            <ContentControl x:Name="contentSection" Grid.Row="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Center"/>
 
             <Grid x:Name="actionButtons" Grid.Row="3" Margin="0,6,0,0" HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
@@ -52,12 +46,12 @@
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
                     HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
-                    BorderThickness="0" Padding="0"
+                    BorderThickness="0" Padding="0" 
                     Margin="0,-12,-12,0"
                     FontFamily="Segoe UI Symbol">
                     <i:Interaction.Behaviors>
                         <iCore:EventTriggerBehavior EventName="Tapped">
-                            <iCore:InvokeCommandAction Command="{Binding ShowMoreLink}" />
+                            <iCore:InvokeCommandAction Command="{Binding ShowMoreComment}" />
                         </iCore:EventTriggerBehavior>
                     </i:Interaction.Behaviors>
                     <Grid>
@@ -86,7 +80,7 @@
                         Margin="0,-12,2,0"
                         BorderThickness="0" Padding="0,0,0,0" 
                         FontFamily="Segoe UI Symbol"
-                        Command="{Binding GotoComments}">
+                        IsEnabled="False">
                     <Grid>
                         <TextBlock Margin="0,0,0,0" FontSize="36" Text="&#xE200;" />
                         <TextBlock Margin="1,11,0,0" Text="{Binding Path=CommentCount}" Foreground="Black" HorizontalAlignment="Center"/>
@@ -95,5 +89,5 @@
             </Grid>
         </Grid>
     </Border>
-    
+
 </UserControl>

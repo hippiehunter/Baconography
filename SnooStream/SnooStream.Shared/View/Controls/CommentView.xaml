@@ -8,6 +8,24 @@
     mc:Ignorable="d"
     d:DesignHeight="480" d:DesignWidth="480">
 
+    <UserControl.Resources>
+        <DataTemplate x:Name="textTemplate">
+            <TextBlock x:Name="plainTextControl"
+                       FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
+                        HorizontalAlignment="Left" TextWrapping="WrapWholeWords"
+                        Margin="3,0,0,0" Text="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate x:Name="markdownTemplate">
+            <snoodom:MarkdownControl
+                    Markdown="{Binding}"
+                    StyleProvider="{StaticResource markdownHelpers}"
+                    CommandFactory="{StaticResource markdownHelpers}"
+                    FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
+                    HorizontalAlignment="Stretch"
+                    Margin="3,0,0,0"/>
+        </DataTemplate>
+    </UserControl.Resources>
+    
     <Grid HorizontalAlignment="Stretch"
           Margin="{Binding Path=Depth, Converter={StaticResource commentDepthMarginConverter}}"
           MinHeight="50">
@@ -72,16 +90,8 @@
                     </StackPanel>
                 </Button>
             </Grid>
-            <TextBlock Grid.Row="1" x:Name="plainTextControl"
-                       FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
-                        HorizontalAlignment="Left" TextWrapping="WrapWholeWords"
-                        Margin="3,0,0,0"/>
-            <snoodom:MarkdownControl x:Name="markdownControl" Grid.Row="1"
-                StyleProvider="{StaticResource markdownHelpers}"
-                CommandFactory="{StaticResource markdownHelpers}"
-                FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
-                HorizontalAlignment="Stretch"
-                Margin="3,0,0,0"/>
+            <ContentControl x:Name="contentControl" Grid.Row="1"/>
+            
         </Grid>            
         
         <!--<ContentControl Margin="5,0,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch"

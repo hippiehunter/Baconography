@@ -13,13 +13,8 @@ namespace SnooStream.Common
         public async Task<string> GetCaptchaResponse(string captchaIden)
         {
             var captcha = new CaptchaViewModel(captchaIden);
-            var popupResult = await SnooStreamViewModel.NavigationService.ShowPopup(captcha);
-            if (popupResult)
-            {
-                return captcha.CaptchaResponse;
-            }
-            else
-                return null;
+            await SnooStreamViewModel.NavigationService.ShowPopup(captcha, null);
+            return captcha.CaptchaResponse;
         }
     }
 }

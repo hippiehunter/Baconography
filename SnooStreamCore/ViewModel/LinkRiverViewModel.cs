@@ -198,13 +198,21 @@ namespace SnooStream.ViewModel
 							((LinkViewModel)existing[linkTpl.Item3.Id].Item2).MergeLink(((LinkViewModel)linkTpl.Item3).Link);
 						}
 
+                        //fill in the new ones at the end, then do the move, then do the actual replace
+                        foreach (var newLink in replace.OrderBy(tpl => tpl.Item1))
+                        {
+                            if (current.Count - 1 <= newLink.Item1)
+                                current.Add(newLink.Item2);
+                                
+                        }
+
 						bool unfinished = true;
 						while (unfinished)
 						{
 							unfinished = false;
 							foreach (var linkTpl in move.OrderBy(tpl => tpl.Item2))
 							{
-								var currentIndex = current.IndexOf(linkTpl.Item3);
+								var currentIndex = current.IndexOf(existing[linkTpl.Item3.Id].Item2);
 								if (currentIndex > 0 && currentIndex != linkTpl.Item2)
 								{
 									unfinished = true;
@@ -217,8 +225,6 @@ namespace SnooStream.ViewModel
 						{
 							if (current.Count - 1 > newLink.Item1)
 								current[newLink.Item1] = newLink.Item2;
-							else
-								current.Add(newLink.Item2);
 						}
 
 						for (int i = current.Count - 1; i > linkIds.Count; i--)

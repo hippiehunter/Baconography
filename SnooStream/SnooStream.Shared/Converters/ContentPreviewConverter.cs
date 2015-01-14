@@ -1,5 +1,7 @@
-﻿using SnooStream.Common;
+﻿using SnooDom;
+using SnooStream.Common;
 using SnooStream.View.Controls;
+using SnooStream.View.Controls.CardView;
 using SnooStream.ViewModel;
 using SnooStream.ViewModel.Content;
 using System;
@@ -17,9 +19,15 @@ namespace SnooStream.Converters
             return MakePreviewControl(value as LinkViewModel);
 		}
 
-		public static FrameworkElement MakePreviewControl(LinkViewModel linkViewModel)
+		public static FrameworkElement MakePreviewControl(LinkViewModel linkViewModel, bool full = false)
 		{
 			var preview = Preview.LoadLinkPreview(linkViewModel.Content);
+            if (full)
+                preview.FinishLoad(SnooStreamViewModel.UIContextCancellationToken);
+            if (linkViewModel.Content is SelfViewModel && full)
+            {
+                return new CardMarkdownControl { DataContext = ((SelfViewModel)linkViewModel.Content).Markdown };
+            }
 			if (preview is PreviewText)
 			{
 				return new CardPreviewTextControl { DataContext = preview };

@@ -40,9 +40,6 @@ namespace SnooStream.View.Controls
 			_streamHack  = memStream.AsRandomAccessStream();
 		}
 
-        public event EventHandler MoreClick;
-
-
 		public bool PhasedLoad
 		{
 			get { return (bool)GetValue(PhasedLoadProperty); }
@@ -163,11 +160,5 @@ namespace SnooStream.View.Controls
 				}
 			}
 		}
-
-        private void More_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            if (MoreClick != null)
-                MoreClick(sender, new EventArgs());
-        }
     }
 }

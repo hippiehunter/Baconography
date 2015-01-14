@@ -9,13 +9,13 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Grid Margin="0,0,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <Grid Margin="0,0,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" MinHeight="175">
         <Grid.Background>
             <ImageBrush ImageSource="{Binding ThumbnailUrl}" Opacity="0.2" Stretch="UniformToFill" />
         </Grid.Background>
 
-        <TextBlock Margin="12,6,12,6" Text="{Binding Synopsis}" FontSize="14" MinHeight="100" MaxHeight="225" TextWrapping="Wrap" TextTrimming="WordEllipsis"
-                   VerticalAlignment="Center"/>
+        <TextBlock Margin="12,6,12,6" Text="{Binding Synopsis}" FontSize="14" TextWrapping="Wrap" TextTrimming="WordEllipsis"
+                   VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
         <Border Padding="2" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <Border.Background>
                 <SolidColorBrush Color="Black" Opacity="0.3" />

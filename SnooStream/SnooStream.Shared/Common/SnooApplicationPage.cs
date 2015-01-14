@@ -16,6 +16,7 @@ using Windows.Graphics.Display;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
@@ -195,6 +196,36 @@ namespace SnooStream.Common
             //var currentStateName = currentState != null ? currentState.Name : null;
             VisualStateManager.GoToState(sender as Control, pushedState, false);
             _navState.Push(Tuple.Create(sender, "Normal"));
+        }
+
+        public static SnooApplicationPage Current
+        {
+            get
+            {
+                return ((Frame)Window.Current.Content).Content as SnooApplicationPage;
+            }
+        }
+
+        public Popup Popup
+        {
+            get
+            {
+                if (Content is Grid)
+                {
+                    var grid = Content as Grid;
+                    var popup = grid.Children.OfType<Popup>().FirstOrDefault();
+                    if (popup == null)
+                    {
+                        popup = new Popup();
+                        popup.SetBinding(FrameworkElement.HeightProperty, new Windows.UI.Xaml.Data.Binding { Source = this, Path = new PropertyPath("ActualHeight") });
+                        popup.SetBinding(FrameworkElement.WidthProperty, new Windows.UI.Xaml.Data.Binding { Source = this, Path = new PropertyPath("ActualWidth") });
+                        grid.Children.Add(popup);
+                    }
+                    return popup;
+                }
+                else
+                    throw new NotImplementedException();
+            }
         }
     }
 

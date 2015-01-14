@@ -34,6 +34,14 @@ namespace SnooStream.ViewModel.Content
 			}
 		}
 
+        public object Markdown
+        {
+            get
+            {
+                return _selfLink.SelfText.MarkdownDom;
+            }
+        }
+
 		protected override Task StartLoad()
 		{
 			return _selfLink.Comments.LoadFull();

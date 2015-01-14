@@ -56,7 +56,7 @@
                       ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <local:CardLinkView MoreClick="CardLinkView_MoreClick"/>
+                        <local:CardLinkView/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

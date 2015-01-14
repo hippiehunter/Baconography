@@ -17,19 +17,11 @@ using Windows.UI.Xaml.Navigation;
 
 namespace SnooStream.View.Controls.CardView
 {
-    public sealed partial class LinkMoreControl : UserControl
+    public sealed partial class CardMarkdownControl : UserControl
     {
-        public LinkMoreControl()
+        public CardMarkdownControl()
         {
             this.InitializeComponent();
-        }
-
-        public event EventHandler Tapped;
-
-        private void After_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            if (Tapped != null)
-                Tapped(sender, new EventArgs());
         }
     }
 }

@@ -14,6 +14,11 @@ using GalaSoft.MvvmLight.Messaging;
 using SnooStream.Messages;
 using Newtonsoft.Json;
 using GalaSoft.MvvmLight;
+using SnooStream.ViewModel.Popups;
+using Windows.UI.Popups;
+using Windows.Foundation;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
 
 namespace SnooStream.PlatformServices
 {
@@ -102,9 +107,27 @@ namespace SnooStream.PlatformServices
 			_frame.Navigate(typeof(LockScreenSettings), "state=" + _navState.AddState(viewModel));
 		}
 
-        public Task<bool> ShowPopup(GalaSoft.MvvmLight.ViewModelBase viewModel)
+        public async Task ShowPopup(ViewModelBase viewModel, object elementTarget)
         {
-            throw new NotImplementedException();
+            if (viewModel is CommandViewModel)
+            {
+                var popup = new PopupMenu();
+                foreach( var command in ((CommandViewModel)viewModel).Commands)
+                {
+                    popup.Commands.Add(new UICommand(command.DisplayText, (u) => command.Command.Execute(null)));
+                }
+                Rect selection = Window.Current.Bounds;
+                if (elementTarget != null && elementTarget is RoutedEventArgs)
+                {
+                    var sourceElement = (elementTarget as RoutedEventArgs).OriginalSource;
+                    GeneralTransform buttonTransform = ((FrameworkElement)sourceElement).TransformToVisual(null);
+                    Point point = buttonTransform.TransformPoint(new Point());
+                    selection = new Rect(point, new Size(((FrameworkElement)sourceElement).ActualWidth, ((FrameworkElement)sourceElement).ActualHeight));
+                }
+                await popup.ShowForSelectionAsync(selection);
+            }
+            else
+                throw new NotImplementedException();
         }
 
         public void GoBack()

@@ -8,6 +8,10 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Input;
+using SnooStream.Common;
+using SnooStream.ViewModel.Popups;
+using Windows.UI.Xaml.Media;
+using Windows.Foundation;
 
 namespace SnooStream.View.Controls
 {
@@ -64,16 +68,16 @@ namespace SnooStream.View.Controls
 			child.button_ok.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
 			{
 				commentsViewModel.SetSort(child.SortOrder);
-				SnooStreamViewModel.NavigationService.PopVisualState();
+				SnooApplicationPage.Current.PopNavState();
 			};
 
 			child.button_cancel.Click += (object buttonSender, RoutedEventArgs buttonArgs) =>
 			{
-				SnooStreamViewModel.NavigationService.PopVisualState();
+                SnooApplicationPage.Current.PopNavState();
 			};
 
 			sortPopup.Child = child;
-			SnooStreamViewModel.NavigationService.PushVisualState(LayoutRoot, "ShowSortPopup");
+            SnooApplicationPage.Current.PushNavState(this, "ShowSortPopup");
 		}
 
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
