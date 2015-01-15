@@ -124,7 +124,7 @@ namespace SnooStream.PlatformServices
                     GeneralTransform buttonTransform = ((FrameworkElement)sourceElement).TransformToVisual(null);
                     Point point = buttonTransform.TransformPoint(new Point());
                     var selection = new Rect(point, new Size(((FrameworkElement)sourceElement).ActualWidth, ((FrameworkElement)sourceElement).ActualHeight));
-                    await popup.ShowForSelectionAsync(selection);
+                    await popup.ShowForSelectionAsync(selection, Placement.Below);
                 }
                 else
                 {
