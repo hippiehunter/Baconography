@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.Services
@@ -20,10 +21,12 @@ namespace SnooStream.Services
         void NavigateToWeb(string url);
         void NavigateToSearch(SearchViewModel viewModel);
         void NavigateToAboutReddit(AboutRedditViewModel viewModel);
+        void NavigateToMultiRedditManagement(LinkRiverViewModel viewModel);
+        void NavigateToSubredditCategorizer(LinkRiverViewModel viewModel);
         void NavigateToAboutUser(AboutUserViewModel viewModel);
 		void NavigateToContentSettings(SettingsViewModel viewModel);
 		void NavigateToLockScreenSettings(SettingsViewModel viewModel);
-        Task ShowPopup(ViewModelBase viewModel, object elementTarget);
+        Task ShowPopup(ViewModelBase viewModel, object elementTarget, CancellationToken abortToken);
 		void PushVisualState(object sender, string visualState);
 		void PopVisualState();
         void GoBack();

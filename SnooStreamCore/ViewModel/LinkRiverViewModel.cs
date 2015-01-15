@@ -25,6 +25,7 @@ namespace SnooStream.ViewModel
         private string LastLinkId { get; set; }
 		public DateTime? LastRefresh { get; set; }
         public bool IsLocal { get; private set; }
+        public string Category { get; private set; }
         public bool IsUserMultiReddit
         {
             get
@@ -90,6 +91,8 @@ namespace SnooStream.ViewModel
 				ProcessLinkThings(initialLinks);
 			}
 		}
+
+        AboutRedditViewModel About { get; set; }
 
 		private class LinksLoader : IIncrementalCollectionLoader<ILinkViewModel>
 		{
@@ -336,6 +339,128 @@ namespace SnooStream.ViewModel
             {
                 return new RelayCommand<string>((str) => SetSort(str));
             }
+        }
+
+        public RelayCommand ShowAboutSubreddit
+        {
+            get
+            {
+                return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToAboutReddit(About));
+            }
+        }
+
+        public RelayCommand ShowMultiRedditManagement
+        {
+            get
+            {
+                return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToMultiRedditManagement(this));
+            }
+        }
+
+        public RelayCommand DeleteMultiReddit
+        {
+            get
+            {
+                return new RelayCommand(async () => await SnooStreamViewModel.RedditService.DeleteMultireddit(Thing.Url));
+            }
+        }
+
+        public RelayCommand Subscribe
+        {
+            get
+            {
+                return new RelayCommand(async () => await SnooStreamViewModel.RedditService.AddSubredditSubscription(Thing.Url, false));
+            }
+        }
+
+        public RelayCommand Unsubscribe
+        {
+            get
+            {
+                return new RelayCommand(async () => await SnooStreamViewModel.RedditService.AddSubredditSubscription(Thing.Url, true));
+            }
+        }
+
+        public RelayCommand ShowCategoryPicker
+        {
+            get
+            {
+                return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToSubredditCategorizer(this));
+            }
+        }
+
+        public List<CommandViewModel.CommandItem> MakeSubredditManagmentCommands()
+        {
+            var result = new List<CommandViewModel.CommandItem>();
+
+            if (IsUserMultiReddit)
+            {
+                //About
+                result.Add(new CommandViewModel.CommandItem
+                {
+                    DisplayText = "About",
+                    Command = ShowAboutSubreddit
+                });
+                //Modify
+                result.Add(new CommandViewModel.CommandItem
+                {
+                    DisplayText = "Modify",
+                    Command = ShowMultiRedditManagement
+                });
+                //Delete
+                result.Add(new CommandViewModel.CommandItem
+                {
+                    DisplayText = "Delete",
+                    Command = DeleteMultiReddit
+                });
+                //Change Category
+                result.Add(new CommandViewModel.CommandItem
+                {
+                    DisplayText = "Change Category",
+                    Command = ShowCategoryPicker
+                });
+            }
+            else
+            {
+                //About
+                if (!IsMultiReddit)
+                {
+                    result.Add(new CommandViewModel.CommandItem
+                    {
+                        DisplayText = "About",
+                        Command = ShowAboutSubreddit
+                    });
+                }
+
+
+                if(IsLocal)
+                {
+                    //Subscribe
+                    result.Add(new CommandViewModel.CommandItem
+                    {
+                        DisplayText = "Subscribe",
+                        Command = Subscribe
+                    });
+                }
+                else
+                {
+                    //Unsubscribe
+                    result.Add(new CommandViewModel.CommandItem
+                    {
+                        DisplayText = "Unsubscribe",
+                        Command = Unsubscribe
+                    });
+                }
+                //Change Category
+                result.Add(new CommandViewModel.CommandItem
+                {
+                    DisplayText = "Change Category",
+                    Command = ShowCategoryPicker
+                });
+
+            }
+            return result;
+                    
         }
 	}
 }

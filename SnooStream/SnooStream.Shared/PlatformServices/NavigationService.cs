@@ -19,6 +19,8 @@ using Windows.UI.Popups;
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Input;
+using System.Threading;
 
 namespace SnooStream.PlatformServices
 {
@@ -107,29 +109,35 @@ namespace SnooStream.PlatformServices
 			_frame.Navigate(typeof(LockScreenSettings), "state=" + _navState.AddState(viewModel));
 		}
 
-        public async Task ShowPopup(ViewModelBase viewModel, object elementTarget)
+        public Task ShowPopup(ViewModelBase viewModel, object elementTarget, CancellationToken abortToken)
         {
             if (viewModel is CommandViewModel)
             {
-                var popup = new PopupMenu();
+                var popup = new MenuFlyout();
                 foreach( var command in ((CommandViewModel)viewModel).Commands)
                 {
-                    popup.Commands.Add(new UICommand(command.DisplayText, (u) => command.Command.Execute(null)));
+                    popup.Items.Add(new MenuFlyoutItem { Text = command.DisplayText, Command = command.Command });
                 }
                 var windowWidth = Window.Current.Bounds.Width;
                 var windowHeight = Window.Current.Bounds.Height;
                 if (elementTarget != null && elementTarget is RoutedEventArgs)
                 {
-                    var sourceElement = (elementTarget as RoutedEventArgs).OriginalSource;
-                    GeneralTransform buttonTransform = ((FrameworkElement)sourceElement).TransformToVisual(null);
-                    Point point = buttonTransform.TransformPoint(new Point());
-                    var selection = new Rect(point, new Size(((FrameworkElement)sourceElement).ActualWidth, ((FrameworkElement)sourceElement).ActualHeight));
-                    await popup.ShowForSelectionAsync(selection, Placement.Below);
+                    var sourceElement = (elementTarget as RoutedEventArgs).OriginalSource as FrameworkElement;
+                    TaskCompletionSource<bool> completionSource = new TaskCompletionSource<bool>();
+                    Action onAbort = () => { popup.Hide(); };
+                    var cancelationTokenRegistration = abortToken.Register(onAbort);
+                    popup.Closed += (sender, args) =>
+                    {
+                        completionSource.TrySetResult(true);
+                        cancelationTokenRegistration.Dispose();
+                    };
+                    
+                    popup.Placement = Windows.UI.Xaml.Controls.Primitives.FlyoutPlacementMode.Bottom;
+                    popup.ShowAt(sourceElement);
+                    return completionSource.Task;
                 }
                 else
-                {
-                    await popup.ShowForSelectionAsync(new Rect(0, 0, windowWidth, windowHeight / 2));
-                }
+                    throw new NotImplementedException();
             }
             else
                 throw new NotImplementedException();
@@ -213,6 +221,14 @@ namespace SnooStream.PlatformServices
 			snooApplicationPage.PopNavState();
 		}
 
-        
+        public void NavigateToMultiRedditManagement(LinkRiverViewModel viewModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void NavigateToSubredditCategorizer(LinkRiverViewModel viewModel)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

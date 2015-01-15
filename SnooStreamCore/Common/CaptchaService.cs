@@ -13,7 +13,7 @@ namespace SnooStream.Common
         public async Task<string> GetCaptchaResponse(string captchaIden)
         {
             var captcha = new CaptchaViewModel(captchaIden);
-            await SnooStreamViewModel.NavigationService.ShowPopup(captcha, null);
+            await SnooStreamViewModel.NavigationService.ShowPopup(captcha, null, new System.Threading.CancellationToken());
             return captcha.CaptchaResponse;
         }
     }

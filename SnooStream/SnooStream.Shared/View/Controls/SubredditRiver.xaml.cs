@@ -11,6 +11,9 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Input;
+using SnooStream.Common;
+using System.Threading;
+using SnooStream.ViewModel.Popups;
 
 namespace SnooStream.View.Controls
 {
@@ -42,8 +45,10 @@ namespace SnooStream.View.Controls
         }
 
 		private void listBox_ItemTap(object sender, TappedRoutedEventArgs e)
-		{
-			var linkRiver = ((Button)sender).DataContext as LinkRiverViewModel;
+        {
+            SnooApplicationPage.Current.PopNavState();
+            searchBox.Text = "";
+            var linkRiver = ((Button)sender).DataContext as LinkRiverViewModel;
 			if(linkRiver != null)
 				SnooStreamViewModel.NavigationService.NavigateToLinkRiver(linkRiver);
 		}
@@ -56,5 +61,25 @@ namespace SnooStream.View.Controls
                 bindingExpression.UpdateSource();
             }
 		}
+
+        CancellationTokenSource _contextPopup = new CancellationTokenSource();
+        private void Button_Holding(object sender, HoldingRoutedEventArgs e)
+        {
+            var linkRiver = ((Button)sender).DataContext as LinkRiverViewModel;
+            if (linkRiver != null && e.HoldingState == HoldingState.Started)
+            {
+                SnooStreamViewModel.NavigationService.ShowPopup(new CommandViewModel
+                {
+                    Commands = linkRiver.MakeSubredditManagmentCommands()
+                }, e, _contextPopup.Token);
+                e.Handled = true;
+            }
+            else if (linkRiver != null && e.HoldingState == HoldingState.Canceled)
+            {
+                _contextPopup.Cancel();
+                _contextPopup = new CancellationTokenSource();
+            }
+
+        }
     }
 }

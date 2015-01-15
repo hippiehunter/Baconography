@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22310.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SnooDom", "SnooDom", "{266F8396-F853-4C3B-940B-47CDA92B74A7}"
 EndProject
@@ -25,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnooStream.WindowsPhone", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SnooStreamBackground", "SnooStreamBackground", "{9E94E870-CEB0-4576-8DDA-E0F956F988DF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SnooDomBackground.Shared", "SnooStreamBackground\SnooStreamBackground.Shared\SnooStreamBackground.Shared.vcxitems", "{462A08BA-A466-47E9-BDBE-A2D3247AE88A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SnooStreamBackground.Shared", "SnooStreamBackground\SnooStreamBackground.Shared\SnooStreamBackground.Shared.vcxitems", "{462A08BA-A466-47E9-BDBE-A2D3247AE88A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SnooStreamBackground.Windows", "SnooStreamBackground\SnooStreamBackground.Windows\SnooStreamBackground.Windows.vcxproj", "{21CEC526-5230-497D-B1B9-ADF599B265F3}"
 EndProject
@@ -206,8 +206,6 @@ Global
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Debug|ARM.ActiveCfg = Debug|ARM
-		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Debug|ARM.Build.0 = Debug|ARM
-		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Debug|ARM.Deploy.0 = Debug|ARM
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Debug|Win32.ActiveCfg = Debug|x86
@@ -223,7 +221,6 @@ Global
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release|ARM.ActiveCfg = Release|ARM
-		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release|ARM.Build.0 = Release|ARM
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release|Mixed Platforms.Build.0 = Release|x86
 		{7773C3F4-7F7F-47A2-9555-1D0D2DC7A3BF}.Release|Mixed Platforms.Deploy.0 = Release|x86

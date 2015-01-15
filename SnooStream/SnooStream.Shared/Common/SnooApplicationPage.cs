@@ -181,6 +181,17 @@ namespace SnooStream.Common
             return false;
 		}
 
+        public bool PopNavState(string popTarget)
+        {
+            if (_navState.Count > 0 && _navState.Peek().Item2 == popTarget)
+            {
+                var poppedState = _navState.Pop();
+                VisualStateManager.GoToState(poppedState.Item1 as Control, poppedState.Item2, true);
+                return true;
+            }
+            return false;
+        }
+
         public int NavStateCount
         {
             get
