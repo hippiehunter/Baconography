@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.Command;
 using SnooSharp;
 using SnooStream.Common;
+using SnooStream.ViewModel.Popups;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -737,5 +738,29 @@ namespace SnooStream.ViewModel
                 return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoEditPost(_context, Link));
             }
         }
-	}
+
+        public RelayCommand  RefreshCommand
+        {
+            get
+            {
+                return new RelayCommand(() => Refresh(false));
+            }
+        }
+
+        public RelayCommand<string> SetSortCommand
+        {
+            get
+            {
+                return new RelayCommand<string>((str) => SetSort(str));
+            }
+        }
+
+        public RelayCommand FindInCommentsCommand
+        {
+            get
+            {
+                return new RelayCommand(() => { throw new NotImplementedException(); });
+            }
+        }
+	} 
 }

@@ -20,18 +20,22 @@ namespace SnooStream.View.Controls
             InitializeComponent();
         }
 
-        internal void Phase0Load(ListViewBase sender, ContainerContentChangingEventArgs args)
+        public int LoadPhase;
+
+        internal bool Phase0Load(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
             if (!args.InRecycleQueue)
             {
                 contentControl.ContentTemplate = null;
                 contentControl.Content = null;
                 args.Handled = true;
-                args.RegisterUpdateCallback(Phase1Load);
+                LoadPhase = 1;
+                return true;
             }
+            return false;
         }
 
-        internal void Phase1Load(ListViewBase sender, ContainerContentChangingEventArgs args)
+        internal bool Phase1Load(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
             if (!args.InRecycleQueue)
             {
@@ -40,14 +44,16 @@ namespace SnooStream.View.Controls
                     contentControl.ContentTemplate = Resources["textTemplate"] as DataTemplate;
                     contentControl.Content = ((CommentViewModel)args.Item).Body;
                     args.Handled = true;
-                    args.RegisterUpdateCallback(10, Phase2Load);
+                    LoadPhase = 2;
+                    return true;
                 }
                 else
                     throw new NotImplementedException();
             }
+            return false;
         }
 
-        internal void Phase2Load(ListViewBase sender, ContainerContentChangingEventArgs args)
+        internal bool Phase2Load(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
             if (!args.InRecycleQueue)
             {
@@ -69,10 +75,12 @@ namespace SnooStream.View.Controls
                         contentControl.Content = textContent;
                         args.Handled = true;
                     }
+                    LoadPhase = 3;
                 }
                 else
                     throw new NotImplementedException();
             }
+            return false;
         }
 	}
 }

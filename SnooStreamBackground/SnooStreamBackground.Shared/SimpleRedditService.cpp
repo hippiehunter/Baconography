@@ -9,6 +9,7 @@
 #include "boost\archive\iterators\base64_from_binary.hpp"
 #include "boost\archive\iterators\ostream_iterator.hpp"
 #include "boost\archive\iterators\transform_width.hpp"
+#include "boost\utility\string_ref.hpp"
 
 
 using Windows::Web::Http::HttpClient;
@@ -28,6 +29,7 @@ using std::wstring;
 using std::wifstream;
 using std::wofstream;
 using std::getline;
+using boost::wstring_ref;
 
 std::string toStdString(Platform::String^ str)
 {
@@ -128,6 +130,29 @@ concurrency::task<RedditOAuth> RefreshToken(Platform::String^ refreshToken, Plat
     });
 }
 
+bool starts_with(wstring_ref fullString, wstring_ref start)
+{
+    if (fullString.length() >= start.length())
+    {
+        return (0 == wstring_ref(fullString.data(), start.length()).compare(start));
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool ends_with(wstring_ref fullString, wstring_ref ending)
+{
+    if (fullString.length() >= ending.length())
+    {
+        return (0 == wstring_ref((fullString.data() + (fullString.length() - ending.length())), ending.length()).compare(ending));
+    }
+    else
+    {
+        return false;
+    }
+}
 
 concurrency::task<Platform::String^> SimpleRedditService::SendGet(String^ url)
 {
@@ -164,11 +189,19 @@ concurrency::task<Platform::String^> SimpleRedditService::SendGet(String^ url)
                       try
                       {
                           auto result = resultTask.get();
-                          return result;
+                          wstring_ref resultString(result->Data(), result->Length());
+                          //if reddit says try again, try again
+                          if (starts_with(resultString, L"<!doctype html><html><title>") &&
+                              ends_with(resultString, L"try again and hopefully we will be fast enough this time."))
+                          {
+                              return SendGet(localUrl);
+                          }
+                          else
+                            return concurrency::task_from_result(result);
                       }
                       catch (...)
                       {
-                          return (Platform::String^)nullptr;
+                          return concurrency::task_from_result((Platform::String^)nullptr);
                       }
                   });
               }

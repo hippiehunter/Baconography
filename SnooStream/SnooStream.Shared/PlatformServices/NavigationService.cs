@@ -116,15 +116,20 @@ namespace SnooStream.PlatformServices
                 {
                     popup.Commands.Add(new UICommand(command.DisplayText, (u) => command.Command.Execute(null)));
                 }
-                Rect selection = Window.Current.Bounds;
+                var windowWidth = Window.Current.Bounds.Width;
+                var windowHeight = Window.Current.Bounds.Height;
                 if (elementTarget != null && elementTarget is RoutedEventArgs)
                 {
                     var sourceElement = (elementTarget as RoutedEventArgs).OriginalSource;
                     GeneralTransform buttonTransform = ((FrameworkElement)sourceElement).TransformToVisual(null);
                     Point point = buttonTransform.TransformPoint(new Point());
-                    selection = new Rect(point, new Size(((FrameworkElement)sourceElement).ActualWidth, ((FrameworkElement)sourceElement).ActualHeight));
+                    var selection = new Rect(point, new Size(((FrameworkElement)sourceElement).ActualWidth, ((FrameworkElement)sourceElement).ActualHeight));
+                    await popup.ShowForSelectionAsync(selection);
                 }
-                await popup.ShowForSelectionAsync(selection);
+                else
+                {
+                    await popup.ShowForSelectionAsync(new Rect(0, 0, windowWidth, windowHeight / 2));
+                }
             }
             else
                 throw new NotImplementedException();

@@ -105,9 +105,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml.cs">
       <DependentUpon>MoreCommentsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\SelectSortTypeView.xaml.cs">
-      <DependentUpon>SelectSortTypeView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\SelfActivityView.xaml.cs">
       <DependentUpon>SelfActivityView.xaml</DependentUpon>
     </Compile>
@@ -212,9 +209,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\SelectSortTypeView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\SelfActivityView.xaml">

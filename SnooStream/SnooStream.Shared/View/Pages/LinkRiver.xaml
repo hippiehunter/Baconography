@@ -29,17 +29,6 @@
                         </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </VisualState>
-                <VisualState x:Name="ShowMorePopup">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames
-                                                Storyboard.TargetName="morePopup"
-                                                Storyboard.TargetProperty="IsOpen">
-                            <DiscreteObjectKeyFrame
-                                                    KeyTime="0"
-                                                    Value="True" />
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid>
@@ -62,14 +51,24 @@
             </ListView>
         </Grid>
         <Popup x:Name="sortPopup" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        <Popup x:Name="morePopup" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
     <common:SnooApplicationPage.BottomAppBar>
         <CommandBar>
-            <AppBarButton Icon="Refresh" Click="Refresh_Click"/>
-            <AppBarButton Icon="Sort" Click="Sort_Click"/>
-            <AppBarButton Icon="Upload" Command="{Binding CreateNewPostCommand}"/>
-            <AppBarButton Icon="Find" Command="{Binding FindInSubredditCommand}"/>
+            <AppBarButton Icon="Refresh" Label="Refresh" Click="Refresh_Click"/>
+            <AppBarButton Icon="Sort" Label="Sort">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Hot" Command="{Binding SetSortCommand}" CommandParameter="hot"/>
+                        <MenuFlyoutItem Text="New" Command="{Binding SetSortCommand}" CommandParameter="new"/>
+                        <MenuFlyoutItem Text="Top" Command="{Binding SetSortCommand}" CommandParameter="top"/>
+                        <MenuFlyoutItem Text="Rising" Command="{Binding SetSortCommand}" CommandParameter="rising"/>
+                        <MenuFlyoutItem Text="Controversial" Command="{Binding SetSortCommand}" CommandParameter="controversial"/>
+                        <MenuFlyoutItem Text="Best" Command="{Binding SetSortCommand}" CommandParameter="best"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarButton Icon="Upload" Label="Upload" Command="{Binding CreateNewPostCommand}"/>
+            <AppBarButton Icon="Find" Label="Find" Command="{Binding FindInSubredditCommand}"/>
         </CommandBar>
     </common:SnooApplicationPage.BottomAppBar>
 </common:SnooApplicationPage>

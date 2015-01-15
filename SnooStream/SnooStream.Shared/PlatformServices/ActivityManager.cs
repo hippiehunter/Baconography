@@ -17,13 +17,22 @@ namespace SnooStream.PlatformServices
         {
         }
 
+        static Listing empty = new Listing { Data = new ListingData { Children = new List<Thing>() } };
+
         public Listing Activity
         {
             get
             {
-                return _activityManager.ActivityBlob != null ?
-                    JsonConvert.DeserializeObject<Listing>(_activityManager.ActivityBlob) :
-                    new Listing { Data = new ListingData { Children = new List<Thing>() } };
+                try
+                {
+                    return _activityManager.ActivityBlob != null ?
+                        JsonConvert.DeserializeObject<Listing>(_activityManager.ActivityBlob) :
+                        empty;
+                }
+                catch
+                {
+                    return empty;
+                }
             }
         }
 
@@ -31,9 +40,16 @@ namespace SnooStream.PlatformServices
         {
             get
             {
-                return _activityManager.ReceivedBlob != null ?
-                    JsonConvert.DeserializeObject<Listing>(_activityManager.ReceivedBlob.Replace("\"kind\": \"t1\"", "\"kind\": \"t4\"")) :
-                    new Listing { Data = new ListingData { Children = new List<Thing>() } };
+                try
+                {
+                    return _activityManager.ReceivedBlob != null ?
+                        JsonConvert.DeserializeObject<Listing>(_activityManager.ReceivedBlob.Replace("\"kind\": \"t1\"", "\"kind\": \"t4\"")) :
+                        empty;
+                }
+                catch
+                {
+                    return empty;
+                }
             }
         }
 
@@ -41,9 +57,16 @@ namespace SnooStream.PlatformServices
         {
             get
             {
-                return _activityManager.SentBlob != null ?
-                    JsonConvert.DeserializeObject<Listing>(_activityManager.SentBlob) :
-                    new Listing { Data = new ListingData { Children = new List<Thing>() } };
+                try
+                {
+                    return _activityManager.SentBlob != null ?
+                        JsonConvert.DeserializeObject<Listing>(_activityManager.SentBlob) :
+                        empty;
+                }
+                catch
+                {
+                    return empty;
+                }
             }
         }
 

@@ -6,9 +6,8 @@
     xmlns:local="using:SnooStream.View.Controls"
     xmlns:common="using:SnooStream.Common"
     xmlns:snoodom="using:SnooDom"
-    xmlns:selectors="using:SnooStream.View.Selectors"
     mc:Ignorable="d"
-    d:DesignHeight="480" d:DesignWidth="480" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
+    d:DesignHeight="480" d:DesignWidth="480">
 
     <UserControl.Resources>
         <DataTemplate x:Key="CommentViewTemplate">
@@ -21,26 +20,10 @@
                 <local:CardCommentView DataContext="{Binding Link}" Margin="12,0,12,0"/>
             </DataTemplate>
             <DataTemplate x:Key="LoadFullyTemplate">
-                <Button Tapped="LoadFully_Tapped" Content="Load full context" BorderThickness="0" Margin="0"/>
+                <Button Command="{Binding Load}" Content="Load full context" BorderThickness="0" Margin="0"/>
             </DataTemplate>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot">
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState x:Name="Normal"/>
-                <VisualState x:Name="ShowSortPopup">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames
-                                                Storyboard.TargetName="sortPopup"
-                                                Storyboard.TargetProperty="IsOpen">
-                            <DiscreteObjectKeyFrame
-                                                    KeyTime="0"
-                                                    Value="True" />
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
         <ListView x:Name="commentsList" HeaderTemplate="{StaticResource HeaderTemplate}"
                   ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging"
                   VirtualizingStackPanel.VirtualizationMode="Standard"
@@ -51,6 +34,5 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Popup x:Name="sortPopup" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </UserControl>

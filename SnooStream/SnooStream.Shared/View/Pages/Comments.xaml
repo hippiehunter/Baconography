@@ -11,5 +11,23 @@
     <Grid>
         <local:CommentsView/>
     </Grid>
-    
+    <common:SnooApplicationPage.BottomAppBar>
+        <CommandBar>
+            <AppBarButton Icon="Refresh" Label="Refresh" Command="{Binding RefreshCommand}"/>
+            <AppBarButton Icon="Sort" Label="Sort">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Hot" Command="{Binding SetSortCommand}" CommandParameter="hot"/>
+                        <MenuFlyoutItem Text="New" Command="{Binding SetSortCommand}" CommandParameter="new"/>
+                        <MenuFlyoutItem Text="Top" Command="{Binding SetSortCommand}" CommandParameter="top"/>
+                        <MenuFlyoutItem Text="Rising" Command="{Binding SetSortCommand}" CommandParameter="rising"/>
+                        <MenuFlyoutItem Text="Controversial" Command="{Binding SetSortCommand}" CommandParameter="controversial"/>
+                        <MenuFlyoutItem Text="Best" Command="{Binding SetSortCommand}" CommandParameter="best"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarButton Icon="MailReply" Label="Reply" Command="{Binding GotoReply}"/>
+            <AppBarButton Icon="Find" Label="Find" Command="{Binding FindInCommentsCommand}"/>
+        </CommandBar>
+    </common:SnooApplicationPage.BottomAppBar>
 </common:SnooApplicationPage>

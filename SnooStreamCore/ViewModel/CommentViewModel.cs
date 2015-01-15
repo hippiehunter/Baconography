@@ -146,6 +146,7 @@ namespace SnooStream.ViewModel
             }
         }
 
+        public RelayCommand ShareContext { get { return new RelayCommand(ShareContextImpl); } }
         public RelayCommand MinimizeCommand { get { return new RelayCommand(() => IsMinimized = !IsMinimized); } }
         public RelayCommand GotoContext { get { return new RelayCommand(GotoContextImpl); } }
         public RelayCommand GotoFullLink { get { return new RelayCommand(GotoFullLinkImpl); } }
@@ -154,6 +155,11 @@ namespace SnooStream.ViewModel
         public RelayCommand GotoReply { get { return new RelayCommand(GotoReplyImpl); } }
         public RelayCommand GotoEdit { get { return new RelayCommand(GotoEditImpl); } }
         public RelayCommand GotoUserDetails { get { return new RelayCommand(GotoUserDetailsImpl); } }
+
+        private void ShareContextImpl()
+        {
+            SnooStreamViewModel.SystemServices.ShareLink(_context.BaseUrl + Thing.Id + "?context=3", "Comment in " + _context.Link.Title, "Comment By " + PosterName);
+        }
 
         private void GotoContextImpl()
         {

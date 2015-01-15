@@ -19,11 +19,24 @@ namespace SnooStream.Converters
             return MakePreviewControl(value as LinkViewModel);
 		}
 
+        private static async void FinishLoad(Preview preview)
+        {
+            try
+            {
+                var cancelSource = SnooStreamViewModel.UIContextCancellationToken;
+                var path = await preview.FinishLoad(cancelSource);
+                preview.ThumbnailUrl = await PlatformImageAcquisition.ImagePreviewFromUrl(path, cancelSource);
+            }
+            catch { }
+        }
+
 		public static FrameworkElement MakePreviewControl(LinkViewModel linkViewModel, bool full = false)
 		{
+            var cancelSource = SnooStreamViewModel.UIContextCancellationToken;
 			var preview = Preview.LoadLinkPreview(linkViewModel.Content);
             if (full)
-                preview.FinishLoad(SnooStreamViewModel.UIContextCancellationToken);
+                FinishLoad(preview);
+
             if (linkViewModel.Content is SelfViewModel && full)
             {
                 return new CardMarkdownControl { DataContext = ((SelfViewModel)linkViewModel.Content).Markdown };

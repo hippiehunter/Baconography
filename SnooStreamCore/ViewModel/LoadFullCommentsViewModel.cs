@@ -12,8 +12,11 @@ namespace SnooStream.ViewModel
         CommentsViewModel _context;
         public LoadFullCommentsViewModel(CommentsViewModel context)
         {
+            Load = new RelayCommand(LoadFully);
             _context = context;
         }
+
+        public RelayCommand Load { get; set; }
 
         public async void LoadFully()
         {

@@ -25,43 +25,6 @@ namespace SnooStream.ViewModel
             Link = link;
             Comments = new CommentsViewModel(this, link);
             _content = new Lazy<ContentViewModel>(() => SnooStream.ViewModel.Content.ContentViewModel.MakeContentViewModel(link.Url, link.Title, this, link.Thumbnail));
-
-            var commonCommands = new List<CommandViewModel.CommandItem>
-                {
-                    new CommandViewModel.CommandItem
-                    {
-                        DisplayText = "Share Link",
-                        Command = Share
-                    },
-                    new CommandViewModel.CommandItem
-                    {
-                        DisplayText = "Report",
-                        Command = Report
-                    },
-                    new CommandViewModel.CommandItem
-                    {
-                        DisplayText = "Save",
-                        Command = Save
-                    },
-                    new CommandViewModel.CommandItem
-                    {
-                        DisplayText = "User Details",
-                        Command = GotoUserDetails
-                    }
-                };
-
-            LinkMore = new CommandViewModel
-                {
-                    Commands = new List<CommandViewModel.CommandItem>(commonCommands) {  new CommandViewModel.CommandItem
-                    {
-                        DisplayText = "Hide",
-                        Command = Hide
-                    } }
-                };
-            CommentMore = new CommandViewModel
-                {
-                    Commands = new List<CommandViewModel.CommandItem>(commonCommands)
-                };
         }
 
         public bool HasContext { get { return true; } }
@@ -235,11 +198,6 @@ namespace SnooStream.ViewModel
             }
         }
 
-        private CommandViewModel LinkMore;
-        private CommandViewModel CommentMore;
-
-        public RelayCommand<object> ShowMoreLink { get { return new RelayCommand<object>((obj) => SnooStreamViewModel.NavigationService.ShowPopup(LinkMore, obj)); } }
-        public RelayCommand<object> ShowMoreComment { get { return new RelayCommand<object>((obj) => SnooStreamViewModel.NavigationService.ShowPopup(CommentMore, obj)); } }
         public RelayCommand Share { get { return new RelayCommand(() => SnooStreamViewModel.SystemServices.ShareLink(Url, Title, "posted by " + Author + " to " + Subreddit)); } }
         public RelayCommand GotoWeb { get { return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToWeb(Link.Url)); } }
         public RelayCommand GotoLink { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoLink(this, Link.Url)); } }

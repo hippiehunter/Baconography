@@ -3,6 +3,7 @@ using GalaSoft.MvvmLight.Command;
 using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Services;
+using SnooStream.ViewModel.Popups;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -328,5 +329,13 @@ namespace SnooStream.ViewModel
 				return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToSearch(new SearchViewModel()));
 			}
 		}
+
+        public RelayCommand<string> SetSortCommand
+        {
+            get
+            {
+                return new RelayCommand<string>((str) => SetSort(str));
+            }
+        }
 	}
 }

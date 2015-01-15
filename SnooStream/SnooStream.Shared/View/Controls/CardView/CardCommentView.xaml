@@ -49,14 +49,17 @@
                     BorderThickness="0" Padding="0" 
                     Margin="0,-12,-12,0"
                     FontFamily="Segoe UI Symbol">
-                    <i:Interaction.Behaviors>
-                        <iCore:EventTriggerBehavior EventName="Tapped">
-                            <iCore:InvokeCommandAction Command="{Binding ShowMoreComment}" />
-                        </iCore:EventTriggerBehavior>
-                    </i:Interaction.Behaviors>
                     <Grid>
                         <TextBlock Margin="0,0,0,0" FontSize="35" Text="&#xE10C;" />
                     </Grid>
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Share Link" Command="{Binding Share}"/>
+                            <MenuFlyoutItem Text="Report" Command="{Binding Report}"/>
+                            <MenuFlyoutItem Text="Save" Command="{Binding Save}"/>
+                            <MenuFlyoutItem Text="User Details" Command="{Binding GotoUserDetails}"/>
+                        </MenuFlyout>
+                    </Button.Flyout>
                 </Button>
 
                 <Button Grid.Column="1"
