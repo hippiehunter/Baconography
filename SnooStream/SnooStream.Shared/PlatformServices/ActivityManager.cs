@@ -87,14 +87,17 @@ namespace SnooStream.PlatformServices
         {
             await SnooStreamViewModel.NotificationService.Report("refreshing activity", async () =>
             {
-                await _activityManager.Refresh(_oAuthBlob, (toast, obj) =>
-                {
+                await Task.Run(async () =>
+                    {
+                        await _activityManager.Refresh(_oAuthBlob, (toast, obj) =>
+                        {
 #if WINDOWS_PHONE_APP
-                    //tag is the item name, use it to navigate directly to the response chain
-                    //toast.Tag
+                            //tag is the item name, use it to navigate directly to the response chain
+                            //toast.Tag
 #endif
 
-                });
+                        });
+                    });
             });
             
         }

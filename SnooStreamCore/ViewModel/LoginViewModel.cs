@@ -20,7 +20,7 @@ namespace SnooStream.ViewModel
 		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<LoginViewModel>();
         public LoginViewModel()
         {
-            IsDefaultLogin = true;
+            IsAutoLogin = true;
             StoredCredentials = new ObservableCollection<UserCredential>();
             LoadStoredCredentials();
         }
@@ -84,7 +84,7 @@ namespace SnooStream.ViewModel
                     {
                         Username = SelectedCredential.Username;
                         IsRememberLogin = true;
-                        IsDefaultLogin = SelectedCredential.IsDefault;
+                        IsAutoLogin = SelectedCredential.IsDefault;
                     }
                 }
             }
@@ -127,34 +127,6 @@ namespace SnooStream.ViewModel
             }
         }
 
-        string _password;
-        public string Password
-        {
-            get
-            {
-                return _password;
-            }
-            set
-            {
-                _password = value;
-                RaisePropertyChanged("Password");
-            }
-        }
-
-        private bool _hasErrors = false;
-        public bool HasErrors
-        {
-            get
-            {
-                return _hasErrors;
-            }
-            set
-            {
-                _hasErrors = value;
-                RaisePropertyChanged("HasErrors");
-            }
-        }
-
         private bool _working = false;
         public bool Working
         {
@@ -169,17 +141,45 @@ namespace SnooStream.ViewModel
             }
         }
 
-        private bool _isDefaultLogin;
-        public bool IsDefaultLogin
+        private bool _success = true;
+        public bool Success
         {
             get
             {
-                return _isDefaultLogin;
+                return _success;
             }
             set
             {
-                _isDefaultLogin = value;
-                RaisePropertyChanged("IsDefaultLogin");
+                _success = value;
+                RaisePropertyChanged("Success");
+            }
+        }
+
+        private bool _finished = true;
+        public bool Finished
+        {
+            get
+            {
+                return _finished;
+            }
+            set
+            {
+                _finished = value;
+                RaisePropertyChanged("Finished");
+            }
+        }
+
+        private bool _isAutoLogin;
+        public bool IsAutoLogin
+        {
+            get
+            {
+                return _isAutoLogin;
+            }
+            set
+            {
+                _isAutoLogin = value;
+                RaisePropertyChanged("IsAutoLogin");
             }
         }
 
@@ -197,17 +197,17 @@ namespace SnooStream.ViewModel
             }
         }
 
-		private string _errorText;
-		public string ErrorText
+		private string _resultText;
+		public string ResultText
 		{
 			get
 			{
-				return _errorText;
+                return _resultText;
 			}
 			set
 			{
-				_errorText = value;
-				RaisePropertyChanged("ErrorText");
+                _resultText = value;
+                RaisePropertyChanged("ResultText");
 			}
 		}
 
@@ -237,36 +237,50 @@ namespace SnooStream.ViewModel
 
 		public void FailOAuth(string errorText, string responseText)
 		{
-			HasErrors = true;
-			ErrorText = errorText;
+			ResultText = errorText;
 		}
 
 		public async void FinishOAuth(string code)
 		{
-			try
-			{
-				Working = true;
-				var oAuth = await SnooStreamViewModel.RedditService.RequestGrantCode(code);
-				SnooStreamViewModel.RedditUserState.OAuth = oAuth;
-				var currentAccount = await SnooStreamViewModel.RedditService.GetIdentity();
-				SnooStreamViewModel.RedditUserState.IsGold = currentAccount.IsGold;
-				SnooStreamViewModel.RedditUserState.LoginCookie = "";
-				SnooStreamViewModel.RedditUserState.ModHash = "";
-				SnooStreamViewModel.RedditUserState.NeedsCaptcha = false;
-				Username = SnooStreamViewModel.RedditUserState.Username = currentAccount.Name;
-				SnooStreamViewModel.RedditUserState.IsDefault = IsDefaultLogin;
-				GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = IsDefaultLogin });
-			}
+            try
+            {
+                Finished = false;
+                SnooStreamViewModel.NavigationService.NavigateToOAuthLanding(this);
+                Working = true;
+                var oAuth = await SnooStreamViewModel.RedditService.RequestGrantCode(code);
+                SnooStreamViewModel.RedditUserState.OAuth = oAuth;
+                var currentAccount = await SnooStreamViewModel.RedditService.GetIdentity();
+                ResultText = "Successfully logged in as " + currentAccount.Name;
+                SnooStreamViewModel.RedditUserState.IsGold = currentAccount.IsGold;
+                SnooStreamViewModel.RedditUserState.LoginCookie = "";
+                SnooStreamViewModel.RedditUserState.ModHash = "";
+                SnooStreamViewModel.RedditUserState.NeedsCaptcha = false;
+                Username = SnooStreamViewModel.RedditUserState.Username = currentAccount.Name;
+                SnooStreamViewModel.RedditUserState.IsDefault = IsAutoLogin;
+                GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = IsAutoLogin });
+                Success = true;
+            }
+            catch(Exception ex)
+            {
+                Success = false;
+                ResultText = ex.Message;
+            }
 			finally
 			{
 				Working = false;
 			}
+            if(Success)
+            {
+                Finished = true;
+            }
 		}
 
         public RelayCommand DoLogout { get { return new RelayCommand(Logout); } }
         public RelayCommand DoLogin { get { return new RelayCommand(Login); } }
-
-
+        public RelayCommand ContinueOAuthCommand { get { return new RelayCommand(() => SnooStreamViewModel.NavigationService.GoBack()); } }
+        public RelayCommand RetryOAuthCommand { get { return new RelayCommand(Login); } }
+        public RelayCommand CancelOAuthCommand { get { return new RelayCommand(() => SnooStreamViewModel.NavigationService.GoBack()); } }
+        
 		
 	}
 }

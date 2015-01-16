@@ -93,6 +93,10 @@ namespace SnooStream.Common
                             streamViewModel.CurrentSelected = streamViewModel.Links.FirstOrDefault(linkVM => linkVM.Id == dumpArgs.Item1 && linkVM.Url == dumpArgs.Item2);
                             return streamViewModel;
                         }
+                    case "LoginViewModel":
+                        {
+                            return rootContext.Login;
+                        }
                     default:
                         throw new InvalidOperationException(stateItem.Item1);
                 }
@@ -150,6 +154,10 @@ namespace SnooStream.Common
                     var currentSelectedUrl = contentStream.CurrentSelected.Url;
                     var currentSelectedId = contentStream.CurrentSelected.Id;
                     return JsonConvert.SerializeObject(Tuple.Create("CommentsContentStreamViewModel", JsonConvert.SerializeObject(Tuple.Create(currentSelectedId, currentSelectedUrl))));
+                }
+                else if (viewModel is LoginViewModel)
+                {
+                    return JsonConvert.SerializeObject(Tuple.Create("LoginViewModel", ""));
                 }
                 else
                     throw new InvalidOperationException(viewModel.GetType().FullName);

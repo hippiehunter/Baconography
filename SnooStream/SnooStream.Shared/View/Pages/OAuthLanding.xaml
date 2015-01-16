@@ -1,0 +1,31 @@
+﻿<common:SnooApplicationPage
+    x:Class="SnooStream.View.Pages.OAuthLanding"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream.View.Controls"
+    xmlns:common="using:SnooStream.Common"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding ResultText}"/>
+        <CheckBox Grid.Row="1" Content="Remember credentials" IsChecked="{Binding IsRememberLogin, Mode=TwoWay}" Visibility="{Binding Success, Converter={StaticResource booleanVisibilityConverter}}"/>
+        <CheckBox Grid.Row="2" Content="Login automatically" IsChecked="{Binding IsAutoLogin, Mode=TwoWay}" Visibility="{Binding Success, Converter={StaticResource booleanVisibilityConverter}}"/>
+        <ProgressBar Grid.Row="3" Grid.ColumnSpan="2" IsIndeterminate="True" Visibility="{Binding Working, Converter={StaticResource booleanVisibilityConverter}}"/>
+        <Button Grid.Row="3" Content="Continue" Command="{Binding ContinueOAuthCommand}" Visibility="{Binding Finished, Converter={StaticResource booleanVisibilityConverter}}"/>
+        <Button Grid.Row="3" Content="Retry" Command="{Binding RetryOAuthCommand}" Visibility="{Binding Success, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>
+        <Button Grid.Row="3" Grid.Column="1" Command="{Binding CancelOAuthCommand}" Content="Cancel" Visibility="{Binding Success, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>
+    </Grid>
+</common:SnooApplicationPage>

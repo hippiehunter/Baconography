@@ -26,7 +26,7 @@
     <Grid x:Name="LayoutRoot">
         <ListView x:Name="commentsList" HeaderTemplate="{StaticResource HeaderTemplate}"
                   ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging"
-                  VirtualizingStackPanel.VirtualizationMode="Standard"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling"
                   ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
             <ListView.ItemTemplate>
                 <DataTemplate>

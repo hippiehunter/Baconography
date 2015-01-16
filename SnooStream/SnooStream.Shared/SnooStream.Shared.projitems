@@ -138,6 +138,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\LockScreenSettings.xaml.cs">
       <DependentUpon>LockScreenSettings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Pages\OAuthLanding.xaml.cs">
+      <DependentUpon>OAuthLanding.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\SnooHubMark2.xaml.cs">
       <DependentUpon>SnooHubMark2.xaml</DependentUpon>
     </Compile>
@@ -246,6 +249,10 @@
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\LockScreenSettings.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Pages\OAuthLanding.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\SnooHubMark2.xaml">
       <SubType>Designer</SubType>

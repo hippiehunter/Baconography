@@ -241,16 +241,20 @@ namespace SnooStream.ViewModel
             ProcessActivityManager();
         }
 
-        private void ProcessActivityManager()
+        private async void ProcessActivityManager()
         {
-            Listing inbox = SnooStreamViewModel.ActivityManager.Received;
-            Listing outbox = SnooStreamViewModel.ActivityManager.Sent;
-            Listing activity = SnooStreamViewModel.ActivityManager.Activity;
+            var resultTpl = await Task.Run(() =>
+                {
+                    Listing inbox = SnooStreamViewModel.ActivityManager.Received;
+                    Listing outbox = SnooStreamViewModel.ActivityManager.Sent;
+                    Listing activity = SnooStreamViewModel.ActivityManager.Activity;
+                    return Tuple.Create(inbox, outbox, activity);
+                });
 
 
-            OldestMessage = ProcessListing(inbox, OldestMessage);
-            OldestSentMessage = ProcessListing(outbox, OldestSentMessage);
-            OldestActivity = ProcessListing(activity, OldestActivity);
+            OldestMessage = ProcessListing(resultTpl.Item1, OldestMessage);
+            OldestSentMessage = ProcessListing(resultTpl.Item2, OldestSentMessage);
+            OldestActivity = ProcessListing(resultTpl.Item3, OldestActivity);
         }
 
         bool _runningActivityUpdater = false;

@@ -259,10 +259,16 @@ namespace SnooStream.PlatformServices
 		private static bool LowPriorityNetworkOkImpl()
 		{
 			var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
+            if (connectionProfile == null)
+                return false;
+
 			if (connectionProfile.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.InternetAccess)
 				return false;
 
 			var connectionCost = connectionProfile.GetConnectionCost();
+            if (connectionCost == null)
+                return false;
+
 			var connectionCostType = connectionCost.NetworkCostType;
 			var connectionStrength = connectionProfile.GetSignalBars() ?? 5;
 			if (connectionCostType != NetworkCostType.Unrestricted && connectionCostType != NetworkCostType.Unknown)
@@ -270,6 +276,9 @@ namespace SnooStream.PlatformServices
 
 			if (connectionProfile.IsWwanConnectionProfile)
 			{
+                if (connectionProfile.WwanConnectionProfileDetails == null)
+                    return false;
+
 				var connectionClass = connectionProfile.WwanConnectionProfileDetails.GetCurrentDataClass();
 				switch (connectionClass)
 				{
@@ -292,10 +301,16 @@ namespace SnooStream.PlatformServices
 		private static bool IsHighPriorityNetworkOkImpl()
 		{
 			var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
+
+            if (connectionProfile == null)
+                return false;
+
 			if (connectionProfile.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.InternetAccess)
 				return false;
 
 			var connectionCost = connectionProfile.GetConnectionCost();
+            if (connectionCost == null)
+                return false;
 			return !connectionCost.OverDataLimit;
 		}
 

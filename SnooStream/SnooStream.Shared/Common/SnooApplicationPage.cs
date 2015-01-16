@@ -33,21 +33,10 @@ namespace SnooStream.Common
 				_orientationManager = Application.Current.Resources["orientationManager"] as OrientationManager;
 				Messenger.Default.Register<SettingsChangedMessage>(this, OnSettingsChanged);
 				OnSettingsChanged(null);
-                this.LayoutUpdated += SnooApplicationPage_LayoutUpdated;
 			}
 			catch
 			{
 			}
-        }
-
-        async void SnooApplicationPage_LayoutUpdated(object sender, object e)
-        {
-            var orientation = ApplicationView.GetForCurrentView().Orientation;
-            if (orientation != LastOrientation)
-            {
-                LastOrientation = orientation;
-                await AdjustForOrientation(orientation);
-            }
         }
 
         public virtual bool DefaultSystray { get { return true; } }
@@ -126,6 +115,13 @@ namespace SnooStream.Common
 
 		}
 
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+            Window.Current.SizeChanged -= sizeChanged;
+        }
+
         string _stateGuid;
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -147,7 +143,7 @@ namespace SnooStream.Common
 				var parameterHash = new HashSet<string>(validParameters);
 				SnooStreamViewModel.NavigationService.ValidateStates(parameterHash);
 
-				AdjustForOrientation(ApplicationView.GetForCurrentView().Orientation);
+                Window.Current.SizeChanged += sizeChanged;
 
 				if (_stateGuid != null)
 				{
@@ -168,6 +164,12 @@ namespace SnooStream.Common
 			}
 			base.OnNavigatedTo(e);
 			_logger.Info("finished loading page " + GetType().Name);
+        }
+
+        private async void sizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
+        {
+            ApplicationView currentView = ApplicationView.GetForCurrentView();
+            await AdjustForOrientation(currentView.Orientation);
         }
 
 		public bool PopNavState()

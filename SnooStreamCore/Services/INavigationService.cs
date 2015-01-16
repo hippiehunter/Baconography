@@ -26,6 +26,7 @@ namespace SnooStream.Services
         void NavigateToAboutUser(AboutUserViewModel viewModel);
 		void NavigateToContentSettings(SettingsViewModel viewModel);
 		void NavigateToLockScreenSettings(SettingsViewModel viewModel);
+        void NavigateToOAuthLanding(LoginViewModel loginViewModel);
         Task ShowPopup(ViewModelBase viewModel, object elementTarget, CancellationToken abortToken);
 		void PushVisualState(object sender, string visualState);
 		void PopVisualState();
@@ -34,6 +35,8 @@ namespace SnooStream.Services
         void ValidateStates(HashSet<string> validStates);
         ViewModelBase GetState(String guid);
         void RemoveState(String guid);
+
+
 
         
     }

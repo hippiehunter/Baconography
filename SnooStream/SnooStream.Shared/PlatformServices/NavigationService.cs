@@ -230,5 +230,11 @@ namespace SnooStream.PlatformServices
         {
             throw new NotImplementedException();
         }
+
+
+        public void NavigateToOAuthLanding(LoginViewModel loginViewModel)
+        {
+            _frame.Navigate(typeof(OAuthLanding), "state=" + _navState.AddState(loginViewModel));
+        }
     }
 }

@@ -21,6 +21,7 @@ namespace SnooStream.View.Controls
         }
 
         public int LoadPhase;
+        public CancellationTokenSource LoadCancelSource = new CancellationTokenSource();
 
         internal bool Phase0Load(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
@@ -28,6 +29,8 @@ namespace SnooStream.View.Controls
             {
                 contentControl.ContentTemplate = null;
                 contentControl.Content = null;
+                var body = ((CommentViewModel)args.Item).Body;
+                contentControl.MinHeight = Math.Max(25, body.Length / 2);
                 args.Handled = true;
                 LoadPhase = 1;
                 return true;
@@ -41,6 +44,7 @@ namespace SnooStream.View.Controls
             {
                 if (args.Item is CommentViewModel)
                 {
+                    contentControl.MinHeight = 0;
                     contentControl.ContentTemplate = Resources["textTemplate"] as DataTemplate;
                     contentControl.Content = ((CommentViewModel)args.Item).Body;
                     args.Handled = true;
@@ -53,34 +57,51 @@ namespace SnooStream.View.Controls
             return false;
         }
 
-        internal bool Phase2Load(ListViewBase sender, ContainerContentChangingEventArgs args)
+        internal async void Phase2Load(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
             if (!args.InRecycleQueue)
             {
                 if (args.Item is CommentViewModel)
                 {
                     var body = ((CommentViewModel)args.Item).Body;
-                    var markdownBody = SnooStreamViewModel.MarkdownProcessor.Process(body);
+                    args.Handled = true;
+                    var loadToken = LoadCancelSource.Token;
+                    var markdownTpl = await Task.Run(() => 
+                        {
+                            try
+                            {
+                                var markdownInner = SnooStreamViewModel.MarkdownProcessor.Process(body);
+                                var isPlainText = SnooStreamViewModel.MarkdownProcessor.IsPlainText(markdownInner);
+                                return Tuple.Create(markdownInner, isPlainText);
+                            }
+                            catch (Exception)
+                            {
+                                //TODO log this failure
+                                return Tuple.Create<MarkdownData, bool>(null, true);
+                            }
+                        });
 
-                    if (!SnooStreamViewModel.MarkdownProcessor.IsPlainText(markdownBody))
+                    if (loadToken.IsCancellationRequested)
+                        return;
+
+                    if (!markdownTpl.Item2)
                     {
                         contentControl.ContentTemplate = Resources["markdownTemplate"] as DataTemplate;
-                        contentControl.Content = markdownBody.MarkdownDom;
-                        args.Handled = true;
+                        contentControl.Content = markdownTpl.Item1.MarkdownDom;
+                        
                     }
                     else if (contentControl.Content == null)
                     {
                         var textContent = (Resources["textTemplate"] as DataTemplate).LoadContent() as FrameworkElement;
-                        textContent.DataContext = ((CommentViewModel)args.Item).Body;
+                        textContent.DataContext = body;
                         contentControl.Content = textContent;
-                        args.Handled = true;
+                        contentControl.MinHeight = 0;
                     }
                     LoadPhase = 3;
                 }
                 else
                     throw new NotImplementedException();
             }
-            return false;
         }
 	}
 }

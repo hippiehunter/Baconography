@@ -34,11 +34,6 @@
                         
                     </ListView>
                 </StackPanel>
-                <ProgressBar IsIndeterminate="{Binding Working}"
-                             Visibility="{Binding Working, Converter={StaticResource booleanVisibilityConverter}}"/>
-                <Border Margin="0,20,0,10" Visibility="{Binding HasErrors, Mode=TwoWay, Converter={StaticResource booleanVisibilityConverter}}">
-                    <TextBlock Foreground="Red" HorizontalAlignment="Center" Text="Login Failed: incorrect username or password"/>
-                </Border>
                 <Button Style="{StaticResource SubtextButton}"
                         Visibility="{Binding Working, Converter={StaticResource invertedBooleanVisibilityConverter}}"
                         Command="{Binding DoLogin}"

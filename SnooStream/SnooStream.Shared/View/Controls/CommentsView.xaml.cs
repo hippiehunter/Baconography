@@ -30,7 +30,6 @@ namespace SnooStream.View.Controls
 		{
             if (args.InRecycleQueue)
             {
-                args.ItemContainer.ContentTemplate = null;
             }
             else if (args.ItemContainer.ContentTemplateRoot == null)
             {
@@ -48,22 +47,32 @@ namespace SnooStream.View.Controls
                     var more = new MoreCommentsView { DataContext = args.Item };
                     more.SetBinding(UIElement.VisibilityProperty, new Binding { Path = new PropertyPath("IsVisible"), Converter = booleanVisiblityConverter });
                     var contentControl = args.ItemContainer.ContentTemplateRoot as ContentControl;
+                    contentControl.ContentTemplate = null;
                     contentControl.Content = more;
                 }
                 else if (args.Item is CommentViewModel)
                 {
                     CommentView comment;
-                    if (args.ItemContainer.ContentTemplateRoot is ContentControl && !(((ContentControl)args.ItemContainer.ContentTemplateRoot).Content is CommentView))
+                    if (args.ItemContainer.ContentTemplateRoot is ContentControl 
+                        && !(((ContentControl)args.ItemContainer.ContentTemplateRoot).Content is CommentView))
                     {
                         comment = new CommentView { DataContext = args.Item };
                         comment.SetBinding(UIElement.VisibilityProperty, new Binding { Path = new PropertyPath("IsVisible"), Converter = booleanVisiblityConverter });
                         var contentControl = args.ItemContainer.ContentTemplateRoot as ContentControl;
+                        contentControl.ContentTemplate = null;
                         contentControl.Content = comment;
                     }
                     else
                     {
                         var contentControl = args.ItemContainer.ContentTemplateRoot as ContentControl;
                         comment = contentControl.Content as CommentView;
+                        if (comment.DataContext != args.Item)
+                        {
+                            comment.DataContext = args.Item;
+                            comment.LoadPhase = 0;
+                            comment.LoadCancelSource.Cancel();
+                            comment.LoadCancelSource = new System.Threading.CancellationTokenSource();
+                        }
                     }
 
                     bool reregister = false;

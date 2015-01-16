@@ -56,6 +56,9 @@ namespace SnooStream.Common
 
 		public static async Task<String> ImagePreviewFromUrl(string url, CancellationToken cancelToken)
 		{
+            if (string.IsNullOrWhiteSpace(url))
+                return null;
+
 			string onDiskName = "snoostream_preview" + ComputeMD5(url);
 			try
 			{

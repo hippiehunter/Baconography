@@ -47,7 +47,6 @@ namespace SnooStream.ViewModel
         private string _firstChild;
         private LoadFullCommentsViewModel _loadFullSentinel;
         private ViewModelBase _context;
-        private bool _isLimitedContext = false;
 
         public CommentsViewModel(ViewModelBase context, Link linkData)
         {
@@ -63,7 +62,6 @@ namespace SnooStream.ViewModel
 
         public CommentsViewModel(ViewModelBase context, string url)
         {
-            _isLimitedContext = true;
             _context = context;
             Link = _context as LinkViewModel;
             _loadFullSentinel = new LoadFullCommentsViewModel(this);
@@ -74,7 +72,6 @@ namespace SnooStream.ViewModel
 
 		public CommentsViewModel(ViewModelBase context, Listing comments, string url, DateTime? lastRefresh, bool isLimitedContext = false)
 		{
-            _isLimitedContext = isLimitedContext;
 			LastRefresh = lastRefresh;
 			_context = context;
 			Link = _context as LinkViewModel;
@@ -114,22 +111,22 @@ namespace SnooStream.ViewModel
                     .Select(str => str.Split('='))
                     .ToDictionary(arr => arr[0].ToLower() , arr => arr[1]);
 
-                if (queryParts.ContainsKey("context"))
-                {
-                    IsContext = true;
-                }
-                else
-                    IsContext = false;
-
                 if (queryParts.ContainsKey("sort"))
                     Sort = queryParts["sort"];
                 else
                     Sort = "hot";
 
                 BaseUrl = url.Substring(0, url.Length - uri.Query.Length);
-                if (IsContext)
+                var lastSlash = BaseUrl.LastIndexOf('/');
+                if (queryParts.ContainsKey("context") || lastSlash < BaseUrl.Length - 1)
                 {
-                    var lastSlash = BaseUrl.LastIndexOf('/');
+                    IsContext = true;
+                }
+                else
+                    IsContext = false;
+
+                if (IsContext && lastSlash > -1)
+                {
                     ContextTargetID = BaseUrl.Substring(lastSlash + 1);
                     BaseUrl = BaseUrl.Remove(lastSlash + 1);
                 }
@@ -360,7 +357,7 @@ namespace SnooStream.ViewModel
             var lastExistingId = GetId(FlatComments.Last());
 
 
-            var aboveComments = replacements.TakeWhile((vm) => GetId(vm) != firstExistingId).Reverse();
+            var aboveComments = replacements.TakeWhile((vm) => GetId(vm) != firstExistingId).Reverse().ToList();
 
             List<ViewModelBase> mergableComments = new List<ViewModelBase>();
             foreach (var item in replacements.SkipWhile((vm) => GetId(vm) != firstExistingId))
