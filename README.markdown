@@ -4,6 +4,7 @@ Baconography is an open source reddit client built from the ground up to provide
 # Prerequisites for building
 *   Visual Studio 2013 (Express should work)
 *   Windows 8.1
+*   [Microsoft Player Framework](https://playerframework.codeplex.com/releases/view/121773)
 
 # Instructions for building
 Open the solution file with Visual Studio 2013. If you don't already have one, you will be prompted for a developer license; all it takes is a Microsoft Live account.
