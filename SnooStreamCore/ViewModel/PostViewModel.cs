@@ -15,7 +15,7 @@ namespace SnooStream.ViewModel
         {
             Kind = "link";
             _refreshUser = new RelayCommand(RefreshUserImpl);
-            _submit = new RelayCommand(SubmitImpl);
+            _submit = new RelayCommand<string>(SubmitImpl);
         }
 
         public PostViewModel(Link link) : this()
@@ -68,6 +68,7 @@ namespace SnooStream.ViewModel
             {
                 _subreddit = value;
                 RaisePropertyChanged("Subreddit");
+                RaisePropertyChanged("CanSend");
             }
         }
 
@@ -82,6 +83,7 @@ namespace SnooStream.ViewModel
             {
                 _title = value;
                 RaisePropertyChanged("Title");
+                RaisePropertyChanged("CanSend");
             }
         }
 
@@ -96,6 +98,7 @@ namespace SnooStream.ViewModel
             {
                 _text = value;
                 RaisePropertyChanged("Text");
+                RaisePropertyChanged("CanSend");
             }
         }
 
@@ -110,6 +113,7 @@ namespace SnooStream.ViewModel
             {
                 _url = value;
                 RaisePropertyChanged("Url");
+                RaisePropertyChanged("CanSend");
             }
         }
 
@@ -153,9 +157,9 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public RelayCommand Submit { get { return _submit; } }
-        private RelayCommand _submit;
-        private void SubmitImpl()
+        public RelayCommand<string> Submit { get { return _submit; } }
+        private RelayCommand<string> _submit;
+        private async void SubmitImpl(string kind)
         {
             if (Url == null)
                 Url = "";
@@ -163,11 +167,11 @@ namespace SnooStream.ViewModel
                 Text = "";
 
 
-            SnooStreamViewModel.NotificationService.Report("posting to reddit", async () =>
+            await SnooStreamViewModel.NotificationService.Report("posting to reddit", async () =>
             {
                 if (!Editing)
                 {
-                    await SnooStreamViewModel.RedditService.AddPost(Kind, Url, Text, Subreddit, Title);
+                    await SnooStreamViewModel.RedditService.AddPost(kind, Url, Text, Subreddit, Title);
                 }
                 else
                 {

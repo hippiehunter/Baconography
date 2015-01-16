@@ -202,12 +202,15 @@ namespace SnooStream.ViewModel
 							((LinkViewModel)existing[linkTpl.Item3.Id].Item2).MergeLink(((LinkViewModel)linkTpl.Item3).Link);
 						}
 
-                        //fill in the new ones at the end, then do the move, then do the actual replace
+                        var firstExisting = move.OrderBy(tpl => tpl.Item2).FirstOrDefault();
+
+                        //fill in the new ones at the end/front, then do the move, then do the actual replace
                         foreach (var newLink in replace.OrderBy(tpl => tpl.Item1))
                         {
                             if (current.Count - 1 <= newLink.Item1)
                                 current.Add(newLink.Item2);
-                                
+                            if (firstExisting != null && newLink.Item1 < firstExisting.Item2)
+                                current.Insert(newLink.Item1, newLink.Item2);
                         }
 
 						bool unfinished = true;
@@ -293,7 +296,17 @@ namespace SnooStream.ViewModel
 			};
 		}
 
-		public async Task MaybeRefresh()
+        public bool IsLoggedIn
+        {
+            get
+            {
+                return !String.IsNullOrWhiteSpace(SnooStreamViewModel.RedditService.CurrentUserName) &&
+                    SnooStreamViewModel.RedditUserState.OAuth != null &&
+                    !String.IsNullOrWhiteSpace(SnooStreamViewModel.RedditUserState.OAuth.RefreshToken);
+            }
+        }
+
+        public async Task MaybeRefresh()
 		{
 			await ((IRefreshable)Links).MaybeRefresh();
 		}
@@ -321,7 +334,7 @@ namespace SnooStream.ViewModel
 		{
 			get
 			{
-				return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToPost(new PostViewModel()));
+				return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToPost(new PostViewModel { Subreddit = Thing.Url, IsLoggedIn = IsLoggedIn, PostingAs = SnooStreamViewModel.RedditService.CurrentUserName }));
 			}
 		}
 
