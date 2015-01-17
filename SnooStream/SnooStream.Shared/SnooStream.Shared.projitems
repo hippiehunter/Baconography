@@ -108,9 +108,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\SelfActivityView.xaml.cs">
       <DependentUpon>SelfActivityView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\SimpleLinkView.xaml.cs">
-      <DependentUpon>SimpleLinkView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\SubredditRiver.xaml.cs">
       <DependentUpon>SubredditRiver.xaml</DependentUpon>
     </Compile>
@@ -215,9 +212,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\SelfActivityView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\Controls\SimpleLinkView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\SubredditRiver.xaml">

@@ -50,7 +50,7 @@
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
-            <AppBarButton Icon="Upload" Label="Upload" Command="{Binding CreateNewPostCommand}"/>
+            <AppBarButton Icon="Upload" Label="Post" IsEnabled="{Binding IsLoggedIn}" Command="{Binding CreateNewPostCommand}"/>
             <AppBarButton Icon="Find" Label="Find" Command="{Binding FindInSubredditCommand}"/>
         </CommandBar>
     </common:SnooApplicationPage.BottomAppBar>
