@@ -15,120 +15,13 @@ namespace SnooStream.ViewModel
 {
 	public class SelfStreamViewModel : ViewModelBase, IRefreshable
 	{
-		public class SelfActivityAggregate : IIncrementalCollectionLoader<ViewModelBase>
+		public class SelfActivityLoader : IIncrementalCollectionLoader<ViewModelBase>
 		{
 			SelfStreamViewModel _selfStream;
-			ObservableCollection<ViewModelBase> _targetCollection;
-			public SelfActivityAggregate(SelfStreamViewModel selfStream)
+            ActivityGroupViewModel.SelfActivityAggregate _activityAggregate;
+			public SelfActivityLoader(SelfStreamViewModel selfStream)
 			{
 				_selfStream = selfStream;
-				_selfStream.Groups.CollectionChanged += _groups_CollectionChanged;
-			}
-
-			void RegisterGroup(ActivityGroupViewModel group)
-			{
-				group.Activities.CollectionChanged += Activities_CollectionChanged;
-				group.PropertyChanged += group_PropertyChanged;
-			}
-
-			void group_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-			{
-				if (e.PropertyName == "IsExpanded")
-				{
-					var group = sender as ActivityGroupViewModel;
-					if (group.IsExpanded)
-					{
-						//need to make sure no one else is marked as expanded
-						//because we only allow one at a time
-						var existingExpanded = _targetCollection.FirstOrDefault(vm => vm != group && vm is ActivityGroupViewModel && ((ActivityGroupViewModel)vm).IsExpanded) as ActivityGroupViewModel;
-						if (existingExpanded != null)
-							existingExpanded.IsExpanded = false;
-
-						if (group.Activities.Count > 1)
-						{
-							var indexOfGroup = _targetCollection.IndexOf(group);
-							foreach (var activity in group.Activities)
-							{
-								_targetCollection.Insert(++indexOfGroup, activity);
-							}
-						}
-					}
-					else
-					{
-						//remove all of the activities from this group
-						if (group.Activities.Count > 1)
-						{
-							foreach (var item in group.Activities)
-								_targetCollection.Remove(item);
-						}
-					}
-				}
-			}
-
-			void Activities_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-			{
-
-				switch (e.Action)
-				{
-					case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-						break;
-					case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-						break;
-					case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-						break;
-					case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-						break;
-					case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-						break;
-					default:
-						break;
-				}
-			}
-
-			void UnregisterGroup(ActivityGroupViewModel group)
-			{
-				group.Activities.CollectionChanged -= Activities_CollectionChanged;
-				group.PropertyChanged -= group_PropertyChanged;
-			}
-
-			void _groups_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-			{
-				var collection = sender as ObservableSortedUniqueCollection<string, ActivityGroupViewModel>;
-				switch (e.Action)
-				{
-					case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-						RegisterGroup(e.NewItems[0] as ActivityGroupViewModel);
-						var followingGroup = collection.GetElementFollowing(e.NewItems[0] as ActivityGroupViewModel);
-						if (followingGroup != null)
-						{
-							_targetCollection.Insert(Math.Max(0, _targetCollection.IndexOf(followingGroup)), e.NewItems[0] as ActivityGroupViewModel);
-						}
-						else
-						{
-							_targetCollection.Add(e.NewItems[0] as ActivityGroupViewModel);
-						}
-
-						break;
-					case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-						break;
-					case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-						var removedGroup = e.OldItems[0] as ActivityGroupViewModel;
-						UnregisterGroup(removedGroup);
-                        _targetCollection.Remove(removedGroup);
-                        if (removedGroup.IsExpanded)
-						{
-							foreach (var item in removedGroup.Activities)
-								_targetCollection.Remove(item);
-						}
-						break;
-					case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-						break;
-					case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-						_targetCollection.Clear();
-						break;
-					default:
-						break;
-				}
 			}
 
 			public Task AuxiliaryItemLoader(IEnumerable<ViewModelBase> items, int timeout)
@@ -166,7 +59,7 @@ namespace SnooStream.ViewModel
 
 			public void Attach(System.Collections.ObjectModel.ObservableCollection<ViewModelBase> targetCollection)
 			{
-				_targetCollection = targetCollection;
+                _activityAggregate = new ActivityGroupViewModel.SelfActivityAggregate(_selfStream.Groups, targetCollection);
 			}
 		}
 
@@ -174,7 +67,7 @@ namespace SnooStream.ViewModel
 		{
 			//load up the activities
 			Groups = new ObservableSortedUniqueCollection<string, ActivityGroupViewModel>(new ActivityGroupViewModel.ActivityAgeComparitor());
-			Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SelfActivityAggregate(this), 100);
+			Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SelfActivityLoader(this), 100);
             if (selfInit != null && IsLoggedIn)
 			{
                 ProcessActivityManager();
@@ -252,9 +145,9 @@ namespace SnooStream.ViewModel
                 });
 
 
-            OldestMessage = ProcessListing(resultTpl.Item1, OldestMessage);
-            OldestSentMessage = ProcessListing(resultTpl.Item2, OldestSentMessage);
-            OldestActivity = ProcessListing(resultTpl.Item3, OldestActivity);
+            OldestMessage = ActivityGroupViewModel.ProcessListing(Groups, resultTpl.Item1, OldestMessage);
+            OldestSentMessage = ActivityGroupViewModel.ProcessListing(Groups, resultTpl.Item2, OldestSentMessage);
+            OldestActivity = ActivityGroupViewModel.ProcessListing(Groups, resultTpl.Item3, OldestActivity);
         }
 
         bool _runningActivityUpdater = false;
@@ -279,38 +172,6 @@ namespace SnooStream.ViewModel
             _runningActivityUpdater = false;
         }
 
-		private string ProcessListing(Listing listing, string after)
-		{
-			if (listing != null)
-			{
-				foreach (var child in listing.Data.Children)
-				{
-					var childName = ActivityViewModel.GetActivityGroupName(child);
-					ActivityGroupViewModel existingGroup;
-					if (Groups.TryGetValue(childName, out existingGroup))
-					{
-						if (existingGroup.Activities.Count <= 1)
-						{
-							existingGroup.Merge(child);
-						}
-						else
-							existingGroup.Merge(child);
-
-                        Groups.Remove(childName);
-                        Groups.Add(childName, existingGroup);
-					}
-					else
-					{
-						Groups.Add(childName, ActivityGroupViewModel.MakeActivityGroup(childName, child));
-					}
-				}
-
-				if (string.IsNullOrWhiteSpace(after))
-					return listing.Data.After;
-			}
-			return after;
-		}
-
 		public async Task PullOlder()
 		{
 			LastRefresh = DateTime.Now;
@@ -318,41 +179,26 @@ namespace SnooStream.ViewModel
 			if (!IsLoggedIn)
 				throw new InvalidOperationException("User must be logged in to do this");
 
-			Listing inbox = null;
-			Listing outbox = null;
-			Listing activity = null;
-
-			if (!string.IsNullOrWhiteSpace(OldestMessage))
-			{
-				await SnooStreamViewModel.NotificationService.Report("getting additional inbox", async () =>
-				{
-					inbox = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(string.Format(Reddit.MailBaseUrlFormat, "inbox"), OldestMessage, null);
-				});
-
-				OldestMessage = ProcessListing(inbox, OldestMessage);
-			}
-
-			if (!string.IsNullOrWhiteSpace(OldestSentMessage))
-			{
-				await SnooStreamViewModel.NotificationService.Report("getting additional outbox", async () =>
-				{
-					outbox = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(string.Format(Reddit.MailBaseUrlFormat, "sent"), OldestSentMessage, null);
-				});
-
-				OldestSentMessage = ProcessListing(inbox, OldestSentMessage);
-			}
-
-
-			if (!string.IsNullOrWhiteSpace(OldestActivity))
-			{
-				await SnooStreamViewModel.NotificationService.Report("getting additional activity", async () =>
-				{
-					activity = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(string.Format(Reddit.PostByUserBaseFormat, SnooStreamViewModel.RedditService.CurrentUserName), OldestActivity, null);
-				});
-
-				OldestActivity = ProcessListing(inbox, OldestActivity);
-			}
+            OldestMessage = await PullActivity(OldestMessage, "inbox", string.Format(Reddit.MailBaseUrlFormat, "inbox"));
+            OldestSentMessage = await PullActivity(OldestSentMessage, "outbox", string.Format(Reddit.MailBaseUrlFormat, "sent"));
+            OldestActivity = await PullActivity(OldestActivity, "activity", string.Format(Reddit.PostByUserBaseFormat, SnooStreamViewModel.RedditService.CurrentUserName));
 		}
+
+        private async Task<string> PullActivity(string oldest, string displayName, string uriFormat)
+        {
+            Listing activity = null;
+            if (!string.IsNullOrWhiteSpace(oldest))
+            {
+                await SnooStreamViewModel.NotificationService.Report("getting additional " + displayName, async () =>
+                {
+                    activity = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(uriFormat, oldest, null);
+                });
+
+                return ActivityGroupViewModel.ProcessListing(Groups, activity, oldest);
+            }
+            else
+                return oldest;
+        }
 
 		internal SelfInit Dump()
 		{

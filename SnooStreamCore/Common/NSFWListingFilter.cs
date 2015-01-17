@@ -64,7 +64,7 @@ namespace SnooStream.Common
         {
             try
             {
-                var targetSubreddit = await _offlineService.GetSubreddit(subreddit) ?? await _redditService.GetSubreddit(subreddit);
+                var targetSubreddit = await _offlineService.GetSubreddit(subreddit) ?? await _redditService.GetSubredditAbout(subreddit);
                 if (targetSubreddit != null && targetSubreddit.Data is Subreddit)
                 {
                     return ((Subreddit)targetSubreddit.Data).Over18 ?? false;

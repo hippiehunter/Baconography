@@ -162,7 +162,7 @@ namespace SnooStream.Common
 
                     if (SnooStreamViewModel.SystemServices.IsHighPriorityNetworkOk)
                     {
-                        subreddit = await SnooStreamViewModel.RedditService.GetSubreddit(subredditName);
+                        subreddit = await SnooStreamViewModel.RedditService.GetSubredditAbout(subredditName);
                     }
                     else
                     {
@@ -198,7 +198,7 @@ namespace SnooStream.Common
 
                     if (SnooStreamViewModel.SystemServices.IsHighPriorityNetworkOk)
                     {
-                        subreddit = await SnooStreamViewModel.RedditService.GetSubreddit(subredditName);
+                        subreddit = await SnooStreamViewModel.RedditService.GetSubredditAbout(subredditName);
                     }
                     else
                     {
@@ -228,18 +228,9 @@ namespace SnooStream.Common
                         userName = url.Substring(nameIndex + 3);
                     }
 
-                    TypedThing<Account> account = null;
-
                     if (SnooStreamViewModel.SystemServices.IsHighPriorityNetworkOk)
                     {
-                        account = await SnooStreamViewModel.RedditService.GetAccountInfo(userName);
-
-                        token.ThrowIfCancellationRequested();
-
-                        if (account != null)
-                            SnooStreamViewModel.NavigationService.NavigateToAboutUser(new AboutUserViewModel(account));
-                        else
-                            throw new RedditException("userinfo doesnt exist");
+                        SnooStreamViewModel.NavigationService.NavigateToAboutUser(new AboutUserViewModel(userName, null));
                     }
                     else
                     {
@@ -280,7 +271,7 @@ namespace SnooStream.Common
                 TypedThing<Subreddit> subredditThing = null;
                 if (SnooStreamViewModel.SystemServices.IsHighPriorityNetworkOk)
                 {
-                    subredditThing = await SnooStreamViewModel.RedditService.GetSubreddit(subreddit);
+                    subredditThing = await SnooStreamViewModel.RedditService.GetSubredditAbout(subreddit);
                 }
                 else
                 {
