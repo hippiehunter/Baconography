@@ -196,6 +196,8 @@ concurrency::task<Platform::String^> SimpleRedditService::SendGet(String^ url)
                           {
                               return SendGet(localUrl);
                           }
+						  else if(starts_with(resultString, L"<!doctype html><html><title>"))
+							  return concurrency::task_from_result((Platform::String^)nullptr);
                           else
                             return concurrency::task_from_result(result);
                       }
