@@ -233,11 +233,11 @@ namespace SnooStream.ViewModel
             Listing subscribedListing = null; 
             if (SnooStreamViewModel.RedditUserState != null && !string.IsNullOrWhiteSpace(SnooStreamViewModel.RedditUserState.Username))
             {
-                subscribedListing = await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing() ?? await SnooStreamViewModel.RedditService.GetDefaultSubreddits();
+                subscribedListing = await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing();
             }
             else
             {
-                subscribedListing = await SnooStreamViewModel.RedditService.GetDefaultSubreddits();
+                subscribedListing = await SnooStreamViewModel.RedditService.GetSubreddits(25);
             }
 
             foreach (var river in subscribedListing.Data.Children.Select(thing => new LinkRiverViewModel(false, thing.Data as Subreddit, "hot", null, null)))
