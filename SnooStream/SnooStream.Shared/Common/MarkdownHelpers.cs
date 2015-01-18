@@ -1,4 +1,5 @@
-﻿using SnooDom;
+﻿using GalaSoft.MvvmLight;
+using SnooDom;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,10 @@ namespace SnooStream.Common
     {
 		private CommentViewModel FindCommentContext(DependencyObject obj)
 		{
-			if (obj is FrameworkElement)
+            if (obj == null)
+                return null;
+
+            if (obj is FrameworkElement)
 			{
 				var frameworkElement = obj as FrameworkElement;
 				if (frameworkElement.DataContext is CommentViewModel)
@@ -22,13 +26,18 @@ namespace SnooStream.Common
 			return FindCommentContext(VisualTreeHelper.GetParent(obj));
 		}
 
-		private CommentsViewModel FindCommentsContext(DependencyObject obj)
+		private ViewModelBase FindCommentsContext(DependencyObject obj)
 		{
+            if (obj == null)
+                return null;
+
 			if (obj is FrameworkElement)
 			{
 				var frameworkElement = obj as FrameworkElement;
-				if (frameworkElement.DataContext is CommentsViewModel)
-					return frameworkElement.DataContext as CommentsViewModel;
+                if (frameworkElement.DataContext is CommentsViewModel)
+                    return frameworkElement.DataContext as CommentsViewModel;
+                else if (frameworkElement.DataContext is LinkViewModel)
+                    return frameworkElement.DataContext as LinkViewModel;
 			}
 			return FindCommentsContext(VisualTreeHelper.GetParent(obj));
 		}
@@ -38,9 +47,12 @@ namespace SnooStream.Common
 			return new Windows.Foundation.TypedEventHandler<Windows.UI.Xaml.Documents.Hyperlink, Windows.UI.Xaml.Documents.HyperlinkClickEventArgs>((link, bla) => 
 			{
 				var commentContext = FindCommentContext(link);
-				var commentsContext = FindCommentsContext(link);
-				SnooStreamViewModel.CommandDispatcher.GotoLink(Tuple.Create(commentsContext, commentContext, url), url);
-			});
+				var topContext = FindCommentsContext(link);
+                if(topContext is LinkViewModel)
+				    SnooStreamViewModel.CommandDispatcher.GotoLink(topContext, url);
+                else
+                    SnooStreamViewModel.CommandDispatcher.GotoLink(Tuple.Create(topContext, commentContext, url), url);
+            });
 		}
 
 		public Windows.UI.Xaml.Style BorderStyle
