@@ -18,8 +18,10 @@ namespace SnooStream.ViewModel
         {
             AboutUserViewModel _user;
             ActivityGroupViewModel.SelfActivityAggregate _activityAggregate;
+            bool _hasLoaded;
             public UserActivityLoader(AboutUserViewModel user)
             {
+                _hasLoaded = false;
                 _user = user;
             }
 
@@ -35,17 +37,23 @@ namespace SnooStream.ViewModel
 
             public bool HasMore()
             {
-                return _user.OldestActivity != null;
+                return _user.OldestActivity != null || !_hasLoaded;
             }
 
             public async Task<IEnumerable<ViewModelBase>> LoadMore()
             {
-                await _user.PullOlder();
+                _hasLoaded = true;
+                if (_user.OldestActivity != null)
+                    await _user.PullOlder();
+                else
+                    await _user.PullNew();
+
                 return Enumerable.Empty<ViewModelBase>();
             }
 
             public async Task Refresh(System.Collections.ObjectModel.ObservableCollection<ViewModelBase> current, bool onlyNew)
             {
+                _hasLoaded = true;
                 await _user.PullNew();
             }
 

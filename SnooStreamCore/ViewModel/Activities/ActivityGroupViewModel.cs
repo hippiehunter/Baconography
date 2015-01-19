@@ -17,7 +17,13 @@ namespace SnooStream.ViewModel
         public class SelfActivityAggregate
         {
             ObservableCollection<ViewModelBase> _targetCollection;
-
+            public bool HasItems
+            {
+                get
+                {
+                    return _targetCollection.Count > 0;
+                }
+            }
             public SelfActivityAggregate(INotifyCollectionChanged sourceCollection, ObservableCollection<ViewModelBase> targetCollection)
             {
                 _targetCollection = targetCollection;
