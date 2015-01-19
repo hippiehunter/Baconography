@@ -114,6 +114,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\SubredditSmallView.xaml.cs">
       <DependentUpon>SubredditSmallView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Pages\AboutUser.xaml.cs">
+      <DependentUpon>AboutUser.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\Comments.xaml.cs">
       <DependentUpon>Comments.xaml</DependentUpon>
     </Compile>
@@ -219,6 +222,10 @@
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\SubredditSmallView.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Pages\AboutUser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\Comments.xaml">
       <SubType>Designer</SubType>

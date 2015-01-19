@@ -14,9 +14,16 @@
                     ItemsSource="{Binding CurrentGroup.Activities}" ContainerContentChanging="messageList_ContainerContentChanging"
                     VirtualizingStackPanel.VirtualizationMode="Standard"
                     ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
+            <ListView.HeaderTemplate>
+                <DataTemplate>
+                    <Grid Visibility="{Binding IsEditing, Converter={StaticResource booleanVisibilityConverter}}">
+                        <controls:ComposeMessageView DataContext="{Binding Reply}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.HeaderTemplate>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <controls:MessageControl />
+                    <controls:MessageControl/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
@@ -24,10 +31,11 @@
     <common:SnooApplicationPage.BottomAppBar>
         <CommandBar>
             <CommandBar.PrimaryCommands>
-                <AppBarButton Icon="MailReply" Label="reply"  Command="{Binding GotoReply}"/>
-                <AppBarButton Icon="Globe" Label="delete" Command="{Binding DeleteMessage}"/>
-                <AppBarButton Icon="Comment" Label="newer" Command="{Binding GotoNewer}"/>
-                <AppBarButton Icon="Memo" Label="older" Command="{Binding GotoOlder}"/>
+                <AppBarButton Icon="Send" Label="send" IsEnabled="{Binding Reply.IsValid}" Visibility="{Binding IsEditing, Converter={StaticResource booleanVisibilityConverter}}" Command="{Binding Reply.Send}" />
+                <AppBarButton Icon="MailReply" Label="reply" Visibility="{Binding IsEditing, Converter={StaticResource invertedBooleanVisibilityConverter}}"  Command="{Binding GotoReply}" />
+                <AppBarButton Icon="Delete" Label="delete" Command="{Binding DeleteMessage}"/>
+                <AppBarButton Icon="Back" Label="newer" Command="{Binding GotoNewer}"/>
+                <AppBarButton Icon="Forward" Label="older" Command="{Binding GotoOlder}"/>
             </CommandBar.PrimaryCommands>
         </CommandBar>
 

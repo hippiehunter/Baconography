@@ -43,7 +43,7 @@ namespace SnooStream.Common
 
         public void GotoUserDetails(string username)
         {
-            throw new NotImplementedException();
+            SnooStreamViewModel.NavigationService.NavigateToAboutUser(new AboutUserViewModel(username));
         }
 
         public void GotoReplyToComment(ViewModelBase currentContext, CommentViewModel source)
@@ -230,7 +230,7 @@ namespace SnooStream.Common
 
                     if (SnooStreamViewModel.SystemServices.IsHighPriorityNetworkOk)
                     {
-                        SnooStreamViewModel.NavigationService.NavigateToAboutUser(new AboutUserViewModel(userName, null));
+                        SnooStreamViewModel.NavigationService.NavigateToAboutUser(new AboutUserViewModel(userName));
                     }
                     else
                     {

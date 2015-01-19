@@ -44,7 +44,7 @@ namespace SnooStream.View.Controls
             }
         }
 
-		private void listBox_ItemTap(object sender, TappedRoutedEventArgs e)
+		private void listBox_ItemTap(object sender, RoutedEventArgs e)
         {
             SnooApplicationPage.Current.PopNavState();
             searchBox.Text = "";

@@ -7,7 +7,6 @@
         xmlns:selectors="using:SnooStream.View.Selectors"
         xmlns:converters="using:SnooStream.Converters"
         xmlns:s="using:System;assembly=mscorlib"
-        xmlns:zp="using:ZeroProximity.Controls"
         mc:Ignorable="d" d:DesignHeight="480" d:DesignWidth="480">
 
     <Grid x:Name="LayoutRoot" Margin="12,0,12,0">
@@ -101,7 +100,7 @@
                 </selectors:UserActivityTemplateSelector.BodyActivityTemplate>
                 <selectors:UserActivityTemplateSelector.SingleActivityTemplate>
                     <DataTemplate>
-                        <Grid Margin="8, 8, 0, 12" HorizontalAlignment="Stretch">
+                        <Grid Margin="8, 8, 0, 12" HorizontalAlignment="Stretch" Tapped="Grid_Tapped">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
@@ -111,19 +110,19 @@
                                 <ColumnDefinition MinWidth="60" Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock
-                                Text="{Binding Author}" 
+                                Text="{Binding FirstActivity.Author}" 
                                 FontSize="20" 
                                 FontFamily="Segoe SemiLight"/>
                             <TextBlock
                                 Grid.Row="1"
-                                Text="{Binding PreviewBody}"
+                                Text="{Binding FirstActivity.PreviewBody}"
                                 TextWrapping="Wrap"
                                 MaxHeight="108"/>
                             <TextBlock 
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Bottom"
                                 Grid.Column="1" 
-                                Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}}"/>
+                                Text="{Binding FirstActivity.CreatedUTC, Converter={StaticResource timeRelationConverter}}"/>
                         </Grid>
                     </DataTemplate>
                 </selectors:UserActivityTemplateSelector.SingleActivityTemplate>

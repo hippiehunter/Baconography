@@ -74,11 +74,6 @@ namespace SnooStream.PlatformServices
             }
         }
 
-        public void NavigateToMessageReply(CreateMessageViewModel viewModel)
-        {
-			_frame.Navigate(typeof(ComposeMessageView), "state=" + _navState.AddState(viewModel));
-        }
-
         public void NavigateToPost(PostViewModel viewModel)
         {
 			_frame.Navigate(typeof(ComposePost), "state=" + _navState.AddState(viewModel));
@@ -177,7 +172,7 @@ namespace SnooStream.PlatformServices
 
         public void NavigateToAboutUser(AboutUserViewModel viewModel)
         {
-			throw new NotImplementedException();
+            _frame.Navigate(typeof(AboutUser), "state=" + _navState.AddState(viewModel));
         }
 
 
@@ -196,6 +191,11 @@ namespace SnooStream.PlatformServices
         public void NavigateToConversation(string conversationId)
         {
             _frame.Navigate(typeof(Conversation), "state=" + _navState.AddState(new ConversationViewModel(_rootContext.SelfStream.Groups[conversationId], _rootContext.SelfStream)));
+        }
+
+        public void NavigateToMessageReply(CreateMessageViewModel viewModel)
+        {
+            _frame.Navigate(typeof(Conversation), "state=" + _navState.AddState(new ConversationViewModel(null, _rootContext.SelfStream, viewModel)));
         }
 
         public void ValidateStates(HashSet<string> validStates)

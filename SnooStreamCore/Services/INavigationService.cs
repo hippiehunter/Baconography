@@ -35,9 +35,6 @@ namespace SnooStream.Services
         void ValidateStates(HashSet<string> validStates);
         ViewModelBase GetState(String guid);
         void RemoveState(String guid);
-
-
-
         
     }
 }

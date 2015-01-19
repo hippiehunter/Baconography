@@ -22,10 +22,11 @@ namespace SnooStream.Common
                 var stateItem = JsonConvert.DeserializeObject<Tuple<string, string>>(dump);
                 switch (stateItem.Item1)
                 {
-                    //case "CommentsContentStreamViewModel":
-                    //	{
-                    //		break;
-                    //	}
+                    case "AboutUserViewModel":
+                        {
+                            var accountThing = JsonConvert.DeserializeObject<Tuple<Account, DateTime>>(stateItem.Item2);
+                            return new AboutUserViewModel(accountThing.Item1, accountThing.Item2);
+                        }
                     case "LinkRiverViewModel":
                         {
                             Debug.Assert(context is SnooStreamViewModel);
@@ -76,13 +77,22 @@ namespace SnooStream.Common
                         }
                     case "ConversationViewModel":
                         {
-                            ActivityGroupViewModel targetGroup;
-                            if (rootContext.SelfStream.Groups.TryGetValue(stateItem.Item2, out targetGroup))
+                            var dumpArgs = JsonConvert.DeserializeAnonymousType(stateItem.Item2, new { ActivityId = "", Username = "", Topic = "", Contents = "", IsReply = false });
+                            CreateMessageViewModel createMessage = null;
+                            if (!string.IsNullOrWhiteSpace(dumpArgs.Username) || !string.IsNullOrWhiteSpace(dumpArgs.Topic) || !string.IsNullOrWhiteSpace(dumpArgs.Contents))
                             {
-                                return new ConversationViewModel(targetGroup, rootContext.SelfStream);
+                                createMessage = new CreateMessageViewModel { Contents = dumpArgs.Contents, Topic = dumpArgs.Topic, Username = dumpArgs.Username, IsReply = dumpArgs.IsReply };
+                            }
+
+                            ActivityGroupViewModel targetGroup;
+                            if (!string.IsNullOrWhiteSpace(dumpArgs.ActivityId) && rootContext.SelfStream.Groups.TryGetValue(dumpArgs.ActivityId, out targetGroup))
+                            {
+                                return new ConversationViewModel(targetGroup, rootContext.SelfStream, createMessage);
                             }
                             else
-                                throw new InvalidOperationException(stateItem.Item1);
+                            {
+                                return new ConversationViewModel(null, rootContext.SelfStream, createMessage);
+                            }
                         }
                     case "CommentsContentStreamViewModel":
                         {
@@ -146,7 +156,19 @@ namespace SnooStream.Common
                 else if (viewModel is ConversationViewModel)
                 {
                     var conversationViewModel = viewModel as ConversationViewModel;
-                    return JsonConvert.SerializeObject(Tuple.Create("ConversationViewModel", conversationViewModel.CurrentGroup.Id));
+                    return JsonConvert.SerializeObject(Tuple.Create("ConversationViewModel",
+                        conversationViewModel.IsEditing ? JsonConvert.SerializeObject(new
+                        {
+                            ActivityId = conversationViewModel.CurrentGroup.Id,
+                            Username = conversationViewModel.Reply.Username,
+                            Topic = conversationViewModel.Reply.Topic,
+                            Contents = conversationViewModel.Reply.Contents,
+                            IsReply = conversationViewModel.Reply.IsReply
+                        }) :
+                        JsonConvert.SerializeObject(new
+                        {
+                            ActivityId = conversationViewModel.CurrentGroup.Id
+                        })));
                 }
                 else if (viewModel is CommentsContentStreamViewModel)
                 {
@@ -158,6 +180,10 @@ namespace SnooStream.Common
                 else if (viewModel is LoginViewModel)
                 {
                     return JsonConvert.SerializeObject(Tuple.Create("LoginViewModel", ""));
+                }
+                else if (viewModel is AboutUserViewModel)
+                {
+                    return JsonConvert.SerializeObject(Tuple.Create("AboutUserViewModel", JsonConvert.SerializeObject(Tuple.Create(((AboutUserViewModel)viewModel).Thing, ((AboutUserViewModel)viewModel).LastRefresh ?? DateTime.UtcNow))));
                 }
                 else
                     throw new InvalidOperationException(viewModel.GetType().FullName);

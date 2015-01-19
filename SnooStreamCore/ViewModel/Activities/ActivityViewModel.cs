@@ -121,6 +121,14 @@ namespace SnooStream.ViewModel
                 throw new ArgumentOutOfRangeException();
         }
 
+        public static string GetAuthor(ActivityViewModel viewModel)
+        {
+            if (viewModel is MessageActivityViewModel)
+                return ((MessageActivityViewModel)viewModel).Author;
+            else
+                return null;
+        }
+
         public static ActivityViewModel CreateActivity(Thing thing)
         {
             ActivityViewModel result;

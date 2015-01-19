@@ -11,13 +11,30 @@ namespace SnooStream.ViewModel
     public class ConversationViewModel : ViewModelBase
     {
         SelfStreamViewModel _selfStream;
-        public ConversationViewModel(ActivityGroupViewModel targetGroup, SelfStreamViewModel selfStream)
+        public ConversationViewModel(ActivityGroupViewModel targetGroup, SelfStreamViewModel selfStream, CreateMessageViewModel replyMessage = null)
         {
             _selfStream = selfStream;
             CurrentGroup = targetGroup;
+            if (replyMessage == null)
+                IsEditing = false;
+            else
+            {
+                IsEditing = true;
+                Reply = replyMessage;
+            }
+
+            if (CurrentGroup == null)
+            {
+                CurrentGroup = new ActivityGroupViewModel("");
+            }
+
             GotoReply = new RelayCommand(() =>
             {
-
+                
+                IsEditing = true;
+                Reply = new CreateMessageViewModel { Username = ActivityViewModel.GetAuthor(CurrentGroup.FirstActivity), Topic = CurrentGroup.FirstActivity.PreviewTitle, IsReply = true };
+                RaisePropertyChanged("Reply");
+                RaisePropertyChanged("IsEditing");
             });
 
             DeleteMessage = new RelayCommand(() =>
@@ -37,8 +54,8 @@ namespace SnooStream.ViewModel
         }
 
         public ActivityGroupViewModel CurrentGroup { get; set; }
-
-
+        public bool IsEditing { get; set; }
+        public CreateMessageViewModel Reply { get; set; }
         public RelayCommand GotoReply { get; set; }
         public RelayCommand DeleteMessage { get; set; }
         public RelayCommand GotoNewer { get; set; }

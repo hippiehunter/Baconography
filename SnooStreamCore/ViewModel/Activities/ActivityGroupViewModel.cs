@@ -195,27 +195,23 @@ namespace SnooStream.ViewModel
 
         public void Merge(Thing additional)
         {
-            var currentFirstActivity = Activities.Count > 0 ? FirstActivity : null;
+            var currentFirstActivity = FirstActivity;
 
             var thingName = ((ThingData)additional.Data).Name;
             if (!Activities.ContainsKey(thingName))
             {
                 var targetActivity = ActivityViewModel.CreateActivity(additional);
 
-                if (Activities.Count == 0 && _innerFirstActivity == null)
+                if (Activities.Count == 0)
                 {
                     _innerFirstActivity = targetActivity;
                     _innerFirstActivityName = thingName;
-                }
-                else if (Activities.Count == 0 && _innerFirstActivityName != thingName)
-                {
-                    Activities.Add(_innerFirstActivityName, _innerFirstActivity);
                     Activities.Add(thingName, targetActivity);
                 }
                 else if (Activities.Count > 0)
                     Activities.Add(thingName, targetActivity);
 
-                if (!IsConversation && Activities.Count > 1)
+                if (!IsConversation && Activities.Count > 2)
                 {
                     IsConversation = true;
                     RaisePropertyChanged("IsConversation");

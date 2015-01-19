@@ -19,30 +19,30 @@
                 <Grid Grid.Row="0">
                     <TextBlock Text="From:" Margin="0,12,0,0" />
                     <TextBox Margin="60,0,0,0" Height="40" Style="{StaticResource MessageTextBox}" BorderThickness="0"
-                            Padding="0" IsReadOnly="True" Text="{Binding Path=Compose.CommentingAs}"
+                            Padding="0" IsReadOnly="True" Text="{Binding Path=LoggedInUser}"
                             KeyUp="TextBox_KeyUp" FontSize="22" />
                     <Button Margin="0,0,0,0" HorizontalAlignment="Right" FontFamily="Segoe UI Symbol" FontSize="16"
-                            Width="30" Height="30" Style="{StaticResource MessageButtonStyle}" Click="ChangeUser_Click"
+                            Width="30" Height="30" Style="{StaticResource MessageButtonStyle}" Command="{Binding Path=Login.DoLogin, Source={StaticResource SnooStream}}"
                             Content="&#xE14A;" />
                     <Border HorizontalAlignment="Stretch" Height="1" BorderThickness=".5" Margin="0,50,0,0" />
                 </Grid>
                 <Grid Grid.Row="1">
                     <TextBlock Text="To:" Margin="0,12,0,0" />
                     <TextBox Margin="35,-1,0,0" Height="40" Style="{StaticResource MessageTextBox}" BorderThickness="0"
-                            Padding="0" FontSize="22" Text="{Binding Path=Compose.Recipient, Mode=TwoWay}"
+                            Padding="0" FontSize="22" Text="{Binding Path=Username, Mode=TwoWay}"
                             KeyUp="TextBox_KeyUp"
-                            IsEnabled="{Binding Path=Compose.IsReply, Converter={StaticResource invertedBooleanConverter}}" />
+                            IsEnabled="{Binding Path=IsReply, Converter={StaticResource invertedBooleanConverter}}" />
                     <Border HorizontalAlignment="Stretch" Height="1" BorderThickness=".5" Margin="0,50,0,0" />
                 </Grid>
                 <Grid Grid.Row="2">
                     <TextBlock Text="Subject:" Margin="0,12,0,0" />
                     <TextBox Margin="80,-2,0,0" Height="40" Style="{StaticResource MessageTextBox}" BorderThickness="0"
                             Padding="0" FontSize="22" KeyUp="TextBox_KeyUp" TextChanged="TextBox_TextChanged"
-                            Text="{Binding Path=Compose.Subject, Mode=TwoWay}" />
+                            Text="{Binding Path=Topic, Mode=TwoWay}" />
                     <Border HorizontalAlignment="Stretch" Height="1" BorderThickness=".5" Margin="0,50,0,0" />
                 </Grid>
                 <TextBox KeyUp="TextBox_KeyUp" Grid.Row="3" AcceptsReturn="True" IsSpellCheckEnabled="True" TextChanged="TextBox_TextChanged" InputScope="Chat" 
-                                         Text="{Binding Path=Text, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                                         Text="{Binding Path=Contents, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
             </Grid>
         </ScrollViewer>
     </Grid>
