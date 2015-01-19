@@ -68,7 +68,8 @@ namespace NBoilerpipePortable.Parser
 
 			public bool End(NBoilerpipeContentHandler instance, string localName	)
 			{
-				instance.inIgnorableElement--;
+                if(instance.inIgnorableElement > 0)
+				    instance.inIgnorableElement--;
 				return true;
 			}
 
@@ -154,7 +155,8 @@ namespace NBoilerpipePortable.Parser
 
             public bool End(NBoilerpipeContentHandler instance, string localName)
             {
-                instance.inIgnorableElement--;
+                if (instance.inIgnorableElement > 0)
+                    instance.inIgnorableElement--;
                 return true;
             }
 
@@ -209,7 +211,10 @@ namespace NBoilerpipePortable.Parser
                     }
                 }
                 else
-                    instance.inIgnorableElement--;
+                {
+                    if (instance.inIgnorableElement > 0)
+                        instance.inIgnorableElement--;
+                }
 				return false;
 			}
 

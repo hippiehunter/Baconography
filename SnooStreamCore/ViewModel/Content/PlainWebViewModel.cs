@@ -60,8 +60,12 @@ namespace SnooStream.ViewModel.Content
 				handler.AutomaticDecompression = DecompressionMethods.GZip |
 												 DecompressionMethods.Deflate;
 			}
-			_httpClient = new HttpClient(handler);
-		}
+
+            var userAgent = "Mozilla/5.0 (Mobile; Windows Phone 8.1; Android 4.0; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 930) like iPhone OS 7_0_3 Mac OS X AppleWebKit/537 (KHTML, like Gecko) Mobile Safari/537";
+
+            _httpClient = new HttpClient(handler);
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
+        }
 
 		public PlainWebViewModel(bool notText, string url, string redditThumbnail)
         {

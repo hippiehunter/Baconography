@@ -67,6 +67,11 @@ namespace NBoilerpipePortable
 
         public void StartElement(HtmlNode node)
         {
+            bool isSafeTag = string.Compare(node.Name, "article", StringComparison.CurrentCultureIgnoreCase) == 0;
+
+            if (isSafeTag)
+                inIgnorableElement = 0;
+
             labelStacks.AddItem(null);
             TagAction ta = tagActions.Get(node.Name);
             if (ta != null)
@@ -83,7 +88,7 @@ namespace NBoilerpipePortable
                 flush = true;
             }
 
-            if (IsHidden(node.Attributes))
+            if (!isSafeTag && IsHidden(node.Attributes))
                 inIgnorableElement++;
 
             lastStartTag = node.Name;
