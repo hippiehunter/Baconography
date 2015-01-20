@@ -37,6 +37,11 @@ namespace SnooStream.ViewModel
             {
                 return _comment.Id;
             }
+            internal set
+            {
+                _comment.Id = value;
+                _comment.Name = "t1_" + value;
+            }
         }
 
         public VotableViewModel Votable
@@ -74,6 +79,15 @@ namespace SnooStream.ViewModel
             {
                 _body = value;
                 RaisePropertyChanged("Body");
+                RaisePropertyChanged("BodyMD");
+            }
+        }
+
+        public object BodyMD
+        {
+            get
+            {
+                return SnooStreamViewModel.MarkdownProcessor.Process(Body).MarkdownDom;
             }
         }
 
@@ -138,6 +152,32 @@ namespace SnooStream.ViewModel
             }
         }
 
+        CommentReplyViewModel _replyViewModel;
+        public CommentReplyViewModel ReplyViewModel
+        {
+            get
+            {
+                if (_replyViewModel == null)
+                    _replyViewModel = new CommentReplyViewModel(this, new Thing { Kind = "t1", Data = Thing }, Thing.Id.Length > 5);
+
+                return _replyViewModel;
+            }
+        }
+
+        private bool _isEditing;
+        public bool IsEditing
+        {
+            get
+            {
+                return _isEditing;
+            }
+            set
+            {
+                _isEditing = value;
+                RaisePropertyChanged("IsEditing");
+            }
+        }
+
         public AuthorFlairKind PosterFlair
         {
             get
@@ -166,9 +206,9 @@ namespace SnooStream.ViewModel
             SnooStreamViewModel.CommandDispatcher.GotoCommentContext(_context, this);
         }
 
-        private void GotoFullLinkImpl()
+        private async void GotoFullLinkImpl()
         {
-			SnooStreamViewModel.CommandDispatcher.GotoFullComments(_context, this);
+            await _context.LoadFull();
         }
 
         private void GotoUserDetailsImpl()
@@ -207,6 +247,16 @@ namespace SnooStream.ViewModel
             {
                 _comment = value;
             }
+        }
+
+        public void RemoveFromContext()
+        {
+            _context.RemoveComment(this);
+        }
+
+        internal void Rename(string id)
+        {
+            _context.RenameThing(Thing.Id, id);
         }
     }
 }

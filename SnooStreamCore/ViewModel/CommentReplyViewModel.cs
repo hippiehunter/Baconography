@@ -11,15 +11,16 @@ namespace SnooStream.ViewModel
 {
     public class CommentReplyViewModel : ViewModelBase
     {
-        ViewModelBase _context;
+        CommentViewModel _context;
         Thing _replyTarget;
-        public CommentReplyViewModel(ViewModelBase context, Thing replyTarget, bool isEdit = false)
+        public CommentReplyViewModel(CommentViewModel context, Thing replyTarget, bool isEdit = false)
         {
+            _replyTarget = replyTarget;
+            _context = context;
             if (isEdit)
             {
                 Editing = true;
                 EditingId = ((Comment)replyTarget.Data).Name;
-                ReplyBody = ((Comment)replyTarget.Data).Body.Replace("&gt;", ">").Replace("&lt;", "<");
             }
 
             RefreshUserImpl();
@@ -93,36 +94,25 @@ namespace SnooStream.ViewModel
             }
         }
 
-        private string _replyBody;
         public string ReplyBody
         {
             get
             {
-                return _replyBody;
+                return _context.Body;
             }
             set
             {
-                _replyBody = value;
+                _context.Body = value;
                 RaisePropertyChanged("ReplyBody");
-                try
-                {
-                    ReplyBodyMD = SnooStreamViewModel.MarkdownProcessor.Process(value);
-                }
-                catch { }
+                RaisePropertyChanged("ReplyBodyMD");
             }
         }
 
-        private Object _replyBodyMD;
         public Object ReplyBodyMD
         {
             get
             {
-                return _replyBodyMD;
-            }
-            set
-            {
-                _replyBodyMD = value;
-                RaisePropertyChanged("ReplyBodyMD");
+                return _context.BodyMD;
             }
         }
 
@@ -272,11 +262,11 @@ namespace SnooStream.ViewModel
             SelectionLength = surroundedTextTpl.Item2 - surroundedTextTpl.Item1;
         }
 
-        private void SubmitImpl()
+        private async void SubmitImpl()
         {
             bool edit = Editing && !string.IsNullOrEmpty(EditingId);
 
-            SnooStreamViewModel.NotificationService.Report(edit ? "updating comment" : "adding reply", async () =>
+            await SnooStreamViewModel.NotificationService.Report(edit ? "updating comment" : "adding reply", async () =>
                 {
                     if (edit)
                     {
@@ -284,11 +274,18 @@ namespace SnooStream.ViewModel
                     }
                     else
                     {
-                        await SnooStreamViewModel.RedditService.AddComment(((dynamic)_replyTarget.Data).Name, ReplyBody);
+                        var parentId = ((Comment)_replyTarget.Data).ParentId;
+                        if (!parentId.StartsWith("t1_") && !parentId.StartsWith("t3_"))
+                            parentId = "t1_" + parentId;
+                        var addedComment = await SnooStreamViewModel.RedditService.AddComment(parentId, ReplyBody);
+                        if (addedComment != null)
+                        {
+                            _context.Rename(addedComment);
+                        }
                     }
                     var theComment = new Thing
                     {
-                        Kind = "t2",
+                        Kind = "t1",
                         Data = new Comment
                         {
                             Author = string.IsNullOrWhiteSpace(CommentingAs) ? "self" : CommentingAs,
@@ -303,18 +300,13 @@ namespace SnooStream.ViewModel
                         }
                     };
 
-                    if (edit)
-                        SnooStreamViewModel.CommandDispatcher.UpdateComment(_context, theComment);
-                    else
-                        SnooStreamViewModel.CommandDispatcher.InsertComment(_context, theComment);
-
-                    Cancel.Execute(null);
+                    _context.IsEditing = false;
                 });
         }
 
         private void RefreshUserImpl()
         {
-            
+
 
             if (string.IsNullOrWhiteSpace(SnooStreamViewModel.RedditService.CurrentUserName))
             {
@@ -328,12 +320,17 @@ namespace SnooStream.ViewModel
             }
         }
 
-        RelayCommand _cancel;
         public RelayCommand Cancel
         {
             get
             {
-                return _cancel;
+                return new RelayCommand(() =>
+                 {
+                     if (Editing)
+                         _context.IsEditing = false;
+                     else
+                         _context.RemoveFromContext();
+                 });
             }
         }
     }

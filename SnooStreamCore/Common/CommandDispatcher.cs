@@ -48,30 +48,24 @@ namespace SnooStream.Common
 
         public void GotoReplyToComment(ViewModelBase currentContext, CommentViewModel source)
         {
-            throw new NotImplementedException();
+            var commentsViewModel = currentContext as CommentsViewModel;
+            if (commentsViewModel != null)
+            {
+                commentsViewModel.AddReplyComment(source.Thing.Name);
+            }
         }
 
         public void GotoReplyToPost(ViewModelBase currentContext, CommentsViewModel source)
         {
-            throw new NotImplementedException();
+            source.AddReplyComment(null);
         }
 
         public void GotoEditComment(ViewModelBase currentContext, CommentViewModel source)
         {
-            throw new NotImplementedException();
+            source.IsEditing = true;
         }
 
         public void GotoEditPost(ViewModelBase currentContext, LinkViewModel source)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UpdateComment(ViewModelBase _context, Thing theComment)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void InsertComment(ViewModelBase _context, Thing theComment)
         {
             throw new NotImplementedException();
         }

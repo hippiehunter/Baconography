@@ -83,7 +83,156 @@ namespace SnooStream.ViewModel
 			_commentsContentStream = new Lazy<CommentsContentStreamViewModel>(() => new CommentsContentStreamViewModel(this));
 		}
 
-		Lazy<CommentsContentStreamViewModel> _commentsContentStream;
+        private string UnusedCommentId()
+        {
+            for (int i = 0; ; i++)
+            {
+                if (!_comments.ContainsKey(i.ToString()))
+                    return i.ToString();
+            }
+        }
+
+        public CommentViewModel AddReplyComment(string parentId)
+        {
+            Comment newComment = null;
+            CommentShell parent = null;
+            if (parentId == null)
+            {
+                newComment = MakeNewComment(parentId, 0);
+            }
+            else
+            {
+                var searchId = parentId.Substring("t1_".Length);
+                if (_comments.TryGetValue(searchId, out parent))
+                {
+                    newComment = MakeNewComment(parentId, parent.Comment.Depth);
+                }
+                else
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            _commentOriginStack.Add(CommentOriginType.New);
+            try
+            {
+                if (parent == null)
+                {
+                    var commentShell = MakeCommentShell(newComment, 0, null);
+                    _comments.Add(newComment.Id, commentShell);
+                    if (_firstChild != null)
+                        _comments[_firstChild].PriorSibling = newComment.Id;
+
+                    commentShell.NextSibling = _firstChild;
+                    _firstChild = newComment.Id;
+                    FlatComments.Insert(0, commentShell.Comment);
+                    commentShell.Comment.IsEditing = true;
+                    return commentShell.Comment;
+                }
+                else
+                {
+                    var commentShell = MakeCommentShell(newComment, parent.Comment.Depth + 1, null);
+                    _comments.Add(newComment.Id, commentShell);
+                    var firstSiblingId = parent.FirstChild;
+                    commentShell.NextSibling = parent.FirstChild;
+                    parent.FirstChild = commentShell.Id;
+                    if (parent.Comment.Thing.Replies != null)
+                        parent.Comment.Thing.Replies.Data.Children.Add(new Thing { Kind = "t1", Data = newComment });
+                    else
+                        parent.Comment.Thing.Replies = new Listing { Data = new ListingData { Children = new List<Thing> { new Thing { Kind = "t1", Data = newComment } } } };
+
+                    CommentShell firstSiblingShell;
+                    if (firstSiblingId != null && _comments.TryGetValue(firstSiblingId, out firstSiblingShell))
+                    {
+                        firstSiblingShell.PriorSibling = newComment.Id;
+                    }
+                    FlatComments.Insert(FlatComments.IndexOf(parent.Comment) + 1, commentShell.Comment);
+                    commentShell.Comment.IsEditing = true;
+                    return commentShell.Comment;
+                }
+            }
+            finally
+            {
+                _commentOriginStack.Clear();
+            }
+            
+        }
+
+        public void RemoveComment(CommentViewModel commentViewModel)
+        {
+            var commentShell = _comments[commentViewModel.Id];
+            var parentShell = commentViewModel.Parent != null ? _comments[commentViewModel.Parent.Id] : null;
+            
+            if (parentShell == null)
+            {   
+                if(commentShell.PriorSibling == null)
+                    _firstChild = commentShell.NextSibling;
+            }
+            else
+            {
+                if(commentShell.PriorSibling == null)
+                    parentShell.FirstChild = commentShell.NextSibling;   
+            }
+
+            if (commentShell.PriorSibling != null)
+                _comments[commentShell.PriorSibling].NextSibling = commentShell.NextSibling;
+
+            if (commentShell.NextSibling != null)
+                _comments[commentShell.NextSibling].PriorSibling = commentShell.PriorSibling;
+
+            _comments.Remove(commentViewModel.Id);
+            FlatComments.Remove(commentViewModel);
+        }
+
+        //does not deal with renaming for parentage
+        internal void RenameThing(string currentId, string newId)
+        {
+            var commentShell = _comments[currentId];
+            if (commentShell.Parent == null)
+            {
+                if (commentShell.PriorSibling == null)
+                    _firstChild = newId;
+            }
+            else
+            {
+                if (commentShell.PriorSibling == null)
+                    _comments[commentShell.Parent].FirstChild = newId;
+            }
+
+            if(commentShell.PriorSibling != null)
+                _comments[commentShell.PriorSibling].NextSibling = newId;
+
+            if (commentShell.NextSibling != null)
+                _comments[commentShell.NextSibling].PriorSibling = newId;
+
+            commentShell.Id = newId;
+            commentShell.Comment.Id = newId;
+            _comments.Remove(currentId);
+            _comments.Add(newId, commentShell);
+        }
+
+        private Comment MakeNewComment(string parentId, int depth)
+        {
+            var newCommentId = UnusedCommentId();
+            return new Comment
+            {
+                Author = SnooStreamViewModel.RedditService.CurrentUserName,
+                CreatedUTC = DateTime.UtcNow,
+                LinkTitle = Link.Title,
+                LinkId = Link.Name,
+                Body = "",
+                Name = "t1_" + newCommentId,
+                Id = newCommentId,
+                Ups = 1,
+                Downs = 0,
+                LinkUrl = Link.Url,
+                ParentId = parentId ?? Link.Name,
+                Replies = new Listing { Data = new ListingData { Children = new List<Thing>() } },
+                Subreddit = Link.Subreddit,
+                Likes = true,
+                Created = DateTime.Now
+            };
+        }
+
+        Lazy<CommentsContentStreamViewModel> _commentsContentStream;
 		public CommentsContentStreamViewModel CommentsContentStream
 		{
 			get
@@ -249,7 +398,10 @@ namespace SnooStream.ViewModel
                     }
                     else
                     {
-                        priorSibling = _comments[commentId];
+                        var current = _comments[commentId];
+                        current.PriorSibling = priorSibling != null ? priorSibling.Id : null;
+                        current.NextSibling = null;
+                        priorSibling = current;
                         MergeComment(priorSibling, child.Data as Comment);
                     }
 
@@ -273,7 +425,7 @@ namespace SnooStream.ViewModel
             {
                 Comment = new CommentViewModel(this, comment, comment.LinkId, depth),
 				Id = comment.Id,
-                Parent = comment.ParentId.StartsWith("t1_") ? comment.ParentId : null,
+                Parent = comment.ParentId.StartsWith("t1_") ? comment.ParentId.Substring("t1_".Length) : null,
                 PriorSibling = priorSibling != null ? priorSibling.Id : null,
                 InsertionWaveIndex = _commentOriginStack.Count - 1,
                 OriginType = _commentOriginStack.Last()

@@ -27,13 +27,24 @@ namespace SnooStream.View.Controls
         {
             if (!args.InRecycleQueue)
             {
-                contentControl.ContentTemplate = null;
-                contentControl.Content = null;
-                var body = ((CommentViewModel)args.Item).Body;
-                contentControl.MinHeight = Math.Max(25, body.Length / 2);
-                args.Handled = true;
-                LoadPhase = 1;
-                return true;
+                if (((CommentViewModel)args.Item).IsEditing)
+                {
+                    var editContent = (Resources["editingTemplate"] as DataTemplate).LoadContent() as FrameworkElement;
+                    editContent.DataContext = ((CommentViewModel)DataContext).ReplyViewModel;
+                    contentControl.Content = editContent;
+                    contentControl.MinHeight = 0;
+                    return false;
+                }
+                else
+                {
+                    contentControl.ContentTemplate = null;
+                    contentControl.Content = null;
+                    var body = ((CommentViewModel)args.Item).Body ?? "";
+                    contentControl.MinHeight = Math.Max(25, body.Length / 2);
+                    args.Handled = true;
+                    LoadPhase = 1;
+                    return true;
+                }
             }
             return false;
         }
@@ -57,51 +68,89 @@ namespace SnooStream.View.Controls
             return false;
         }
 
-        internal async void Phase2Load(ListViewBase sender, ContainerContentChangingEventArgs args)
+        internal async void FinishPhaseLoad(CommentViewModel viewModel)
+        {
+            var body = viewModel.Body;
+            var loadToken = LoadCancelSource.Token;
+            var markdownTpl = await Task.Run(() =>
+            {
+                try
+                {
+                    var markdownInner = SnooStreamViewModel.MarkdownProcessor.Process(body);
+                    var isPlainText = SnooStreamViewModel.MarkdownProcessor.IsPlainText(markdownInner);
+                    return Tuple.Create(markdownInner, isPlainText);
+                }
+                catch (Exception)
+                {
+                    //TODO log this failure
+                    return Tuple.Create<MarkdownData, bool>(null, true);
+                }
+            });
+
+            if (loadToken.IsCancellationRequested)
+                return;
+
+            if (!markdownTpl.Item2)
+            {
+                contentControl.ContentTemplate = Resources["markdownTemplate"] as DataTemplate;
+                contentControl.Content = markdownTpl.Item1.MarkdownDom;
+
+            }
+            else if (contentControl.Content == null)
+            {
+                var textContent = (Resources["textTemplate"] as DataTemplate).LoadContent() as FrameworkElement;
+                textContent.DataContext = body;
+                contentControl.Content = textContent;
+                contentControl.MinHeight = 0;
+            }
+            LoadPhase = 3;
+        }
+
+        internal void Phase2Load(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
             if (!args.InRecycleQueue)
             {
                 if (args.Item is CommentViewModel)
                 {
-                    var body = ((CommentViewModel)args.Item).Body;
                     args.Handled = true;
-                    var loadToken = LoadCancelSource.Token;
-                    var markdownTpl = await Task.Run(() => 
-                        {
-                            try
-                            {
-                                var markdownInner = SnooStreamViewModel.MarkdownProcessor.Process(body);
-                                var isPlainText = SnooStreamViewModel.MarkdownProcessor.IsPlainText(markdownInner);
-                                return Tuple.Create(markdownInner, isPlainText);
-                            }
-                            catch (Exception)
-                            {
-                                //TODO log this failure
-                                return Tuple.Create<MarkdownData, bool>(null, true);
-                            }
-                        });
-
-                    if (loadToken.IsCancellationRequested)
-                        return;
-
-                    if (!markdownTpl.Item2)
-                    {
-                        contentControl.ContentTemplate = Resources["markdownTemplate"] as DataTemplate;
-                        contentControl.Content = markdownTpl.Item1.MarkdownDom;
-                        
-                    }
-                    else if (contentControl.Content == null)
-                    {
-                        var textContent = (Resources["textTemplate"] as DataTemplate).LoadContent() as FrameworkElement;
-                        textContent.DataContext = body;
-                        contentControl.Content = textContent;
-                        contentControl.MinHeight = 0;
-                    }
-                    LoadPhase = 3;
+                    FinishPhaseLoad(args.Item as CommentViewModel);
                 }
                 else
                     throw new NotImplementedException();
             }
         }
-	}
+
+        private void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        {
+            if (DataContext != null && DataContext is CommentViewModel)
+            {
+                ((CommentViewModel)DataContext).PropertyChanged -= CommentView_PropertyChanged;
+            }
+
+            if(args.NewValue is CommentViewModel)
+            {
+                ((CommentViewModel)DataContext).PropertyChanged += CommentView_PropertyChanged;
+            }
+        }
+
+        private void CommentView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "IsEditing")
+            {
+                if (((CommentViewModel)DataContext).IsEditing)
+                {
+                    var editContent = (Resources["editingTemplate"] as DataTemplate).LoadContent() as FrameworkElement;
+                    editContent.DataContext = ((CommentViewModel)DataContext).ReplyViewModel;
+                    contentControl.Content = editContent;
+                    contentControl.MinHeight = 0;
+                }
+                else
+                {
+                    contentControl.Content = null;
+                    FinishPhaseLoad(DataContext as CommentViewModel);
+                }
+            }
+        }
+            
+    }
 }

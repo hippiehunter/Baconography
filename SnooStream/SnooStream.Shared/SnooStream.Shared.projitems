@@ -74,6 +74,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CommentView.xaml.cs">
       <DependentUpon>CommentView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\ComposeComment.xaml.cs">
+      <DependentUpon>ComposeComment.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\ComposeMessageView.xaml.cs">
       <DependentUpon>ComposeMessageView.xaml</DependentUpon>
     </Compile>
@@ -178,6 +181,10 @@
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\CommentView.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\ComposeComment.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\ComposeMessageView.xaml">
       <SubType>Designer</SubType>

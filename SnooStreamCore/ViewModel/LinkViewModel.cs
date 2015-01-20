@@ -223,5 +223,10 @@ namespace SnooStream.ViewModel
         {
             get { return Link.Id; }
         }
+
+        public string Name
+        {
+            get { return Link.Name; }
+        }
     }
 }

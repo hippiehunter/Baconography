@@ -6,7 +6,7 @@
     xmlns:local="using:SnooStream.View.Controls"
     xmlns:snoodom="using:SnooDom"
     mc:Ignorable="d"
-    d:DesignHeight="480" d:DesignWidth="480">
+    d:DesignHeight="480" d:DesignWidth="480" DataContextChanged="UserControl_DataContextChanged">
 
     <UserControl.Resources>
         <DataTemplate x:Name="textTemplate">
@@ -14,6 +14,9 @@
                        FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
                         HorizontalAlignment="Left" TextWrapping="WrapWholeWords"
                         Margin="3,0,0,0" Text="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate x:Name="editingTemplate">
+            <local:ComposeComment DataContext="{Binding ReplyViewModel}"/>
         </DataTemplate>
         <DataTemplate x:Name="markdownTemplate">
             <snoodom:MarkdownControl
@@ -107,11 +110,11 @@
             Content="{Binding ExtendedData, Converter={StaticResource extendedCommentConverter}}"/>-->
         <!--<ContentControl Content="{Binding ReplyData, Converter={StaticResource replyConverter}}"/>-->
         <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Visibility="{Binding IsMinimized, Converter={StaticResource booleanVisibilityConverter}}">
-            <Button BorderThickness="0" Margin="-5,-10,0,0" Padding="0" HorizontalAlignment="Left"
+            <Button BorderThickness="0" Margin="-15,-10,0,0" Padding="0" HorizontalAlignment="Left"
                     HorizontalContentAlignment="Left" Command="{Binding MinimizeCommand}" CommandParameter="{Binding}">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
-                        <Button BorderThickness="0" VerticalAlignment="Top" FontSize="15" Margin="-10,-5,-5,-5" Padding="2,-5,2,2"
+                        <Button BorderThickness="0" VerticalAlignment="Top" FontSize="15" Margin="-15,-5,-5,-5" Padding="2,-5,2,2"
                                 Command="{Binding MinimizeCommand}" CommandParameter="{Binding}">[+]</Button>
                         <Border Margin="0,0,0,0" BorderThickness="0" Padding="0" Background="{Binding PosterFlair, Converter={StaticResource authorFlairKindConverter}}">
                             <TextBlock FontStyle="Italic" FontSize="16" Margin="0,1,0,0" Text="{Binding PosterName}" />

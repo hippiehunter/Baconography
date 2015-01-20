@@ -10,18 +10,12 @@
     d:DesignHeight="480" d:DesignWidth="480">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="CommentViewTemplate">
-                <local:CommentView Visibility="{Binding IsVisible, Converter={StaticResource booleanVisibilityConverter}}"/>
-            </DataTemplate>
-            <DataTemplate x:Key="MoreViewTemplate">
-                <local:MoreCommentsView Visibility="{Binding IsVisible, Converter={StaticResource booleanVisibilityConverter}}"/>
-            </DataTemplate>
-            <DataTemplate x:Key="HeaderTemplate">
-                <local:CardCommentView DataContext="{Binding Link}" Margin="12,0,12,0"/>
-            </DataTemplate>
-            <DataTemplate x:Key="LoadFullyTemplate">
-                <Button Command="{Binding Load}" Content="Load full context" BorderThickness="0" Margin="0"/>
-            </DataTemplate>
+        <DataTemplate x:Key="HeaderTemplate">
+            <local:CardCommentView DataContext="{Binding Link}" Margin="12,0,12,0"/>
+        </DataTemplate>
+        <DataTemplate x:Key="LoadFullyTemplate">
+            <Button Command="{Binding Load}" Content="Load full context" BorderThickness="0" Margin="0"/>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot">
         <ListView x:Name="commentsList" HeaderTemplate="{StaticResource HeaderTemplate}"
