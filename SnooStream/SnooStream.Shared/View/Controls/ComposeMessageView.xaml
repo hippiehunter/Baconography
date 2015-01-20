@@ -42,7 +42,7 @@
                     <Border HorizontalAlignment="Stretch" Height="1" BorderThickness=".5" Margin="0,50,0,0" />
                 </Grid>
                 <TextBox KeyUp="TextBox_KeyUp" Grid.Row="3" AcceptsReturn="True" IsSpellCheckEnabled="True" TextChanged="TextBox_TextChanged" InputScope="Chat" 
-                                         Text="{Binding Path=Contents, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                         HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" TextWrapping="Wrap" Text="{Binding Path=Contents, Mode=TwoWay}" />
             </Grid>
         </ScrollViewer>
     </Grid>

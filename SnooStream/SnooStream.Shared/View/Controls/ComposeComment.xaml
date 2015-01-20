@@ -58,7 +58,8 @@
                 Command="{Binding AddNumbers}"/>
         </StackPanel>
         
-        <TextBox Grid.Row="1" AcceptsReturn="True" Height="300" HorizontalAlignment="Stretch" InputScope="Chat" Text="{Binding ReplyBody, Mode=TwoWay}" TextChanged="TextBox_TextChanged"/>
+        <TextBox Grid.Row="1" AcceptsReturn="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" TextWrapping="Wrap"
+                 InputScope="Chat" IsSpellCheckEnabled="True" Text="{Binding ReplyBody, Mode=TwoWay}" TextChanged="TextBox_TextChanged"/>
         
         <snoodom:MarkdownControl
             Grid.Row="2"

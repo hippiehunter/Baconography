@@ -4,7 +4,7 @@
 
 Platform::String^ readFileWithLock(std::wstring fileName)
 {
-	std::wifstream ifs(fileName, std::ios_base::in | std::ios_base::binary, _SH_DENYRW);
+	std::wifstream ifs(fileName, std::ios_base::in | std::ios_base::binary | std::ios_base::ate, _SH_DENYRW);
 	auto fileSize = ifs.tellg();
 	if (ifs.is_open() && fileSize > 0)
 	{
