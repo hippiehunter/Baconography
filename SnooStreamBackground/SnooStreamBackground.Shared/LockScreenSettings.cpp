@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "LockScreenSettings.h"
+#include "FileUtilities.h"
 
 #include <iostream>
 #include <fstream>
@@ -18,18 +19,10 @@ LockScreenSettings::LockScreenSettings()
 {
     wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
     localPath += L"\\bgtaskSettings.txt";
-	wifstream settingsFile(localPath, std::ios_base::in | std::ios_base::binary, _SH_DENYRW);
-
-	wstring fileStr;
-	if (settingsFile.is_open())
-	{
-		fileStr = wstring(istreambuf_iterator<wchar_t>(settingsFile), istreambuf_iterator<wchar_t>());
-	}
-
-	settingsFile.close();
-    if (fileStr.size() > 0)
+	auto fileStr = readFileWithLock(localPath);
+    if (fileStr->Length() > 0)
     {
-        auto parsedFileObject = JsonObject::Parse(ref new String(fileStr.data(), fileStr.size()));
+        auto parsedFileObject = JsonObject::Parse(fileStr);
 
         RedditOAuth = parsedFileObject->GetNamedString("RedditOAuth", RedditOAuth);
         LockScreenOverlayRoundedEdges = parsedFileObject->GetNamedBoolean("LockScreenOverlayRoundedEdges", LockScreenOverlayRoundedEdges);

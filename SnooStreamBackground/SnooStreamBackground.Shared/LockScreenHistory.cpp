@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "LockScreenHistory.h"
+#include "FileUtilities.h"
 
 #include <iostream>
 #include <fstream>
@@ -20,23 +21,15 @@ LockScreenHistory::LockScreenHistory()
 {
     wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
     localPath += L"\\bgtaskHistory.txt";
-    wifstream settingsFile(localPath, std::ios_base::in | std::ios_base::binary, _SH_DENYRW);
-
-	wstring fileStr;
-	if (settingsFile.is_open())
-	{
-		fileStr = wstring(istreambuf_iterator<wchar_t>(settingsFile), istreambuf_iterator<wchar_t>());
-	}
-
-    settingsFile.close();
+	auto fileStr = readFileWithLock(localPath);
 
     _history = ref new Platform::Collections::UnorderedMap<Platform::String^, int>();
-    if (fileStr.size() > 0)
+	if (fileStr->Length() > 0)
     {
 		JsonObject^ parsedFileObject = nullptr;
 		try
 		{
-			parsedFileObject = JsonObject::Parse(ref new String(fileStr.data(), fileStr.size()));
+			parsedFileObject = JsonObject::Parse(fileStr);
 		}
 		catch(...)
 		{

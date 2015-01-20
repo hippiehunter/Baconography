@@ -91,11 +91,11 @@ namespace SnooStreamBackground
             redditService = std::make_unique<SimpleRedditService>(RedditOAuth::Deserialize(lockScreenSettings->RedditOAuth));
 
             auto tileUpdateTask = RunTileUpdater(lockScreenSettings, lockScreenHistory)
-                .then([=]()
+                .then([=](task<void> task)
             {
                 return ImageUtilities::ClearOldTempImages();
             })
-                .then([=]()
+                .then([=](task<void> task)
             {
                 lockScreenHistory->Store();
                 if (taskInstance != nullptr)
@@ -121,7 +121,7 @@ namespace SnooStreamBackground
         task<void> UpdateLockScreen(String^ lockScreenImagePath)
         {
 #ifdef WINDOWS_PHONE
-            return task<void>();
+            return concurrency::task_from_result();
 #else
             return create_task(Windows::Storage::StorageFile::GetFileFromPathAsync(lockScreenImagePath)).then([](StorageFile^ file)
             {
@@ -168,10 +168,8 @@ namespace SnooStreamBackground
                         liveTileImageUrls.push_back(message);
                     }
                 }
-                //TODO
-                //check history to see if we've already shown this tile in the past if so, penalize it and prefer other tiles
-                //need to do cleanup on LockScreen*.jpg files with older creation dates, after sucessfully building the live tiles
 
+                //check history to see if we've already shown this tile in the past if so, penalize it and prefer other tiles
                 std::sort(liveTileImageUrls.begin(), liveTileImageUrls.end(), [&](tuple<String^, String^> option1, tuple<String^, String^> option2)
                 {
                     return history->Age(std::get<1>(option1)) > history->Age(std::get<1>(option2));
@@ -189,7 +187,7 @@ namespace SnooStreamBackground
 
         task<void> RunSecondaryTileUpdater(LockScreenSettings^ settings, LockScreenHistory^ history, LiveTileSettings^ liveTile)
         {
-            return task<void>();
+			return concurrency::task_from_result();
         }
 
         task<void> RunTileUpdater(LockScreenSettings^ settings, LockScreenHistory^ history)
@@ -206,7 +204,7 @@ namespace SnooStreamBackground
                     auto tsk = RunPrimaryTileUpdater(settings, history, settings->LiveTileSettings->GetAt(0));
                     for (int i = 1; i < settings->LiveTileSettings->Size; i++)
                     {
-                        tsk = tsk.then([&]()
+                        tsk = tsk.then([&](task<void> priorTask)
                         {
                             return RunSecondaryTileUpdater(settings, history, settings->LiveTileSettings->GetAt(i));
                         });
@@ -214,7 +212,7 @@ namespace SnooStreamBackground
                     return tsk;
                 }
                 else
-                    return task<void>();
+                    return concurrency::task_from_result();
             };
             
             if (!_external && activityManager->NeedsRefresh)

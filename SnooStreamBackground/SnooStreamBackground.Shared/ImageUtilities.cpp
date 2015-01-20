@@ -73,22 +73,27 @@ task<void> ImageUtilities::ClearOldTempImages()
             return create_task(ApplicationData::Current->LocalFolder->GetFilesAsync())
                 .then([=](task<Windows::Foundation::Collections::IVectorView<StorageFile^>^> filesTask)
             {
-                for (auto file : filesTask.get())
-                {
-                    auto fileName = wstring(file->Name->Data());
-                    if (ends_with(fileName, L".jpg") && starts_with(fileName, L"LiveTile"))
-                    {
-                        auto dateCreated = toDuration(file->DateCreated);
-                        if (dateCreated < cutoff)
-                            create_task(file->DeleteAsync()).then([](task<void> deleteResult) { try { deleteResult.get(); } catch (...) {} });
-                    }
-                }
+				try
+				{
+					for (auto file : filesTask.get())
+					{
+						auto fileName = wstring(file->Name->Data());
+						if (ends_with(fileName, L".jpg") && starts_with(fileName, L"LiveTile"))
+						{
+							auto dateCreated = toDuration(file->DateCreated);
+							if (dateCreated < cutoff)
+								create_task(file->DeleteAsync()).then([](task<void> deleteResult) { try { deleteResult.get(); } catch (...) {} });
+						}
+					}
+				}
+				catch (...) { }
+				return task_from_result();
             });
         }
         catch (...)
         {
         }
-		return task<void>();
+		return task_from_result();
     });
 }
 

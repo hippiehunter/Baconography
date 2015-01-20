@@ -14,6 +14,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FileUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ImageUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LiveTileUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)LockScreenHistory.h" />
@@ -31,6 +32,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)SimpleRedditService.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)FileUtilities.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ImageUtilities.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LiveTileUtilities.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)LockScreenHistory.cpp" />

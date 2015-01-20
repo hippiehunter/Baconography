@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ActivityManager.h"
 #include "SimpleRedditService.h"
+#include "FileUtilities.h"
 
 #include <fstream>
 #include <string>
@@ -20,20 +21,11 @@ ActivityManager::ActivityManager()
     wstring activityPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
     activityPath += L"\\bgtaskActivity.txt";
 
+	auto fileStr = readFileWithLock(activityPath);
 
-    wifstream activityFile(activityPath, std::ios_base::in | std::ios_base::binary, _SH_DENYRW);
-    wstring fileStr;
-
-    if (activityFile.is_open())
+    if (fileStr->Length() > 0)
     {
-		fileStr = wstring(istreambuf_iterator<wchar_t>(activityFile), istreambuf_iterator<wchar_t>());
-    }
-    activityFile.close();
-
-
-    if (fileStr.size() > 0)
-    {
-        auto parsedFileObject = JsonObject::Parse(ref new String(fileStr.data(), fileStr.size()));
+        auto parsedFileObject = JsonObject::Parse(fileStr);
         auto toastedArray = parsedFileObject->GetNamedArray("toasted");
         ReceivedBlob = parsedFileObject->GetNamedString("received");
         SentBlob = parsedFileObject->GetNamedString("sent");
