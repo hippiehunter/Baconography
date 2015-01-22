@@ -25,6 +25,7 @@ namespace SnooStream.ViewModel
         private string LastLinkId { get; set; }
 		public DateTime? LastRefresh { get; set; }
         public string Category { get; private set; }
+        private SubredditRiverViewModel _context;
         public bool IsUserMultiReddit
         {
             get
@@ -78,8 +79,9 @@ namespace SnooStream.ViewModel
 				return width ? Thing.HeaderSize[0] : Thing.HeaderSize[1];
 		}
 
-		public LinkRiverViewModel(string category, Subreddit thing, string sort, IEnumerable<Link> initialLinks, DateTime? lastRefreshed)
+		public LinkRiverViewModel(SubredditRiverViewModel context, string category, Subreddit thing, string sort, IEnumerable<Link> initialLinks, DateTime? lastRefreshed)
 		{
+            _context = context;
             Category = category;
 			LastRefresh = lastRefreshed;
 			Thing = thing;
@@ -394,6 +396,14 @@ namespace SnooStream.ViewModel
             }
         }
 
+        public RelayCommand Pin
+        {
+            get
+            {
+                return new RelayCommand(() => _context.PinSubreddit(this));
+            }
+        }
+
         public RelayCommand ShowCategoryPicker
         {
             get
@@ -454,6 +464,15 @@ namespace SnooStream.ViewModel
                         DisplayText = "Subscribe",
                         Command = Subscribe
                     });
+
+                    if (_context != null && !_context.CombinedRivers.Contains(this))
+                    {
+                        result.Add(new CommandViewModel.CommandItem
+                        {
+                            DisplayText = "Pin",
+                            Command = Pin
+                        });
+                    }
                 }
                 else
                 {

@@ -39,7 +39,7 @@ namespace SnooStream.Common
                             var result = rootContext.SubredditRiver.CombinedRivers.FirstOrDefault(vm => vm.Thing.Id == subredditThing.Item1.Id);
                             if (result == null)
                             {
-                                result = new LinkRiverViewModel(subredditThing.Item5, subredditThing.Item1, subredditThing.Item2, subredditThing.Item3, subredditThing.Item4);
+                                result = new LinkRiverViewModel(rootContext.SubredditRiver, subredditThing.Item5, subredditThing.Item1, subredditThing.Item2, subredditThing.Item3, subredditThing.Item4);
                             }
 
                             result.CurrentSelected = result.Links.FirstOrDefault(lnk => lnk.Id == subredditThing.Item5);

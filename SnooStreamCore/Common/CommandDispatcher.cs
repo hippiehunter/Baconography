@@ -168,7 +168,7 @@ namespace SnooStream.Common
                     token.ThrowIfCancellationRequested();
 
                     if (subreddit != null)
-                        SnooStreamViewModel.NavigationService.NavigateToLinkRiver(new LinkRiverViewModel("", subreddit.Data, null, null, null));
+                        SnooStreamViewModel.NavigationService.NavigateToLinkRiver(new LinkRiverViewModel(null, "", subreddit.Data, null, null, null));
                     else
                         throw new RedditException("subreddit unavailable");
                 }
@@ -204,7 +204,7 @@ namespace SnooStream.Common
                     token.ThrowIfCancellationRequested();
 
                     if (subreddit != null)
-                        SnooStreamViewModel.NavigationService.NavigateToLinkRiver(new LinkRiverViewModel("", subreddit.Data, null, null, null));
+                        SnooStreamViewModel.NavigationService.NavigateToLinkRiver(new LinkRiverViewModel(null, "", subreddit.Data, null, null, null));
                     else
                         throw new RedditException("subreddit unavailable");
                 }
@@ -277,7 +277,7 @@ namespace SnooStream.Common
                 token.ThrowIfCancellationRequested();
 
                 if (subredditThing != null)
-                    SnooStreamViewModel.NavigationService.NavigateToLinkRiver(new LinkRiverViewModel("", subredditThing.Data, null, null, null));
+                    SnooStreamViewModel.NavigationService.NavigateToLinkRiver(new LinkRiverViewModel(null, "", subredditThing.Data, null, null, null));
                 else
                     throw new RedditException("subreddit unavailable");
             });
