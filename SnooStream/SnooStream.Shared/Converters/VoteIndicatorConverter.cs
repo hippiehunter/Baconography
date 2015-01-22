@@ -57,6 +57,33 @@ namespace SnooStream.Converters
         }
     }
 
+    public class VoteUriConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            var votable = value as VotableViewModel;
+            //These are the wrong icons but they will work for now
+            if (votable != null && votable.LikeStatus != 0)
+            {
+                if (votable.LikeStatus == 1)
+                {
+                    return new BitmapIcon { UriSource = new Uri("ms-appx:///Assets/Buttons/updown_up_fill.png") };
+                }
+                else
+                {
+                    return new BitmapIcon { UriSource = new Uri("ms-appx:///Assets/Buttons/updown_down_fill.png") };
+                }
+            }
+            else
+                return new BitmapIcon { UriSource = new Uri("ms-appx:///Assets/Buttons/updown_hollow.png") };
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 	public class VoteSymbolConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, string language)

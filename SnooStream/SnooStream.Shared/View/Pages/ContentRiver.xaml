@@ -52,7 +52,7 @@
     <common:SnooApplicationPage.BottomAppBar>
         <CommandBar>
             <CommandBar.PrimaryCommands>
-                <AppBarButton DataContext="{Binding CurrentSelected}" Icon="{Binding Votable, Converter={StaticResource voteSymbolConverter}}" Label="Vote"  Command="{Binding Votable.ToggleVote}"/>
+                <AppBarButton DataContext="{Binding CurrentSelected}" Icon="{Binding Votable, Converter={StaticResource voteUriConverter}}" Label="Vote"  Command="{Binding Votable.ToggleVote}"/>
                 <AppBarButton DataContext="{Binding CurrentSelected}" Icon="Globe" Label="Browser" Command="{Binding GotoWeb}"/>
                 <AppBarButton DataContext="{Binding CurrentSelected}" Icon="Comment" Label="Comments" Command="{Binding GotoComments}"/>
                 <AppBarButton Icon="View" Label="Overlay" Click="Overlay_Click"/>

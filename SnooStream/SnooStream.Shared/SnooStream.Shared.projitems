@@ -267,6 +267,14 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Assets\Buttons\down_fill.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\Buttons\down_hollow.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\Buttons\updown_down_fill.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\Buttons\updown_fill.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\Buttons\updown_hollow.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\Buttons\updown_up_fill.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\Buttons\up_fill.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\Buttons\up_hollow.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\WebGlyphTile.png" />
   </ItemGroup>
   <ItemGroup>

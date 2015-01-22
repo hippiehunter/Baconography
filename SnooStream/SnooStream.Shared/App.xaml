@@ -7,6 +7,7 @@
             <converters:LinkMetadataConverter x:Key="linkMetadataConverter" />
             <converters:VoteIndicatorConverter x:Key="voteIndicatorConverter" />
             <converters:VoteSymbolConverter x:Key="voteSymbolConverter" />
+            <converters:VoteUriConverter x:Key="voteUriConverter" />
             <converters:BooleanVisibilityConverter x:Key="booleanVisibilityConverter" />
             <converters:InvertedBooleanVisibilityConverter x:Key="invertedBooleanVisibilityConverter" />
             <converters:LinkGlyphConverter x:Key="linkGlyphConverter" />
