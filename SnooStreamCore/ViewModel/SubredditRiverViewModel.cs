@@ -18,20 +18,118 @@ namespace SnooStream.ViewModel
 {
     public class SubredditRiverViewModel : ViewModelBase
     {
+        public class SubredditGroup
+        {
+            public string Name { get; set; }
+            public ObservableCollection<LinkRiverViewModel> Collection { get; set; }
+        }
 		static ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooStreamViewModel>();
-        static public string SmallGroupNameSelector(LinkRiverViewModel viewModel)
-        {
-            return viewModel.IsLocal ? "favorites" : "subscribed";
-        }
-
-        static public string LargeGroupNameSelector(LinkRiverViewModel viewModel)
-        {
-            return viewModel.Thing.DisplayName.Substring(0, 1);
-        }
-        
         internal ObservableCollection<LinkRiverViewModel> CombinedRivers { get; set; }
 		private ObservableCollection<LinkRiverViewModel> _subreddits;
-		public ObservableCollection<LinkRiverViewModel> Subreddits { get { return _subreddits; } set { _subreddits = value; RaisePropertyChanged("Subreddits"); } }
+
+        ObservableCollection<SubredditGroup> _subredditCollection;
+        public ObservableCollection<SubredditGroup> SubredditCollection
+        {
+            get
+            {
+                return _subredditCollection;
+            }
+        }
+		public ObservableCollection<LinkRiverViewModel> Subreddits
+        { 
+            get 
+            { 
+                return _subreddits; 
+            } 
+            set 
+            {
+                if (_subreddits != value)
+                {
+                    _subreddits = value;
+                    if (_subreddits != null && _subredditCollection != null)
+                        DetachCollection(_subreddits);
+
+                    AttachCollection(value);
+                    RaisePropertyChanged("Subreddits");
+                }
+            } 
+        }
+
+        private void AttachCollection(ObservableCollection<LinkRiverViewModel> sourceCollection)
+        {
+            _subredditCollection = SnooStreamViewModel.SystemServices.FilterAttachIncrementalLoadCollection(sourceCollection, _subredditCollection);
+            sourceCollection.CollectionChanged += sourceCollection_CollectionChanged;
+            foreach (var item in sourceCollection)
+            {
+                AddToCategory(_subredditCollection, item);
+            }
+
+            RaisePropertyChanged("SubredditCollection"); 
+        }
+
+        private void sourceCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    AddToCategory(_subredditCollection, e.NewItems[0] as LinkRiverViewModel);
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    RemoveFromCategory(_subredditCollection, e.NewItems[0] as LinkRiverViewModel);
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    RemoveFromCategory(_subredditCollection, e.OldItems[0] as LinkRiverViewModel);
+                    AddToCategory(_subredditCollection, e.NewItems[0] as LinkRiverViewModel);
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    _subredditCollection.Clear();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void AddToCategory(ObservableCollection<SubredditGroup> target, LinkRiverViewModel viewModel)
+        {
+            var category = viewModel.Category;
+            var existingCategory = target.FirstOrDefault((group) => string.Compare(group.Name, category, StringComparison.CurrentCultureIgnoreCase) == 0);
+            if (existingCategory != null)
+            {
+                existingCategory.Collection.Add(viewModel);
+            }
+            else
+            {
+                target.Add(new SubredditGroup { Name = category, Collection = new ObservableCollection<LinkRiverViewModel> { viewModel } });
+                IsShowingGroups = target.Count > 1;
+            }
+        }
+
+        private void RemoveFromCategory(ObservableCollection<SubredditGroup> target, LinkRiverViewModel viewModel)
+        {
+            var category = viewModel.Category;
+            var existingCategory = target.FirstOrDefault((group) => string.Compare(group.Name, category, StringComparison.CurrentCultureIgnoreCase) == 0);
+            if (existingCategory != null)
+            {
+                existingCategory.Collection.Remove(viewModel);
+                if (existingCategory.Collection.Count == 0)
+                {
+                    target.Remove(existingCategory);
+                    IsShowingGroups = target.Count > 1;
+                }
+            }
+        }
+
+
+        private void DetachCollection(ObservableCollection<LinkRiverViewModel> targetCollection)
+        {
+            SnooStreamViewModel.SystemServices.FilterDetachIncrementalLoadCollection(_subredditCollection, targetCollection);
+            targetCollection.CollectionChanged -= sourceCollection_CollectionChanged;
+            IsShowingGroups = false;
+            _subredditCollection.Clear();
+        }
+
         public LinkRiverViewModel SelectedRiver { get; private set; }
 		private string _searchString;
 		public string SearchString
@@ -147,7 +245,7 @@ namespace SnooStream.ViewModel
 								else
 								{
 									//TODO: this represents an oddity, we loose the cached links by creating a new LinkRiverViewModel
-									result.Add(new LinkRiverViewModel(false, subreddit.Data as Subreddit, null, null, null));
+									result.Add(new LinkRiverViewModel("", subreddit.Data as Subreddit, null, null, null));
 								}
 							}
 						}
@@ -167,7 +265,7 @@ namespace SnooStream.ViewModel
 							else
 							{
 								//TODO: this represents an oddity, we loose the cached links by creating a new LinkRiverViewModel
-								result.Add(new LinkRiverViewModel(false, subreddit.Data as Subreddit, null, null, null));
+								result.Add(new LinkRiverViewModel("", subreddit.Data as Subreddit, null, null, null));
 							}
 						}
 					}
@@ -187,12 +285,29 @@ namespace SnooStream.ViewModel
 			}
 		}
 
+        private bool _isShowingGroups = false;
+        public bool IsShowingGroups
+        {
+            get
+            {
+                return _isShowingGroups;
+            }
+            set
+            {
+                if(_isShowingGroups != value)
+                {
+                    _isShowingGroups = value;
+                    RaisePropertyChanged("IsShowingGroups");
+                }
+            }
+        }
+
         public SubredditRiverViewModel(SubredditRiverInit initBlob)
         {
             if (initBlob != null)
             {
-                var localSubreddits = initBlob.Pinned.Select(blob => new LinkRiverViewModel(true, blob.Thing, blob.DefaultSort, blob.Links, blob.LastRefresh ?? DateTime.Now));
-				var subscribbedSubreddits = initBlob.Subscribed.Select(blob => new LinkRiverViewModel(false, blob.Thing, blob.DefaultSort, blob.Links, blob.LastRefresh ?? DateTime.Now));
+                var localSubreddits = initBlob.Pinned.Select(blob => new LinkRiverViewModel(blob.Category ?? "pinned", blob.Thing, blob.DefaultSort, blob.Links, blob.LastRefresh ?? DateTime.Now));
+                var subscribbedSubreddits = initBlob.Subscribed.Select(blob => new LinkRiverViewModel(blob.Category ?? "subscribed", blob.Thing, blob.DefaultSort, blob.Links, blob.LastRefresh ?? DateTime.Now));
                 
                 CombinedRivers = new ObservableCollection<LinkRiverViewModel>(localSubreddits.Concat(subscribbedSubreddits));
                 EnsureFrontPage();
@@ -204,7 +319,7 @@ namespace SnooStream.ViewModel
                 EnsureFrontPage();
             }
 			Subreddits = CombinedRivers;
-            SelectedRiver = CombinedRivers.FirstOrDefault() ?? new LinkRiverViewModel(true, new Subreddit("/"), "hot", null, null);
+            SelectedRiver = CombinedRivers.FirstOrDefault() ?? new LinkRiverViewModel(IsLoggedIn ? "subscribed" : "popular", new Subreddit("/"), "hot", null, null);
             Messenger.Default.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
         }
 
@@ -223,24 +338,34 @@ namespace SnooStream.ViewModel
         {
             if (!CombinedRivers.Any((lrvm) => lrvm.Thing.Url == "/"))
             {
-                CombinedRivers.Add(new LinkRiverViewModel(true, new Subreddit("/"), "hot", null, null));
+                CombinedRivers.Add(new LinkRiverViewModel(IsLoggedIn ? "subscribed" : "popular", new Subreddit("/"), "hot", null, null));
+            }
+        }
+
+        private bool IsLoggedIn
+        {
+            get
+            {
+                return SnooStreamViewModel.RedditUserState != null && !string.IsNullOrWhiteSpace(SnooStreamViewModel.RedditUserState.Username);
             }
         }
 
         private async void LoadWithoutInitial()
         {
             CombinedRivers = new ObservableCollection<LinkRiverViewModel>();
-            Listing subscribedListing = null; 
-            if (SnooStreamViewModel.RedditUserState != null && !string.IsNullOrWhiteSpace(SnooStreamViewModel.RedditUserState.Username))
+            Listing subscribedListing = null;
+            string categoryName = "subscribed";
+            if (IsLoggedIn)
             {
                 subscribedListing = await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing();
             }
             else
             {
-                subscribedListing = await SnooStreamViewModel.RedditService.GetSubreddits(25);
+                categoryName = "popular";
+                subscribedListing = await SnooStreamViewModel.RedditService.GetSubreddits(25, "popular");
             }
 
-            foreach (var river in subscribedListing.Data.Children.Select(thing => new LinkRiverViewModel(false, thing.Data as Subreddit, "hot", null, null)))
+            foreach (var river in subscribedListing.Data.Children.Select(thing => new LinkRiverViewModel(categoryName, thing.Data as Subreddit, "hot", null, null)))
             {
                 CombinedRivers.Add(river);
             }
@@ -283,7 +408,7 @@ namespace SnooStream.ViewModel
 					if (!existingRivers.ContainsKey(river.Thing.Id))
 						existingRivers.Add(river.Thing.Id, river);
 
-					if (!river.IsLocal && !newRivers.ContainsKey(river.Thing.Id))
+					if (river.Category != "subscribed" && !newRivers.ContainsKey(river.Thing.Id))
 						missingRivers.Add(river);
 					else if (newRivers.ContainsKey(river.Thing.Id))
 						river.Thing = newRivers[river.Thing.Id];
@@ -293,7 +418,7 @@ namespace SnooStream.ViewModel
 				foreach (var subredditTpl in newRivers)
 				{
 					if (!existingRivers.ContainsKey(subredditTpl.Key))
-						CombinedRivers.Add(new LinkRiverViewModel(false, subredditTpl.Value, "hot", null, null));
+						CombinedRivers.Add(new LinkRiverViewModel("subscribed", subredditTpl.Value, "hot", null, null));
 				}
 
 				foreach (var missingRiver in missingRivers)
@@ -312,11 +437,11 @@ namespace SnooStream.ViewModel
 			return new SubredditRiverInit
 			{
 				Pinned = CombinedRivers
-					.Where(vm => vm.IsLocal)
+					.Where(vm => vm.Category != "subscribed")
 					.Select(vm => vm.Dump())
 					.ToList(),
 				Subscribed = CombinedRivers
-					.Where(vm => !vm.IsLocal)
+                    .Where(vm => vm.Category == "subscribed")
 					.Select(vm => vm.Dump())
 					.ToList(),
 			};

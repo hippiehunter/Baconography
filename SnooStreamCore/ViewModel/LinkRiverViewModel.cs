@@ -24,7 +24,6 @@ namespace SnooStream.ViewModel
         public string Sort { get; private set; }
         private string LastLinkId { get; set; }
 		public DateTime? LastRefresh { get; set; }
-        public bool IsLocal { get; private set; }
         public string Category { get; private set; }
         public bool IsUserMultiReddit
         {
@@ -79,11 +78,12 @@ namespace SnooStream.ViewModel
 				return width ? Thing.HeaderSize[0] : Thing.HeaderSize[1];
 		}
 
-		public LinkRiverViewModel(bool isLocal, Subreddit thing, string sort, IEnumerable<Link> initialLinks, DateTime? lastRefreshed)
+		public LinkRiverViewModel(string category, Subreddit thing, string sort, IEnumerable<Link> initialLinks, DateTime? lastRefreshed)
 		{
+            Category = category;
 			LastRefresh = lastRefreshed;
-			IsLocal = isLocal;
 			Thing = thing;
+            About = Thing.Name != null ? new AboutRedditViewModel(Thing.Url) : null;
 			Sort = sort ?? "hot";
 			Links = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new LinksLoader(this));
 			if (initialLinks != null)
@@ -446,7 +446,7 @@ namespace SnooStream.ViewModel
                 }
 
 
-                if(IsLocal)
+                if(!Thing.Subscribed)
                 {
                     //Subscribe
                     result.Add(new CommandViewModel.CommandItem

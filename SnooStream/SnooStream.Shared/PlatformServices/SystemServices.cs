@@ -450,6 +450,21 @@ namespace SnooStream.PlatformServices
 			return new BufferedAuxiliaryIncrementalLoadCollection<T>(loader, loadIncrement, auxiliaryTimeout);
 		}
 
+        public ObservableCollection<T> FilterAttachIncrementalLoadCollection<T, T2>(ObservableCollection<T2> incrementalSource, ObservableCollection<T> filteredCollection)
+        {
+            var result = (filteredCollection as AttachedIncrementalLoadCollection<T>) ?? new AttachedIncrementalLoadCollection<T>();
+            if(incrementalSource is ISupportIncrementalLoading)
+                result.AttachCollection(incrementalSource as ISupportIncrementalLoading);
+            return result;
+        }
+
+        public void FilterDetachIncrementalLoadCollection<T, T2>(ObservableCollection<T> filteredCollection, ObservableCollection<T2> incrementalSource)
+        {
+            var attached = filteredCollection as AttachedIncrementalLoadCollection<T>;
+            if(attached != null && incrementalSource is ISupportIncrementalLoading)
+                attached.RemoveCollection(incrementalSource as ISupportIncrementalLoading);
+        }
+
 
 		internal class WrappedCollectionViewSource : IWrappedCollectionViewSource
 		{

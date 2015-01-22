@@ -91,7 +91,7 @@ namespace SnooStream.PlatformServices
 
         public void NavigateToAboutReddit(AboutRedditViewModel viewModel)
         {
-            throw new NotImplementedException();
+            _frame.Navigate(typeof(AboutSubreddit), "state=" + _navState.AddState(viewModel));
         }
 
 		public void NavigateToContentSettings(SettingsViewModel viewModel)

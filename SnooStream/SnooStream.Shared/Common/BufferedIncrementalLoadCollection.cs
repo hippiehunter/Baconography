@@ -115,4 +115,43 @@ namespace SnooStream.Common
 			}
 		}
 	}
+
+    public class AttachedIncrementalLoadCollection<T> : ObservableCollection<T>, ISupportIncrementalLoading
+    {
+        List<ISupportIncrementalLoading> _sources = new List<ISupportIncrementalLoading>();
+
+        public void AttachCollection(ISupportIncrementalLoading sourceCollection)
+        {
+            if (sourceCollection.HasMoreItems)
+            {
+                var task = sourceCollection.LoadMoreItemsAsync(25);
+            }
+
+            _sources.Add(sourceCollection);
+        }
+
+        public void RemoveCollection(ISupportIncrementalLoading sourceCollection)
+        {
+            _sources.Remove(sourceCollection);
+        }
+
+
+        public bool HasMoreItems
+        {
+            get { return _sources.Any(incr => incr.HasMoreItems); }
+        }
+
+        public Windows.Foundation.IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        {
+            List<Task<LoadMoreItemsResult>> resultTasks = new List<Task<LoadMoreItemsResult>>();
+            foreach(var incr in _sources)
+            {
+                resultTasks.Add(incr.LoadMoreItemsAsync(count).AsTask());
+            }
+
+            return Task.WhenAll(resultTasks).ContinueWith((rslt) => rslt.Result
+                .Aggregate(new LoadMoreItemsResult { Count = 0}, (seed, itemsRslt) => { seed.Count += itemsRslt.Count; return seed;}), TaskContinuationOptions.OnlyOnRanToCompletion)
+                .AsAsyncOperation();
+        }
+    }
 }

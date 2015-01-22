@@ -13,7 +13,10 @@
     mc:Ignorable="d"
     d:DesignHeight="480" d:DesignWidth="480" x:Name="root" >
     
-
+    <UserControl.Resources>
+        <CollectionViewSource x:Name="subredditViewSource" ItemsPath="Collection" IsSourceGrouped="True" Source="{Binding SubredditCollection}"/>
+    </UserControl.Resources>
+    
     <Grid x:Name="LayoutRoot">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
@@ -39,11 +42,10 @@
         </VisualStateManager.VisualStateGroups>
         <Grid.Resources>
 			<DataTemplate x:Name="subredditGroupHeader">
-				<Border HorizontalAlignment="Stretch"
-					BorderThickness="0,0,0,0" Margin="0,0,18,0"
-					Visibility="{Binding Converter={StaticResource blankVisibilityConverter}}">
-					<TextBlock Text="{Binding}" Padding="6" Margin="12,0,12,0"
-						HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Border HorizontalAlignment="Stretch" Visibility="{Binding DataContext.IsShowingGroups, ElementName=root, Converter={StaticResource booleanVisibilityConverter}}"
+					BorderThickness="0,0,0,0" Margin="0,0,18,0">
+					<TextBlock Text="{Binding Name}" FontSize="24" FontWeight="Bold" Padding="6" Margin="12,0,12,0"
+						HorizontalAlignment="Left" VerticalAlignment="Center" />
 				</Border>
 			</DataTemplate>
 
@@ -82,7 +84,7 @@
 			x:Name="listBox"
 			HorizontalAlignment="Stretch"
 			HorizontalContentAlignment="Stretch"
-			Margin="-12,0,-12,0" ItemsSource="{Binding Subreddits}">
+			Margin="-12,0,-12,0" ItemsSource="{Binding Source={StaticResource subredditViewSource}}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -97,6 +99,9 @@
 					</Button>
 				</DataTemplate>
 			</ListView.ItemTemplate>
+            <ListView.GroupStyle>
+                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource subredditGroupHeader}"/>
+            </ListView.GroupStyle>
             <ListView.Footer>
                 <Grid Height="12" />
             </ListView.Footer>

@@ -27,14 +27,19 @@ namespace SnooStream.Common
                             var accountThing = JsonConvert.DeserializeObject<Tuple<Account, DateTime>>(stateItem.Item2);
                             return new AboutUserViewModel(accountThing.Item1, accountThing.Item2);
                         }
+                    case "AboutRedditViewModel":
+                        {
+                            var subredditThing = JsonConvert.DeserializeObject<Tuple<Subreddit, DateTime>>(stateItem.Item2);
+                            return new AboutRedditViewModel(subredditThing.Item1, subredditThing.Item2);
+                        }
                     case "LinkRiverViewModel":
                         {
                             Debug.Assert(context is SnooStreamViewModel);
-                            var subredditThing = JsonConvert.DeserializeObject<Tuple<Subreddit, string, List<Link>, DateTime, string>>(stateItem.Item2);
+                            var subredditThing = JsonConvert.DeserializeObject<Tuple<Subreddit, string, List<Link>, DateTime, string, string>>(stateItem.Item2);
                             var result = rootContext.SubredditRiver.CombinedRivers.FirstOrDefault(vm => vm.Thing.Id == subredditThing.Item1.Id);
                             if (result == null)
                             {
-                                result = new LinkRiverViewModel(false, subredditThing.Item1, subredditThing.Item2, subredditThing.Item3, subredditThing.Item4);
+                                result = new LinkRiverViewModel(subredditThing.Item5, subredditThing.Item1, subredditThing.Item2, subredditThing.Item3, subredditThing.Item4);
                             }
 
                             result.CurrentSelected = result.Links.FirstOrDefault(lnk => lnk.Id == subredditThing.Item5);

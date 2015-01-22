@@ -116,8 +116,8 @@ namespace SnooStream.ViewModel
 
         public Task MaybeRefresh()
         {
-            var validLastRefresh = LastRefresh ?? DateTime.UtcNow;
-            if ((validLastRefresh - DateTime.UtcNow).TotalMinutes > 15)
+            var validLastRefresh = LastRefresh ?? new DateTime();
+            if ((DateTime.UtcNow - validLastRefresh).TotalMinutes > 15)
                 return Refresh(false);
             else
                 return Task.FromResult<bool>(true);
@@ -198,6 +198,13 @@ namespace SnooStream.ViewModel
                 return new RelayCommand(() => SnooStreamViewModel.SystemServices.ShowMessage("Not implemented", "Gilding is not currently implemented please post to /r/Snoostream if this feature is important to you"));
             }
         }
-        
+
+        public RelayCommand ShowUserDetails
+        {
+            get
+            {
+                return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToAboutUser(this));
+            }
+        }
     }
 }

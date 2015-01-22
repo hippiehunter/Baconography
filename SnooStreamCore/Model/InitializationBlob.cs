@@ -41,5 +41,6 @@ namespace SnooStream.Common
         public List<Link> Links { get; set; }
         public string DefaultSort { get; set; }
 		public DateTime? LastRefresh { get; set; }
+        public string Category { get; set; }
     }
 }
