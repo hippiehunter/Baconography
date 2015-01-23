@@ -11,6 +11,14 @@ namespace SnooStream.ViewModel
 {
 	public class ContentStreamViewModel : ViewModelBase
 	{
+        private static async void DelayContentStreamAddition(IEnumerable<ILinkViewModel> rawBefore, ObservableCollection<ILinkViewModel> target)
+        {
+            await Task.Delay(100);
+            foreach (var raw in rawBefore.Reverse())
+            {
+                target.Insert(0, raw);
+            }
+        }
 		public static ObservableCollection<ILinkViewModel> MakeFilteredContentStream(ObservableCollection<ILinkViewModel> raw, ILinkViewModel hasImmunity)
 		{
 			var filterFunc = new Func<ILinkViewModel, bool>((link) =>
@@ -30,7 +38,14 @@ namespace SnooStream.ViewModel
 				return true;
 			});
 
-			ObservableCollection<ILinkViewModel> filteredCollection = new ObservableCollection<ILinkViewModel>(raw.Where(filterFunc));
+            var filteredList = raw.Where(filterFunc).ToList();
+            var selectedIndex = filteredList.IndexOf(hasImmunity);
+            ObservableCollection<ILinkViewModel> filteredCollection = new ObservableCollection<ILinkViewModel>(filteredList.Skip(selectedIndex - 1));
+            if(selectedIndex > 0)
+            {
+                var rawBefore = filteredList.Take(selectedIndex - 1);
+                DelayContentStreamAddition(rawBefore, filteredCollection);
+            }
 
 			raw.CollectionChanged += (s, e) =>
 				{

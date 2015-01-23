@@ -1,11 +1,13 @@
 ﻿using SnooStream.Common;
 using SnooStream.View.Controls.Content;
 using SnooStream.ViewModel;
+using SnooStream.ViewModel.Content;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -30,7 +32,7 @@ namespace SnooStream.View.Pages
             this.InitializeComponent();
         }
 
-		protected override void OnNavigatedTo(NavigationEventArgs e)
+		protected override async void OnNavigatedTo(NavigationEventArgs e)
 		{
 			base.OnNavigatedTo(e);
 			if(DataContext is IHasLinks)
@@ -41,7 +43,19 @@ namespace SnooStream.View.Pages
 				if (dataContext.CurrentSelected != null)
 					SnooStreamViewModel.OfflineService.AddHistory(dataContext.CurrentSelected.Url);
 				flipView.SelectionChanged += flipView_SelectionChanged;
-			}
+
+                await Task.Delay(10);
+                if (dataContext.CurrentSelected.Content is VideoViewModel)
+                {
+                    var videoControl = FindContentType<VideoControl>(flipView.ContainerFromItem(dataContext.CurrentSelected) as FlipViewItem);
+                    if (videoControl != null)
+                    {
+                        videoControl.player.Position = new TimeSpan();
+                        videoControl.player.Play();
+                        videoControl.player.AutoPlay = true;
+                    }
+                }
+            }
 		}
 
 		private async void flipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -64,7 +78,52 @@ namespace SnooStream.View.Pages
 						await loader.LoadMoreItemsAsync(20);
 				}
 			}
+
+            try
+            {
+                if (e.RemovedItems.Count > 0)
+                {
+                    if (((ILinkViewModel)e.RemovedItems[0]).Content is VideoViewModel)
+                    {
+                        var videoControl = FindContentType<VideoControl>(flipView.ContainerFromItem(e.RemovedItems[0]) as FlipViewItem);
+                        if (videoControl != null)
+                        {
+                            videoControl.player.Stop();
+                            videoControl.player.Position = new TimeSpan();
+                        }
+                    }
+                }
+
+                if (e.AddedItems.Count > 0)
+                {
+                    if (((ILinkViewModel)e.AddedItems[0]).Content is VideoViewModel)
+                    {
+                        var videoControl = FindContentType<VideoControl>(flipView.ContainerFromItem(e.AddedItems[0]) as FlipViewItem);
+                        if (videoControl != null)
+                        {
+                            videoControl.player.Position = new TimeSpan();
+                            videoControl.player.Play();
+                            videoControl.player.AutoPlay = true;
+                        }
+                    }
+                }
+            }
+            catch { }
 		}
+
+        private T FindContentType<T>(FlipViewItem itemContainer) where T : class
+        {
+            var itemContentControl = itemContainer.ContentTemplateRoot as ContentControl;
+            if (itemContentControl != null)
+            {
+                var nestedContentControl = itemContentControl.ContentTemplateRoot as T;
+                if (nestedContentControl != null)
+                {
+                    return nestedContentControl as T;
+                }
+            }
+            return null;
+        }
 
 		private bool _overlayVisible = true;
 		private void Overlay_Click(object sender, RoutedEventArgs e)
@@ -75,5 +134,10 @@ namespace SnooStream.View.Pages
 			else 
 				fadeOutOverlay.Begin();
 		}
-	}
+
+        private void caption_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+
+        }
+    }
 }

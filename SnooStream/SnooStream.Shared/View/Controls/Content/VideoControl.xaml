@@ -10,5 +10,5 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <mmppf:MediaPlayer x:Name="player" AutoPlay="False"  Source="{Binding BestPlayableUrl}" IsFullScreen="True"/>
+    <mmppf:MediaPlayer x:Name="player" x:FieldModifier="public" AutoPlay="False" IsLooping="{Binding IsLooping}"  Source="{Binding BestPlayableUrl}" IsFullScreen="True"/>
 </UserControl>

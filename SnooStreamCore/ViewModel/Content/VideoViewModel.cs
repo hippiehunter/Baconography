@@ -33,6 +33,14 @@ namespace SnooStream.ViewModel.Content
 			}
 		}
 
+        public bool IsLooping
+        {
+            get
+            {
+                return CommonResourceAcquisition.VideoAcquisition.VideoAcquisition.IsGifType(_url);
+            }
+        }
+
 		internal Task<string> StillUrl()
 		{
 			return _videoResult.Value.PreviewUrl(CancelToken.Token);
