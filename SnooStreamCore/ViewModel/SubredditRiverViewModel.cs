@@ -71,6 +71,11 @@ namespace SnooStream.ViewModel
 
                         if (_context != null)
                         {
+                            if (_context.LocalSubreddits != null)
+                            {
+                                if (!_context.LocalSubreddits.Contains(this))
+                                    _context.AddToLocalSubreddits(this);
+                            }
                             _context.RemoveFromCategory(_context.SubredditCollection, this);
                             _context.AddToCategory(_context.SubredditCollection, this);
                         }
@@ -210,6 +215,13 @@ namespace SnooStream.ViewModel
         ObservableCollection<SubredditWrapper> LocalSubreddits { get; set; }
         ObservableCollection<SubredditWrapper> SearchSubreddits { get; set; }
         ObservableCollection<SubredditWrapper> AttachedCollection { get; set; }
+
+        void AddToLocalSubreddits(SubredditWrapper wrapper)
+        {
+            if (!LocalSubreddits.Any((local) => local.Name == wrapper.Name))
+                LocalSubreddits.Add(wrapper);
+        }
+
         private void AttachCollection(ObservableCollection<SubredditWrapper> sourceCollection)
         {
             if (sourceCollection != AttachedCollection)
@@ -263,7 +275,7 @@ namespace SnooStream.ViewModel
             }
             else
             {
-                target.Add(new SubredditGroup { Name = category, Collection = new ObservableCollection<SubredditWrapper> { viewModel } });
+                target.Insert(0, new SubredditGroup { Name = category, Collection = new ObservableCollection<SubredditWrapper> { viewModel } });
                 IsShowingGroups = target.Count > 1;
             }
         }
@@ -464,12 +476,20 @@ namespace SnooStream.ViewModel
         {
             if (initBlob != null && initBlob.Local != null)
             {
-                LocalSubreddits = new ObservableCollection<SubredditWrapper>(initBlob.Local.Select(blob => new SubredditWrapper(this, blob.Thing.Url, blob.Thing, blob.DefaultSort, blob.Category ?? "pinned")));
+                LocalSubreddits = new ObservableCollection<SubredditWrapper>();
+                foreach(var local in initBlob.Local.Select(blob => new SubredditWrapper(this, blob.Thing.Url, blob.Thing, blob.DefaultSort, blob.Category ?? "pinned")))
+                {
+                    AddToLocalSubreddits(local);
+                }
                 EnsureFrontPage();
-                ReloadSubscribed(false);
+                if (IsLoggedIn)
+                    ReloadSubscribed(false);
+                else
+                    LoadWithoutInitial();
             }
             else
             {
+                LocalSubreddits = new ObservableCollection<SubredditWrapper>();
                 LoadWithoutInitial();
                 EnsureFrontPage();
             }
@@ -495,10 +515,7 @@ namespace SnooStream.ViewModel
 
         private void EnsureFrontPage()
         {
-            if (!LocalSubreddits.Any((lrvm) => lrvm.Thing.Url == "/"))
-            {
-                LocalSubreddits.Add(new SubredditWrapper(this, "/", new Subreddit("/"), "hot", IsLoggedIn ? "subscribed" : "popular"));
-            }
+            AddToLocalSubreddits(new SubredditWrapper(this, "/", new Subreddit("/"), "hot", IsLoggedIn ? "subscribed" : "popular"));
         }
 
         private bool IsLoggedIn
@@ -511,7 +528,6 @@ namespace SnooStream.ViewModel
 
         private async void LoadWithoutInitial()
         {
-            LocalSubreddits = new ObservableCollection<SubredditWrapper>();
             Listing subscribedListing = null;
             string categoryName = "subscribed";
             if (IsLoggedIn)
@@ -526,7 +542,7 @@ namespace SnooStream.ViewModel
 
             foreach (var river in subscribedListing.Data.Children.Select(thing => new SubredditWrapper(this, ((Subreddit)thing.Data).Url, thing.Data as Subreddit, "hot", categoryName)))
             {
-                LocalSubreddits.Add(river);
+                AddToLocalSubreddits(river);
             }
         }
 
@@ -577,7 +593,7 @@ namespace SnooStream.ViewModel
 				foreach (var subredditTpl in newRivers)
 				{
 					if (!existingRivers.ContainsKey(subredditTpl.Key))
-                        LocalSubreddits.Add(new SubredditWrapper(this, subredditTpl.Value.Url, subredditTpl.Value, "hot", "subscribed"));
+                        AddToLocalSubreddits(new SubredditWrapper(this, subredditTpl.Value.Url, subredditTpl.Value, "hot", "subscribed"));
 				}
 
 				foreach (var missingRiver in missingRivers)
@@ -593,8 +609,7 @@ namespace SnooStream.ViewModel
 
         public void PinSubreddit(LinkRiverViewModel linkRiver)
         {
-            if (!LocalSubreddits.Any((wrap) => wrap.Thing.Url == linkRiver.Thing.Url))
-                LocalSubreddits.Add(new SubredditWrapper(this, linkRiver.Thing.Url, linkRiver.Thing, linkRiver.Sort, string.IsNullOrWhiteSpace(linkRiver.Category) ? "pinned" : linkRiver.Category));
+            AddToLocalSubreddits(new SubredditWrapper(this, linkRiver.Thing.Url, linkRiver.Thing, linkRiver.Sort, string.IsNullOrWhiteSpace(linkRiver.Category) ? "pinned" : linkRiver.Category));
         }
 
 		internal SubredditRiverInit Dump()
