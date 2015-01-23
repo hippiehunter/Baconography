@@ -454,7 +454,7 @@ namespace SnooStream.ViewModel
 
         public SubredditRiverViewModel(SubredditRiverInit initBlob)
         {
-            if (initBlob != null)
+            if (initBlob != null && initBlob.Local != null)
             {
                 LocalSubreddits = new ObservableCollection<SubredditWrapper>(initBlob.Local.Select(blob => new SubredditWrapper(this, blob.Thing.Url, blob.Thing, blob.DefaultSort, blob.Category ?? "pinned")));
                 EnsureFrontPage();
