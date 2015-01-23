@@ -36,12 +36,7 @@ namespace SnooStream.Common
                         {
                             Debug.Assert(context is SnooStreamViewModel);
                             var subredditThing = JsonConvert.DeserializeObject<Tuple<Subreddit, string, List<Link>, DateTime, string, string>>(stateItem.Item2);
-                            var result = rootContext.SubredditRiver.CombinedRivers.FirstOrDefault(vm => vm.Thing.Id == subredditThing.Item1.Id);
-                            if (result == null)
-                            {
-                                result = new LinkRiverViewModel(rootContext.SubredditRiver, subredditThing.Item5, subredditThing.Item1, subredditThing.Item2, subredditThing.Item3, subredditThing.Item4);
-                            }
-
+                            var result = rootContext.SubredditRiver.GetOrMakeSubreddit(subredditThing.Item5, subredditThing.Item1, subredditThing.Item2, subredditThing.Item3, subredditThing.Item4);
                             result.CurrentSelected = result.Links.FirstOrDefault(lnk => lnk.Id == subredditThing.Item5);
                             return result;
                         }

@@ -65,8 +65,9 @@ namespace SnooStream.PlatformServices
             if (_frame.Content is LinkRiver)
             {
 				var hub = _frame.Content as LinkRiver;
-                var ssvm = hub.DataContext as SnooStreamViewModel;
-                ssvm.SubredditRiver.SelectSubreddit(viewModel);
+                var ssvm = hub.DataContext as LinkRiverViewModel;
+                hub.DataContext = viewModel;
+                ssvm.Context.SelectSubreddit(viewModel);
             }
             else
             {
@@ -129,6 +130,31 @@ namespace SnooStream.PlatformServices
                     
                     popup.Placement = Windows.UI.Xaml.Controls.Primitives.FlyoutPlacementMode.Bottom;
                     popup.ShowAt(sourceElement);
+                    return completionSource.Task;
+                }
+                else
+                    throw new NotImplementedException();
+            }
+            else if (viewModel is InputViewModel)
+            {
+                if (elementTarget != null && elementTarget is RoutedEventArgs)
+                {
+                    var inputViewModel = viewModel as InputViewModel;
+                    var popup = new Flyout();
+                    var inputBox = new TextBox { Text = inputViewModel.InputValue };
+                    var stackPanel = new StackPanel { HorizontalAlignment = HorizontalAlignment.Stretch };
+                    stackPanel.Children.Add(new TextBlock { Text = inputViewModel.Prompt });
+                    stackPanel.Children.Add(inputBox);
+                    popup.Content = stackPanel;
+                    TaskCompletionSource<bool> completionSource = new TaskCompletionSource<bool>();
+                    popup.Closed += (sender, args) =>
+                        {
+                            if (inputViewModel.Dismissed != null)
+                                inputViewModel.Dismissed.Execute(string.IsNullOrWhiteSpace(inputBox.Text) ? "pinned" : inputBox.Text);
+                            completionSource.TrySetResult(true);
+                        };
+                    popup.Placement = Windows.UI.Xaml.Controls.Primitives.FlyoutPlacementMode.Bottom;
+                    popup.ShowAt(((RoutedEventArgs)elementTarget).OriginalSource as FrameworkElement);
                     return completionSource.Task;
                 }
                 else

@@ -90,6 +90,7 @@
     <Compile Include="ViewModel\LoadFullCommentsViewModel.cs" />
     <Compile Include="ViewModel\MoreViewModel.cs" />
     <Compile Include="ViewModel\Popups\CommandViewModel.cs" />
+    <Compile Include="ViewModel\Popups\InputViewModel.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
     <Compile Include="ViewModel\Activities\ActivityViewModel.cs" />
     <Compile Include="ViewModel\SelfStreamViewModel.cs" />

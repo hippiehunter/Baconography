@@ -31,14 +31,12 @@ namespace SnooStream.Common
 
     public class SubredditRiverInit
     {
-        public List<SubredditInit> Pinned { get; set; }
-        public List<SubredditInit> Subscribed { get; set; }
+        public List<SubredditInit> Local { get; set; }
     }
 
     public class SubredditInit
     {
         public Subreddit Thing { get; set; }
-        public List<Link> Links { get; set; }
         public string DefaultSort { get; set; }
 		public DateTime? LastRefresh { get; set; }
         public string Category { get; set; }

@@ -51,7 +51,7 @@ namespace SnooStream.Common
                 if(topContext is LinkViewModel)
 				    SnooStreamViewModel.CommandDispatcher.GotoLink(topContext, url);
                 else
-                    SnooStreamViewModel.CommandDispatcher.GotoLink(Tuple.Create(topContext, commentContext, url), url);
+                    SnooStreamViewModel.CommandDispatcher.GotoLink(Tuple.Create(topContext as CommentsViewModel, commentContext, url), url);
             });
 		}
 

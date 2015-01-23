@@ -19,13 +19,11 @@ namespace SnooStream.ViewModel
     {
         //need to come up with an init blob setup for this, meaining a per river blob
         public Subreddit Thing { get; internal set; }
-		public int HeaderImageWidth { get { return GetHeaderSizeOrDefault(true); } }
-		public int HeaderImageHeight { get { return GetHeaderSizeOrDefault(false); } }
-        public string Sort { get; private set; }
+		public string Sort { get; private set; }
         private string LastLinkId { get; set; }
 		public DateTime? LastRefresh { get; set; }
-        public string Category { get; private set; }
-        private SubredditRiverViewModel _context;
+        public string Category { get; internal set; }
+        public SubredditRiverViewModel Context {get; set;}
         public bool IsUserMultiReddit
         {
             get
@@ -68,20 +66,11 @@ namespace SnooStream.ViewModel
         }
 
 
-		private const int DefaultHeaderWidth = 125;
-		private const int DefaultHeaderHeight = 50;
-
-		private int GetHeaderSizeOrDefault (bool width)
-		{
-			if(Thing.HeaderSize == null || Thing.HeaderSize.Length < 2)
-				return width ? DefaultHeaderWidth : DefaultHeaderHeight;
-			else
-				return width ? Thing.HeaderSize[0] : Thing.HeaderSize[1];
-		}
+		
 
 		public LinkRiverViewModel(SubredditRiverViewModel context, string category, Subreddit thing, string sort, IEnumerable<Link> initialLinks, DateTime? lastRefreshed)
 		{
-            _context = context;
+            Context = context;
             Category = category;
 			LastRefresh = lastRefreshed;
 			Thing = thing;
@@ -168,8 +157,7 @@ namespace SnooStream.ViewModel
 						if (thing.Data is Link)
 						{
 							linkIds.Add(((Link)thing.Data).Id);
-							var viewModel = new LinkViewModel(_linkRiverViewModel, thing.Data as Link);
-							replace.Add(Tuple.Create<int, ILinkViewModel>(i, viewModel));
+							replace.Add(Tuple.Create<int, ILinkViewModel>(i, _linkRiverViewModel.MakeLinkThing(thing.Data as Link)));
 						}
 					}
 
@@ -260,11 +248,16 @@ namespace SnooStream.ViewModel
 			}
 		}
 
+        private LinkViewModel MakeLinkThing(Link link)
+        {
+            return new LinkViewModel(this, link) { FromMultiReddit = (IsMultiReddit || Thing.Url == "/") };
+        }
+
         private void ProcessLinkThings(IEnumerable<Link> links)
         {
             foreach (var link in links)
             {
-				Links.Add(new LinkViewModel(this, link) { FromMultiReddit = (IsMultiReddit || Thing.Url == "/") });
+                Links.Add(MakeLinkThing(link));
             }
         }
 
@@ -293,8 +286,8 @@ namespace SnooStream.ViewModel
 			{
 				DefaultSort = Sort,
 				Thing = Thing,
-				Links = Links.Select(vm => ((LinkViewModel)vm).Link).ToList(),
-				LastRefresh = LastRefresh
+				LastRefresh = LastRefresh,
+                Category = Category
 			};
 		}
 
@@ -400,7 +393,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return new RelayCommand(() => _context.PinSubreddit(this));
+                return new RelayCommand(() => Context.PinSubreddit(this));
             }
         }
 
@@ -410,89 +403,6 @@ namespace SnooStream.ViewModel
             {
                 return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToSubredditCategorizer(this));
             }
-        }
-
-        public List<CommandViewModel.CommandItem> MakeSubredditManagmentCommands()
-        {
-            var result = new List<CommandViewModel.CommandItem>();
-
-            if (IsUserMultiReddit)
-            {
-                //About
-                result.Add(new CommandViewModel.CommandItem
-                {
-                    DisplayText = "About",
-                    Command = ShowAboutSubreddit
-                });
-                //Modify
-                result.Add(new CommandViewModel.CommandItem
-                {
-                    DisplayText = "Modify",
-                    Command = ShowMultiRedditManagement
-                });
-                //Delete
-                result.Add(new CommandViewModel.CommandItem
-                {
-                    DisplayText = "Delete",
-                    Command = DeleteMultiReddit
-                });
-                //Change Category
-                result.Add(new CommandViewModel.CommandItem
-                {
-                    DisplayText = "Change Category",
-                    Command = ShowCategoryPicker
-                });
-            }
-            else
-            {
-                //About
-                if (!IsMultiReddit)
-                {
-                    result.Add(new CommandViewModel.CommandItem
-                    {
-                        DisplayText = "About",
-                        Command = ShowAboutSubreddit
-                    });
-                }
-
-
-                if(!Thing.Subscribed)
-                {
-                    //Subscribe
-                    result.Add(new CommandViewModel.CommandItem
-                    {
-                        DisplayText = "Subscribe",
-                        Command = Subscribe
-                    });
-
-                    if (_context != null && !_context.CombinedRivers.Contains(this))
-                    {
-                        result.Add(new CommandViewModel.CommandItem
-                        {
-                            DisplayText = "Pin",
-                            Command = Pin
-                        });
-                    }
-                }
-                else
-                {
-                    //Unsubscribe
-                    result.Add(new CommandViewModel.CommandItem
-                    {
-                        DisplayText = "Unsubscribe",
-                        Command = Unsubscribe
-                    });
-                }
-                //Change Category
-                result.Add(new CommandViewModel.CommandItem
-                {
-                    DisplayText = "Change Category",
-                    Command = ShowCategoryPicker
-                });
-
-            }
-            return result;
-                    
         }
 	}
 }

@@ -6,6 +6,7 @@ using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Messages;
 using SnooStream.Services;
+using SnooStream.ViewModel.Popups;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,12 +23,169 @@ namespace SnooStream.ViewModel
         public class SubredditGroup
         {
             public string Name { get; set; }
-            public ObservableCollection<LinkRiverViewModel> Collection { get; set; }
+            public ObservableCollection<SubredditWrapper> Collection { get; set; }
+        }
+
+        public class SubredditWrapper : ViewModelBase
+        {
+            public SubredditWrapper(SubredditRiverViewModel context, string name, Subreddit thing, string sort, string category)
+            {
+                Thing = thing;
+                Name = name;
+                _category = category;
+                _context = context;
+                _linkRiver = new Lazy<LinkRiverViewModel>(() =>
+                {
+                    if (_context._madeSubreddits.ContainsKey(name))
+                        return _context._madeSubreddits[name];
+                    else
+                    {
+                        var result = new LinkRiverViewModel(_context, category, thing, sort, null, null);
+                        _context._madeSubreddits.Add(name, result);
+                        return result;
+                    }
+                });
+            }
+
+            private SubredditRiverViewModel _context;
+            public string Name { get; set; }
+            public Subreddit Thing { get; set; }
+            private string _category;
+            public string Category
+            {
+                get
+                {
+                    return _category;
+                }
+                set
+                {
+                    if (_category != value)
+                    {
+                        _category = value;
+                        RaisePropertyChanged("Category");
+
+                        if (_linkRiver.IsValueCreated)
+                        {
+                            _linkRiver.Value.Category = value;
+                        }
+
+                        if (_context != null)
+                        {
+                            _context.RemoveFromCategory(_context.SubredditCollection, this);
+                            _context.AddToCategory(_context.SubredditCollection, this);
+                        }
+                    }
+
+                }
+            }
+            public int HeaderImageWidth { get { return GetHeaderSizeOrDefault(true); } }
+            public int HeaderImageHeight { get { return GetHeaderSizeOrDefault(false); } }
+        
+            private Lazy<LinkRiverViewModel> _linkRiver;
+            public LinkRiverViewModel LinkRiver
+            {
+                get
+                {
+                    return _linkRiver.Value;
+                }
+            }
+
+            private const int DefaultHeaderWidth = 125;
+            private const int DefaultHeaderHeight = 50;
+
+            private int GetHeaderSizeOrDefault(bool width)
+            {
+                if (Thing.HeaderSize == null || Thing.HeaderSize.Length < 2)
+                    return width ? DefaultHeaderWidth : DefaultHeaderHeight;
+                else
+                    return width ? Thing.HeaderSize[0] : Thing.HeaderSize[1];
+            }
+
+            void ShowCategoryPicker(object elementTarget)
+            {
+                SnooStreamViewModel.NavigationService.ShowPopup(new InputViewModel { Prompt = "Choose a category to group this subreddit", InputValue = Category, Dismissed = new RelayCommand<string>(val => Category = val) }, elementTarget, SnooStreamViewModel.UIContextCancellationToken);
+            }
+
+            public List<CommandViewModel.CommandItem> MakeSubredditManagmentCommands(object elementTarget)
+            {
+                var result = new List<CommandViewModel.CommandItem>();
+
+                if (LinkRiver.IsUserMultiReddit)
+                {
+                    //About
+                    result.Add(new CommandViewModel.CommandItem
+                    {
+                        DisplayText = "About",
+                        Command = LinkRiver.ShowAboutSubreddit
+                    });
+                    //Modify
+                    result.Add(new CommandViewModel.CommandItem
+                    {
+                        DisplayText = "Modify",
+                        Command = LinkRiver.ShowMultiRedditManagement
+                    });
+                    //Delete
+                    result.Add(new CommandViewModel.CommandItem
+                    {
+                        DisplayText = "Delete",
+                        Command = LinkRiver.DeleteMultiReddit
+                    });
+                }
+                else
+                {
+                    //About
+                    if (!LinkRiver.IsMultiReddit)
+                    {
+                        result.Add(new CommandViewModel.CommandItem
+                        {
+                            DisplayText = "About",
+                            Command = LinkRiver.ShowAboutSubreddit
+                        });
+                    }
+
+
+                    if (!Thing.Subscribed)
+                    {
+                        //Subscribe
+                        result.Add(new CommandViewModel.CommandItem
+                        {
+                            DisplayText = "Subscribe",
+                            Command = LinkRiver.Subscribe
+                        });
+
+                        if (LinkRiver.Context != null && !LinkRiver.Context.LocalSubreddits.Contains(this))
+                        {
+                            result.Add(new CommandViewModel.CommandItem
+                            {
+                                DisplayText = "Pin",
+                                Command = LinkRiver.Pin
+                            });
+                        }
+                    }
+                    else
+                    {
+                        //Unsubscribe
+                        result.Add(new CommandViewModel.CommandItem
+                        {
+                            DisplayText = "Unsubscribe",
+                            Command = LinkRiver.Unsubscribe
+                        });
+                    }
+                }
+
+                //Change Category
+                result.Add(new CommandViewModel.CommandItem
+                {
+                    DisplayText = "Change Category",
+                    Command = new RelayCommand(() => ShowCategoryPicker(elementTarget))
+                });
+
+                return result;
+
+            }
         }
 		static ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooStreamViewModel>();
-        internal ObservableCollection<LinkRiverViewModel> CombinedRivers { get; set; }
-		private ObservableCollection<LinkRiverViewModel> _subreddits;
-
+        Dictionary<string, LinkRiverViewModel> _madeSubreddits = new Dictionary<string, LinkRiverViewModel>();
         ObservableCollection<SubredditGroup> _subredditCollection;
         public ObservableCollection<SubredditGroup> SubredditCollection
         {
@@ -36,27 +194,23 @@ namespace SnooStream.ViewModel
                 return _subredditCollection;
             }
         }
-		public ObservableCollection<LinkRiverViewModel> Subreddits
-        { 
-            get 
-            { 
-                return _subreddits; 
-            } 
-            set 
-            {
-                if (_subreddits != value)
-                {
-                    _subreddits = value;
-                    if (_subreddits != null && _subredditCollection != null)
-                        DetachCollection(_subreddits);
 
-                    AttachCollection(value);
-                    RaisePropertyChanged("Subreddits");
-                }
-            } 
+        internal LinkRiverViewModel GetOrMakeSubreddit(string category, Subreddit thing, string sort, IEnumerable<Link> initialLinks, DateTime? lastRefreshed)
+        {
+            if (_madeSubreddits.ContainsKey(thing.Url))
+                return _madeSubreddits[thing.Url];
+            else
+            {
+                var result = new LinkRiverViewModel(this, category, thing, sort, initialLinks, lastRefreshed);
+                _madeSubreddits.Add(thing.Url, result);
+                return result;
+            }
         }
 
-        private void AttachCollection(ObservableCollection<LinkRiverViewModel> sourceCollection)
+        ObservableCollection<SubredditWrapper> LocalSubreddits { get; set; }
+        ObservableCollection<SubredditWrapper> SearchSubreddits { get; set; }
+
+        private void AttachCollection(ObservableCollection<SubredditWrapper> sourceCollection)
         {
             _subredditCollection = SnooStreamViewModel.SystemServices.FilterAttachIncrementalLoadCollection(sourceCollection, _subredditCollection);
             sourceCollection.CollectionChanged += sourceCollection_CollectionChanged;
@@ -73,16 +227,16 @@ namespace SnooStream.ViewModel
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    AddToCategory(_subredditCollection, e.NewItems[0] as LinkRiverViewModel);
+                    AddToCategory(_subredditCollection, e.NewItems[0] as SubredditWrapper);
                     break;
                 case NotifyCollectionChangedAction.Move:
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    RemoveFromCategory(_subredditCollection, e.OldItems[0] as LinkRiverViewModel);
+                    RemoveFromCategory(_subredditCollection, e.OldItems[0] as SubredditWrapper);
                     break;
                 case NotifyCollectionChangedAction.Replace:
-                    RemoveFromCategory(_subredditCollection, e.OldItems[0] as LinkRiverViewModel);
-                    AddToCategory(_subredditCollection, e.NewItems[0] as LinkRiverViewModel);
+                    RemoveFromCategory(_subredditCollection, e.OldItems[0] as SubredditWrapper);
+                    AddToCategory(_subredditCollection, e.NewItems[0] as SubredditWrapper);
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     _subredditCollection.Clear();
@@ -92,7 +246,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        private void AddToCategory(ObservableCollection<SubredditGroup> target, LinkRiverViewModel viewModel)
+        private void AddToCategory(ObservableCollection<SubredditGroup> target, SubredditWrapper viewModel)
         {
             var category = viewModel.Category;
             var existingCategory = target.FirstOrDefault((group) => string.Compare(group.Name, category, StringComparison.CurrentCultureIgnoreCase) == 0);
@@ -102,12 +256,12 @@ namespace SnooStream.ViewModel
             }
             else
             {
-                target.Add(new SubredditGroup { Name = category, Collection = new ObservableCollection<LinkRiverViewModel> { viewModel } });
+                target.Add(new SubredditGroup { Name = category, Collection = new ObservableCollection<SubredditWrapper> { viewModel } });
                 IsShowingGroups = target.Count > 1;
             }
         }
 
-        private void RemoveFromCategory(ObservableCollection<SubredditGroup> target, LinkRiverViewModel viewModel)
+        private void RemoveFromCategory(ObservableCollection<SubredditGroup> target, SubredditWrapper viewModel)
         {
             var category = viewModel.Category;
             var existingCategory = target.FirstOrDefault((group) => string.Compare(group.Name, category, StringComparison.CurrentCultureIgnoreCase) == 0);
@@ -123,12 +277,15 @@ namespace SnooStream.ViewModel
         }
 
 
-        private void DetachCollection(ObservableCollection<LinkRiverViewModel> targetCollection)
+        private void DetachCollection(ObservableCollection<SubredditWrapper> targetCollection)
         {
-            SnooStreamViewModel.SystemServices.FilterDetachIncrementalLoadCollection(_subredditCollection, targetCollection);
-            targetCollection.CollectionChanged -= sourceCollection_CollectionChanged;
-            IsShowingGroups = false;
-            _subredditCollection.Clear();
+            if (targetCollection != null)
+            {
+                SnooStreamViewModel.SystemServices.FilterDetachIncrementalLoadCollection(_subredditCollection, targetCollection);
+                targetCollection.CollectionChanged -= sourceCollection_CollectionChanged;
+                IsShowingGroups = false;
+                _subredditCollection.Clear();
+            }
         }
 
         public LinkRiverViewModel SelectedRiver { get; private set; }
@@ -148,7 +305,9 @@ namespace SnooStream.ViewModel
 
 					if (_searchString.Length < 3)
 					{
-						Subreddits = CombinedRivers;
+                        DetachCollection(SearchSubreddits);
+                        SearchSubreddits = null;
+                        AttachCollection(LocalSubreddits);
 						RevokeQueryTimer();
 					}
 					else
@@ -190,29 +349,29 @@ namespace SnooStream.ViewModel
 
 			if (!(_searchString != null && _searchString.Contains("/")))
 			{
-				Subreddits = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SubreditSearchLoader(_searchString, CombinedRivers, this));
-			}
+				SearchSubreddits = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SubreditSearchLoader(_searchString, this));
+                DetachCollection(LocalSubreddits);
+                AttachCollection(SearchSubreddits);
+            }
 		}
 
-		private class SubreditSearchLoader : IIncrementalCollectionLoader<LinkRiverViewModel>
+		private class SubreditSearchLoader : IIncrementalCollectionLoader<SubredditWrapper>
 		{
 			string _afterSearch = "";
 			string _afterUri = "";
 			string _searchString;
 			bool _hasLoaded = false;
-			IEnumerable<LinkRiverViewModel> _existing;
             SubredditRiverViewModel _context;
 
-            public SubreditSearchLoader(string searchString, IEnumerable<LinkRiverViewModel> existing, SubredditRiverViewModel context)
+            public SubreditSearchLoader(string searchString, SubredditRiverViewModel context)
 			{
                 _context = context;
-                _existing = existing;
 				_searchString = searchString;
 			}
 
-			public void Attach(ObservableCollection<LinkRiverViewModel> targetCollection) { }
+            public void Attach(ObservableCollection<SubredditWrapper> targetCollection) { }
 
-			public Task AuxiliaryItemLoader(IEnumerable<LinkRiverViewModel> items, int timeout)
+            public Task AuxiliaryItemLoader(IEnumerable<SubredditWrapper> items, int timeout)
 			{
 				return Task.FromResult(true);
 			}
@@ -227,10 +386,10 @@ namespace SnooStream.ViewModel
 				return !_hasLoaded || !string.IsNullOrWhiteSpace(_afterSearch);
 			}
 
-			public async Task<IEnumerable<LinkRiverViewModel>> LoadMore()
+            public async Task<IEnumerable<SubredditWrapper>> LoadMore()
 			{
 				_hasLoaded = true;
-				var result = new List<LinkRiverViewModel>();
+                var result = new List<SubredditWrapper>();
 				if (string.IsNullOrWhiteSpace(_afterSearch))
 				{
 					var searchListing = await SnooStreamViewModel.RedditService.Search(_searchString, null, true, null);
@@ -256,22 +415,15 @@ namespace SnooStream.ViewModel
 				return result;
 			}
 
-            private void MakeSubreddit(List<LinkRiverViewModel> result, Thing subreddit, string category)
+            private void MakeSubreddit(List<SubredditWrapper> result, Thing subreddit, string category)
             {
                 if (subreddit.Data is Subreddit)
                 {
-                    var existing = _existing.FirstOrDefault(lrvm => lrvm.Thing.Id == ((Subreddit)subreddit.Data).Id);
-                    if (existing != null)
-                        result.Add(existing);
-                    else
-                    {
-                        //TODO: this represents an oddity, we loose the cached links by creating a new LinkRiverViewModel
-                        result.Add(new LinkRiverViewModel(_context, category, subreddit.Data as Subreddit, null, null, null));
-                    }
+                    result.Add(new SubredditWrapper(_context, ((Subreddit)subreddit.Data).Url, subreddit.Data as Subreddit, "hot", category));
                 }
             }
 
-            public Task Refresh(ObservableCollection<LinkRiverViewModel> current, bool onlyNew)
+            public Task Refresh(ObservableCollection<SubredditWrapper> current, bool onlyNew)
 			{
 				throw new NotImplementedException();
 			}
@@ -304,10 +456,7 @@ namespace SnooStream.ViewModel
         {
             if (initBlob != null)
             {
-                var localSubreddits = initBlob.Pinned.Select(blob => new LinkRiverViewModel(this, blob.Category ?? "pinned", blob.Thing, blob.DefaultSort, blob.Links, blob.LastRefresh ?? DateTime.Now));
-                var subscribbedSubreddits = initBlob.Subscribed.Select(blob => new LinkRiverViewModel(this, blob.Category ?? "subscribed", blob.Thing, blob.DefaultSort, blob.Links, blob.LastRefresh ?? DateTime.Now));
-                
-                CombinedRivers = new ObservableCollection<LinkRiverViewModel>(localSubreddits.Concat(subscribbedSubreddits));
+                LocalSubreddits = new ObservableCollection<SubredditWrapper>(initBlob.Local.Select(blob => new SubredditWrapper(this, blob.Thing.Url, blob.Thing, blob.DefaultSort, blob.Category ?? "pinned")));
                 EnsureFrontPage();
                 ReloadSubscribed(false);
             }
@@ -316,8 +465,9 @@ namespace SnooStream.ViewModel
                 LoadWithoutInitial();
                 EnsureFrontPage();
             }
-			Subreddits = CombinedRivers;
-            SelectedRiver = CombinedRivers.FirstOrDefault() ?? new LinkRiverViewModel(this, IsLoggedIn ? "subscribed" : "popular", new Subreddit("/"), "hot", null, null);
+
+            SelectedRiver = (LocalSubreddits.FirstOrDefault() ?? new SubredditWrapper(this, "/", new Subreddit("/"), "hot", IsLoggedIn ? "subscribed" : "popular")).LinkRiver;
+            AttachCollection(LocalSubreddits);
             Messenger.Default.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
         }
 
@@ -329,14 +479,17 @@ namespace SnooStream.ViewModel
 
         private void OnUserLoggedIn(UserLoggedInMessage obj)
         {
+            LocalSubreddits.Clear();
+            _madeSubreddits.Clear();
+            EnsureFrontPage();
             ReloadSubscribed(true);
         }
 
         private void EnsureFrontPage()
         {
-            if (!CombinedRivers.Any((lrvm) => lrvm.Thing.Url == "/"))
+            if (!LocalSubreddits.Any((lrvm) => lrvm.Thing.Url == "/"))
             {
-                CombinedRivers.Add(new LinkRiverViewModel(this, IsLoggedIn ? "subscribed" : "popular", new Subreddit("/"), "hot", null, null));
+                LocalSubreddits.Add(new SubredditWrapper(this, "/", new Subreddit("/"), "hot", IsLoggedIn ? "subscribed" : "popular"));
             }
         }
 
@@ -350,7 +503,7 @@ namespace SnooStream.ViewModel
 
         private async void LoadWithoutInitial()
         {
-            CombinedRivers = new ObservableCollection<LinkRiverViewModel>();
+            LocalSubreddits = new ObservableCollection<SubredditWrapper>();
             Listing subscribedListing = null;
             string categoryName = "subscribed";
             if (IsLoggedIn)
@@ -363,9 +516,9 @@ namespace SnooStream.ViewModel
                 subscribedListing = await SnooStreamViewModel.RedditService.GetSubreddits(25, "popular");
             }
 
-            foreach (var river in subscribedListing.Data.Children.Select(thing => new LinkRiverViewModel(this, categoryName, thing.Data as Subreddit, "hot", null, null)))
+            foreach (var river in subscribedListing.Data.Children.Select(thing => new SubredditWrapper(this, ((Subreddit)thing.Data).Url, thing.Data as Subreddit, "hot", categoryName)))
             {
-                CombinedRivers.Add(river);
+                LocalSubreddits.Add(river);
             }
         }
 
@@ -395,9 +548,9 @@ namespace SnooStream.ViewModel
 						newRivers.Add(((Subreddit)subreddit.Data).Id, ((Subreddit)subreddit.Data));
 				}
 
-				var missingRivers = new List<LinkRiverViewModel>();
-				var existingRivers = new Dictionary<string, LinkRiverViewModel>();
-				foreach (var river in CombinedRivers)
+                var missingRivers = new List<SubredditWrapper>();
+                var existingRivers = new Dictionary<string, SubredditWrapper>();
+                foreach (var river in LocalSubreddits)
 				{
 					//ignore the frontpage
 					if (string.IsNullOrWhiteSpace(river.Thing.Id))
@@ -416,12 +569,12 @@ namespace SnooStream.ViewModel
 				foreach (var subredditTpl in newRivers)
 				{
 					if (!existingRivers.ContainsKey(subredditTpl.Key))
-						CombinedRivers.Add(new LinkRiverViewModel(this, "subscribed", subredditTpl.Value, "hot", null, null));
+                        LocalSubreddits.Add(new SubredditWrapper(this, subredditTpl.Value.Url, subredditTpl.Value, "hot", "subscribed"));
 				}
 
 				foreach (var missingRiver in missingRivers)
 				{
-					CombinedRivers.Remove(missingRiver);
+                    LocalSubreddits.Remove(missingRiver);
 				}
 			}
 			catch (Exception ex)
@@ -432,22 +585,17 @@ namespace SnooStream.ViewModel
 
         public void PinSubreddit(LinkRiverViewModel linkRiver)
         {
-            if (!CombinedRivers.Contains(linkRiver))
-                CombinedRivers.Add(linkRiver);
+            if (!LocalSubreddits.Any((wrap) => wrap.Thing.Url == linkRiver.Thing.Url))
+                LocalSubreddits.Add(new SubredditWrapper(this, linkRiver.Thing.Url, linkRiver.Thing, linkRiver.Sort, linkRiver.Category));
         }
 
 		internal SubredditRiverInit Dump()
 		{
 			return new SubredditRiverInit
 			{
-				Pinned = CombinedRivers
-					.Where(vm => vm.Category != "subscribed")
-					.Select(vm => vm.Dump())
-					.ToList(),
-				Subscribed = CombinedRivers
-                    .Where(vm => vm.Category == "subscribed")
-					.Select(vm => vm.Dump())
-					.ToList(),
+                Local = LocalSubreddits
+					.Select(vm => vm.LinkRiver.Dump())
+					.ToList()
 			};
 		}
 	}

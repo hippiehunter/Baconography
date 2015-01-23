@@ -48,9 +48,9 @@ namespace SnooStream.View.Controls
         {
             SnooApplicationPage.Current.PopNavState();
             searchBox.Text = "";
-            var linkRiver = ((Button)sender).DataContext as LinkRiverViewModel;
+            var linkRiver = ((Button)sender).DataContext as SubredditRiverViewModel.SubredditWrapper;
 			if(linkRiver != null)
-				SnooStreamViewModel.NavigationService.NavigateToLinkRiver(linkRiver);
+				SnooStreamViewModel.NavigationService.NavigateToLinkRiver(linkRiver.LinkRiver);
 		}
 
 		private void searchBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -65,12 +65,12 @@ namespace SnooStream.View.Controls
         CancellationTokenSource _contextPopup = new CancellationTokenSource();
         private void Button_Holding(object sender, HoldingRoutedEventArgs e)
         {
-            var linkRiver = ((Button)sender).DataContext as LinkRiverViewModel;
+            var linkRiver = ((Button)sender).DataContext as SubredditRiverViewModel.SubredditWrapper;
             if (linkRiver != null && e.HoldingState == HoldingState.Started)
             {
                 SnooStreamViewModel.NavigationService.ShowPopup(new CommandViewModel
                 {
-                    Commands = linkRiver.MakeSubredditManagmentCommands()
+                    Commands = linkRiver.MakeSubredditManagmentCommands(e)
                 }, e, _contextPopup.Token);
                 e.Handled = true;
             }
