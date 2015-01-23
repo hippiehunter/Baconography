@@ -209,17 +209,24 @@ namespace SnooStream.ViewModel
 
         ObservableCollection<SubredditWrapper> LocalSubreddits { get; set; }
         ObservableCollection<SubredditWrapper> SearchSubreddits { get; set; }
-
+        ObservableCollection<SubredditWrapper> AttachedCollection { get; set; }
         private void AttachCollection(ObservableCollection<SubredditWrapper> sourceCollection)
         {
-            _subredditCollection = SnooStreamViewModel.SystemServices.FilterAttachIncrementalLoadCollection(sourceCollection, _subredditCollection);
-            sourceCollection.CollectionChanged += sourceCollection_CollectionChanged;
-            foreach (var item in sourceCollection)
+            if (sourceCollection != AttachedCollection)
             {
-                AddToCategory(_subredditCollection, item);
-            }
+                if (AttachedCollection != null)
+                    DetachCollection(AttachedCollection);
 
-            RaisePropertyChanged("SubredditCollection"); 
+                AttachedCollection = sourceCollection;
+                _subredditCollection = SnooStreamViewModel.SystemServices.FilterAttachIncrementalLoadCollection(sourceCollection, _subredditCollection);
+                sourceCollection.CollectionChanged += sourceCollection_CollectionChanged;
+                foreach (var item in sourceCollection)
+                {
+                    AddToCategory(_subredditCollection, item);
+                }
+
+                RaisePropertyChanged("SubredditCollection");
+            }
         }
 
         private void sourceCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -285,6 +292,7 @@ namespace SnooStream.ViewModel
                 targetCollection.CollectionChanged -= sourceCollection_CollectionChanged;
                 IsShowingGroups = false;
                 _subredditCollection.Clear();
+                AttachedCollection = null;
             }
         }
 
@@ -586,7 +594,7 @@ namespace SnooStream.ViewModel
         public void PinSubreddit(LinkRiverViewModel linkRiver)
         {
             if (!LocalSubreddits.Any((wrap) => wrap.Thing.Url == linkRiver.Thing.Url))
-                LocalSubreddits.Add(new SubredditWrapper(this, linkRiver.Thing.Url, linkRiver.Thing, linkRiver.Sort, linkRiver.Category));
+                LocalSubreddits.Add(new SubredditWrapper(this, linkRiver.Thing.Url, linkRiver.Thing, linkRiver.Sort, string.IsNullOrWhiteSpace(linkRiver.Category) ? "pinned" : linkRiver.Category));
         }
 
 		internal SubredditRiverInit Dump()
