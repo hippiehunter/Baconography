@@ -31,6 +31,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ActivityGroupCountConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\AuthorFlairKindConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BoolToAccentBrushConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\HasThumbnailConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CommentDepthColorConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CommentDepthMarginConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ContentConverter.cs" />
@@ -67,6 +68,9 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CardView\CardPreviewTextControl.xaml.cs">
       <DependentUpon>CardPreviewTextControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CommentCountControl.xaml.cs">
+      <DependentUpon>CommentCountControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CommentsView.xaml.cs">
       <DependentUpon>CommentsView.xaml</DependentUpon>
@@ -116,6 +120,9 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\SubredditSmallView.xaml.cs">
       <DependentUpon>SubredditSmallView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\VotableControl.xaml.cs">
+      <DependentUpon>VotableControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\AboutSubreddit.xaml.cs">
       <DependentUpon>AboutSubreddit.xaml</DependentUpon>
@@ -179,6 +186,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\CommentCountControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\CommentsView.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -232,6 +243,10 @@
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\SubredditSmallView.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\VotableControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\AboutSubreddit.xaml">
       <SubType>Designer</SubType>

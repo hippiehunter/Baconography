@@ -58,7 +58,7 @@ namespace SnooStream.Common
 			}
 			else if (content is SelfViewModel)
 			{
-				result = new PreviewText { };
+                result = new PreviewText { };
 				result.FinishLoad = (cancel) => LoadPreview(content as SelfViewModel, result as PreviewText, cancel);
 			}
 			else

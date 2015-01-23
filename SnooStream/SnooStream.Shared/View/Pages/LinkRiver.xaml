@@ -16,7 +16,7 @@
     
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid>
-            <ListView x:Name="linksListView" Grid.Column="0"  Margin="12,0,12,0"
+            <ListView x:Name="linksListView" Grid.Column="0"  Margin="0,0,0,0"
                       SelectionMode="None"
                       ItemsSource="{Binding Links}"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
