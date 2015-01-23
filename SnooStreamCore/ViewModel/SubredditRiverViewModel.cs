@@ -264,7 +264,7 @@ namespace SnooStream.ViewModel
         private void RemoveFromCategory(ObservableCollection<SubredditGroup> target, SubredditWrapper viewModel)
         {
             var category = viewModel.Category;
-            var existingCategory = target.FirstOrDefault((group) => string.Compare(group.Name, category, StringComparison.CurrentCultureIgnoreCase) == 0);
+            var existingCategory = target.FirstOrDefault((group) => group.Collection.Contains(viewModel));
             if (existingCategory != null)
             {
                 existingCategory.Collection.Remove(viewModel);
