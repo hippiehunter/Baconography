@@ -11,7 +11,7 @@
     d:DataContext="{Binding Source={StaticResource SnooStream}, Path=SubredditRiver.SelectedRiver.CurrentSelected}"
     DataContextChanged="UserControl_DataContextChanged">
 
-    <Border HorizontalAlignment="Stretch" Background="#FF1F1F1F" Margin="0,0,0,24">
+    <Border HorizontalAlignment="Stretch" Background="{ThemeResource ContentBackgroundBrush}" Margin="0,0,0,24">
         <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0">
 
             <Grid.RowDefinitions>
@@ -21,24 +21,28 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
+            <!-- Title block -->
             <TextBlock Grid.Row="0"
                    HorizontalAlignment="Left" TextWrapping="Wrap"
                    Style="{StaticResource SubheaderTextBlockStyle}"
                    Text="{Binding Title}"
                    TextTrimming="WordEllipsis"
                    MinHeight="50">
-                <TextBlock.Foreground>
-                    <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
-                </TextBlock.Foreground>
             </TextBlock>
 
+            <!-- Link info, user / time / subreddit / domain -->
             <ContentControl x:Name="linkMetadata" Grid.Row="1"
                             Margin="0,5,0,3"
                             HorizontalAlignment="Stretch" Content="{Binding Converter={StaticResource linkMetadataConverter}}"/>
 
-            <ContentControl x:Name="contentSection" Grid.Row="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Center"/>
+            <!-- Content block -->
+            <ContentControl x:Name="contentSection" Grid.Row="2" Margin="0,0,0,0"
+                            BorderThickness="0"
+                            VerticalContentAlignment="Stretch" VerticalAlignment="Center"
+                            HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" />
 
-            <Grid x:Name="actionButtons" Grid.Row="3" Margin="0,6,0,0" HorizontalAlignment="Stretch">
+            <!-- Action block, flyout menu / vote / comment count -->
+            <Grid x:Name="actionButtons" Grid.Row="3" Margin="0,0,0,0" HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
@@ -62,32 +66,14 @@
                     </Button.Flyout>
                 </Button>
 
-                <Button Grid.Column="1"
-                    HorizontalContentAlignment="Center" HorizontalAlignment="Stretch"
-                    BorderThickness="0" Margin="0,-12,0,0" Padding="0"
-                    Command="{Binding Votable.ToggleVote}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="0,0,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=1, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol"/>
-                        <TextBlock Margin="-6,4,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=0, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol">
-                            <TextBlock.RenderTransform>
-                                <RotateTransform Angle="180" CenterX="9" CenterY="12" />
-                            </TextBlock.RenderTransform>
-                        </TextBlock>
-                        <TextBlock Margin="-2,0,0,0" Text="{Binding Path=Votable.TotalVotes}"
-                            Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, Mode=TwoWay}"/>
-                    </StackPanel>
-                </Button>
+                <local:VotableControl Grid.Column="1" />
 
                 <Button Grid.Column="2"
                         HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
                         Margin="0,-12,2,0"
                         BorderThickness="0" Padding="0,0,0,0" 
-                        FontFamily="Segoe UI Symbol"
                         IsEnabled="False">
-                    <Grid>
-                        <TextBlock Margin="0,0,0,0" FontSize="36" Text="&#xE200;" />
-                        <TextBlock Margin="1,11,0,0" Text="{Binding Path=CommentCount}" Foreground="Black" HorizontalAlignment="Center"/>
-                    </Grid>
+                    <local:CommentCountControl />
                 </Button>
             </Grid>
         </Grid>

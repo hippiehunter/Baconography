@@ -74,7 +74,7 @@ namespace SnooStream.ViewModel.Content
 				if (VideoAcquisition.IsAPI(url))
 					result = new VideoViewModel(url, redditThumbnail);
 				else
-					result = new PlainWebViewModel(true, url, redditThumbnail);
+					result = new PlainWebViewModel(true, url, title, redditThumbnail);
 
 			}
 			else
@@ -92,7 +92,7 @@ namespace SnooStream.ViewModel.Content
 					result = new ImageViewModel(url, title, redditThumbnail);
 				}
 				else
-					result = new PlainWebViewModel(true, url, redditThumbnail);
+					result = new PlainWebViewModel(true, url, title, redditThumbnail);
 			}
 
 			result.Glyph = glyph;

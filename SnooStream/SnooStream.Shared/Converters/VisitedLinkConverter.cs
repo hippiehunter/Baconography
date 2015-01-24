@@ -34,16 +34,20 @@ namespace SnooStream.Converters
 
     public class VisitedMainLinkConverter : IValueConverter
     {
-        static SolidColorBrush history = new SolidColorBrush(Colors.Gray);
-        static Brush noHistory;
+        static SolidColorBrush darkVisited = new SolidColorBrush(Colors.Gray);
+        static SolidColorBrush lightVisited = new SolidColorBrush(Colors.Gray);
+        static Brush darkNew = new SolidColorBrush(Colors.White);
+        static Brush lightNew = new SolidColorBrush(Colors.Black);
 
         public VisitedMainLinkConverter()
         {
-			noHistory = new SolidColorBrush(Colors.White);
         }
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
+            var noHistory = Application.Current.RequestedTheme == ApplicationTheme.Dark ? darkNew : lightNew;
+            var history = Application.Current.RequestedTheme == ApplicationTheme.Dark ? darkVisited : lightVisited;
+
 			if(ViewModelBase.IsInDesignModeStatic)
 			{
 				return noHistory;

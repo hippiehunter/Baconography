@@ -32,6 +32,18 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/StyleResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FFDCDCDC" />
+                    <SolidColorBrush x:Key="InvertThemeForegroundBrush" Color="White" />
+                </ResourceDictionary>
+                
+                <ResourceDictionary x:Key="Default">
+                    <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FF1F1F1F" />
+                    <SolidColorBrush x:Key="InvertThemeForegroundBrush" Color="Black" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
