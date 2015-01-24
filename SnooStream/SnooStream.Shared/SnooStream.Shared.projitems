@@ -31,7 +31,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ActivityGroupCountConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\AuthorFlairKindConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BoolToAccentBrushConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Converters\HasThumbnailConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CommentDepthColorConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CommentDepthMarginConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\ContentConverter.cs" />
@@ -111,6 +110,9 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml.cs">
       <DependentUpon>MoreCommentsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\OverlayControl.xaml.cs">
+      <DependentUpon>OverlayControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\SelfActivityView.xaml.cs">
       <DependentUpon>SelfActivityView.xaml</DependentUpon>
@@ -234,6 +236,10 @@
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\OverlayControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\SelfActivityView.xaml">
       <SubType>Designer</SubType>

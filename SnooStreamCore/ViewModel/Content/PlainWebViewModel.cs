@@ -32,6 +32,7 @@ namespace SnooStream.ViewModel.Content
 		public bool TextPreview { get; private set; }
 		public bool ImagePreview { get; private set; }
         bool _notText;
+        string _title;
         public bool NotText
         {
             get
@@ -45,8 +46,18 @@ namespace SnooStream.ViewModel.Content
             }
         }
 		public string Url { get; private set; }
-		public string Title { get; private set; }
 		public string RedditThumbnail { get; private set; }
+        public string Title
+        {
+            get
+            {
+                return _title;
+            }
+            private set
+            {
+                _title = value;
+            }
+        }
 		public ObservableCollection<Readable> WebParts { get; private set; }
 		Lazy<Task<Tuple<string, string, IEnumerable<Readable>>>> _firstResult;
 		private string _nextUrl;
@@ -67,11 +78,12 @@ namespace SnooStream.ViewModel.Content
             _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
         }
 
-		public PlainWebViewModel(bool notText, string url, string redditThumbnail)
+		public PlainWebViewModel(bool notText, string url, string title, string redditThumbnail)
         {
             NotText = true;
             TextPreview = !notText;
             Url = url;
+            Title = title;
 			RedditThumbnail = redditThumbnail;
 			_firstResult = new Lazy<Task<Tuple<string, string, IEnumerable<Readable>>>>(() => LoadOneImpl(_httpClient, url));
 			WebParts = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new WebLoader(this));
