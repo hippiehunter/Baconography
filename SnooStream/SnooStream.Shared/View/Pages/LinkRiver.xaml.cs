@@ -47,8 +47,14 @@ namespace SnooStream.View.Pages
 		private void linksListView_ContainerContentChanging(Windows.UI.Xaml.Controls.ListViewBase sender, Windows.UI.Xaml.Controls.ContainerContentChangingEventArgs args)
 		{
 			var card = args.ItemContainer.ContentTemplateRoot as CardLinkView;
-			if(card != null)
-				card.PhaseLoad(sender, args);
+            if (card != null)
+            {
+                if (card.PhaseLoad(sender, args))
+                    args.RegisterUpdateCallback(linksListView_ContainerContentChanging);
+            }
+            else
+            {
+            }
 		}
 
 		private async void Refresh_Click(object sender, RoutedEventArgs e)

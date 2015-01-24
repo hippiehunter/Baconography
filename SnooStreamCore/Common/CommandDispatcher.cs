@@ -242,7 +242,7 @@ namespace SnooStream.Common
 					{
 						var contextTpl = contextObj as Tuple<CommentsViewModel, CommentViewModel, string>;
 						var contentStream = contextTpl.Item1.CommentsContentStream;
-						var targetContent = contentStream.Links.FirstOrDefault(item => item.Id == contextTpl.Item2.Id && item.Url == contextTpl.Item3);
+                        var targetContent = contentStream.Links.FirstOrDefault(item => (contextTpl.Item2 == null || item.Id == contextTpl.Item2.Id) && item.Url == contextTpl.Item3);
 						if (targetContent != null)
 							contentStream.CurrentSelected = targetContent as ILinkViewModel;
 

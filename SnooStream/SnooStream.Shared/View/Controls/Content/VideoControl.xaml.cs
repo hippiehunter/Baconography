@@ -23,5 +23,10 @@ namespace SnooStream.View.Controls.Content
         {
             this.InitializeComponent();
         }
+
+        private void player_MediaFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            
+        }
     }
 }

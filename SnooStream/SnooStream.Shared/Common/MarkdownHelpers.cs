@@ -37,7 +37,7 @@ namespace SnooStream.Common
                 if (frameworkElement.DataContext is CommentsViewModel)
                     return frameworkElement.DataContext as CommentsViewModel;
                 else if (frameworkElement.DataContext is LinkViewModel)
-                    return frameworkElement.DataContext as LinkViewModel;
+                    return (frameworkElement.DataContext as LinkViewModel).Comments;
 			}
 			return FindCommentsContext(VisualTreeHelper.GetParent(obj));
 		}

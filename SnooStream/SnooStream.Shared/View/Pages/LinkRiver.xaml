@@ -25,7 +25,7 @@
                       IsItemClickEnabled="False"
                       IncrementalLoadingTrigger="Edge"
                       IncrementalLoadingThreshold="10" 
-                      VirtualizingStackPanel.VirtualizationMode="Standard"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling"
                       ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
                 <ListView.ItemTemplate>
                     <DataTemplate>

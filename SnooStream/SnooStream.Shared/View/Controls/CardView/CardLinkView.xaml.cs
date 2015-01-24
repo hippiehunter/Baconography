@@ -40,50 +40,16 @@ namespace SnooStream.View.Controls
 			_streamHack  = memStream.AsRandomAccessStream();
 		}
 
-		public bool PhasedLoad
-		{
-			get { return (bool)GetValue(PhasedLoadProperty); }
-			set { SetValue(PhasedLoadProperty, value); }
-		}
+        private int CurrentLoadPhase = 0;
 
-		// Using a DependencyProperty as the backing store for PhasedLoad.  This enables animation, styling, binding, etc...
-		public static readonly DependencyProperty PhasedLoadProperty =
-			DependencyProperty.Register("PhasedLoad", typeof(bool), typeof(CardLinkView), new PropertyMetadata(true, PhaseLoadChanged));
-
-		private static void PhaseLoadChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		internal bool PhaseLoad(ListViewBase sender, ContainerContentChangingEventArgs args)
 		{
-			var thisp = d as CardLinkView;
-			if (!thisp.PhasedLoad)
+			if (args.InRecycleQueue || (args.Phase == 0 && CurrentLoadPhase != 0))
 			{
-				thisp.DataContextChanged += async (sender, args) =>
-					{
-						if (args.NewValue != null)
-						{
-							thisp.previewSection.Content = ContentPreviewConverter.MakePreviewControl(args.NewValue as LinkViewModel);
-							var context = ((Preview)((UserControl)thisp.previewSection.Content).DataContext);
-							var hqImageUrl = await Task.Run(() => context.FinishLoad(thisp.cancelSource.Token));
-							if (string.IsNullOrWhiteSpace(hqImageUrl) || thisp.cancelSource.IsCancellationRequested)
-								return;
-
-							try
-							{
-								var previewUrl = await Task.Run(() => PlatformImageAcquisition.ImagePreviewFromUrl(hqImageUrl, thisp.cancelSource.Token));
-								((Preview)((UserControl)thisp.previewSection.Content).DataContext).ThumbnailUrl = previewUrl;
-							}
-							catch (Exception ex)
-							{
-								SnooStreamViewModel.Logging.Log(ex);
-							}
-						}
-					};
-			}
-		}
-
-		internal async void PhaseLoad(ListViewBase sender, ContainerContentChangingEventArgs args)
-		{
-			if (args.InRecycleQueue)
-			{
+                CurrentLoadPhase = 0;
 				cancelSource.Cancel();
+                cancelSource = new CancellationTokenSource();
+                rootGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 				if (previewSection != null)
 				{
 					if (previewSection.Content is CardPreviewImageControl)
@@ -97,68 +63,61 @@ namespace SnooStream.View.Controls
 					previewSection.Content = null;
 				}
 			}
-			else
-			{
-				switch (args.Phase)
-				{
-					case 0:
-						actionButtons.Opacity = 0;
-						previewSection.Opacity = 0;
-						linkMetadata.Opacity = 0;
-						args.RegisterUpdateCallback(PhaseLoad);
-						break;
-					case 1:
-						actionButtons.Opacity = 1;
-						linkMetadata.Opacity = 1;
-						args.RegisterUpdateCallback(PhaseLoad);
-						break;
-					case 2:
-						previewSection.Opacity = 1;
-						previewSection.Content = ContentPreviewConverter.MakePreviewControl(DataContext as LinkViewModel);
-						args.RegisterUpdateCallback(PhaseLoad);
-						break;
-					case 3:
-						try
-						{
-							//make sure its ok to load non essential content
-							if (SnooStreamViewModel.SystemServices.IsLowPriorityNetworkOk)
-							{
-								var context = ((Preview)((UserControl)previewSection.Content).DataContext);
-								var hqImageUrl = await Task.Run(() => context.FinishLoad(cancelSource.Token));
-								if (string.IsNullOrWhiteSpace(hqImageUrl) || cancelSource.IsCancellationRequested)
-									return;
 
-								try
-								{
-									var previewUrl = Task.Run(() => PlatformImageAcquisition.ImagePreviewFromUrl(hqImageUrl, cancelSource.Token));
-									args.RegisterUpdateCallback(async (nestedSender, nestedArgs) =>
-										{
-											if (!nestedArgs.InRecycleQueue)
-											{
-												try
-												{
-													((Preview)((UserControl)previewSection.Content).DataContext).ThumbnailUrl = await previewUrl;
-												}
-												catch (OperationCanceledException)
-												{
-													//Do Nothing
-												}
-											}
-										});
-								}
-								catch (OperationCanceledException)
-								{
-									//Do nothing
-								}
-							}
-						}
-						catch (Exception ex)
-						{
-							SnooStreamViewModel.Logging.Log(ex);
-						}
-						break;
-				}
-			}
+            if (!args.InRecycleQueue)
+            {
+                switch (CurrentLoadPhase)
+                {
+                    case 0:
+                        CurrentLoadPhase++;
+                        return true;
+                    case 1:
+                        CurrentLoadPhase++;
+                        rootGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                        return true;
+                    case 2:
+                        CurrentLoadPhase++;
+                        previewSection.Content = ContentPreviewConverter.MakePreviewControl(DataContext as LinkViewModel);
+                        return true;
+                    case 3:
+                        try
+                        {
+                            //make sure its ok to load non essential content
+                            if (SnooStreamViewModel.SystemServices.IsLowPriorityNetworkOk)
+                            {
+                                var context = ((Preview)((UserControl)previewSection.Content).DataContext);
+                                var finishLoad = new Action(async () =>
+                                    {
+                                        var hqImageUrl = await Task.Run(() => context.FinishLoad(cancelSource.Token));
+                                        if (string.IsNullOrWhiteSpace(hqImageUrl) || cancelSource.IsCancellationRequested)
+                                            return;
+
+                                        try
+                                        {
+                                            var cancelToken = cancelSource.Token;
+                                            var previewUrl = await Task.Run(() => PlatformImageAcquisition.ImagePreviewFromUrl(hqImageUrl, cancelToken));
+                                            if (!cancelSource.IsCancellationRequested)
+                                            {
+                                                ((Preview)((UserControl)previewSection.Content).DataContext).ThumbnailUrl = previewUrl;
+                                                CurrentLoadPhase++;
+                                            }
+                                        }
+                                        catch (OperationCanceledException)
+                                        {
+                                            //Do nothing
+                                        }
+                                    });
+                                finishLoad();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SnooStreamViewModel.Logging.Log(ex);
+                        }
+                        break;
+                }
+            }
+            return false;
 		}
     }
 }

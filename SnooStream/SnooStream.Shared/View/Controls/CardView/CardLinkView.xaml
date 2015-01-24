@@ -11,8 +11,8 @@
     d:DataContext="{Binding Source={StaticResource SnooStream}, Path=SubredditRiver.SelectedRiver.CurrentSelected}"
     MinHeight="300">
 
-    <Border HorizontalAlignment="Stretch" Background="#FF1F1F1F" Margin="0,0,0,24">
-        <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0">
+    <Border HorizontalAlignment="Stretch" Background="#FF1F1F1F" Margin="0,0,0,24" MinHeight="350">
+        <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0" x:Name="rootGrid" Visibility="Collapsed">
             
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

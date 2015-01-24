@@ -16,8 +16,8 @@ namespace SnooStream.Common
 {
     public class SnooStreamViewModelPlatform : SnooStreamViewModel
     {
-		public SnooStreamViewModelPlatform()
-		{
+        public SnooStreamViewModelPlatform()
+        {
             try
             {
                 SnooStreamViewModel.SystemServices = new SystemServices();
@@ -36,32 +36,29 @@ namespace SnooStream.Common
                 {
                     LockScreenSettings lsSettings = new LockScreenSettings();
                     lsSettings.LiveTileSettings = new List<LiveTileSettings>
-                {
-                    new LiveTileSettings { CurrentImages = new List<string>(), LiveTileItemsReddit = "/", LiveTileStyle = LiveTileStyle.TextImage}
-                };
+                    {
+                        new LiveTileSettings { CurrentImages = new List<string>(), LiveTileItemsReddit = "/", LiveTileStyle = LiveTileStyle.TextImage}
+                    };
                     lsSettings.RedditOAuth = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.OAuth != null ?
                         JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
-
-
 
                     lsSettings.Store();
 
                     Task.Delay(10000).ContinueWith(async (tskTop) =>
                         {
-                            var status = BackgroundExecutionManager.GetAccessStatus();
-                            if (status == BackgroundAccessStatus.Unspecified)
+                            try
                             {
-                                status = await BackgroundExecutionManager.RequestAccessAsync();
-                            }
-
-                            if (status != BackgroundAccessStatus.Denied)
-                            {
+                                await BackgroundExecutionManager.RequestAccessAsync();
                                 TimeTrigger timeTrigger = new TimeTrigger(30, false);
                                 SystemCondition userCondition = new SystemCondition(SystemConditionType.UserPresent);
                                 string entryPoint = "SnooStreamBackground.UpdateBackgroundTask";
                                 string taskName = "Background task for updating live tile and displaying message notifications from reddit";
 
                                 BackgroundTaskRegistration task = RegisterBackgroundTask(entryPoint, taskName, timeTrigger, userCondition);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.Error("failed to register background task", ex);
                             }
 
                             SystemServices.RunUIIdleAsync(() =>
@@ -76,7 +73,7 @@ namespace SnooStream.Common
                                             catch { }
                                         });
                                 });
-                        });
+                        }, TaskScheduler.Current);
 
                 }
             }
@@ -85,7 +82,7 @@ namespace SnooStream.Common
                 _logger.Fatal("fetal error during initialization", ex);
                 throw ex;
             }
-		}
+        }
 
         public static BackgroundTaskRegistration RegisterBackgroundTask(
                                                 string taskEntryPoint,
@@ -132,11 +129,11 @@ namespace SnooStream.Common
 
         public override void Resume()
         {
-            if(!_backgroundCancellationTokenSource.IsCancellationRequested)
+            if (!_backgroundCancellationTokenSource.IsCancellationRequested)
                 _backgroundCancellationTokenSource.Cancel();
 
             _backgroundCancellationTokenSource = new CancellationTokenSource();
-            if(SelfStream.IsLoggedIn)
+            if (SelfStream.IsLoggedIn)
                 SelfStream.RunActivityUpdater();
         }
     }
