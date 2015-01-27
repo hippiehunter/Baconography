@@ -10,6 +10,7 @@ using System.Windows;
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 
 namespace SnooStream.View.Controls
 {
@@ -150,6 +151,16 @@ namespace SnooStream.View.Controls
                     FinishPhaseLoad(DataContext as CommentViewModel);
                 }
             }
+        }
+
+        private void Button_Holding(object sender, Windows.UI.Xaml.Input.HoldingRoutedEventArgs e)
+        {
+            FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
+        }
+
+        private void Button_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            ((CommentViewModel)DataContext).MinimizeCommand.Execute(null);
         }
             
     }
