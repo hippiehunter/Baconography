@@ -12,6 +12,11 @@
     MinHeight="300">
 
     <Border HorizontalAlignment="Stretch" Background="{ThemeResource ContentBackgroundBrush}" Margin="0,0,0,24" MinHeight="350">
+        <Border.Transitions>
+            <TransitionCollection>
+                <EntranceThemeTransition FromHorizontalOffset="400" />
+            </TransitionCollection>
+        </Border.Transitions>
         <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0" x:Name="rootGrid" Visibility="Collapsed">
 
             <Grid.RowDefinitions>

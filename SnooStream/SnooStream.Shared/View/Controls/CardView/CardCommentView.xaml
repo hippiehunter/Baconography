@@ -12,6 +12,11 @@
     DataContextChanged="UserControl_DataContextChanged">
 
     <Border HorizontalAlignment="Stretch" Background="{ThemeResource ContentBackgroundBrush}" Margin="0,0,0,24">
+        <Border.Transitions>
+            <TransitionCollection>
+                <EntranceThemeTransition FromVerticalOffset="-400" />
+            </TransitionCollection>
+        </Border.Transitions>
         <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0">
 
             <Grid.RowDefinitions>
