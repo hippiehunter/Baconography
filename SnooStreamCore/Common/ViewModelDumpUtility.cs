@@ -36,7 +36,7 @@ namespace SnooStream.Common
                         {
                             Debug.Assert(context is SnooStreamViewModel);
                             var subredditThing = JsonConvert.DeserializeObject<Tuple<Subreddit, string, List<Link>, DateTime, string, string>>(stateItem.Item2);
-                            var result = rootContext.SubredditRiver.GetOrMakeSubreddit(subredditThing.Item5, subredditThing.Item1, subredditThing.Item2, subredditThing.Item3, subredditThing.Item4);
+                            var result = rootContext.SubredditRiver.GetOrMakeSubreddit(subredditThing.Item6, subredditThing.Item1, subredditThing.Item2, subredditThing.Item3, subredditThing.Item4);
                             result.CurrentSelected = result.Links.FirstOrDefault(lnk => lnk.Id == subredditThing.Item5);
                             return result;
                         }
@@ -129,12 +129,12 @@ namespace SnooStream.Common
                     if (linkRiver.CurrentSelected != null)
                         selectedId = linkRiver.CurrentSelected.Id;
 
-                    var serializationTpl = new Tuple<Subreddit, string, List<Link>, DateTime, string>(linkRiver.Thing, linkRiver.Sort,
+                    var serializationTpl = new Tuple<Subreddit, string, List<Link>, DateTime, string, string>(linkRiver.Thing, linkRiver.Sort,
                         linkRiver.Links
                             .Take(100)
                             .Select(lvm => ((LinkViewModel)lvm).Link)
                             .ToList(),
-                        linkRiver.LastRefresh ?? DateTime.Now, selectedId);
+                        linkRiver.LastRefresh ?? DateTime.Now, selectedId, linkRiver.Category);
                     var serialized = JsonConvert.SerializeObject(serializationTpl);
                     return JsonConvert.SerializeObject(Tuple.Create("LinkRiverViewModel", serialized));
                 }
