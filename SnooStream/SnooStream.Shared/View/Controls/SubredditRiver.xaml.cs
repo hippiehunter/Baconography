@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Input;
 using SnooStream.Common;
 using System.Threading;
 using SnooStream.ViewModel.Popups;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace SnooStream.View.Controls
 {
@@ -46,6 +47,7 @@ namespace SnooStream.View.Controls
 
 		private void listBox_ItemTap(object sender, RoutedEventArgs e)
         {
+            ContinuumNavigationTransitionInfo.SetIsExitElement(sender as UIElement, true);
             SnooApplicationPage.Current.PopNavState();
             searchBox.Text = "";
             var linkRiver = ((Button)sender).DataContext as SubredditRiverViewModel.SubredditWrapper;

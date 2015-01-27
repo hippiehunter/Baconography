@@ -28,13 +28,20 @@
                         Storyboard.TargetProperty="Visibility">
                             <DiscreteObjectKeyFrame KeyTime="0:0:0.5" Value="Collapsed" />
                         </ObjectAnimationUsingKeyFrames>
-                        <DoubleAnimation Storyboard.TargetName="search" Duration="0:0:0.2" Storyboard.TargetProperty="Opacity" To="0.0"/>
+                        <DoubleAnimation Storyboard.TargetName="search" Duration="0:0:0.1" Storyboard.TargetProperty="Opacity" To="0.0"/>
 
                         <ObjectAnimationUsingKeyFrames
                         Storyboard.TargetName="searchBox"
-                        Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.5" Value="Visible" />
+                        Storyboard.TargetProperty="Margin">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="-3,0,-3,0" />
                         </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames
+                        Storyboard.TargetName="listBox"
+                        Storyboard.TargetProperty="Margin">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="-62,0,-12,0" />
+                        </ObjectAnimationUsingKeyFrames>
+                        
+
 
                     </Storyboard>
                 </VisualState>
@@ -78,8 +85,13 @@
             <SymbolIcon Symbol="Find"/>
         </Button>
         <TextBox Grid.Column="1" PlaceholderText="Search for subreddit"
-                 Margin="-3,0,-3,0"
-                 Visibility="Collapsed" x:Name="searchBox" KeyDown="manualBox_KeyDown" TextChanged="searchBox_TextChanged" Text="{Binding Path=SearchString, Mode=TwoWay}"/>
+                 Margin="-3,-150,-3,0" x:Name="searchBox" KeyDown="manualBox_KeyDown" TextChanged="searchBox_TextChanged" Text="{Binding Path=SearchString, Mode=TwoWay}">
+            <TextBox.Transitions>
+                <TransitionCollection>
+                    <RepositionThemeTransition/>
+                </TransitionCollection>
+            </TextBox.Transitions>
+        </TextBox>
         <ListView Grid.Column="1" Grid.Row="1"
 			x:Name="listBox"
 			HorizontalAlignment="Stretch"
@@ -105,6 +117,16 @@
             <ListView.Footer>
                 <Grid Height="12" />
             </ListView.Footer>
+            <ListView.ItemContainerTransitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition IsStaggeringEnabled="True"/>
+                </TransitionCollection>
+            </ListView.ItemContainerTransitions>
+            <ListView.Transitions>
+                <TransitionCollection>
+                    <RepositionThemeTransition/>
+                </TransitionCollection>
+            </ListView.Transitions>
 		</ListView>
 	</Grid>
 </UserControl>

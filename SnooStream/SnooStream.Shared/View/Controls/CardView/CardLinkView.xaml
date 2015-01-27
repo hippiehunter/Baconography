@@ -79,7 +79,7 @@
                         HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
                         Margin="0,-12,2,0"
                         BorderThickness="0" Padding="0,0,0,0" 
-                        Command="{Binding GotoComments}">
+                        Command="{Binding GotoComments}" Tapped="Comments_Tapped">
                     <local:CommentCountControl />
                 </Button>
             </Grid>

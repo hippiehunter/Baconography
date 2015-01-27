@@ -18,6 +18,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
@@ -119,5 +120,10 @@ namespace SnooStream.View.Controls
             }
             return false;
 		}
+
+        private void Comments_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            ContinuumNavigationTransitionInfo.SetIsExitElement(sender as UIElement, true);
+        }
     }
 }

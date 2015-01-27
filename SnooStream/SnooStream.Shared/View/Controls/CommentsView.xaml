@@ -27,6 +27,12 @@
                     <ContentControl HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" MinHeight="25" />
                 </DataTemplate>
             </ListView.ItemTemplate>
+            <ListView.ItemContainerTransitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition IsStaggeringEnabled="True"/>
+                    <AddDeleteThemeTransition/>
+                </TransitionCollection>
+            </ListView.ItemContainerTransitions>
         </ListView>
     </Grid>
 </UserControl>
