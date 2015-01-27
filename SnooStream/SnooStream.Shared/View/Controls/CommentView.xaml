@@ -11,9 +11,9 @@
     <UserControl.Resources>
         <DataTemplate x:Name="textTemplate">
             <TextBlock x:Name="plainTextControl"
-                       FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
+                       FontFamily="Segoe WP" FontSize="17" FontWeight="Normal" FontStyle="Normal"
                         HorizontalAlignment="Left" TextWrapping="WrapWholeWords"
-                        Margin="3,0,0,0" Text="{Binding}"/>
+                        Margin="6,0,0,0" Text="{Binding}"/>
         </DataTemplate>
         <DataTemplate x:Name="editingTemplate">
             <local:ComposeComment DataContext="{Binding ReplyViewModel}"/>
@@ -23,9 +23,9 @@
                     Markdown="{Binding}"
                     StyleProvider="{StaticResource markdownHelpers}"
                     CommandFactory="{StaticResource markdownHelpers}"
-                    FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
+                    FontFamily="Segoe WP" FontSize="17" FontWeight="Normal" FontStyle="Normal"
                     HorizontalAlignment="Stretch"
-                    Margin="3,0,0,0"/>
+                    Margin="5,0,0,0"/>
         </DataTemplate>
     </UserControl.Resources>
     
@@ -49,7 +49,7 @@
             <Grid Grid.Row="0" HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="90" />
+                    <ColumnDefinition Width="102" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -69,7 +69,7 @@
                                    FontSize="15" Text="{Binding Path=AuthorFlairText}" Margin="4,2,2,0"
                                    Visibility="{Binding HasAuthorFlair, Converter={StaticResource booleanVisibilityConverter}}"/>
                             </StackPanel>
-                            <TextBlock Foreground="Gray" FontSize="15" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="2,0,0,0" />
+                            <TextBlock Foreground="Gray" FontSize="14" FontWeight="SemiBold" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="2,0,0,0" />
                         </StackPanel>                        
                     </Button.Content>
                     <Button.Flyout>
@@ -87,7 +87,7 @@
                 <!-- Votable Section -->
                 <local:VotableControl Grid.Column="1" />
             </Grid>
-            <ContentControl x:Name="contentControl" Grid.Row="1"/>
+            <ContentControl x:Name="contentControl" Grid.Row="1" Margin="0,0,12,0"/>
             
         </Grid>            
         
@@ -95,8 +95,8 @@
             Content="{Binding ExtendedData, Converter={StaticResource extendedCommentConverter}}"/>-->
         <!--<ContentControl Content="{Binding ReplyData, Converter={StaticResource replyConverter}}"/>-->
         <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Visibility="{Binding IsMinimized, Converter={StaticResource booleanVisibilityConverter}}">
-            <Button BorderThickness="0" Margin="-15,-10,0,0" Padding="0" HorizontalAlignment="Left"
-                    HorizontalContentAlignment="Left" Command="{Binding MinimizeCommand}" CommandParameter="{Binding}">
+            <Button  Margin="4,-10,0,0" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                     Command="{Binding MinimizeCommand}" CommandParameter="{Binding}">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <Button BorderThickness="0" VerticalAlignment="Top" FontSize="15" Margin="-15,-5,-5,-5" Padding="2,-5,2,2"
