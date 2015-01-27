@@ -97,7 +97,7 @@ namespace SnooStream.Common
 										{
 											var info = await source.GetInfoAsync();
 
-											if (source.ImageFormat == ImageFormat.Jpeg && info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024)
+											if (source.ImageFormat == ImageFormat.Jpeg && (info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024))
 											{
 												var resizedBuffer = await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(buffer, new Nokia.Graphics.Imaging.AutoResizeConfiguration(1024 * 1024,
 												new Windows.Foundation.Size(1024, 1024), new Windows.Foundation.Size(0, 0), Nokia.Graphics.Imaging.AutoResizeMode.Automatic, 0, Nokia.Graphics.Imaging.ColorSpace.Yuv420));
