@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<UITest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="" Id="a758a8d6-2492-42ec-a15a-6bcc66aaec4b" AssemblyVersion="12.0.30501.0" Version="1.0" xmlns="http://schemas.microsoft.com/VisualStudio/TeamTest/UITest/2010">
+  <Configuration>
+    <Group Name="TechnologyManagers" />
+  </Configuration>
+  <InitializeActions />
+  <ExecuteActions />
+  <CleanupActions />
+  <OnErrorActions />
+  <Maps>
+    <UIMap Id="UIMap">
+      <TopLevelWindows>
+        <TopLevelWindow ControlType="Window" Id="UISnooStreamBetaWindow" FriendlyName="SnooStream Beta" SpecialControlType="None" SessionId="0">
+          <TechnologyName>UIA</TechnologyName>
+          <WindowTitles />
+          <AndCondition>
+            <PropertyCondition Name="ControlType">Window</PropertyCondition>
+            <PropertyCondition Name="Name">SnooStream Beta</PropertyCondition>
+            <PropertyCondition Name="FrameworkId">XAML</PropertyCondition>
+          </AndCondition>
+          <SupportLevel>0</SupportLevel>
+          <Descendants>
+            <UIObject ControlType="HubSection" Id="UISubredditsHubSection" FriendlyName="subreddits" SpecialControlType="None">
+              <TechnologyName>UIA</TechnologyName>
+              <WindowTitles />
+              <AndCondition>
+                <PropertyCondition Name="FrameworkId">XAML</PropertyCondition>
+                <PropertyCondition Name="ControlType">HubSection</PropertyCondition>
+                <PropertyCondition Name="Name">subreddits</PropertyCondition>
+              </AndCondition>
+              <SupportLevel>0</SupportLevel>
+              <Descendants>
+                <UIObject ControlType="List" Id="UIListBoxList" FriendlyName="listBox" SpecialControlType="None">
+                  <TechnologyName>UIA</TechnologyName>
+                  <WindowTitles />
+                  <AndCondition>
+                    <PropertyCondition Name="FrameworkId">XAML</PropertyCondition>
+                    <PropertyCondition Name="ControlType">List</PropertyCondition>
+                    <PropertyCondition Name="AutomationId">listBox</PropertyCondition>
+                  </AndCondition>
+                  <SupportLevel>0</SupportLevel>
+                  <Descendants>
+                    <UIObject ControlType="Group" Id="UISubredditGrouppopulaGroup" FriendlyName="SubredditGroup: popular" SpecialControlType="None">
+                      <TechnologyName>UIA</TechnologyName>
+                      <WindowTitles />
+                      <AndCondition>
+                        <PropertyCondition Name="FrameworkId">XAML</PropertyCondition>
+                        <PropertyCondition Name="ControlType">Group</PropertyCondition>
+                        <PropertyCondition Name="Name">SubredditGroup: popular</PropertyCondition>
+                      </AndCondition>
+                      <SupportLevel>0</SupportLevel>
+                      <Descendants>
+                        <UIObject ControlType="ListItem" Id="UISubredditWrapperpopuListItem" FriendlyName="SubredditWrapper: popular" SpecialControlType="None">
+                          <TechnologyName>UIA</TechnologyName>
+                          <WindowTitles />
+                          <AndCondition>
+                            <PropertyCondition Name="FrameworkId">XAML</PropertyCondition>
+                            <PropertyCondition Name="ControlType">ListItem</PropertyCondition>
+                            <PropertyCondition Name="Name">SubredditWrapper: popular</PropertyCondition>
+                            <PropertyCondition Name="Instance">3</PropertyCondition>
+                          </AndCondition>
+                          <SupportLevel>0</SupportLevel>
+                          <Descendants>
+                            <UIObject ControlType="Button" Id="UIPicsButton" FriendlyName="pics" SpecialControlType="None">
+                              <TechnologyName>UIA</TechnologyName>
+                              <WindowTitles />
+                              <AndCondition>
+                                <PropertyCondition Name="FrameworkId">XAML</PropertyCondition>
+                                <PropertyCondition Name="ControlType">Button</PropertyCondition>
+                                <PropertyCondition Name="Name">pics</PropertyCondition>
+                              </AndCondition>
+                              <SupportLevel>0</SupportLevel>
+                              <Descendants />
+                            </UIObject>
+                          </Descendants>
+                        </UIObject>
+                      </Descendants>
+                    </UIObject>
+                  </Descendants>
+                </UIObject>
+              </Descendants>
+            </UIObject>
+          </Descendants>
+        </TopLevelWindow>
+      </TopLevelWindows>
+    </UIMap>
+  </Maps>
+  <ValueMap>
+    <ParameterList />
+  </ValueMap>
+</UITest>

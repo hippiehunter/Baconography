@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-	public class ContentStreamViewModel : ViewModelBase
+	public class ContentStreamViewModel
 	{
         private static async void DelayContentStreamAddition(IEnumerable<ILinkViewModel> rawBefore, ObservableCollection<ILinkViewModel> target)
         {

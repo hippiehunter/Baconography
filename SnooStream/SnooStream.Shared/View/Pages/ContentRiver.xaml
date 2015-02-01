@@ -7,7 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    x:Name="root">
+    x:Name="root"
+    DataContextChanged="root_DataContextChanged">
     <common:SnooApplicationPage.Resources>
         <Storyboard x:Name="fadeInOverlay">
             <DoubleAnimation

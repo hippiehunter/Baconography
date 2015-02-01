@@ -22,7 +22,7 @@ namespace SnooStream.ViewModel
     
     //this class needs to take care of storing off prior comment sets so we can point the user directly to
     //the comments that have been either edited, added, or deleted
-    public class CommentsViewModel : ViewModelBase, IRefreshable
+    public class CommentsViewModel : ViewModelBase, IRefreshable, IHasFocus
     {
         private class CommentShell
         {
@@ -911,5 +911,27 @@ namespace SnooStream.ViewModel
                 return new RelayCommand(() => { throw new NotImplementedException(); });
             }
         }
-	} 
+
+        ViewModelBase _currentlyFocused;
+        public ViewModelBase CurrentlyFocused
+        {
+            get
+            {
+                return _currentlyFocused;
+            }
+            set
+            {
+                if(_currentlyFocused != value)
+                {
+                    if (FocusChanged != null)
+                        FocusChanged(_currentlyFocused, value);
+
+                    _currentlyFocused = value;
+                }
+            }
+        }
+
+
+        public event Action<ViewModelBase, ViewModelBase> FocusChanged;
+    } 
 }

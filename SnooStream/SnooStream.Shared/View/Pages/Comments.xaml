@@ -15,7 +15,7 @@
         </TransitionCollection>
     </Page.Transitions>
     <Grid>
-        <local:CommentsView/>
+        <local:CommentsView x:Name="commentsView"/>
     </Grid>
     <common:SnooApplicationPage.BottomAppBar>
         <CommandBar>

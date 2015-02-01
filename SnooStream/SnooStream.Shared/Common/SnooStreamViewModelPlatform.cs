@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using GalaSoft.MvvmLight;
+using Newtonsoft.Json;
 using SnooStream.PlatformServices;
 using SnooStream.Services;
 using SnooStream.ViewModel;
@@ -135,6 +136,11 @@ namespace SnooStream.Common
             _backgroundCancellationTokenSource = new CancellationTokenSource();
             if (SelfStream.IsLoggedIn)
                 SelfStream.RunActivityUpdater();
+        }
+
+        public override void SetFocusedViewModel(ViewModelBase viewModel)
+        {
+            SnooApplicationPage.Current.SetFocusedViewModel(viewModel);
         }
     }
 }

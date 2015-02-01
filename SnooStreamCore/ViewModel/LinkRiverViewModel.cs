@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-    public class LinkRiverViewModel : ViewModelBase, IRefreshable, IHasLinks
+    public class LinkRiverViewModel : ViewModelBase, IRefreshable, IHasLinks, IHasFocus
     {
         //need to come up with an init blob setup for this, meaining a per river blob
         public Subreddit Thing { get; internal set; }
@@ -271,11 +271,11 @@ namespace SnooStream.ViewModel
 				if (IsInDesignMode)
 					return new LinkViewModel(this, new Link { Title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras ac tempor erat. Cras sagittis eu urna sed posuere. Proin sit amet fringilla magna. Sed feugiat lorem nibh, ac mollis risus rutrum non. Pellentesque pharetra auctor pellentesque. Maecenas vel lorem sagittis.", Domain = "http://www.google.com", Author = "fredbob", Url = "http://www.google.com", CommentCount = 2453 });
 				else
-					return _currentSelected;
+					return CurrentlyFocused as ILinkViewModel;
 			}
 			set
 			{
-				_currentSelected = value;
+                CurrentlyFocused = value as ViewModelBase;
 				RaisePropertyChanged("CurrentSelected");
 			}
 		}
@@ -404,5 +404,36 @@ namespace SnooStream.ViewModel
                 return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToSubredditCategorizer(this));
             }
         }
+
+        private ViewModelBase _currentlyFocused;
+        public ViewModelBase CurrentlyFocused
+        {
+            get
+            {
+                return _currentlyFocused;
+            }
+            set
+            {
+                if (_currentlyFocused != value)
+                {
+                    var newLink = value as ILinkViewModel;
+                    var oldLink = _currentlyFocused as ILinkViewModel;
+                    if (oldLink != null)
+                        oldLink.Content.Focused = false;
+
+                    if (newLink != null)
+                        newLink.Content.Focused = true;
+
+                    var oldFocus = _currentlyFocused;
+                    _currentlyFocused = value;
+
+                    if (FocusChanged != null)
+                        FocusChanged(oldFocus, value);
+                }
+            }
+        }
+
+
+        public event Action<ViewModelBase, ViewModelBase> FocusChanged;
 	}
 }

@@ -18,7 +18,7 @@
         </DataTemplate>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot">
-        <ListView x:Name="commentsList" HeaderTemplate="{StaticResource HeaderTemplate}"
+        <ListView x:Name="commentsList" x:FieldModifier="public" HeaderTemplate="{StaticResource HeaderTemplate}"
                   ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
                   ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">

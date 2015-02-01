@@ -1,4 +1,5 @@
-﻿using GalaSoft.MvvmLight.Messaging;
+﻿using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
 using MetroLog;
 using Microsoft.Xaml.Interactivity;
 using SnooStream.Messages;
@@ -24,6 +25,7 @@ namespace SnooStream.Common
 {
     public class SnooApplicationPage : Page
     {
+        object _dataContext;
         OrientationManager _orientationManager;
 		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooApplicationPage>();
         public SnooApplicationPage()
@@ -33,10 +35,23 @@ namespace SnooStream.Common
 				_orientationManager = Application.Current.Resources["orientationManager"] as OrientationManager;
 				Messenger.Default.Register<SettingsChangedMessage>(this, OnSettingsChanged);
 				OnSettingsChanged(null);
+                Loaded += OnLoaded;
 			}
 			catch
 			{
 			}
+        }
+
+        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (_dataContext != null)
+            {
+                DataContext = _dataContext;
+                if(_dataContext is IHasFocus)
+                {
+                    SetFocusedViewModel(((IHasFocus)_dataContext).CurrentlyFocused);
+                }
+            }
         }
 
         public virtual bool DefaultSystray { get { return true; } }
@@ -145,17 +160,23 @@ namespace SnooStream.Common
 
                 Window.Current.SizeChanged += sizeChanged;
 
-				if (_stateGuid != null)
+				if (_stateGuid != null && DataContext == null)
 				{
 					_logger.Info("loading state guid for page " + GetType().Name);
-					SystemServices.WrappedCollectionViewSource._dataBinding = true;
-					DataContext = NavigationStateUtility.GetDataContext(_stateGuid);
-					SystemServices.WrappedCollectionViewSource._dataBinding = false;
-					if (DataContext is IRefreshable)
+                    _dataContext = NavigationStateUtility.GetDataContext(_stateGuid);
+					if (_dataContext is IRefreshable)
 					{
-						((IRefreshable)DataContext).MaybeRefresh();
+						((IRefreshable)_dataContext).MaybeRefresh();
 					}
 				}
+
+                if (DataContext != null && e.NavigationMode == NavigationMode.Back)
+                {
+                    if (DataContext is IHasFocus)
+                    {
+                        SetFocusedViewModel(((IHasFocus)DataContext).CurrentlyFocused);
+                    }
+                }
 				
 			}
 			catch(Exception ex)
@@ -205,8 +226,6 @@ namespace SnooStream.Common
         Stack<Tuple<object, string>> _navState = new Stack<Tuple<object, string>>();
         internal void PushNavState(object sender, string pushedState)
         {
-            //var currentState = VisualStateManager.GetVisualStateGroups(sender as FrameworkElement).First().CurrentState;
-            //var currentStateName = currentState != null ? currentState.Name : null;
             VisualStateManager.GoToState(sender as Control, pushedState, false);
             _navState.Push(Tuple.Create(sender, "Normal"));
         }
@@ -239,6 +258,11 @@ namespace SnooStream.Common
                 else
                     throw new NotImplementedException();
             }
+        }
+
+        public virtual void SetFocusedViewModel(ViewModelBase viewModel)
+        { 
+            
         }
     }
 

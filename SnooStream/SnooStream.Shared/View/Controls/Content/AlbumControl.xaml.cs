@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SnooStream.ViewModel.Content;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,6 +33,11 @@ namespace SnooStream.View.Controls.Content
 				if (loader.HasMoreItems)
 					await loader.LoadMoreItemsAsync(20);
 			}
+            if (e.AddedItems.Count > 0)
+                ((ContentViewModel)e.AddedItems[0]).Focused = true;
+
+            if (e.RemovedItems.Count > 0)
+                ((ContentViewModel)e.RemovedItems[0]).Focused = false;
 		}
 
 		private async void albumSlideView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)

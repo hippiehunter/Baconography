@@ -192,18 +192,25 @@ namespace SnooStream.ViewModel
             {
                 return new RelayCommand(() =>
                 {
+                    SetFocused();
                     Comments.LoadFull();
                     SnooStreamViewModel.NavigationService.NavigateToComments(Comments);
                 });
             }
         }
 
-        public RelayCommand Share { get { return new RelayCommand(() => SnooStreamViewModel.SystemServices.ShareLink(Url, Title, "posted by " + Author + " to " + Subreddit)); } }
-        public RelayCommand GotoWeb { get { return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToWeb(Link.Url)); } }
-        public RelayCommand GotoLink { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoLink(this, Link.Url)); } }
-        public RelayCommand GotoSubreddit { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoSubreddit(Subreddit)); } }
-        public RelayCommand GotoUserDetails { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoUserDetails(Author)); } }
-        public RelayCommand Report { get { return new RelayCommand(() => SnooStreamViewModel.RedditService.AddReportOnThing(Link.Name)); } }
+        private void SetFocused()
+        {
+            if (Context is IHasFocus)
+                ((IHasFocus)Context).CurrentlyFocused = this;
+        }
+
+        public RelayCommand Share { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.SystemServices.ShareLink(Url, Title, "posted by " + Author + " to " + Subreddit); }); } }
+        public RelayCommand GotoWeb { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.NavigationService.NavigateToWeb(Link.Url); }); } }
+        public RelayCommand GotoLink { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.CommandDispatcher.GotoLink(this, Link.Url); }); } }
+        public RelayCommand GotoSubreddit { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.CommandDispatcher.GotoSubreddit(Subreddit); }); } }
+        public RelayCommand GotoUserDetails { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.CommandDispatcher.GotoUserDetails(Author); }); } }
+        public RelayCommand Report { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.RedditService.AddReportOnThing(Link.Name); }); } }
         public RelayCommand Hide
         {
             get

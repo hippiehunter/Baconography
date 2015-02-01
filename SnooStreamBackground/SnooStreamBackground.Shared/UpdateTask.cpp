@@ -51,11 +51,7 @@ namespace SnooStreamBackground
 {
     [Windows::Foundation::Metadata::WebHostHidden]
     public ref class UpdateBackgroundTask sealed :
-#ifdef WINDOWS_PHONE
-        XamlRenderingBackgroundTask
-#else
         public IBackgroundTask
-#endif
     {
     private:
         std::unique_ptr<SimpleRedditService> redditService;
@@ -65,20 +61,10 @@ namespace SnooStreamBackground
         void RunExternal()
         {
 			_external = true;
-#ifdef WINDOWS_PHONE
-            OnRun(nullptr);
-#else
             Run(nullptr);
-#endif
         }
-
-#ifdef WINDOWS_PHONE
-    protected:
-        void OnRun(IBackgroundTaskInstance^ taskInstance) override
-#else
     public:
         virtual void Run(IBackgroundTaskInstance^ taskInstance)
-#endif
         {
             Platform::Agile<Windows::ApplicationModel::Background::BackgroundTaskDeferral> deferral;
             if (taskInstance != nullptr)

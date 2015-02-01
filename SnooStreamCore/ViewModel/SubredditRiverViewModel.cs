@@ -24,6 +24,10 @@ namespace SnooStream.ViewModel
         {
             public string Name { get; set; }
             public ObservableCollection<SubredditWrapper> Collection { get; set; }
+            public override string ToString()
+            {
+                return "SubredditGroup: " + Name;
+            }
         }
 
         public class SubredditWrapper : ViewModelBase
@@ -45,6 +49,11 @@ namespace SnooStream.ViewModel
                         return result;
                     }
                 });
+            }
+
+            public override string ToString()
+            {
+                return "SubredditWrapper: " + Category;
             }
 
             private SubredditRiverViewModel _context;

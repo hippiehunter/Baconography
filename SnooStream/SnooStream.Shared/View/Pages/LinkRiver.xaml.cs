@@ -19,30 +19,6 @@ namespace SnooStream.View.Pages
         {
             InitializeComponent();
         }
-		protected override async void OnNavigatedTo(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
-		{
-			base.OnNavigatedTo(e);
-			if (DataContext is LinkRiverViewModel)
-			{
-				if (((LinkRiverViewModel)DataContext).CurrentSelected != null)
-				{
-					await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
-						() => linksListView.ScrollIntoView(((LinkRiverViewModel)DataContext).CurrentSelected));
-				}
-			}
-				
-		}
-
-		protected override void OnNavigatedFrom(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
-		{
-			base.OnNavigatedFrom(e);
-
-			if(e.NavigationMode == Windows.UI.Xaml.Navigation.NavigationMode.Back)
-			{
-				((LinkRiverViewModel)DataContext).CurrentSelected = null;
-				linksListView.ScrollIntoView(null);
-			}
-		}
 
 		private void linksListView_ContainerContentChanging(Windows.UI.Xaml.Controls.ListViewBase sender, Windows.UI.Xaml.Controls.ContainerContentChangingEventArgs args)
 		{
@@ -65,5 +41,11 @@ namespace SnooStream.View.Pages
 				linksListView.ScrollIntoView(((LinkRiverViewModel)DataContext).Links.FirstOrDefault());
 			}
 		}
+
+        public override void SetFocusedViewModel(GalaSoft.MvvmLight.ViewModelBase viewModel)
+        {
+            base.SetFocusedViewModel(viewModel);
+            linksListView.ScrollIntoView(linksListView.SelectedItem = viewModel);
+        }
     }
 }

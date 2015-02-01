@@ -11,10 +11,12 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-	public class CommentsContentStreamViewModel : ViewModelBase, IHasLinks
+	public class CommentsContentStreamViewModel : ViewModelBase, IHasLinks, IHasFocus
 	{
+        CommentsViewModel _context;
 		public CommentsContentStreamViewModel(CommentsViewModel context)
 		{
+            _context = context;
 			Links = new ObservableCollection<ILinkViewModel>();
             if (context.Link != null && context.Link.IsSelfPost)
                 ProcessMarkdown(context.Link, context.Link.SelfText);
@@ -61,10 +63,12 @@ namespace SnooStream.ViewModel
 				_currentSelected = value;
 			}
 		}
-		private class CommentLinkViewModel : ILinkViewModel
+        private class CommentLinkViewModel : ViewModelBase, ILinkViewModel
 		{
+            public CommentViewModel Context {get; set;}
 			public CommentLinkViewModel(CommentViewModel context, string url, string title)
 			{
+                Context = context;
 				AuthorFlairText = context.Thing.AuthorFlairText;
 				Author = context.Thing.Author;
 				Subreddit = context.Thing.Subreddit;
@@ -119,7 +123,7 @@ namespace SnooStream.ViewModel
 			public RelayCommand GotoUserDetails { get; set; }
 		}
 
-        private class SelfTextLinkViewModel : ILinkViewModel
+        private class SelfTextLinkViewModel : ViewModelBase, ILinkViewModel
         {
             public SelfTextLinkViewModel(LinkViewModel context, string url, string title)
             {
@@ -176,5 +180,37 @@ namespace SnooStream.ViewModel
             public RelayCommand GotoComments { get; set; }
             public RelayCommand GotoUserDetails { get; set; }
         }
-	}
+
+        public ViewModelBase CurrentlyFocused
+        {
+            get
+            {
+                return CurrentSelected as ViewModelBase;
+            }
+            set
+            {
+                if(CurrentSelected != value)
+                {
+                    var newSelected = value as ILinkViewModel;
+                    if (CurrentSelected != null)
+                        CurrentSelected.Content.Focused = false;
+
+                    if (newSelected != null)
+                        newSelected.Content.Focused = true;
+
+                    if (FocusChanged != null)
+                        FocusChanged(CurrentSelected as ViewModelBase, value);
+
+                    CurrentSelected = newSelected;
+                    if (value is CommentLinkViewModel)
+                    {
+                        _context.CurrentlyFocused = ((CommentLinkViewModel)value).Context;
+                    }
+                }
+            }
+        }
+
+
+        public event Action<ViewModelBase, ViewModelBase> FocusChanged;
+    }
 }

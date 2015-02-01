@@ -106,13 +106,14 @@
 			<ListView.ItemTemplate>
 				<DataTemplate>
                     <Button Margin="0,0,0,-18" BorderThickness="0" Tapped="listBox_ItemTap" Holding="Button_Holding"
-                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{Binding Thing.DisplayName}">
                         <localC:SubredditSmallView HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" />
 					</Button>
 				</DataTemplate>
 			</ListView.ItemTemplate>
             <ListView.GroupStyle>
-                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource subredditGroupHeader}"/>
+                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource subredditGroupHeader}">
+                </GroupStyle>
             </ListView.GroupStyle>
             <ListView.Footer>
                 <Grid Height="12" />

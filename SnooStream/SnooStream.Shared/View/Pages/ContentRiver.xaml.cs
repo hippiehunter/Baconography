@@ -1,4 +1,5 @@
-﻿using SnooStream.Common;
+﻿using GalaSoft.MvvmLight;
+using SnooStream.Common;
 using SnooStream.View.Controls.Content;
 using SnooStream.ViewModel;
 using SnooStream.ViewModel.Content;
@@ -32,31 +33,11 @@ namespace SnooStream.View.Pages
             this.InitializeComponent();
         }
 
-		protected override async void OnNavigatedTo(NavigationEventArgs e)
-		{
-			base.OnNavigatedTo(e);
-			if(DataContext is IHasLinks)
-			{
-				var dataContext = DataContext as IHasLinks;
-				flipView.ItemsSource = ContentStreamViewModel.MakeFilteredContentStream(dataContext.Links, dataContext.CurrentSelected);
-				flipView.SelectedValue = dataContext.CurrentSelected;
-				if (dataContext.CurrentSelected != null)
-					SnooStreamViewModel.OfflineService.AddHistory(dataContext.CurrentSelected.Url);
-				flipView.SelectionChanged += flipView_SelectionChanged;
-
-                await Task.Delay(10);
-                if (dataContext.CurrentSelected.Content is VideoViewModel)
-                {
-                    var videoControl = FindContentType<VideoControl>(flipView.ContainerFromItem(dataContext.CurrentSelected) as FlipViewItem);
-                    if (videoControl != null)
-                    {
-                        videoControl.player.Position = new TimeSpan();
-                        videoControl.player.Play();
-                        videoControl.player.AutoPlay = true;
-                    }
-                }
-            }
-		}
+        public override void SetFocusedViewModel(ViewModelBase viewModel)
+        {
+            base.SetFocusedViewModel(viewModel);
+            this.flipView.SelectedItem = viewModel;
+        }
 
 		private async void flipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
@@ -106,6 +87,11 @@ namespace SnooStream.View.Pages
                             videoControl.player.AutoPlay = true;
                         }
                     }
+
+                    if(DataContext is IHasFocus && e.AddedItems[0] is ViewModelBase)
+                    {
+                        ((IHasFocus)DataContext).CurrentlyFocused = e.AddedItems[0] as ViewModelBase;
+                    }
                 }
             }
             catch { }
@@ -138,6 +124,29 @@ namespace SnooStream.View.Pages
         private void caption_SelectionChanged(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private async void root_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        {
+            if (args.NewValue is IHasLinks)
+            {
+                var dataContext = args.NewValue as IHasLinks;
+                flipView.ItemsSource = ContentStreamViewModel.MakeFilteredContentStream(dataContext.Links, dataContext.CurrentSelected);
+                flipView.SelectedValue = dataContext.CurrentSelected;
+                flipView.SelectionChanged += flipView_SelectionChanged;
+
+                await Task.Delay(10);
+                if (dataContext.CurrentSelected.Content is VideoViewModel)
+                {
+                    var videoControl = FindContentType<VideoControl>(flipView.ContainerFromItem(dataContext.CurrentSelected) as FlipViewItem);
+                    if (videoControl != null)
+                    {
+                        videoControl.player.Position = new TimeSpan();
+                        videoControl.player.Play();
+                        videoControl.player.AutoPlay = true;
+                    }
+                }
+            }
         }
     }
 }

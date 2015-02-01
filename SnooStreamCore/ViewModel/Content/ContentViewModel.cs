@@ -20,7 +20,7 @@ namespace SnooStream.ViewModel.Content
 		public string Glyph { get; set; }
 		public string Title { get; set; }
         protected bool UIThreadLoad { get; set; }
-
+        public string Url { get; set; }
 		VotableViewModel Votable { get; set; }
 
 		public static ContentViewModel MakeContentViewModel(string url, string title = null, ILinkViewModel selfLink = null, string redditThumbnail = null)
@@ -101,7 +101,7 @@ namespace SnooStream.ViewModel.Content
 				result.Votable = selfLink.Votable;
 				result.Title = selfLink.Title;
 			}
-
+            result.Url = url;
 			return result;
 		}
 
@@ -157,5 +157,19 @@ namespace SnooStream.ViewModel.Content
 		}
 
 		protected abstract Task StartLoad();
+        private bool _focused;
+        public virtual bool Focused
+        {
+            get
+            {
+                return _focused;
+            }
+            set
+            {
+                if(value)
+                    SnooStreamViewModel.OfflineService.AddHistory(Url);
+                _focused = value;
+            }
+        }
 	}
 }

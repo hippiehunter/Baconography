@@ -6,6 +6,8 @@ using System.Windows;
 using SnooStream.Common;
 using SnooStream.ViewModel;
 using SnooStream.View.Controls;
+using GalaSoft.MvvmLight;
+using System.Threading.Tasks;
 
 namespace SnooStream.View.Pages
 {
@@ -14,6 +16,17 @@ namespace SnooStream.View.Pages
         public Comments()
         {
             InitializeComponent();
+        }
+
+        public override async void SetFocusedViewModel(ViewModelBase viewModel)
+        {
+            if (viewModel != null)
+            {
+                commentsView.commentsList.SelectedItem = viewModel;
+                await Task.Delay(10);
+                base.SetFocusedViewModel(viewModel);
+                commentsView.commentsList.ScrollIntoView(viewModel);
+            }
         }
     }
 }

@@ -23,6 +23,7 @@ namespace SnooStream.ViewModel
 		protected ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooStreamViewModel>();
 		protected void FinishInit()
 		{
+            Current = this;
 			_listingFilter = new NSFWListingFilter();
 			if (IsInDesignMode)
 			{
@@ -124,5 +125,8 @@ namespace SnooStream.ViewModel
 
         public abstract void Suspend();
         public abstract void Resume();
+        public abstract void SetFocusedViewModel(ViewModelBase viewModel);
+
+        public static SnooStreamViewModel Current { get; private set; }
     }
 }

@@ -84,6 +84,7 @@
     <Compile Include="ViewModel\Content\SelfViewModel.cs" />
     <Compile Include="ViewModel\Content\VideoViewModel.cs" />
     <Compile Include="ViewModel\ConversationViewModel.cs" />
+    <Compile Include="ViewModel\IHasFocus.cs" />
     <Compile Include="ViewModel\IHasLinks.cs" />
     <Compile Include="ViewModel\ILinkViewModel.cs" />
     <Compile Include="ViewModel\IRefreshable.cs" />
