@@ -1,14 +1,16 @@
-﻿using System;
+﻿using GalaSoft.MvvmLight;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
 namespace SnooStream.Common
 {
-    public class Utility
+    public static class Utility
     {
         public static SolidColorBrush GetColorFromHexa(string hexaColor)
         {
@@ -63,6 +65,14 @@ namespace SnooStream.Common
                 return userInput;
             else
                 return "/r/" + userInput;
+        }
+
+        public static void SafeScrollIntoView(this ListViewBase thisp, object viewModel)
+        {
+            if (viewModel == null)
+                thisp.ScrollIntoView(null);
+            else
+                thisp.ScrollIntoView(viewModel, ScrollIntoViewAlignment.Leading);
         }
     }
 }

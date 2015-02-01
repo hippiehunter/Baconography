@@ -41,16 +41,15 @@ namespace SnooStream.View.Pages
 
 		private async void flipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			var dataContext = DataContext as IHasLinks;
-			if (dataContext != null)
+			var focusContext = DataContext as IHasFocus;
+            var linksContext = DataContext as IHasLinks;
+			if (focusContext != null && linksContext != null)
 			{
 				if (e.AddedItems.Count > 0)
 				{
-					dataContext.CurrentSelected = e.AddedItems.First() as ILinkViewModel;
-					if (dataContext.CurrentSelected != null)
-						SnooStreamViewModel.OfflineService.AddHistory(dataContext.CurrentSelected.Url);
+                    focusContext.CurrentlyFocused = e.AddedItems.First() as ViewModelBase;
 				}
-				var loader = dataContext.Links as ISupportIncrementalLoading;
+				var loader = linksContext.Links as ISupportIncrementalLoading;
 				if (e.AddedItems.Count > 0 &&
 					flipView.Items.Count < (flipView.Items.IndexOf(e.AddedItems.First()) + 5) &&
 					loader != null)
@@ -86,11 +85,6 @@ namespace SnooStream.View.Pages
                             videoControl.player.Play();
                             videoControl.player.AutoPlay = true;
                         }
-                    }
-
-                    if(DataContext is IHasFocus && e.AddedItems[0] is ViewModelBase)
-                    {
-                        ((IHasFocus)DataContext).CurrentlyFocused = e.AddedItems[0] as ViewModelBase;
                     }
                 }
             }

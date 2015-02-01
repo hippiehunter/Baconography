@@ -40,7 +40,7 @@ namespace SnooStream.ViewModel
 
             var filteredList = raw.Where(filterFunc).ToList();
             var selectedIndex = filteredList.IndexOf(hasImmunity);
-            ObservableCollection<ILinkViewModel> filteredCollection = new ObservableCollection<ILinkViewModel>(filteredList.Skip(selectedIndex - 1));
+            ObservableCollection<ILinkViewModel> filteredCollection = new ObservableCollection<ILinkViewModel>(filteredList.Skip(selectedIndex));
             if(selectedIndex > 0)
             {
                 var rawBefore = filteredList.Take(selectedIndex - 1);

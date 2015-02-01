@@ -10,6 +10,8 @@ using GalaSoft.MvvmLight.Messaging;
 using SnooStream.Messages;
 using Windows.UI.Xaml;
 using SnooStream.View.Controls;
+using Windows.UI.Xaml.Controls;
+using GalaSoft.MvvmLight;
 
 namespace SnooStream.View.Pages
 {
@@ -38,14 +40,15 @@ namespace SnooStream.View.Pages
 			if (DataContext is LinkRiverViewModel)
 			{
 				await ((LinkRiverViewModel)DataContext).Refresh(false);
-				linksListView.ScrollIntoView(((LinkRiverViewModel)DataContext).Links.FirstOrDefault());
+                var viewModel = ((LinkRiverViewModel)DataContext).Links.FirstOrDefault();
+                linksListView.SafeScrollIntoView(viewModel);
 			}
 		}
 
         public override void SetFocusedViewModel(GalaSoft.MvvmLight.ViewModelBase viewModel)
         {
             base.SetFocusedViewModel(viewModel);
-            linksListView.ScrollIntoView(linksListView.SelectedItem = viewModel);
+            linksListView.SafeScrollIntoView(linksListView.SelectedItem = viewModel);
         }
     }
 }

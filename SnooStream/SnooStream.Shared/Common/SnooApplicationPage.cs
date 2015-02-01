@@ -160,7 +160,7 @@ namespace SnooStream.Common
 
                 Window.Current.SizeChanged += sizeChanged;
 
-				if (_stateGuid != null && DataContext == null)
+				if (_stateGuid != null && (DataContext == null || e.NavigationMode == NavigationMode.New))
 				{
 					_logger.Info("loading state guid for page " + GetType().Name);
                     _dataContext = NavigationStateUtility.GetDataContext(_stateGuid);

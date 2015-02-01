@@ -8,6 +8,7 @@ using SnooStream.ViewModel;
 using SnooStream.View.Controls;
 using GalaSoft.MvvmLight;
 using System.Threading.Tasks;
+using Windows.UI.Xaml.Controls;
 
 namespace SnooStream.View.Pages
 {
@@ -25,7 +26,7 @@ namespace SnooStream.View.Pages
                 commentsView.commentsList.SelectedItem = viewModel;
                 await Task.Delay(10);
                 base.SetFocusedViewModel(viewModel);
-                commentsView.commentsList.ScrollIntoView(viewModel);
+                commentsView.commentsList.SafeScrollIntoView(viewModel);
             }
         }
     }
