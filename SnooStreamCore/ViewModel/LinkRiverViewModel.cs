@@ -429,6 +429,8 @@ namespace SnooStream.ViewModel
 
                     if (FocusChanged != null)
                         FocusChanged(oldFocus, value);
+                    RaisePropertyChanged("CurrentlyFocused");
+                    RaisePropertyChanged("CurrentSelected");
                 }
             }
         }

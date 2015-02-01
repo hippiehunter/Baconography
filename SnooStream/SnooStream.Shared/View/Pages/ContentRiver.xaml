@@ -48,13 +48,13 @@
     <common:SnooApplicationPage.BottomAppBar>
         <CommandBar>
             <CommandBar.PrimaryCommands>
-                <AppBarButton DataContext="{Binding CurrentSelected}" Icon="{Binding Votable, Converter={StaticResource voteUriConverter}}" Label="Vote"  Command="{Binding Votable.ToggleVote}"/>
-                <AppBarButton DataContext="{Binding CurrentSelected}" Icon="Globe" Label="Browser" Command="{Binding GotoWeb}"/>
-                <AppBarButton DataContext="{Binding CurrentSelected}" Icon="Comment" Label="Comments" Command="{Binding GotoComments}"/>
+                <AppBarButton DataContext="{Binding CurrentlyFocused}" Icon="{Binding Votable, Converter={StaticResource voteUriConverter}}" Label="Vote"  Command="{Binding Votable.ToggleVote}"/>
+                <AppBarButton DataContext="{Binding CurrentlyFocused}" Icon="Globe" Label="Browser" Command="{Binding GotoWeb}"/>
+                <AppBarButton DataContext="{Binding CurrentlyFocused}" Icon="Comment" Label="Comments" Command="{Binding GotoComments}"/>
                 <AppBarButton Icon="View" Label="Overlay" Click="Overlay_Click"/>
             </CommandBar.PrimaryCommands>
             <CommandBar.SecondaryCommands>
-                <AppBarButton DataContext="{Binding CurrentSelected}" Icon="OtherUser" Label="Show OP details" Command="{Binding GotoUserDetails}"/>
+                <AppBarButton DataContext="{Binding CurrentlyFocused}" Icon="OtherUser" Label="Show OP details" Command="{Binding GotoUserDetails}"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
 

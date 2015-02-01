@@ -76,7 +76,7 @@ namespace SnooStream.Common
 						cancelToken.ThrowIfCancellationRequested();
 						using (var client = new HttpClient())
 						{
-							var asyncHttpOp = client.GetAsync(new Uri(url), HttpCompletionOption.ResponseContentRead);
+							var asyncHttpOp = client.GetAsync(new Uri(url), HttpCompletionOption.ResponseHeadersRead);
 							RegisterCancel(cancelToken, asyncHttpOp);
 							using (var response = await asyncHttpOp)
 							{
