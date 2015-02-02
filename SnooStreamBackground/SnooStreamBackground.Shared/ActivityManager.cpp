@@ -134,13 +134,18 @@ IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHa
             try
             {
                 auto resultActivities = result.get();
-                ActivityBlob = resultActivities.Blob;
-                return redditService->GetSent();
+				if (!resultActivities.Faulted)
+				{
+					JsonObject^ validationResult = nullptr;
+					if (JsonObject::TryParse(resultActivities.Blob, &validationResult))
+					{
+						ActivityBlob = resultActivities.Blob;
+						return redditService->GetSent();
+					}
+				}
             }
-            catch (...)
-            {
-                return result;
-            }
+			catch (...) {}
+			return concurrency::task_from_result(Activities::MakeFaulted());
 
         })
             .then([=](concurrency::task<Activities> result)
@@ -148,14 +153,19 @@ IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHa
             try
             {
                 auto resultActivities = result.get();
-                SentBlob = resultActivities.Blob;
+				if (!resultActivities.Faulted)
+				{
+					JsonObject^ validationResult = nullptr;
+					if (JsonObject::TryParse(resultActivities.Blob, &validationResult))
+					{
+						SentBlob = resultActivities.Blob;
 
-                return redditService->GetMessages();
+						return redditService->GetMessages();
+					}
+				}
             }
-            catch (...)
-            {
-                return result;
-            }
+			catch (...) {}
+			return concurrency::task_from_result(Activities::MakeFaulted());
         })
             .then([=](concurrency::task<Activities> result)
         {
@@ -163,19 +173,26 @@ IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHa
             {
                 std::unordered_set<Platform::String^> toastedLookup(_alreadyToasted.begin(), _alreadyToasted.end());
                 auto resultActivities = result.get();
-                ReceivedBlob = resultActivities.Blob;
-                for (auto toastTpl : resultActivities.Toastables)
-                {
-                    if (toastedLookup.find(toastTpl->Key) == toastedLookup.end())
-                    {
-                        UpdateCountSinceActivity = 0;
-                        MakeToast(toastTpl->Key, toastTpl->Value, resultActivities.ContextBlobs->HasKey(toastTpl->Key) ? resultActivities.ContextBlobs->Lookup(toastTpl->Key) : nullptr, activatedHandler);
-                        toastedLookup.insert(toastTpl->Key);
-                        _alreadyToasted.insert(_alreadyToasted.begin(), toastTpl->Key);
-                    }
-                }
-				_lastUpdate = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch());
-                StoreState();
+				if (!resultActivities.Faulted)
+				{
+					JsonObject^ validationResult = nullptr;
+					if (JsonObject::TryParse(resultActivities.Blob, &validationResult))
+					{
+						ReceivedBlob = resultActivities.Blob;
+						for (auto toastTpl : resultActivities.Toastables)
+						{
+							if (toastedLookup.find(toastTpl->Key) == toastedLookup.end())
+							{
+								UpdateCountSinceActivity = 0;
+								MakeToast(toastTpl->Key, toastTpl->Value, resultActivities.ContextBlobs->HasKey(toastTpl->Key) ? resultActivities.ContextBlobs->Lookup(toastTpl->Key) : nullptr, activatedHandler);
+								toastedLookup.insert(toastTpl->Key);
+								_alreadyToasted.insert(_alreadyToasted.begin(), toastTpl->Key);
+							}
+						}
+						_lastUpdate = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch());
+						StoreState();
+					}
+				}
             }
             catch (...)
             {

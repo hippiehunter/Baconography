@@ -8,12 +8,15 @@ using namespace Windows::Networking::Connectivity;
 bool NetworkUtilities::LowPriorityNetworkOk()
 {
     auto connectionProfile = NetworkInformation::GetInternetConnectionProfile();
-    if (connectionProfile->GetNetworkConnectivityLevel() != NetworkConnectivityLevel::InternetAccess)
+    if (connectionProfile == nullptr || connectionProfile->GetNetworkConnectivityLevel() != NetworkConnectivityLevel::InternetAccess)
         return false;
 
     auto connectionCost = connectionProfile->GetConnectionCost();
+	if (connectionCost == nullptr)
+		return false;
+
     auto connectionCostType = connectionCost->NetworkCostType;
-    auto connectionStrength = connectionProfile->GetSignalBars() != nullptr ? connectionProfile->GetSignalBars()->Value : 5;
+    auto connectionStrength = connectionProfile->GetSignalBars() != nullptr ? connectionProfile->GetSignalBars()->Value : 0;
     if (connectionCostType != NetworkCostType::Unrestricted && connectionCostType != NetworkCostType::Unknown)
         return false;
 
@@ -41,9 +44,9 @@ bool NetworkUtilities::LowPriorityNetworkOk()
 bool NetworkUtilities::IsHighPriorityNetworkOk()
 {
     auto connectionProfile = NetworkInformation::GetInternetConnectionProfile();
-    if (connectionProfile->GetNetworkConnectivityLevel() != NetworkConnectivityLevel::InternetAccess)
+    if (connectionProfile == nullptr || connectionProfile->GetNetworkConnectivityLevel() != NetworkConnectivityLevel::InternetAccess)
         return false;
 
     auto connectionCost = connectionProfile->GetConnectionCost();
-    return !connectionCost->OverDataLimit;
+    return connectionCost != nullptr && connectionProfile->GetSignalBars() != nullptr && !connectionCost->OverDataLimit;
 }

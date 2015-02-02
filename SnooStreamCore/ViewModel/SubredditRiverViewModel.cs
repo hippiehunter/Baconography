@@ -557,6 +557,9 @@ namespace SnooStream.ViewModel
 
         private async void ReloadSubscribed(bool required)
         {
+            if (!SnooStreamViewModel.SystemServices.IsHighPriorityNetworkOk && !required)
+                return;
+
             if (!required)
             {
 				if (SnooStreamViewModel.SystemServices == null)

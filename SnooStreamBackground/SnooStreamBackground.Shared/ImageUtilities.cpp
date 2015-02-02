@@ -219,6 +219,9 @@ task<String^> ImageUtilities::MakeTileSizedImage(IImageProvider^ imageSource, St
 
 task<vector<ImageInfo^>> ImageUtilities::MakeLiveTileImages(vector<ImageInfo^> liveTileFiles, LockScreenHistory^ history, vector<tuple<String^, String^>> liveTileTpls, int targetCount, int targetIndex)
 {
+	if (liveTileFiles.size() > 0 && liveTileFiles.back()->Faulted)
+		liveTileFiles.pop_back();
+
     if (targetIndex < liveTileTpls.size() && liveTileFiles.size() < targetCount)
     {
         auto targetUrl = get<1>(liveTileTpls[targetIndex]);
@@ -244,22 +247,37 @@ task<vector<ImageInfo^>> ImageUtilities::MakeLiveTileImages(vector<ImageInfo^> l
         else
         {
             return GetImageSource(targetUrl)
-                .then([=](IImageProvider^ imageSource)
+                .then([=](task<IImageProvider^> imageSourceTask)
             {
-                if (imageSource != nullptr)
-                {
-                    return MakeTileSizedImage(imageSource, targetUrl, 150, 310)
-                        .then([=](String^ filePath)
-                    {
-                        return MakeTileSizedImage(imageSource, targetUrl, 150, 150)
-                            .then([=](String^ smallFilePath)
-                        {
-                            return MakeLiveTileImages(liveTileFiles, history, liveTileTpls, targetCount, targetIndex + 1);
-                        });
-                    });
-                }
-                else
-                    return MakeLiveTileImages(liveTileFiles, history, liveTileTpls, targetCount, targetIndex + 1);
+				try
+				{
+					auto imageSource = imageSourceTask.get();
+					if (imageSource != nullptr)
+					{
+						return MakeTileSizedImage(imageSource, targetUrl, 150, 310)
+							.then([=](String^ filePath)
+						{
+							return MakeTileSizedImage(imageSource, targetUrl, 150, 150)
+								.then([=](String^ smallFilePath)
+							{
+								if (filePath == nullptr || smallFilePath == nullptr)
+									madeImageInfo->Faulted = true;
+								
+								return MakeLiveTileImages(liveTileFiles, history, liveTileTpls, targetCount, targetIndex + 1);
+							});
+						});
+					}
+					else
+					{
+						madeImageInfo->Faulted = true;
+						return MakeLiveTileImages(liveTileFiles, history, liveTileTpls, targetCount, targetIndex + 1);
+					}
+				}
+				catch (...)
+				{
+					madeImageInfo->Faulted = true;
+					return concurrency::task_from_result(liveTileFiles);
+				}
             });
         }
     }

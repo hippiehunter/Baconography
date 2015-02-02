@@ -141,33 +141,44 @@ namespace SnooStreamBackground
         task<void> RunPrimaryTileUpdater(LockScreenSettings^ settings, LockScreenHistory^ history, LiveTileSettings^ liveTile)
         {
             return redditService->GetPostsBySubreddit(liveTile->LiveTileItemsReddit, 100)
-                .then([=](std::vector<tuple<String^, String^>> messages)
+                .then([=](task<std::vector<tuple<String^, String^>>> messagesTask)
             {
-                std::vector<tuple<String^, String^>> liveTileImageUrls;
-                for (auto& message : messages)
-                {
-                    std::wstring url(std::get<1>(message)->Begin(), std::get<1>(message)->End());
-                    if (ends_with(url, L".jpg") ||
-                        ends_with(url, L".jpeg") ||
-                        ends_with(url, L".png"))
-                    {
-                        liveTileImageUrls.push_back(message);
-                    }
-                }
+				try
+				{
+					auto messages = messagesTask.get();
+					std::vector<tuple<String^, String^>> liveTileImageUrls;
+					for (auto& message : messages)
+					{
+						std::wstring url(std::get<1>(message)->Begin(), std::get<1>(message)->End());
+						if (ends_with(url, L".jpg") ||
+							ends_with(url, L".jpeg") ||
+							ends_with(url, L".png"))
+						{
+							liveTileImageUrls.push_back(message);
+						}
+					}
 
-                //check history to see if we've already shown this tile in the past if so, penalize it and prefer other tiles
-                std::sort(liveTileImageUrls.begin(), liveTileImageUrls.end(), [&](tuple<String^, String^> option1, tuple<String^, String^> option2)
-                {
-                    return history->Age(std::get<1>(option1)) > history->Age(std::get<1>(option2));
-                });
+					//check history to see if we've already shown this tile in the past if so, penalize it and prefer other tiles
+					std::sort(liveTileImageUrls.begin(), liveTileImageUrls.end(), [&](tuple<String^, String^> option1, tuple<String^, String^> option2)
+					{
+						return history->Age(std::get<1>(option1)) > history->Age(std::get<1>(option2));
+					});
 
-                return create_task(ImageUtilities::MakeLiveTileImages(vector<ImageInfo^> {}, history, liveTileImageUrls, GetTileCountTarget(true)))
-                    .then([=](vector<ImageInfo^> liveTileImageUrls)
-                {
-                    auto tileUpdater = Windows::UI::Notifications::TileUpdateManager::CreateTileUpdaterForApplication();
-                    history->CurrentTileImages = ref new Platform::Collections::Vector<ImageInfo^>(liveTileImageUrls);
-                    LiveTileUtilities::MakeLiveTile(history, liveTile, liveTileImageUrls, tileUpdater);
-                });
+					return create_task(ImageUtilities::MakeLiveTileImages(vector<ImageInfo^> {}, history, liveTileImageUrls, GetTileCountTarget(true)))
+						.then([=](vector<ImageInfo^> liveTileImageUrls)
+					{
+						if (liveTileImageUrls.size() > 0)
+						{
+							auto tileUpdater = Windows::UI::Notifications::TileUpdateManager::CreateTileUpdaterForApplication();
+							history->CurrentTileImages = ref new Platform::Collections::Vector<ImageInfo^>(liveTileImageUrls);
+							LiveTileUtilities::MakeLiveTile(history, liveTile, liveTileImageUrls, tileUpdater);
+						}
+					});
+				}
+				catch (...)
+				{
+					return concurrency::task_from_result();
+				}
             });
         }
 

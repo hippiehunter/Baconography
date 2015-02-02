@@ -14,6 +14,7 @@ namespace SnooStreamBackground
         property Platform::String^ LocalWideUrl;
         property int LastShown;
         property Platform::String^ Title;
+		property bool Faulted;
         ImageInfo(Platform::String^ originalUrl, Platform::String^ localSmallSquareUrl, Platform::String^ localLargeSquareUrl, Platform::String^ localWideUrl, int lastShown, Platform::String^ title)
         {
             OriginalUrl = originalUrl;
@@ -24,6 +25,7 @@ namespace SnooStreamBackground
 
             LastShown = lastShown;
             Title = title;
+			Faulted = false;
         }
     };
 

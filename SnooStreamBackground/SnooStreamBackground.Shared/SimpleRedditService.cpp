@@ -154,6 +154,48 @@ bool ends_with(wstring_ref fullString, wstring_ref ending)
     }
 }
 
+concurrency::task<Platform::String^> SimpleRedditService::SendGetBody(HttpClient^ httpClient, String^ localUrl)
+{
+	return create_task(httpClient->GetAsync(ref new Uri(localUrl)))
+		.then([=](task<Windows::Web::Http::HttpResponseMessage^> responseTask)
+	{
+		try
+		{
+			auto response = responseTask.get();
+			return create_task(response->Content->ReadAsStringAsync())
+				.then([=](task<Platform::String^> resultTask)
+			{
+				try
+				{
+					auto result = resultTask.get();
+					wstring_ref resultString(result->Data(), result->Length());
+					//if reddit says try again, try again
+					if (starts_with(resultString, L"<!doctype html><html><title>") &&
+						ends_with(resultString, L"try again and hopefully we will be fast enough this time."))
+					{
+						return SendGetBody(httpClient, localUrl);
+					}
+					else if (starts_with(resultString, L"<!doctype html><html><title>"))
+						return concurrency::task_from_result((Platform::String^)nullptr);
+					else
+					{
+						response->EnsureSuccessStatusCode();
+						return concurrency::task_from_result(result);
+					}
+				}
+				catch (...)
+				{
+					return concurrency::task_from_result((Platform::String^)nullptr);
+				}
+			});
+		}
+		catch (...)
+		{
+			return concurrency::task_from_result((Platform::String^)nullptr);
+		}
+	});
+}
+
 concurrency::task<Platform::String^> SimpleRedditService::SendGet(String^ url)
 {
   auto httpClient = ref new HttpClient();
@@ -163,94 +205,35 @@ concurrency::task<Platform::String^> SimpleRedditService::SendGet(String^ url)
   if (_oAuth.AccessToken != nullptr)
   {
       return create_task(RefreshToken(_oAuth.RefreshToken, _oAuth.Username))
-          .then([=](RedditOAuth oAuth)
+          .then([=](task<RedditOAuth> oAuthTask)
       {
-          auto localUrl = url;
-          if (oAuth.AccessToken != nullptr)
-          {
-              _oAuth = oAuth;
-              httpClient->DefaultRequestHeaders->Authorization = ref new Windows::Web::Http::Headers::HttpCredentialsHeaderValue("Bearer", _oAuth.AccessToken);
-              localUrl = "https://oauth.reddit.com" + localUrl;
-          }
-          else
-          {
-              localUrl = "http://reddit.com" + localUrl;
-          }
-
-          return create_task(httpClient->GetAsync(ref new Uri(localUrl)))
-              .then([=](task<Windows::Web::Http::HttpResponseMessage^> responseTask)
-          {
-              try
-              {
-                  auto response = responseTask.get();
-                  return create_task(response->Content->ReadAsStringAsync())
-                      .then([=](task<Platform::String^> resultTask)
-                  {
-                      try
-                      {
-                          auto result = resultTask.get();
-                          wstring_ref resultString(result->Data(), result->Length());
-                          //if reddit says try again, try again
-                          if (starts_with(resultString, L"<!doctype html><html><title>") &&
-                              ends_with(resultString, L"try again and hopefully we will be fast enough this time."))
-                          {
-                              return SendGet(localUrl);
-                          }
-						  else if(starts_with(resultString, L"<!doctype html><html><title>"))
-							  return concurrency::task_from_result((Platform::String^)nullptr);
-                          else
-                            return concurrency::task_from_result(result);
-                      }
-                      catch (...)
-                      {
-                          return concurrency::task_from_result((Platform::String^)nullptr);
-                      }
-                  });
-              }
-              catch (...)
-              {
-                  return concurrency::task_from_result((Platform::String^)nullptr);
-              }
-          });
+		  auto localUrl = url;
+		  try
+		  {
+			  auto oAuth = oAuthTask.get();
+			  if (oAuth.AccessToken != nullptr)
+			  {
+				  _oAuth = oAuth;
+				  httpClient->DefaultRequestHeaders->Authorization = ref new Windows::Web::Http::Headers::HttpCredentialsHeaderValue("Bearer", _oAuth.AccessToken);
+				  localUrl = "https://oauth.reddit.com" + localUrl;
+			  }
+			  else
+			  {
+				  localUrl = "http://reddit.com" + localUrl;
+			  }
+		  }
+		  catch (...)
+		  {
+			  localUrl = "http://reddit.com" + localUrl;
+		  }
+		  return SendGetBody(httpClient, localUrl);
+          
       });
   }
   else
   {
-      if (_oAuth.AccessToken != nullptr)
-      {
-          httpClient->DefaultRequestHeaders->Authorization = ref new Windows::Web::Http::Headers::HttpCredentialsHeaderValue("Bearer", _oAuth.AccessToken);
-          url = "https://oauth.reddit.com" + url;
-      }
-      else
-      {
-          url = "http://reddit.com" + url;
-      }
-
-      return create_task(httpClient->GetAsync(ref new Uri(url)))
-          .then([=](task<Windows::Web::Http::HttpResponseMessage^> responseTask)
-      {
-          try
-          {
-              auto response = responseTask.get();
-              return create_task(response->Content->ReadAsStringAsync())
-                .then([=](task<Platform::String^> resultTask)
-              {
-                  try
-                  {
-                      auto result = resultTask.get();
-                      return result;
-                  }
-                  catch (...)
-                  {
-                      return (Platform::String^)nullptr;
-                  }
-              });
-          }
-          catch (...)
-          {
-              return concurrency::task_from_result((Platform::String^)nullptr);
-          }
-      });
+      url = "http://reddit.com" + url;
+	  return SendGetBody(httpClient, url);
   }
 }
 
@@ -310,45 +293,48 @@ concurrency::task<Activities> SimpleRedditService::GetMessages()
     return SendGet("/message/inbox/.json")
         .then([=](String^ response)
     {
-        
+		bool faulted = false;
         auto toastables = ref new Platform::Collections::Map<Platform::String^, Platform::String^>();
-        if (response != nullptr)
-        {
-            auto messages = JsonObject::Parse(response);
-            auto messageArray = messages->GetNamedObject("data")->GetNamedArray("children");
+		if (response != nullptr)
+		{
+			auto messages = JsonObject::Parse(response);
+			auto messageArray = messages->GetNamedObject("data")->GetNamedArray("children");
 
-            for (auto&& message : messageArray)
-            {
-                try
-                {
-                    auto messageObject = message->GetObject();
-                    auto messageData = messageObject->GetNamedObject("data");
-                    auto messageId = messageData->GetNamedString("id");
-                    auto messageNew = messageData->GetNamedBoolean("new");
-                    auto messageName = messageData->GetNamedString("name");
+			for (auto&& message : messageArray)
+			{
+				try
+				{
+					auto messageObject = message->GetObject();
+					auto messageData = messageObject->GetNamedObject("data");
+					auto messageId = messageData->GetNamedString("id");
+					auto messageNew = messageData->GetNamedBoolean("new");
+					auto messageName = messageData->GetNamedString("name");
 
-                    if (messageNew)
-                    {
-                        String^ toastableContent = nullptr;
-                        auto messageWasComment = messageData->GetNamedBoolean("was_comment");
-                        if (messageWasComment)
-                        {
-                            contextBlobs->Insert(messageName, "");
-                            nameContextBlob->Insert(messageName, messageData->GetNamedString("context"));
-                            toastableContent = messageData->GetNamedString("link_title");
-                        }
-                        else
-                            toastableContent = messageData->GetNamedString("subject");
+					if (messageNew)
+					{
+						String^ toastableContent = nullptr;
+						auto messageWasComment = messageData->GetNamedBoolean("was_comment");
+						if (messageWasComment)
+						{
+							contextBlobs->Insert(messageName, "");
+							nameContextBlob->Insert(messageName, messageData->GetNamedString("context"));
+							toastableContent = messageData->GetNamedString("link_title");
+						}
+						else
+							toastableContent = messageData->GetNamedString("subject");
 
-                        toastables->Insert(messageName, toastableContent);
+						toastables->Insert(messageName, toastableContent);
 
-                    }
-                }
-                //ignore bad messages (probably an odd thing type in the listing)
-                catch (...) {}
-            }
-        }
-        Activities result = { response, toastables, nameContextBlob, contextBlobs};
+					}
+				}
+				//ignore bad messages (probably an odd thing type in the listing)
+				catch (...) { faulted = true; }
+			}
+		}
+		else
+			faulted = true;
+
+        Activities result = { faulted, response, toastables, nameContextBlob, contextBlobs};
         return result;
     }).then([=](concurrency::task<Activities> placeholder) { return ProcContext(placeholder); });
 }
@@ -358,7 +344,7 @@ concurrency::task<Activities> SimpleRedditService::GetActivity()
     return SendGet("/user/" + _oAuth.Username + "/.json")
         .then([&](String^ response)
     {
-        Activities result = { response, nullptr };
+        Activities result = { response == nullptr, response, nullptr };
         return result;
     });
 }
@@ -368,7 +354,7 @@ concurrency::task<Activities> SimpleRedditService::GetSent()
     return SendGet("/message/sent/.json")
         .then([&](String^ response)
     {
-        Activities result = { response, nullptr };
+        Activities result = { response == nullptr, response, nullptr };
         return result;
     });
 }
@@ -381,6 +367,8 @@ task<vector<tuple<String^, String^>>> SimpleRedditService::GetPostsBySubreddit(S
     .then([&](String^ postsResponse)
 	{
 		vector<tuple<String^, String^>> result;
+		if (postsResponse == nullptr)
+			return concurrency::task_from_exception<vector<tuple<String^, String^>>>(ref new Platform::Exception(1337));
 
 		auto posts = JsonObject::Parse(postsResponse);
 		auto postArray = posts->GetNamedObject("data")->GetNamedArray("children");
@@ -395,6 +383,6 @@ task<vector<tuple<String^, String^>>> SimpleRedditService::GetPostsBySubreddit(S
 			result.emplace_back(postData->GetNamedString("title"), postData->GetNamedBoolean("is_self") ? "" : postData->GetNamedString("url"));
 		}
 
-		return result;
+		return concurrency::task_from_result(result);
 	});
 }

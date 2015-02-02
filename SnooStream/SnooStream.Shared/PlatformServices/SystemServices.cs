@@ -52,8 +52,8 @@ namespace SnooStream.PlatformServices
 
 		private void networkStatusChanged(object sender)
 		{
-			_lowPriorityNetworkOk = new Lazy<bool>(LowPriorityNetworkOkImpl);
-			_highPriorityNetworkOk = new Lazy<bool>(IsHighPriorityNetworkOkImpl);
+			_lowPriorityNetworkOk = new Lazy<bool>(SnooStreamBackground.NetworkUtilities.LowPriorityNetworkOk);
+			_highPriorityNetworkOk = new Lazy<bool>(SnooStreamBackground.NetworkUtilities.IsHighPriorityNetworkOk);
 		}
 
 		public async void StopTimer(object tickHandle)
@@ -254,64 +254,6 @@ namespace SnooStream.PlatformServices
 		{
 			var dialog = new MessageDialog(text, title);
 			var asyncOp = dialog.ShowAsync(); //just continue it doesnt matter at this point anyway
-		}
-
-		private static bool LowPriorityNetworkOkImpl()
-		{
-			var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
-            if (connectionProfile == null)
-                return false;
-
-			if (connectionProfile.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.InternetAccess)
-				return false;
-
-			var connectionCost = connectionProfile.GetConnectionCost();
-            if (connectionCost == null)
-                return false;
-
-			var connectionCostType = connectionCost.NetworkCostType;
-			var connectionStrength = connectionProfile.GetSignalBars() ?? 5;
-			if (connectionCostType != NetworkCostType.Unrestricted && connectionCostType != NetworkCostType.Unknown)
-				return false;
-
-			if (connectionProfile.IsWwanConnectionProfile)
-			{
-                if (connectionProfile.WwanConnectionProfileDetails == null)
-                    return false;
-
-				var connectionClass = connectionProfile.WwanConnectionProfileDetails.GetCurrentDataClass();
-				switch (connectionClass)
-				{
-					case WwanDataClass.Hsdpa:
-					case WwanDataClass.Hsupa:
-					case WwanDataClass.LteAdvanced:
-					case WwanDataClass.Umts:
-						break;
-					default:
-						return false;
-				}
-
-				if (connectionStrength < 3)
-					return false;
-			}
-
-			return !(connectionCost.ApproachingDataLimit || connectionCost.OverDataLimit || connectionCost.Roaming);
-		}
-
-		private static bool IsHighPriorityNetworkOkImpl()
-		{
-			var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
-
-            if (connectionProfile == null)
-                return false;
-
-			if (connectionProfile.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.InternetAccess)
-				return false;
-
-			var connectionCost = connectionProfile.GetConnectionCost();
-            if (connectionCost == null)
-                return false;
-			return !connectionCost.OverDataLimit;
 		}
 
 		Lazy<bool> _lowPriorityNetworkOk;

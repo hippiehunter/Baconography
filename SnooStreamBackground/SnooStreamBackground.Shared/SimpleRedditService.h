@@ -24,10 +24,21 @@ namespace SnooStreamBackground
     class Activities
     {
     public:
+		bool Faulted;
         Platform::String^ Blob;
         Platform::Collections::Map<Platform::String^, Platform::String^>^ Toastables;
         Platform::Collections::Map<Platform::String^, Platform::String^>^ NameContextMapping;
         Platform::Collections::Map<Platform::String^, Platform::String^>^ ContextBlobs;
+		static Activities MakeFaulted() 
+		{
+			Activities result;
+			result.Faulted = true;
+			result.Blob = nullptr;
+			result.Toastables = nullptr;
+			result.NameContextMapping = nullptr;
+			result.ContextBlobs = nullptr;
+			return result;
+		}
     };
 
     class SimpleRedditService
@@ -36,6 +47,7 @@ namespace SnooStreamBackground
         RedditOAuth _oAuth;
         concurrency::task<Platform::String^> SendGet(Platform::String^ url);
         concurrency::task<Activities> ProcContext(concurrency::task<Activities> activitiesTask);
+		concurrency::task<Platform::String^> SendGetBody(Windows::Web::Http::HttpClient^ httpClient, Platform::String^ localUrl);
     public:
         SimpleRedditService(RedditOAuth oAuth);
         concurrency::task<bool> HasMail();
