@@ -16,7 +16,10 @@ bool NetworkUtilities::LowPriorityNetworkOk()
 		return false;
 
     auto connectionCostType = connectionCost->NetworkCostType;
-    auto connectionStrength = connectionProfile->GetSignalBars() != nullptr ? connectionProfile->GetSignalBars()->Value : 0;
+	auto signalBars = connectionProfile->GetSignalBars();
+    auto connectionStrength = signalBars != nullptr ? 
+		signalBars->Value : 
+		connectionProfile->IsWwanConnectionProfile ? 0 : 5;
     if (connectionCostType != NetworkCostType::Unrestricted && connectionCostType != NetworkCostType::Unknown)
         return false;
 
@@ -48,5 +51,6 @@ bool NetworkUtilities::IsHighPriorityNetworkOk()
         return false;
 
     auto connectionCost = connectionProfile->GetConnectionCost();
-    return connectionCost != nullptr && connectionProfile->GetSignalBars() != nullptr && !connectionCost->OverDataLimit;
+	
+    return connectionCost != nullptr && (connectionProfile->GetSignalBars() != nullptr || !connectionProfile->IsWwanConnectionProfile) && !connectionCost->OverDataLimit;
 }

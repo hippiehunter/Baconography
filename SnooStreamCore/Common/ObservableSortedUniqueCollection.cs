@@ -42,9 +42,13 @@ namespace SnooStream.Common
         public void Add(TKey key, TValue value)
         {
             _realLookup.Add(key, value);
-            var indexOfAdd = _realSorted.Add(value, value);
-            if (CollectionChanged != null)
-                CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value, indexOfAdd));
+            if (!_realSorted.ContainsKey(value))
+            {
+                var indexOfAdd = _realSorted.Add(value, value);
+
+                if (CollectionChanged != null)
+                    CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, value, indexOfAdd));
+            }
         }
 
         public bool ContainsKey(TKey key)
