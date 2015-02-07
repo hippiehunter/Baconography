@@ -168,6 +168,7 @@ namespace SnooStream.ViewModel
                     await Task.Delay(1000 * 60 * 5, cancelToken);
                 }
             }
+            catch (TaskCanceledException) { }
             catch (OperationCanceledException) { }
             _runningActivityUpdater = false;
         }

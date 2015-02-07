@@ -71,40 +71,48 @@ namespace SnooStream.View.Controls
 
         internal async void FinishPhaseLoad(CommentViewModel viewModel)
         {
-            var body = viewModel.Body;
-            var loadToken = LoadCancelSource.Token;
-            var markdownTpl = await Task.Run(() =>
+            try
             {
-                try
+                var body = viewModel.Body;
+                var loadToken = LoadCancelSource.Token;
+                var markdownTpl = await SnooStreamViewModel.SystemServices.RunAsyncIdle(() =>
                 {
-                    var markdownInner = SnooStreamViewModel.MarkdownProcessor.Process(body);
-                    var isPlainText = SnooStreamViewModel.MarkdownProcessor.IsPlainText(markdownInner);
-                    return Tuple.Create(markdownInner, isPlainText);
-                }
-                catch (Exception)
-                {
-                    //TODO log this failure
-                    return Tuple.Create<MarkdownData, bool>(null, true);
-                }
-            });
+                    try
+                    {
+                        var markdownInner = SnooStreamViewModel.MarkdownProcessor.Process(body);
+                        var isPlainText = SnooStreamViewModel.MarkdownProcessor.IsPlainText(markdownInner);
+                        return Tuple.Create(markdownInner, isPlainText);
+                    }
+                    catch (Exception)
+                    {
+                        //TODO log this failure
+                        return Tuple.Create<MarkdownData, bool>(null, true);
+                    }
+                }, loadToken);
 
-            if (loadToken.IsCancellationRequested)
+
+                if (loadToken.IsCancellationRequested)
+                    return;
+
+                if (!markdownTpl.Item2)
+                {
+                    contentControl.ContentTemplate = Resources["markdownTemplate"] as DataTemplate;
+                    contentControl.Content = markdownTpl.Item1.MarkdownDom;
+
+                }
+                else if (contentControl.Content == null)
+                {
+                    var textContent = (Resources["textTemplate"] as DataTemplate).LoadContent() as FrameworkElement;
+                    textContent.DataContext = body;
+                    contentControl.Content = textContent;
+                    contentControl.MinHeight = 0;
+                }
+                LoadPhase = 3;
+            }
+            catch (TaskCanceledException)
+            {
                 return;
-
-            if (!markdownTpl.Item2)
-            {
-                contentControl.ContentTemplate = Resources["markdownTemplate"] as DataTemplate;
-                contentControl.Content = markdownTpl.Item1.MarkdownDom;
-
             }
-            else if (contentControl.Content == null)
-            {
-                var textContent = (Resources["textTemplate"] as DataTemplate).LoadContent() as FrameworkElement;
-                textContent.DataContext = body;
-                contentControl.Content = textContent;
-                contentControl.MinHeight = 0;
-            }
-            LoadPhase = 3;
         }
 
         internal void Phase2Load(ListViewBase sender, ContainerContentChangingEventArgs args)
@@ -128,7 +136,7 @@ namespace SnooStream.View.Controls
                 ((CommentViewModel)DataContext).PropertyChanged -= CommentView_PropertyChanged;
             }
 
-            if(args.NewValue is CommentViewModel)
+            if (args.NewValue is CommentViewModel)
             {
                 ((CommentViewModel)DataContext).PropertyChanged += CommentView_PropertyChanged;
             }
@@ -162,6 +170,6 @@ namespace SnooStream.View.Controls
         {
             ((CommentViewModel)DataContext).MinimizeCommand.Execute(null);
         }
-            
+
     }
 }

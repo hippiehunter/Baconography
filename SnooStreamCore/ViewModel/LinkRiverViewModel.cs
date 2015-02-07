@@ -85,7 +85,7 @@ namespace SnooStream.ViewModel
 
         AboutRedditViewModel About { get; set; }
 
-		private class LinksLoader : IIncrementalCollectionLoader<ILinkViewModel>
+		private class LinksLoader : IUniqueIncrementalCollectionLoader<ILinkViewModel>
 		{
 			LinkRiverViewModel _linkRiverViewModel;
 			public LinksLoader(LinkRiverViewModel linkRiverViewModel)
@@ -140,113 +140,122 @@ namespace SnooStream.ViewModel
 				return result;
 			}
 
-			public async Task Refresh(ObservableCollection<ILinkViewModel> current, bool onlyNew)
-			{
-				var postListing = await SnooStreamViewModel.RedditService.GetPostsBySubreddit(_linkRiverViewModel.Thing.Url, _linkRiverViewModel.Sort); 
-				if (postListing != null)
-				{
-					_linkRiverViewModel.LastRefresh = DateTime.Now;
-					var linkIds = new List<string>();
-					var replace = new List<Tuple<int, ILinkViewModel>>();
-					var move = new List<Tuple<int, int, ILinkViewModel>>();
-					var existing = new Dictionary<string, Tuple<int, ILinkViewModel>>();
-					var update = new List<ILinkViewModel>();
-					for (int i = 0; i < postListing.Data.Children.Count; i++)
-					{
-						var thing = postListing.Data.Children[i];
-						if (thing.Data is Link)
-						{
-							linkIds.Add(((Link)thing.Data).Id);
-							replace.Add(Tuple.Create<int, ILinkViewModel>(i, _linkRiverViewModel.MakeLinkThing(thing.Data as Link)));
-						}
-					}
-
-					for (int i = 0; i < current.Count; i++)
-					{
-						if (!existing.ContainsKey(current[i].Id))
-							existing.Add(current[i].Id, Tuple.Create(i, current[i]));
-					}
-
-					foreach (var link in replace)
-					{
-						if (existing.ContainsKey(link.Item2.Id))
-						{
-							var existingIndex = existing[link.Item2.Id].Item1;
-							if (existingIndex == link.Item1)
-								update.Add(link.Item2);
-							else
-								move.Add(Tuple.Create(existingIndex, link.Item1, link.Item2));
-						}
-					}
-					replace.RemoveAll((tpl) => update.Contains(tpl.Item2) || move.Any(tpl2 => tpl2.Item3 == tpl.Item2));
-
-					SnooStreamViewModel.SystemServices.RunUIIdleAsync(async () =>
-					{
-						foreach (var link in update)
-						{
-							((LinkViewModel)existing[link.Id].Item2).MergeLink(((LinkViewModel)link).Link);
-						}
-
-						foreach (var linkTpl in move)
-						{
-							((LinkViewModel)existing[linkTpl.Item3.Id].Item2).MergeLink(((LinkViewModel)linkTpl.Item3).Link);
-						}
-
-                        var firstExisting = move.OrderBy(tpl => tpl.Item2).FirstOrDefault();
-
-                        //fill in the new ones at the end/front, then do the move, then do the actual replace
-                        foreach (var newLink in replace.OrderBy(tpl => tpl.Item1))
+            public async Task Refresh(ObservableCollection<ILinkViewModel> current, bool onlyNew)
+            {
+                await await SnooStreamViewModel.SystemServices.RunAsyncIdle(async () =>
+                    {
+                        var postListing = await SnooStreamViewModel.RedditService.GetPostsBySubreddit(_linkRiverViewModel.Thing.Url, _linkRiverViewModel.Sort);
+                        if (postListing != null)
                         {
-                            if (current.Count - 1 <= newLink.Item1)
-                                current.Add(newLink.Item2);
-                            if (firstExisting != null && newLink.Item1 < firstExisting.Item2)
-                                current.Insert(newLink.Item1, newLink.Item2);
+                            _linkRiverViewModel.LastRefresh = DateTime.Now;
+                            var linkIds = new List<string>();
+                            var replace = new List<Tuple<int, ILinkViewModel>>();
+                            var move = new List<Tuple<int, int, ILinkViewModel>>();
+                            var existing = new Dictionary<string, Tuple<int, ILinkViewModel>>();
+                            var update = new List<ILinkViewModel>();
+                            for (int i = 0; i < postListing.Data.Children.Count; i++)
+                            {
+                                var thing = postListing.Data.Children[i];
+                                if (thing.Data is Link)
+                                {
+                                    linkIds.Add(((Link)thing.Data).Id);
+                                    replace.Add(Tuple.Create<int, ILinkViewModel>(i, _linkRiverViewModel.MakeLinkThing(thing.Data as Link)));
+                                }
+                            }
+
+                            for (int i = 0; i < current.Count; i++)
+                            {
+                                if (!existing.ContainsKey(current[i].Id))
+                                    existing.Add(current[i].Id, Tuple.Create(i, current[i]));
+                            }
+
+                            foreach (var link in replace)
+                            {
+                                if (existing.ContainsKey(link.Item2.Id))
+                                {
+                                    var existingIndex = existing[link.Item2.Id].Item1;
+                                    if (existingIndex == link.Item1)
+                                        update.Add(link.Item2);
+                                    else
+                                        move.Add(Tuple.Create(existingIndex, link.Item1, link.Item2));
+                                }
+                            }
+                            replace.RemoveAll((tpl) => update.Contains(tpl.Item2) || move.Any(tpl2 => tpl2.Item3 == tpl.Item2));
+
+                            SnooStreamViewModel.SystemServices.RunUIIdleAsync(async () =>
+                            {
+                                foreach (var link in update)
+                                {
+                                    ((LinkViewModel)existing[link.Id].Item2).MergeLink(((LinkViewModel)link).Link);
+                                }
+
+                                foreach (var linkTpl in move)
+                                {
+                                    ((LinkViewModel)existing[linkTpl.Item3.Id].Item2).MergeLink(((LinkViewModel)linkTpl.Item3).Link);
+                                }
+
+                                var firstExisting = move.OrderBy(tpl => tpl.Item2).FirstOrDefault();
+
+                                //fill in the new ones at the end/front, then do the move, then do the actual replace
+                                foreach (var newLink in replace.OrderBy(tpl => tpl.Item1))
+                                {
+                                    if (current.Count - 1 <= newLink.Item1)
+                                        current.Add(newLink.Item2);
+                                    if (firstExisting != null && newLink.Item1 < firstExisting.Item2)
+                                        current.Insert(newLink.Item1, newLink.Item2);
+                                }
+
+                                bool unfinished = true;
+                                while (unfinished)
+                                {
+                                    unfinished = false;
+                                    foreach (var linkTpl in move.OrderBy(tpl => tpl.Item2))
+                                    {
+                                        var currentIndex = current.IndexOf(existing[linkTpl.Item3.Id].Item2);
+                                        if (currentIndex > 0 && currentIndex != linkTpl.Item2)
+                                        {
+                                            unfinished = true;
+                                            current.Move(currentIndex, linkTpl.Item2);
+                                        }
+                                    }
+                                }
+
+                                foreach (var newLink in replace.OrderBy(tpl => tpl.Item1))
+                                {
+                                    if (current.Count - 1 > newLink.Item1)
+                                        current[newLink.Item1] = newLink.Item2;
+                                }
+
+                                for (int i = current.Count - 1; i > linkIds.Count; i--)
+                                {
+                                    current.RemoveAt(i);
+                                }
+
+                                var linkMetadata = (await SnooStreamViewModel.OfflineService.GetLinkMetadata(linkIds)).ToList();
+                                for (int i = 0; i < linkMetadata.Count; i++)
+                                {
+                                    ((LinkViewModel)current[i]).UpdateMetadata(linkMetadata[i]);
+                                }
+                                _linkRiverViewModel.LastLinkId = postListing.Data.After;
+
+                                if (_linkRiverViewModel != null)
+                                    _linkRiverViewModel.CurrentSelected = _linkRiverViewModel.Links.FirstOrDefault();
+                            });
                         }
-
-						bool unfinished = true;
-						while (unfinished)
-						{
-							unfinished = false;
-							foreach (var linkTpl in move.OrderBy(tpl => tpl.Item2))
-							{
-								var currentIndex = current.IndexOf(existing[linkTpl.Item3.Id].Item2);
-								if (currentIndex > 0 && currentIndex != linkTpl.Item2)
-								{
-									unfinished = true;
-									current.Move(currentIndex, linkTpl.Item2);
-								}
-							}
-						}
-
-						foreach (var newLink in replace.OrderBy(tpl => tpl.Item1))
-						{
-							if (current.Count - 1 > newLink.Item1)
-								current[newLink.Item1] = newLink.Item2;
-						}
-
-						for (int i = current.Count - 1; i > linkIds.Count; i--)
-						{
-							current.RemoveAt(i);
-						}
-
-						var linkMetadata = (await SnooStreamViewModel.OfflineService.GetLinkMetadata(linkIds)).ToList();
-						for (int i = 0; i < linkMetadata.Count; i++)
-						{
-							((LinkViewModel)current[i]).UpdateMetadata(linkMetadata[i]);
-						}
-						_linkRiverViewModel.LastLinkId = postListing.Data.After;
-					});
-				}
-				if(_linkRiverViewModel != null)
-					_linkRiverViewModel.CurrentSelected = _linkRiverViewModel.Links.FirstOrDefault();
-			}
+                    }, SnooStreamViewModel.UIContextCancellationToken);
+            }
 
 
 			public string NameForStatus
 			{
 				get { return "post"; }
 			}
-		}
+
+            public string UniqueId(ILinkViewModel t)
+            {
+                return t.Id;
+            }
+        }
 
         private LinkViewModel MakeLinkThing(Link link)
         {

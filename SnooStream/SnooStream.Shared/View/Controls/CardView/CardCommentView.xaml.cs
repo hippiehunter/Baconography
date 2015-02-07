@@ -26,10 +26,10 @@ namespace SnooStream.View.Controls
             this.InitializeComponent();
         }
 
-        private void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        private async void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (args.NewValue != null)
-                contentSection.Content = ContentPreviewConverter.MakePreviewControl(args.NewValue as LinkViewModel, true);
+                contentSection.Content = await ContentPreviewConverter.MakePreviewControl(args.NewValue as LinkViewModel, SnooStreamViewModel.UIContextCancellationToken, null, true);
             else
                 contentSection.Content = null;
         }

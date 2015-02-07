@@ -166,7 +166,7 @@ namespace SnooStream.Common
                     _dataContext = NavigationStateUtility.GetDataContext(_stateGuid);
 					if (_dataContext is IRefreshable)
 					{
-						((IRefreshable)_dataContext).MaybeRefresh();
+                        ((IRefreshable)_dataContext).MaybeRefresh();
 					}
 				}
 

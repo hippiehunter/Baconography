@@ -49,36 +49,33 @@
                         <PropertyCondition Name="Name">SubredditGroup: popular</PropertyCondition>
                       </AndCondition>
                       <SupportLevel>0</SupportLevel>
-                      <Descendants>
-                        <UIObject ControlType="ListItem" Id="UISubredditWrapperpopuListItem" FriendlyName="SubredditWrapper: popular" SpecialControlType="None">
-                          <TechnologyName>UIA</TechnologyName>
-                          <WindowTitles />
-                          <AndCondition>
-                            <PropertyCondition Name="FrameworkId">XAML</PropertyCondition>
-                            <PropertyCondition Name="ControlType">ListItem</PropertyCondition>
-                            <PropertyCondition Name="Name">SubredditWrapper: popular</PropertyCondition>
-                            <PropertyCondition Name="Instance">3</PropertyCondition>
-                          </AndCondition>
-                          <SupportLevel>0</SupportLevel>
-                          <Descendants>
-                            <UIObject ControlType="Button" Id="UIPicsButton" FriendlyName="pics" SpecialControlType="None">
-                              <TechnologyName>UIA</TechnologyName>
-                              <WindowTitles />
-                              <AndCondition>
-                                <PropertyCondition Name="FrameworkId">XAML</PropertyCondition>
-                                <PropertyCondition Name="ControlType">Button</PropertyCondition>
-                                <PropertyCondition Name="Name">pics</PropertyCondition>
-                              </AndCondition>
-                              <SupportLevel>0</SupportLevel>
-                              <Descendants />
-                            </UIObject>
-                          </Descendants>
-                        </UIObject>
-                      </Descendants>
+                      <Descendants />
                     </UIObject>
                   </Descendants>
                 </UIObject>
               </Descendants>
+            </UIObject>
+            <UIObject ControlType="List" Id="UILinksListViewList" FriendlyName="linksListView" SpecialControlType="None">
+              <TechnologyName>UIA</TechnologyName>
+              <WindowTitles />
+              <AndCondition>
+                <PropertyCondition Name="FrameworkId">XAML</PropertyCondition>
+                <PropertyCondition Name="ControlType">List</PropertyCondition>
+                <PropertyCondition Name="AutomationId">linksListView</PropertyCondition>
+              </AndCondition>
+              <SupportLevel>0</SupportLevel>
+              <Descendants />
+            </UIObject>
+            <UIObject ControlType="FlipView" Id="UIFlipViewFlipView" FriendlyName="flipView" SpecialControlType="None">
+              <TechnologyName>UIA</TechnologyName>
+              <WindowTitles />
+              <AndCondition>
+                <PropertyCondition Name="FrameworkId">XAML</PropertyCondition>
+                <PropertyCondition Name="ControlType">FlipView</PropertyCondition>
+                <PropertyCondition Name="AutomationId">flipView</PropertyCondition>
+              </AndCondition>
+              <SupportLevel>0</SupportLevel>
+              <Descendants />
             </UIObject>
           </Descendants>
         </TopLevelWindow>

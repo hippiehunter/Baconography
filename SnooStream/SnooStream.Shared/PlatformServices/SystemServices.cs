@@ -553,5 +553,37 @@ namespace SnooStream.PlatformServices
 
             Windows.ApplicationModel.DataTransfer.DataTransferManager.ShowShareUI();
         }
+
+
+        public Task<T> RunAsyncIdle<T>(Func<T> action, CancellationToken cancelToken)
+        {
+            TaskCompletionSource<T> source = new TaskCompletionSource<T>();
+            var poolTask = ThreadPool.RunAsync((op) =>
+                {
+                    try
+                    {
+                        if (cancelToken.IsCancellationRequested)
+                        {
+                            source.TrySetCanceled();
+                            return;
+                        }
+                        var result = action();
+                        if (cancelToken.IsCancellationRequested)
+                        {
+                            source.TrySetCanceled();
+                        }
+                        else
+                        {
+                            source.TrySetResult(result);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        source.TrySetException(ex);
+                    }
+
+                }, WorkItemPriority.Low, WorkItemOptions.None);
+            return source.Task;
+        }
     }
 }

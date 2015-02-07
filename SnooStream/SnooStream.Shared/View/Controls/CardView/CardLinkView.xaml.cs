@@ -42,26 +42,24 @@ namespace SnooStream.View.Controls
 		}
 
         private int CurrentLoadPhase = 0;
-
 		internal bool PhaseLoad(ListViewBase sender, ContainerContentChangingEventArgs args)
 		{
 			if (args.InRecycleQueue || (args.Phase == 0 && CurrentLoadPhase != 0))
 			{
                 CurrentLoadPhase = 0;
-				cancelSource.Cancel();
+                cancelSource.Cancel();
                 cancelSource = new CancellationTokenSource();
-                rootGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+
 				if (previewSection != null)
 				{
 					if (previewSection.Content is CardPreviewImageControl)
 					{
 						var imageControl = previewSection.Content as CardPreviewImageControl;
-						if (imageControl.imageControl.Source is BitmapSource)
-						{
-							((BitmapSource)imageControl.imageControl.Source).SetSource(_streamHack);
-						}
+                        if (imageControl.hqImageControl.Source is BitmapSource)
+                        {
+                            ((BitmapSource)imageControl.hqImageControl.Source).SetSource(_streamHack);
+                        }
 					}
-					previewSection.Content = null;
 				}
 			}
 
@@ -78,37 +76,60 @@ namespace SnooStream.View.Controls
                         return true;
                     case 2:
                         CurrentLoadPhase++;
-                        previewSection.Content = ContentPreviewConverter.MakePreviewControl(DataContext as LinkViewModel);
-                        return true;
+                        var finishLoad2 = new Action(async () =>
+                            {
+                                try
+                                {
+                                    var cancelToken = cancelSource.Token;
+                                    var previewControl = await ContentPreviewConverter.MakePreviewControl(DataContext as LinkViewModel, cancelToken, previewSection.Content);
+                                    if (!cancelToken.IsCancellationRequested)
+                                    {
+                                        if (previewSection.Content != previewControl)
+                                            previewSection.Content = previewControl;
+
+                                        args.RegisterUpdateCallback((sender2, args2) => PhaseLoad(sender2, args2));
+                                    }
+                                }
+                                catch (TaskCanceledException)
+                                {
+                                }
+                            });
+                        finishLoad2();
+                        return false;
                     case 3:
                         try
                         {
                             //make sure its ok to load non essential content
                             if (SnooStreamViewModel.SystemServices.IsLowPriorityNetworkOk)
                             {
+                                var cancelToken = cancelSource.Token;
                                 var context = ((Preview)((UserControl)previewSection.Content).DataContext);
-                                var finishLoad = new Action(async () =>
+                                var finishLoad3 = new Action(async () =>
                                     {
-                                        var hqImageUrl = await Task.Run(() => context.FinishLoad(cancelSource.Token));
+                                        var hqImageUrl = await await SnooStreamViewModel.SystemServices.RunAsyncIdle(() => context.FinishLoad(cancelSource.Token), cancelToken);
                                         if (string.IsNullOrWhiteSpace(hqImageUrl) || cancelSource.IsCancellationRequested)
                                             return;
 
                                         try
                                         {
-                                            var cancelToken = cancelSource.Token;
-                                            var previewUrl = await Task.Run(() => PlatformImageAcquisition.ImagePreviewFromUrl(hqImageUrl, cancelToken));
-                                            if (!cancelSource.IsCancellationRequested)
+                                            if (previewSection.Content is CardPreviewImageControl)
                                             {
-                                                ((Preview)((UserControl)previewSection.Content).DataContext).ThumbnailUrl = previewUrl;
-                                                CurrentLoadPhase++;
+                                                var previewImage = previewSection.Content as CardPreviewImageControl;
+                                                var previewUrl = await await SnooStreamViewModel.SystemServices.RunAsyncIdle(() => PlatformImageAcquisition.ImagePreviewFromUrl(hqImageUrl, cancelToken), cancelToken);
+                                                var dataContext = ((Preview)((UserControl)previewSection.Content).DataContext);
+                                                if (!cancelToken.IsCancellationRequested)
+                                                {
+                                                    dataContext.HQThumbnailUrl = previewUrl;
+                                                }
                                             }
+                                            CurrentLoadPhase++;
                                         }
-                                        catch (OperationCanceledException)
+                                        catch (TaskCanceledException)
                                         {
                                             //Do nothing
                                         }
                                     });
-                                finishLoad();
+                                finishLoad3();
                             }
                         }
                         catch (Exception ex)
@@ -118,6 +139,7 @@ namespace SnooStream.View.Controls
                         break;
                 }
             }
+
             return false;
 		}
 

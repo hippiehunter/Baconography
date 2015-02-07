@@ -235,5 +235,10 @@ namespace SnooStream.ViewModel
         {
             get { return Link.Name; }
         }
+
+        public override string ToString()
+        {
+            return Id + Title;
+        }
     }
 }

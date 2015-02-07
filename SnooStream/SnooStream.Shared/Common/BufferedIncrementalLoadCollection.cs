@@ -14,6 +14,7 @@ namespace SnooStream.Common
 	{
 		IIncrementalCollectionLoader<T> _loader;
 		List<T> _unloadedBuffer = new List<T>();
+        HashSet<string> _uniqueItems = new HashSet<string>();
 		bool _locked;
 		int _loadIncrement;
 		int _auxiliaryTimeout;
@@ -53,7 +54,7 @@ namespace SnooStream.Common
 						async () =>
 						{
 							var items = await _loader.LoadMore();
-							_unloadedBuffer.AddRange(items);
+                            _unloadedBuffer.AddRange(items);
 						});
 				}
 
@@ -62,9 +63,10 @@ namespace SnooStream.Common
 					var targetItems = _unloadedBuffer.Take(_loadIncrement).ToList();
 					_unloadedBuffer = _unloadedBuffer.Skip(_loadIncrement).ToList();
 					var task = _loader.AuxiliaryItemLoader(targetItems, _auxiliaryTimeout);
+                    var uniqueLoader = _loader as IUniqueIncrementalCollectionLoader<T>;
 					foreach (var item in targetItems)
 					{
-						Add(item);
+                        Add(item);
 					}
 					return new LoadMoreItemsResult { Count = (uint)targetItems.Count };
 				}
@@ -103,6 +105,7 @@ namespace SnooStream.Common
 				await SnooStreamViewModel.NotificationService.Report(string.Format("refreshing {0}s", _loader.NameForStatus),
 						async () =>
 						{
+                            _unloadedBuffer.Clear();
 							await _loader.Refresh(this, onlyNew);
 						});
 			}

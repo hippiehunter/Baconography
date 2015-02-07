@@ -66,10 +66,44 @@ namespace SnooStream.CUITests
                 return this.mUISubredditsHubSection;
             }
         }
+        
+        public XamlList UILinksListViewList
+        {
+            get
+            {
+                if ((this.mUILinksListViewList == null))
+                {
+                    this.mUILinksListViewList = new XamlList(this);
+                    #region Search Criteria
+                    this.mUILinksListViewList.SearchProperties[XamlList.PropertyNames.AutomationId] = "linksListView";
+                    #endregion
+                }
+                return this.mUILinksListViewList;
+            }
+        }
+        
+        public XamlFlipView UIFlipViewFlipView
+        {
+            get
+            {
+                if ((this.mUIFlipViewFlipView == null))
+                {
+                    this.mUIFlipViewFlipView = new XamlFlipView(this);
+                    #region Search Criteria
+                    this.mUIFlipViewFlipView.SearchProperties[XamlFlipView.PropertyNames.AutomationId] = "flipView";
+                    #endregion
+                }
+                return this.mUIFlipViewFlipView;
+            }
+        }
         #endregion
         
         #region Fields
         private UISubredditsHubSection mUISubredditsHubSection;
+        
+        private XamlList mUILinksListViewList;
+        
+        private XamlFlipView mUIFlipViewFlipView;
         #endregion
     }
     
@@ -117,13 +151,17 @@ namespace SnooStream.CUITests
         }
         
         #region Properties
-        public UISubredditGrouppopulaGroup UISubredditGrouppopulaGroup
+        public XamlControl UISubredditGrouppopulaGroup
         {
             get
             {
                 if ((this.mUISubredditGrouppopulaGroup == null))
                 {
-                    this.mUISubredditGrouppopulaGroup = new UISubredditGrouppopulaGroup(this);
+                    this.mUISubredditGrouppopulaGroup = new XamlControl(this);
+                    #region Search Criteria
+                    this.mUISubredditGrouppopulaGroup.SearchProperties[UITestControl.PropertyNames.ControlType] = "Group";
+                    this.mUISubredditGrouppopulaGroup.SearchProperties[UITestControl.PropertyNames.Name] = "SubredditGroup: popular";
+                    #endregion
                 }
                 return this.mUISubredditGrouppopulaGroup;
             }
@@ -131,74 +169,7 @@ namespace SnooStream.CUITests
         #endregion
         
         #region Fields
-        private UISubredditGrouppopulaGroup mUISubredditGrouppopulaGroup;
-        #endregion
-    }
-    
-    [GeneratedCode("Coded UITest Builder", "12.0.30501.0")]
-    public class UISubredditGrouppopulaGroup : XamlControl
-    {
-        
-        public UISubredditGrouppopulaGroup(XamlControl searchLimitContainer) : 
-                base(searchLimitContainer)
-        {
-            #region Search Criteria
-            this.SearchProperties[UITestControl.PropertyNames.ControlType] = "Group";
-            this.SearchProperties[UITestControl.PropertyNames.Name] = "SubredditGroup: popular";
-            #endregion
-        }
-        
-        #region Properties
-        public UISubredditWrapperpopuListItem UISubredditWrapperpopuListItem
-        {
-            get
-            {
-                if ((this.mUISubredditWrapperpopuListItem == null))
-                {
-                    this.mUISubredditWrapperpopuListItem = new UISubredditWrapperpopuListItem(this);
-                }
-                return this.mUISubredditWrapperpopuListItem;
-            }
-        }
-        #endregion
-        
-        #region Fields
-        private UISubredditWrapperpopuListItem mUISubredditWrapperpopuListItem;
-        #endregion
-    }
-    
-    [GeneratedCode("Coded UITest Builder", "12.0.30501.0")]
-    public class UISubredditWrapperpopuListItem : XamlListItem
-    {
-        
-        public UISubredditWrapperpopuListItem(XamlControl searchLimitContainer) : 
-                base(searchLimitContainer)
-        {
-            #region Search Criteria
-            this.SearchProperties[XamlListItem.PropertyNames.Name] = "SubredditWrapper: popular";
-            this.SearchProperties[XamlListItem.PropertyNames.Instance] = "3";
-            #endregion
-        }
-        
-        #region Properties
-        public XamlButton UIPicsButton
-        {
-            get
-            {
-                if ((this.mUIPicsButton == null))
-                {
-                    this.mUIPicsButton = new XamlButton(this);
-                    #region Search Criteria
-                    this.mUIPicsButton.SearchProperties[XamlButton.PropertyNames.Name] = "pics";
-                    #endregion
-                }
-                return this.mUIPicsButton;
-            }
-        }
-        #endregion
-        
-        #region Fields
-        private XamlButton mUIPicsButton;
+        private XamlControl mUISubredditGrouppopulaGroup;
         #endregion
     }
 }

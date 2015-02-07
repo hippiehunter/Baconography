@@ -35,15 +35,16 @@ namespace SnooStream.Common
 
 		private static void RegisterCancel(CancellationToken cancelToken, IAsyncInfo asyncOperation)
 		{
-			WeakReference<IAsyncInfo> _weakRef = new WeakReference<IAsyncInfo>(asyncOperation);
+			WeakReference<object> _weakRef = new WeakReference<object>(asyncOperation);
 			cancelToken.Register(() =>
 				{
 					try
 					{
-						IAsyncInfo target;
+						object target;
 						if (_weakRef.TryGetTarget(out target))
 						{
-							target.Cancel();
+                            if(target is IAsyncInfo)
+							    ((IAsyncInfo)target).Cancel();
 						}
 						_weakRef = null;
 					}
@@ -97,10 +98,10 @@ namespace SnooStream.Common
 										{
 											var info = await source.GetInfoAsync();
 
-											if (source.ImageFormat == ImageFormat.Jpeg && (info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024))
+                                            if (source.ImageFormat == ImageFormat.Jpeg && (info.ImageSize.Height > 768 || info.ImageSize.Width > 768))
 											{
-												var resizedBuffer = await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(buffer, new Nokia.Graphics.Imaging.AutoResizeConfiguration(1024 * 1024,
-												new Windows.Foundation.Size(1024, 1024), new Windows.Foundation.Size(0, 0), Nokia.Graphics.Imaging.AutoResizeMode.Automatic, 0, Nokia.Graphics.Imaging.ColorSpace.Yuv420));
+                                                var resizedBuffer = await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(buffer, new Nokia.Graphics.Imaging.AutoResizeConfiguration(768 * 768,
+                                                new Windows.Foundation.Size(768, 768), new Windows.Foundation.Size(0, 0), Nokia.Graphics.Imaging.AutoResizeMode.Automatic, 0, Nokia.Graphics.Imaging.ColorSpace.Yuv420));
 												try
 												{
 													await targetStream.WriteAsync(resizedBuffer);
@@ -111,18 +112,18 @@ namespace SnooStream.Common
 														((IDisposable)resizedBuffer).Dispose();
 												}
 											}
-											else if (info.ImageSize.Height > 1024 || info.ImageSize.Width > 1024 || source.ImageFormat == ImageFormat.Gif)
+                                            else if (info.ImageSize.Height > 768 || info.ImageSize.Width > 768 || source.ImageFormat == ImageFormat.Gif)
 											{
 												using (var jpegRenderer = new JpegRenderer(source))
 												{
 													// Find aspect ratio for resize
-													var nPercentW = (1024.0 / info.ImageSize.Width);
-													var nPercentH = (1024.0 / info.ImageSize.Height);
+                                                    var nPercentW = (768 / info.ImageSize.Width);
+                                                    var nPercentH = (768 / info.ImageSize.Height);
 													var nPercent = nPercentH < nPercentW ? nPercentH : nPercentW;
 
 													jpegRenderer.Size = new Windows.Foundation.Size(info.ImageSize.Width * nPercent, info.ImageSize.Height * nPercent);
 													jpegRenderer.OutputOption = OutputOption.PreserveAspectRatio;
-													jpegRenderer.Quality = .75;
+													jpegRenderer.Quality = .50;
 													var renderedJpeg = await jpegRenderer.RenderAsync();
 													try
 													{
@@ -163,7 +164,7 @@ namespace SnooStream.Common
 			}
 			catch (OperationCanceledException cancel)
 			{
-				throw cancel;
+				throw new TaskCanceledException();
 			}
 			catch(Exception ex) 
 			{

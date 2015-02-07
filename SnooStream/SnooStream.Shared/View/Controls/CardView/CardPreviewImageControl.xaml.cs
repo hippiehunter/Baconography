@@ -23,5 +23,16 @@ namespace SnooStream.View.Controls
         {
             this.InitializeComponent();
         }
+
+        private void hqImageControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            HQFadeIn.Begin();
+        }
+
+        private void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        {
+            hqImageControl.Opacity = 0;
+            imageControl.Opacity = 1;
+        }
     }
 }

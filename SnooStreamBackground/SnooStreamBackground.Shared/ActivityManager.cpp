@@ -25,16 +25,19 @@ ActivityManager::ActivityManager()
 
     if (fileStr->Length() > 0)
     {
-        auto parsedFileObject = JsonObject::Parse(fileStr);
-        auto toastedArray = parsedFileObject->GetNamedArray("toasted");
-        ReceivedBlob = parsedFileObject->GetNamedString("received");
-        SentBlob = parsedFileObject->GetNamedString("sent");
-        ActivityBlob = parsedFileObject->GetNamedString("activity");
-        UpdateCountSinceActivity = (int)parsedFileObject->GetNamedNumber("updateSinceActivity");
-        _lastUpdate = chrono::seconds((long long)parsedFileObject->GetNamedNumber("lastUpdate"));
-        for (auto toasted : toastedArray)
+        JsonObject^ parsedFileObject = nullptr;
+        if (JsonObject::TryParse(fileStr, &parsedFileObject))
         {
-            _alreadyToasted.push_back(toasted->GetString());
+            auto toastedArray = parsedFileObject->GetNamedArray("toasted");
+            ReceivedBlob = parsedFileObject->GetNamedString("received");
+            SentBlob = parsedFileObject->GetNamedString("sent");
+            ActivityBlob = parsedFileObject->GetNamedString("activity");
+            UpdateCountSinceActivity = (int) parsedFileObject->GetNamedNumber("updateSinceActivity");
+            _lastUpdate = chrono::seconds((long long) parsedFileObject->GetNamedNumber("lastUpdate"));
+            for (auto toasted : toastedArray)
+            {
+                _alreadyToasted.push_back(toasted->GetString());
+            }
         }
     }
 }

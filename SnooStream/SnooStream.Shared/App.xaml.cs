@@ -20,6 +20,7 @@ using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Background;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -91,7 +92,7 @@ namespace SnooStream
         /// search results, and so forth.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override async void OnLaunched(LaunchActivatedEventArgs e)
+        protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
@@ -116,8 +117,11 @@ namespace SnooStream
                 // Create a Frame to act as the navigation context and navigate to the first page
                 rootFrame = new Frame();
 
-                // TODO: change this value to a cache size that is appropriate for your application
+#if WINDOWS_PHONE_APP
+                rootFrame.CacheSize = MemoryManager.AppMemoryUsageLimit > 300 * 1024 * 1024 ? 2 : 0;
+#else
                 rootFrame.CacheSize = 4;
+#endif
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {

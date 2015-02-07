@@ -25,6 +25,20 @@ namespace SnooStream.Common
 				RaisePropertyChanged("ThumbnailUrl");
 			}
 		}
+        private object _hqthumbnailUrl;
+        public object HQThumbnailUrl
+        {
+            get
+            {
+                return _hqthumbnailUrl;
+            }
+            set
+            {
+                _hqthumbnailUrl = value;
+                RaisePropertyChanged("HQThumbnailUrl");
+            }
+        }
+
 		public string Glyph { get; set; }
 
 		public Func<CancellationToken, Task<string>> FinishLoad { get; private set; }

@@ -15,6 +15,7 @@ namespace SnooStream.Services
         void RestartTimer(object tickHandle);
         void StopTimer(object tickHandle);
         void RunAsync(Func<object, Task> action);
+        Task<T> RunAsyncIdle<T>(Func<T> action, CancellationToken cancelToken);
 		void RunUIAsync(Func<Task> action);
 		void RunUIIdleAsync(Func<Task> action);
         void StartThreadPoolTimer(Func<object, Task> action, TimeSpan timer);
@@ -44,6 +45,11 @@ namespace SnooStream.Services
 		string NameForStatus { get; }
 		void Attach(ObservableCollection<T> targetCollection);
 	}
+
+    public interface IUniqueIncrementalCollectionLoader<T> : IIncrementalCollectionLoader<T>
+    {
+        string UniqueId(T t);
+    }
 
 	public interface IWrappedCollectionView
 	{

@@ -48,7 +48,7 @@
             <Button x:Name="previewSection" Grid.Row="2" Margin="0,0,0,0" Height="175"
                     BorderThickness="0" Padding="0,0,0,0"
                     VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
-                    HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" 
+                    HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" Content=""
                     Command="{Binding GotoLink}">
             </Button>
 
