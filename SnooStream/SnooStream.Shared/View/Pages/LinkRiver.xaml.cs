@@ -12,6 +12,7 @@ using Windows.UI.Xaml;
 using SnooStream.View.Controls;
 using Windows.UI.Xaml.Controls;
 using GalaSoft.MvvmLight;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace SnooStream.View.Pages
 {
@@ -20,6 +21,14 @@ namespace SnooStream.View.Pages
         public LinkRiver()
         {
             InitializeComponent();
+#if WINDOWS_PHONE_APP
+            var transition = new NavigationThemeTransition();
+            transition.DefaultNavigationTransitionInfo = new ContinuumNavigationTransitionInfo();
+            if (Transitions == null)
+                Transitions = new TransitionCollection();
+
+            Transitions.Add(transition);
+#endif
         }
 
 		private void linksListView_ContainerContentChanging(Windows.UI.Xaml.Controls.ListViewBase sender, Windows.UI.Xaml.Controls.ContainerContentChangingEventArgs args)

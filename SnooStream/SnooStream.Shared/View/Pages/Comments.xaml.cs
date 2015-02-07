@@ -9,6 +9,7 @@ using SnooStream.View.Controls;
 using GalaSoft.MvvmLight;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace SnooStream.View.Pages
 {
@@ -17,6 +18,14 @@ namespace SnooStream.View.Pages
         public Comments()
         {
             InitializeComponent();
+#if WINDOWS_PHONE_APP
+            var transition = new NavigationThemeTransition();
+            transition.DefaultNavigationTransitionInfo = new ContinuumNavigationTransitionInfo();
+            if (Transitions == null)
+                Transitions = new TransitionCollection();
+
+            Transitions.Add(transition);
+#endif
         }
 
         public override async void SetFocusedViewModel(ViewModelBase viewModel)

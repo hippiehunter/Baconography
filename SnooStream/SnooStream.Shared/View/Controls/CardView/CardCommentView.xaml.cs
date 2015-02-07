@@ -24,6 +24,9 @@ namespace SnooStream.View.Controls
         public CardCommentView()
         {
             this.InitializeComponent();
+#if WINDOWS_PHONE_APP
+            Windows.UI.Xaml.Media.Animation.ContinuumNavigationTransitionInfo.SetIsEntranceElement(this, true);
+#endif
         }
 
         private async void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)

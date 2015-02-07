@@ -40,7 +40,11 @@ namespace SnooStream.CUITests
                     Debug.WriteLine("found duplicate link " + childEnum.Current.Name);
                 else
                     itemNames.Add(childEnum.Current.Name);
-                childEnum.MoveNext();
+                if (!childEnum.MoveNext())
+                {
+                    //end of collection, something bad happened on the test side
+                    break;
+                }
             }
         }
 
@@ -103,7 +107,7 @@ namespace SnooStream.CUITests
             foreach (var item in allChildren)
             {
                 WaitForDataContextReady(itemNames, UIMap.UISnooStreamBetaWindow.UILinksListViewList, item);
-                if (count++ > 1)
+                if (count++ > 100)
                 {
                     Gesture.Tap(FindButton(item as XamlControl, "AutomationId", "previewSection"));
                     UIMap.UISnooStreamBetaWindow.UIFlipViewFlipView.WaitForControlReady(-1);
@@ -111,13 +115,9 @@ namespace SnooStream.CUITests
                     foreach (var child in UIMap.UISnooStreamBetaWindow.UIFlipViewFlipView.GetChildren())
                     {
                         WaitForDataContextReady(itemNames, UIMap.UISnooStreamBetaWindow.UIFlipViewFlipView, child);
-                        if (count++ > 300)
+                        if (count++ > 119)
                             break;
 
-                        while (UIMap.UISnooStreamBetaWindow.UIFlipViewFlipView.SelectedIndex > flipViewItems.Count - 5)
-                        {
-                            Playback.Wait(50);
-                        }
                         UIMap.UISnooStreamBetaWindow.UIFlipViewFlipView.FlipNext();
                     }
                     break;

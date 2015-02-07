@@ -47,7 +47,9 @@ namespace SnooStream.View.Controls
 
 		private void listBox_ItemTap(object sender, RoutedEventArgs e)
         {
+#if WINDOWS_PHONE_APP
             ContinuumNavigationTransitionInfo.SetIsExitElement(sender as UIElement, true);
+#endif
             SnooApplicationPage.Current.PopNavState();
             searchBox.Text = "";
             var linkRiver = ((Button)sender).DataContext as SubredditRiverViewModel.SubredditWrapper;

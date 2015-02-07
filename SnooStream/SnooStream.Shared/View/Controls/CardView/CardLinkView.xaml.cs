@@ -145,7 +145,9 @@ namespace SnooStream.View.Controls
 
         private void Comments_Tapped(object sender, TappedRoutedEventArgs e)
         {
+#if WINDOWS_PHONE_APP
             ContinuumNavigationTransitionInfo.SetIsExitElement(sender as UIElement, true);
+#endif
         }
     }
 }
