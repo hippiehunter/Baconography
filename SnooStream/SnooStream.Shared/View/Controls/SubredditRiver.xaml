@@ -33,7 +33,13 @@
                         <ObjectAnimationUsingKeyFrames
                         Storyboard.TargetName="searchBox"
                         Storyboard.TargetProperty="Margin">
-                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="-3,0,-3,0" />
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="-52,0,-3,0" />
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames
+                        Storyboard.TargetName="searchBox"
+                        Storyboard.TargetProperty="Opacity">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="1" />
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames
                         Storyboard.TargetName="listBox"
@@ -85,7 +91,7 @@
             <SymbolIcon Symbol="Find"/>
         </Button>
         <TextBox Grid.Column="1" PlaceholderText="Search for subreddit"
-                 Margin="-3,-150,-3,0" x:Name="searchBox" KeyDown="manualBox_KeyDown" TextChanged="searchBox_TextChanged" Text="{Binding Path=SearchString, Mode=TwoWay}">
+                 Margin="-3,-150,-3,0" x:Name="searchBox" KeyDown="manualBox_KeyDown" TextChanged="searchBox_TextChanged" Text="{Binding Path=SearchString, Mode=TwoWay}" Opacity="0">
             <TextBox.Transitions>
                 <TransitionCollection>
                     <RepositionThemeTransition/>
