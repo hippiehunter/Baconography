@@ -262,8 +262,9 @@ namespace SnooStream.ViewModel
             return new LinkViewModel(this, link) { FromMultiReddit = (IsMultiReddit || Thing.Url == "/") };
         }
 
-        private void ProcessLinkThings(IEnumerable<Link> links)
+        internal void ProcessLinkThings(IEnumerable<Link> links)
         {
+            Links.Clear();
             foreach (var link in links)
             {
                 Links.Add(MakeLinkThing(link));
@@ -320,10 +321,11 @@ namespace SnooStream.ViewModel
 			await ((IRefreshable)Links).Refresh(onlyNew);
 		}
 
-		public async void SetSort(string sort)
+		public async void SetSort(string sort, bool refresh = true)
 		{
 			Sort = sort;
-			await Refresh(false);
+            if (refresh)
+			    await Refresh(false);
 		}
 
 		public RelayCommand RefreshCommand

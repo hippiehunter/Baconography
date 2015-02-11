@@ -212,7 +212,15 @@ namespace SnooStream.ViewModel
         internal LinkRiverViewModel GetOrMakeSubreddit(string category, Subreddit thing, string sort, IEnumerable<Link> initialLinks, DateTime? lastRefreshed)
         {
             if (_madeSubreddits.ContainsKey(thing.Url))
-                return _madeSubreddits[thing.Url];
+            {
+                var existingSubreddit = _madeSubreddits[thing.Url];
+                existingSubreddit.Category = category;
+                existingSubreddit.Thing = thing;
+                existingSubreddit.SetSort(sort, false);
+                existingSubreddit.ProcessLinkThings(initialLinks);
+                existingSubreddit.LastRefresh = lastRefreshed;
+                return existingSubreddit;
+            } 
             else
             {
                 var result = new LinkRiverViewModel(this, category, thing, sort, initialLinks, lastRefreshed);
