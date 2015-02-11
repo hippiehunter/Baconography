@@ -83,8 +83,7 @@ namespace SnooStream.Common
 							{
 								using (var content = response.Content)
 								{
-									ulong length;
-									if (content.TryComputeLength(out length) && length > 1024 * 1024 * 4)
+                                    if (content.Headers.ContentLength != null && content.Headers.ContentLength.Value > (1024 * 1024 * 4))
 										throw new OperationCanceledException();
 
 									var readBufferOp = content.ReadAsBufferAsync();
