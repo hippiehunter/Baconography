@@ -388,7 +388,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return new RelayCommand(async () => await SnooStreamViewModel.RedditService.AddSubredditSubscription(Thing.Url, false));
+                return new RelayCommand(async () => await SnooStreamViewModel.RedditService.AddSubredditSubscription(Thing.Name, false));
             }
         }
 
@@ -396,7 +396,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return new RelayCommand(async () => await SnooStreamViewModel.RedditService.AddSubredditSubscription(Thing.Url, true));
+                return new RelayCommand(async () => await SnooStreamViewModel.RedditService.AddSubredditSubscription(Thing.Name, true));
             }
         }
 
