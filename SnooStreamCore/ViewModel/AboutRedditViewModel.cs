@@ -65,9 +65,24 @@ namespace SnooStream.ViewModel
             {
                 List<ViewModelBase> result = new List<ViewModelBase>();
                 var listing = await SnooStreamViewModel.RedditService.GetRecomendedSubreddits(new List<string> { _subreddit.Thing.Url });
-                foreach (var item in listing)
+                if (listing == null || listing.Count == 0)
                 {
-                    result.Add(new AboutRedditViewModel(item.Subreddit));
+                    var search = await SnooStreamViewModel.RedditService.Search(_subreddit.Thing.DisplayName, null, true, null);
+                    if (search != null && search.Item2 != null && search.Item2.Data != null && search.Item2.Data.Children != null)
+                    {
+                        foreach (var thing in search.Item2.Data.Children)
+                        {
+                            if(thing.Data is Subreddit)
+                                result.Add(new AboutRedditViewModel(thing.Data as Subreddit, DateTime.Now));
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var item in listing)
+                    {
+                        result.Add(new AboutRedditViewModel(item.Subreddit));
+                    }
                 }
                 LastRefresh = DateTime.UtcNow;
                 return result;
