@@ -96,6 +96,21 @@ namespace SnooStream.CUITests
                 return this.mUIFlipViewFlipView;
             }
         }
+        
+        public XamlList UICommentsListList
+        {
+            get
+            {
+                if ((this.mUICommentsListList == null))
+                {
+                    this.mUICommentsListList = new XamlList(this);
+                    #region Search Criteria
+                    this.mUICommentsListList.SearchProperties[XamlList.PropertyNames.AutomationId] = "commentsList";
+                    #endregion
+                }
+                return this.mUICommentsListList;
+            }
+        }
         #endregion
         
         #region Fields
@@ -104,6 +119,8 @@ namespace SnooStream.CUITests
         private XamlList mUILinksListViewList;
         
         private XamlFlipView mUIFlipViewFlipView;
+        
+        private XamlList mUICommentsListList;
         #endregion
     }
     

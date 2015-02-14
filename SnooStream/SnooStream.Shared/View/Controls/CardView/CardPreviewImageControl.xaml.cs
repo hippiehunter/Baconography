@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SnooStream.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,13 +27,16 @@ namespace SnooStream.View.Controls
 
         private void hqImageControl_Loaded(object sender, RoutedEventArgs e)
         {
-            HQFadeIn.Begin();
+            imageControl.Opacity = 0;
         }
 
         private void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            hqImageControl.Opacity = 0;
-            imageControl.Opacity = 1;
+            if (args.NewValue != null && args.NewValue is Preview && !string.IsNullOrWhiteSpace(((Preview)args.NewValue).HQThumbnailUrl))
+                imageControl.Opacity = 0;
+            else
+                imageControl.Opacity = 1;
+            
         }
     }
 }

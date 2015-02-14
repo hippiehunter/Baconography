@@ -16,13 +16,11 @@ namespace SnooStream.Converters
 {
     public class ContentPreviewConverter
     {
-        private static async void FinishLoad(Preview preview)
+        private static async void FinishLoad(Preview preview, CancellationToken cancelToken)
         {
             try
             {
-                var cancelSource = SnooStreamViewModel.UIContextCancellationToken;
-                var path = await preview.FinishLoad(cancelSource);
-                preview.ThumbnailUrl = await PlatformImageAcquisition.ImagePreviewFromUrl(path, cancelSource);
+                await preview.FinishLoad(cancelToken);
             }
             catch { }
         }
@@ -32,8 +30,7 @@ namespace SnooStream.Converters
             var preview = await SnooStreamViewModel.SystemServices.RunAsyncIdle(() => 
                 {
                     var result = Preview.LoadLinkPreview(linkViewModel.Content);
-                    if (full)
-                        FinishLoad(result);
+                    FinishLoad(result, cancelSource);
                     return result;
                 }, cancelSource);
             if (linkViewModel.Content is SelfViewModel && full)

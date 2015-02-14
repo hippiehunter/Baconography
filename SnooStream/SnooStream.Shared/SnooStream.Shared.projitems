@@ -15,7 +15,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Background\BackgroundUpdater.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\BackgroundTaskManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\BufferedIncrementalLoadCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\LinkViewLayoutManager.cs" />

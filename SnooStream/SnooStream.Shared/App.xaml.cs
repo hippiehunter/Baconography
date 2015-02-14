@@ -118,7 +118,7 @@ namespace SnooStream
                 rootFrame = new Frame();
 
 #if WINDOWS_PHONE_APP
-                rootFrame.CacheSize = MemoryManager.AppMemoryUsageLimit > 300 * 1024 * 1024 ? 2 : 0;
+                rootFrame.CacheSize = MemoryManager.AppMemoryUsageLimit > 300 * 1024 * 1024 ? 2 : 2;
 #else
                 rootFrame.CacheSize = 4;
 #endif

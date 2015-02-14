@@ -9,25 +9,22 @@
     d:DesignHeight="300"
     d:DesignWidth="400" DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Resources>
-        <Storyboard x:Name="HQFadeIn">
-            <DoubleAnimation
-                    Storyboard.TargetName="hqImageControl"
-                    Storyboard.TargetProperty="Opacity"
-                    Duration="0:0:0.05"
-                    From="0" To="1"/>
+        <!--Storyboard x:Name="HQFadeIn">
             <DoubleAnimation
                     Storyboard.TargetName="imageControl"
                     Storyboard.TargetProperty="Opacity"
-                    Duration="0:0:0.05" From="1" To="0"/>
-        </Storyboard>
+                    Duration="0:0:1.00" From="1" To="0"/>
+        </-->
     </UserControl.Resources>
     <Grid Margin="0,0,0,0" VerticalAlignment="Stretch">
         <Border BorderThickness="0" Margin="0,0,0,0" VerticalAlignment="Center">
             <Grid>
+                <Image Margin="-12,0,-12,0" x:Name="hqImageControl" x:FieldModifier="public" DataContext="{Binding HQThumbnailUrl}" Source="{Binding}" HorizontalAlignment="Stretch" Stretch="UniformToFill"
+                                       VerticalAlignment="Center" Height="175" ImageOpened="hqImageControl_Loaded"/>
+                
                 <Image Margin="-12,0,-12,0" x:Name="imageControl" x:FieldModifier="public" Source="{Binding ThumbnailUrl}" HorizontalAlignment="Stretch" Stretch="UniformToFill"
                                        VerticalAlignment="Center" Height="175"/>
-                <Image Margin="-12,0,-12,0" x:Name="hqImageControl" x:FieldModifier="public" Source="{Binding HQThumbnailUrl}" HorizontalAlignment="Stretch" Stretch="UniformToFill"
-                                       VerticalAlignment="Center" Opacity="0" Height="175" ImageOpened="hqImageControl_Loaded"/>
+                
                 <Border Padding="2" Margin="0,0,0,12" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                     <Border.Background>
                         <SolidColorBrush Color="Black" Opacity="0.3" />

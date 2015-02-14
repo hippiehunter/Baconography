@@ -12,7 +12,7 @@
     mc:Ignorable="d"
     d:DataContext="{Binding SubredditRiver.SelectedRiver, Source={StaticResource SnooStream}}"
     x:Name="root"
-    NavigationCacheMode="Enabled">
+    NavigationCacheMode="Required">
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid>
             <ListView x:Name="linksListView" Grid.Column="0"  Margin="0,0,0,0"
@@ -33,7 +33,7 @@
                 </ListView.ItemTemplate>
                 <ListView.ItemContainerTransitions>
                     <TransitionCollection>
-                        <EntranceThemeTransition IsStaggeringEnabled="True"/>
+                        <EntranceThemeTransition IsStaggeringEnabled="False"/>
                         <AddDeleteThemeTransition/>
                     </TransitionCollection>
                 </ListView.ItemContainerTransitions>

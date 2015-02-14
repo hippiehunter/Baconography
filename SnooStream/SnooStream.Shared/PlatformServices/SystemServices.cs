@@ -1,8 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using MetroLog;
 using MetroLog.Targets;
-using Nokia.Graphics.Imaging;
-using Nokia.InteropServices.WindowsRuntime;
+using Lumia.Imaging;
 using SnooStream.Common;
 using SnooStream.Services;
 using SnooStream.ViewModel;
@@ -211,7 +210,7 @@ namespace SnooStream.PlatformServices
 					var resizeConfiguration = new AutoResizeConfiguration(5 * 1024 * 1024, desiredSize,
 						new Size(0, 0), AutoResizeMode.Automatic, 0, ColorSpace.Yuv420);
 
-					return (await Nokia.Graphics.Imaging.JpegTools.AutoResizeAsync(source.Buffer, resizeConfiguration)).ToArray();
+					return (await JpegTools.AutoResizeAsync(source.Buffer, resizeConfiguration)).ToArray();
 				}
 				else
 				{
@@ -584,6 +583,12 @@ namespace SnooStream.PlatformServices
 
                 }, WorkItemPriority.Low, WorkItemOptions.None);
             return source.Task;
+        }
+
+
+        public Task<string> ImagePreviewFromUrl(string url, CancellationToken cancel)
+        {
+            return PlatformImageAcquisition.ImagePreviewFromUrl(url, cancel);
         }
     }
 }

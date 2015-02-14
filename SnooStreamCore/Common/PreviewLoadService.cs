@@ -12,8 +12,8 @@ namespace SnooStream.Common
 {
 	public class Preview : ViewModelBase
 	{
-		private object _thumbnailUrl;
-		public object ThumbnailUrl
+        private string _thumbnailUrl;
+        public string ThumbnailUrl
 		{
 			get
 			{
@@ -25,8 +25,8 @@ namespace SnooStream.Common
 				RaisePropertyChanged("ThumbnailUrl");
 			}
 		}
-        private object _hqthumbnailUrl;
-        public object HQThumbnailUrl
+        private string _hqthumbnailUrl;
+        public string HQThumbnailUrl
         {
             get
             {
@@ -35,20 +35,25 @@ namespace SnooStream.Common
             set
             {
                 _hqthumbnailUrl = value;
+                if (!string.IsNullOrWhiteSpace(value))
+                    IsFullyLoaded = true;
+
                 RaisePropertyChanged("HQThumbnailUrl");
             }
         }
 
+        public bool IsFullyLoaded { get; set; }
+
 		public string Glyph { get; set; }
 
-		public Func<CancellationToken, Task<string>> FinishLoad { get; private set; }
+		public Func<CancellationToken, Task> FinishLoad { get; private set; }
 		public static Preview LoadLinkPreview(ContentViewModel content)
 		{
 			Preview result = null;
 			if (content is ImageViewModel)
 			{
-				result = new PreviewImage { ThumbnailUrl = ((ImageViewModel)content).RedditThumbnail };
-				result.FinishLoad = (cancel) => LoadPreview(content as ImageViewModel, result as PreviewImage); 
+                result = new PreviewImage { ThumbnailUrl = ((ImageViewModel)content).RedditThumbnail, HQThumbnailUrl = ((ImageViewModel)content).HQThumbnail };
+				result.FinishLoad = (cancel) => LoadPreview(content as ImageViewModel, result as PreviewImage, cancel); 
 			}
 			else if (content is AlbumViewModel)
 			{
@@ -82,58 +87,74 @@ namespace SnooStream.Common
 
 			return result;
 		}
-		private static Task<string> LoadPreview(ImageViewModel imageViewModel, PreviewImage target)
+		private static async Task LoadPreview(ImageViewModel imageViewModel, PreviewImage target, CancellationToken cancel)
 		{
-			return Task.FromResult(imageViewModel.Url);
+            if (!string.IsNullOrWhiteSpace(imageViewModel.HQThumbnail) || string.IsNullOrWhiteSpace(imageViewModel.Url) || cancel.IsCancellationRequested)
+                return;
+
+            try
+            {
+                var previewUrl = await SnooStreamViewModel.SystemServices.ImagePreviewFromUrl(imageViewModel.Url, cancel);
+                if(!cancel.IsCancellationRequested)
+                    SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() => target.HQThumbnailUrl = previewUrl);
+            }
+            catch (OperationCanceledException)
+            {
+                //Do nothing
+            }
 		}
 
-		private static async Task<string> LoadPreview(AlbumViewModel albumViewModel, PreviewImage target, CancellationToken cancel)
+		private static async Task LoadPreview(AlbumViewModel albumViewModel, PreviewImage target, CancellationToken cancel)
 		{
 			try
 			{
-				return await albumViewModel.FirstUrl();
+				var previewUrl = await albumViewModel.FirstUrl();
+                if (!cancel.IsCancellationRequested)
+                    SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() => target.HQThumbnailUrl = previewUrl);
 			}
 			catch(TaskCanceledException)
 			{
-				return null;
 			}
 		}
 
-		private static async Task<string> LoadPreview(VideoViewModel videoViewModel, PreviewImage target, CancellationToken cancel)
+		private static async Task LoadPreview(VideoViewModel videoViewModel, PreviewImage target, CancellationToken cancel)
 		{
 			try
 			{
-				return await videoViewModel.StillUrl();
+                var previewUrl = await videoViewModel.StillUrl();
+                if (!cancel.IsCancellationRequested)
+                    SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() => target.HQThumbnailUrl = previewUrl);
 			}
 			catch (TaskCanceledException)
 			{
-				return null;
 			}
 		}
 
-		private static async Task<string> LoadPreview(PlainWebViewModel plainWebViewModel, PreviewText target, CancellationToken cancel)
+		private static async Task LoadPreview(PlainWebViewModel plainWebViewModel, PreviewText target, CancellationToken cancel)
 		{
 			try
 			{
 				target.Synopsis = await plainWebViewModel.FirstParagraph();
-				if (String.IsNullOrEmpty(plainWebViewModel.RedditThumbnail))
-					return await plainWebViewModel.FirstImage();
-				else
-					return null;
+                if (String.IsNullOrEmpty(plainWebViewModel.RedditThumbnail))
+                {
+                    var previewUrl = await plainWebViewModel.FirstImage();
+                    SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() => target.ThumbnailUrl = previewUrl);
+                    target.IsFullyLoaded = true;
+                }
 			}
 			catch(TaskCanceledException)
 			{
-				return null;
 			}
 		}
 
-		private static Task<string> LoadPreview(SelfViewModel selfViewModel, PreviewText target, CancellationToken cancel)
+		private static Task LoadPreview(SelfViewModel selfViewModel, PreviewText target, CancellationToken cancel)
 		{
 			target.Synopsis = selfViewModel.SelfText;
-			return Task.FromResult<string>(null);
+            target.IsFullyLoaded = true;
+            return Task.FromResult<string>(null);
 		}
 
-		private static Task<string> LoadPreview(InternalRedditViewModel internalRedditViewModel, PreviewText target, CancellationToken cancel)
+		private static Task LoadPreview(InternalRedditViewModel internalRedditViewModel, PreviewText target, CancellationToken cancel)
 		{
 			return Task.FromResult<string>(null);
 			//TODO ??

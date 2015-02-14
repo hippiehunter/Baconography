@@ -10,7 +10,7 @@ using namespace std;
 using namespace Platform;
 using namespace SnooStreamBackground;
 using namespace concurrency;
-using namespace Nokia::Graphics::Imaging;
+using namespace Lumia::Imaging;
 using namespace Platform::Collections;
 using namespace Windows::Storage::Streams;
 using namespace Windows::Storage;
@@ -97,11 +97,11 @@ task<void> ImageUtilities::ClearOldTempImages()
     });
 }
 
-task<IImageProvider^> ImageUtilities::GetImageSource(String^ url)
+task<BufferImageSource^> ImageUtilities::GetImageSource(String^ url)
 {
     auto httpClient = ref new HttpClient();
     return create_task(httpClient->GetBufferAsync(ref new Uri(url)))
-        .then([=](task<IBuffer^> bufferTask) -> IImageProvider^
+        .then([=](task<IBuffer^> bufferTask) -> BufferImageSource^
     {
         try
         {
@@ -123,97 +123,116 @@ String^ ImageUtilities::ComputeMD5(String^ str)
     return res;
 }
 
-task<String^> ImageUtilities::MakeTileSizedImage(IImageProvider^ imageSource, String^ url, float height, float width)
+Platform::String^ ImageUtilities::MakeTempFileName(Platform::String^ prefix, Platform::String^ url, int height, int width)
 {
-    try
+    auto widthString = to_wstring((int) width);
+    auto heightString = to_wstring((int) height);
+    return prefix + ref new String(widthString.data(), widthString.size()) + "x" +
+        ref new String(heightString.data(), heightString.size()) + ComputeMD5(url) + ".jpg";
+}
+
+task<String^> ImageUtilities::MakeTileSizedImage(BufferImageSource^ imageSource, String^ targetFileName, float height, float width, Windows::Storage::StorageFolder^ targetFolder)
+{
+    _stat64i32 stat;
+    if (_wstat((targetFolder->Path + L"\\" + targetFileName)->Data(), &stat) == 0)
     {
-        return create_task(imageSource->GetInfoAsync())
-            .then([=](task<ImageProviderInfo^> infoTask)
+
+        return task_from_result<String^>(targetFileName);
+    }
+    else
+    {
+        return create_task(targetFolder->CreateFileAsync(targetFileName, CreationCollisionOption::FailIfExists))
+            .then([=](task<StorageFile^> targetFileTask)
         {
+            auto cleanupTargetFile = [=]()
+            {
+                try
+                {
+                    create_task(targetFileTask.get()->DeleteAsync()).then([=](task<void> tsk)
+                    {
+                        try
+                        {
+                            tsk.get();
+                        }
+                        catch (...) {}
+                    });
+                }
+                catch (...) {}
+            };
+
             try
             {
-                auto imageSize = infoTask.get()->ImageSize;
-                auto filter = ref new FilterEffect(imageSource);
-                auto filters = ref new Vector<IFilter^>();
-
-                auto frameScale = std::min(width / imageSize.Width, height / imageSize.Height);
-                if (frameScale < 1.0)
+                auto targetFile = targetFileTask.get();
+                return create_task(targetFile->OpenAsync(FileAccessMode::ReadWrite))
+                    .then([=](IRandomAccessStream^ targetStream)
                 {
-                    auto targetRatio = width / height;
-                    auto currentRatio = imageSize.Width / imageSize.Height;
-                    auto ratioDifference = std::abs(targetRatio - currentRatio);
-                    if (targetRatio < currentRatio)
+                    return create_task(imageSource->GetInfoAsync())
+                        .then([=](task<ImageProviderInfo^> infoTask)
                     {
-                        filters->Append(ref new ReframingFilter(Rect(0.0, 0.0, imageSize.Width * (targetRatio / currentRatio), imageSize.Height), 0.0));
-                    }
-                    else
-                    {
-                        filters->Append(ref new ReframingFilter(Rect(0.0, 0.0, imageSize.Width, imageSize.Height * (currentRatio / targetRatio)), 0.0));
-                    }
-                }
+                        try
+                        {
+                            auto providerInfo = infoTask.get();
+                            auto imageSize = providerInfo->ImageSize;
+                            
+                            auto filter = ref new FilterEffect(imageSource);
+                            auto filters = ref new Vector<IFilter^>();
 
-                filter->Filters = filters;
-                auto render = ref new JpegRenderer(filter);
-                render->Size = Size(width, height);
-                render->Quality = 0.75;
-                return create_task(render->RenderAsync())
-                    .then([=](task<IBuffer^> jpegBufferTask)
-                {
-                    try
-                    {
-                        auto jpegBuffer = jpegBufferTask.get();
-						delete filter;
-                        auto widthString = to_wstring((int)width);
-                        auto heightString = to_wstring((int)height);
-                        auto targetFileName = L"LiveTile" + ref new String(widthString.data(), widthString.size()) + "x" +
-                            ref new String(heightString.data(), heightString.size()) + ComputeMD5(url) + ".jpg";
-                        
-                        _stat64i32 stat;
-                        if (_wstat((ApplicationData::Current->LocalFolder->Path + L"\\" + targetFileName)->Data(), &stat) == 0)
-                        {
-							
-                            return task_from_result<String^>(targetFileName);
-                        }
-                        else
-                        {
-                            return create_task(ApplicationData::Current->LocalFolder->CreateFileAsync(targetFileName, CreationCollisionOption::FailIfExists))
-                                .then([=](task<StorageFile^> targetFileTask)
+                            auto frameScale = std::min(width / imageSize.Width, height / imageSize.Height);
+                            if (frameScale < 1.0)
+                            {
+                                auto targetRatio = width / height;
+                                auto currentRatio = imageSize.Width / imageSize.Height;
+                                auto ratioDifference = std::abs(targetRatio - currentRatio);
+                                if (targetRatio < currentRatio)
+                                {
+                                    filters->Append(ref new Lumia::Imaging::Transforms::ReframingFilter(Rect(0.0, 0.0, imageSize.Width * (targetRatio / currentRatio), imageSize.Height), 0.0));
+                                }
+                                else
+                                {
+                                    filters->Append(ref new Lumia::Imaging::Transforms::ReframingFilter(Rect(0.0, 0.0, imageSize.Width, imageSize.Height * (currentRatio / targetRatio)), 0.0));
+                                }
+                            }
+
+                            filter->Filters = filters;
+                            auto render = ref new JpegRenderer(filter);
+                            render->Size = Size(width, height);
+                            render->Quality = 0.75;
+
+                            return create_task(render->RenderAsync())
+                                .then([=](task<IBuffer^> jpegBufferTask)
                             {
                                 try
                                 {
-                                    auto targetFile = targetFileTask.get();
-                                    return create_task(targetFile->OpenAsync(FileAccessMode::ReadWrite))
-                                        .then([=](IRandomAccessStream^ targetStream)
+                                    auto jpegBuffer = jpegBufferTask.get();
+                                    return create_task(targetStream->WriteAsync(jpegBuffer))
+                                        .then([=](unsigned int bytesWriten)
                                     {
-                                        return create_task(targetStream->WriteAsync(jpegBuffer))
-                                            .then([=](unsigned int bytesWriten)
-                                        {
-                                            return targetFile->DisplayName;
-                                        });
+                                        return targetFolder->Path + L"\\" + targetFile->DisplayName;
                                     });
                                 }
-                                catch (Exception^ ex)
+                                catch (Platform::Exception^ ex)
                                 {
-                                    return task_from_result<String^>(targetFileName);
+                                    cleanupTargetFile();
+                                    return task_from_exception<String^>(ex);
                                 }
                             });
+
                         }
-                    }
-                    catch (...)
-                    {
-                        return task_from_result<String^>(nullptr);
-                    }
+                        catch (Platform::Exception^ ex)
+                        {
+                            cleanupTargetFile();
+                            return task_from_exception<String^>(ex);
+                        }
+                    });
                 });
             }
-            catch (...)
+            catch (Platform::Exception^ ex)
             {
-                return task_from_result<String^>(nullptr);
+                return task_from_result<String^>(targetFolder->Path + L"\\" + targetFileName);
             }
         });
-    }
-    catch (...)
-    {
-        return task_from_result<String^>(nullptr);
+
+
     }
 }
 
@@ -227,13 +246,8 @@ task<vector<ImageInfo^>> ImageUtilities::MakeLiveTileImages(vector<ImageInfo^> l
         auto targetUrl = get<1>(liveTileTpls[targetIndex]);
         auto targetTitle = get<0>(liveTileTpls[targetIndex]);
         wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
-        auto widthString = to_wstring(310);
-        auto heightString = to_wstring(150);
-        auto wideFileName = L"LiveTile" + ref new String(widthString.data(), widthString.size()) + "x" +
-            ref new String(heightString.data(), heightString.size()) + ComputeMD5(targetUrl) + ".jpg";
-
-        auto squareFileName = L"LiveTile" + ref new String(heightString.data(), heightString.size()) + "x" +
-            ref new String(heightString.data(), heightString.size()) + ComputeMD5(targetUrl) + ".jpg";
+        auto wideFileName = MakeTempFileName(L"LiveTile", targetUrl, 310, 150);
+        auto squareFileName = MakeTempFileName(L"LiveTile", targetUrl, 150, 150);
 
         auto madeImageInfo = ref new ImageInfo(targetUrl, squareFileName, nullptr, wideFileName, history->Age(targetUrl), targetTitle);
         liveTileFiles.push_back(madeImageInfo);
@@ -247,21 +261,26 @@ task<vector<ImageInfo^>> ImageUtilities::MakeLiveTileImages(vector<ImageInfo^> l
         else
         {
             return GetImageSource(targetUrl)
-                .then([=](task<IImageProvider^> imageSourceTask)
+                .then([=](task<BufferImageSource^> imageSourceTask)
             {
 				try
 				{
 					auto imageSource = imageSourceTask.get();
 					if (imageSource != nullptr)
 					{
-						return MakeTileSizedImage(imageSource, targetUrl, 150, 310)
-							.then([=](String^ filePath)
+                        return MakeTileSizedImage(imageSource, wideFileName, 150, 310, Windows::Storage::ApplicationData::Current->LocalFolder)
+							.then([=](task<String^> filePath)
 						{
-							return MakeTileSizedImage(imageSource, targetUrl, 150, 150)
-								.then([=](String^ smallFilePath)
+                            return MakeTileSizedImage(imageSource, squareFileName, 150, 150, Windows::Storage::ApplicationData::Current->LocalFolder)
+								.then([=](task<String^> smallFilePath)
 							{
-								if (filePath == nullptr || smallFilePath == nullptr)
-									madeImageInfo->Faulted = true;
+                                try
+                                {
+                                    if (filePath.get() == nullptr || smallFilePath.get() == nullptr)
+                                        madeImageInfo->Faulted = true;
+                                }
+                                catch (...){};
+								
 								
 								return MakeLiveTileImages(liveTileFiles, history, liveTileTpls, targetCount, targetIndex + 1);
 							});
@@ -283,4 +302,65 @@ task<vector<ImageInfo^>> ImageUtilities::MakeLiveTileImages(vector<ImageInfo^> l
     }
     else
         return concurrency::task_from_result(liveTileFiles);
+}
+
+
+IAsyncOperation<Platform::String^>^ ImageUtilities::MakeSizedImage(Platform::String^ onDiskPrefix, Platform::String^ url, float height, float width)
+{
+    return create_async([=](cancellation_token token)
+    {
+        auto resultFileName = MakeTempFileName(onDiskPrefix, url, (int) height, (int) width);
+        auto fullPath = Windows::Storage::ApplicationData::Current->TemporaryFolder->Path + L"\\" + resultFileName;
+        if (FileExists(fullPath))
+        {
+            return task_from_result(fullPath);
+        }
+        else
+        {
+            auto httpClient = ref new HttpClient();
+            return create_task(httpClient->GetAsync(ref new Uri(url), Windows::Web::Http::HttpCompletionOption::ResponseHeadersRead), token)
+                .then([=](task<Windows::Web::Http::HttpResponseMessage^> responseTask)
+            {
+                try
+                {
+                    auto response = responseTask.get();
+                    response->EnsureSuccessStatusCode();
+                    auto contentLength = response->Content->Headers->ContentLength;
+                    if (contentLength != nullptr && contentLength->Value > 1024 * 1024 * 4)
+                    {
+                        return task_from_exception<IBuffer^>(ref new Platform::OperationCanceledException("object size too large"));
+                    }
+                    return create_task(response->Content->ReadAsBufferAsync(), token);
+                }
+                catch (Platform::Exception^ ex)
+                {
+                    return task_from_exception<IBuffer^>(ex);
+                }
+            }, token)
+                .then([=](task<IBuffer^> bufferTask)
+            {
+                try
+                {
+                    return MakeTileSizedImage(ref new BufferImageSource(bufferTask.get()), resultFileName, height, width, Windows::Storage::ApplicationData::Current->TemporaryFolder);
+                }
+                catch (Platform::Exception^ ex)
+                {
+                    return task_from_exception<Platform::String^>(ex);
+                }
+            }, token);
+        }
+    });
+}
+
+Platform::String^ ImageUtilities::TrySizedImage(Platform::String^ onDiskPrefix, Platform::String^ url, float height, float width)
+{
+    auto resultFileName = MakeTempFileName(onDiskPrefix, url, (int) height, (int) width);
+    if (FileExists(resultFileName))
+    {
+        return resultFileName;
+    }
+    else
+    {
+        return nullptr;
+    }
 }

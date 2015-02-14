@@ -32,7 +32,8 @@ namespace SnooStream.Services
 		IWrappedCollectionViewSource MakeCollectionViewSource(object source);
         void ShareLink(string url, string title, string description);
 		void ShowOAuthBroker();
-	}
+        Task<string> ImagePreviewFromUrl(string url, CancellationToken cancel);
+    }
 
 	public interface IIncrementalCollectionLoader<T>
 	{

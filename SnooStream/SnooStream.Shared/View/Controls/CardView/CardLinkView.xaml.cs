@@ -73,70 +73,24 @@ namespace SnooStream.View.Controls
                     case 1:
                         CurrentLoadPhase++;
                         rootGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                        return true;
-                    case 2:
-                        CurrentLoadPhase++;
                         var finishLoad2 = new Action(async () =>
-                            {
-                                try
-                                {
-                                    var cancelToken = cancelSource.Token;
-                                    var previewControl = await ContentPreviewConverter.MakePreviewControl(DataContext as LinkViewModel, cancelToken, previewSection.Content);
-                                    if (!cancelToken.IsCancellationRequested)
-                                    {
-                                        if (previewSection.Content != previewControl)
-                                            previewSection.Content = previewControl;
-
-                                        args.RegisterUpdateCallback((sender2, args2) => PhaseLoad(sender2, args2));
-                                    }
-                                }
-                                catch (TaskCanceledException)
-                                {
-                                }
-                            });
-                        finishLoad2();
-                        return false;
-                    case 3:
-                        try
                         {
-                            //make sure its ok to load non essential content
-                            if (SnooStreamViewModel.SystemServices.IsLowPriorityNetworkOk)
+                            try
                             {
                                 var cancelToken = cancelSource.Token;
-                                var context = ((Preview)((UserControl)previewSection.Content).DataContext);
-                                var finishLoad3 = new Action(async () =>
-                                    {
-                                        var hqImageUrl = await await SnooStreamViewModel.SystemServices.RunAsyncIdle(() => context.FinishLoad(cancelSource.Token), cancelToken);
-                                        if (string.IsNullOrWhiteSpace(hqImageUrl) || cancelSource.IsCancellationRequested)
-                                            return;
-
-                                        try
-                                        {
-                                            if (previewSection.Content is CardPreviewImageControl)
-                                            {
-                                                var previewImage = previewSection.Content as CardPreviewImageControl;
-                                                var previewUrl = await await SnooStreamViewModel.SystemServices.RunAsyncIdle(() => PlatformImageAcquisition.ImagePreviewFromUrl(hqImageUrl, cancelToken), cancelToken);
-                                                var dataContext = ((Preview)((UserControl)previewSection.Content).DataContext);
-                                                if (!cancelToken.IsCancellationRequested)
-                                                {
-                                                    dataContext.HQThumbnailUrl = previewUrl;
-                                                }
-                                            }
-                                            CurrentLoadPhase++;
-                                        }
-                                        catch (TaskCanceledException)
-                                        {
-                                            //Do nothing
-                                        }
-                                    });
-                                finishLoad3();
+                                var previewControl = await ContentPreviewConverter.MakePreviewControl(DataContext as LinkViewModel, cancelToken, previewSection.Content);
+                                if (!cancelToken.IsCancellationRequested)
+                                {
+                                    if (previewSection.Content != previewControl)
+                                        previewSection.Content = previewControl;
+                                }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            SnooStreamViewModel.Logging.Log(ex);
-                        }
-                        break;
+                            catch (TaskCanceledException)
+                            {
+                            }
+                        });
+                        finishLoad2();
+                        return false;
                 }
             }
 
