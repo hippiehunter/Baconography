@@ -48,9 +48,9 @@
                                     Visibility="{Binding Editing, Converter={StaticResource invertedBooleanVisibilityConverter}}">
                             <TextBlock Text="Subreddit:"
                                         Margin="0,12,0,0" />
-                            <TextBox Margin="100,-1,0,0" Height="40" Style="{StaticResource MessageTextBox}"
+                            <local:AutoCompleteTextBox Margin="100,-1,0,0" Height="40" TextBoxStyle="{StaticResource MessageTextBox}"
                                         BorderThickness="0" Padding="0" FontSize="22"
-                                        Text="{Binding Path=Subreddit, Mode=TwoWay}" KeyUp="TextBox_KeyUp" />
+                                        Text="{Binding Path=Subreddit, Mode=TwoWay}"/>
                             <Border HorizontalAlignment="Stretch" Height="1" BorderThickness=".5"
                                         Margin="0,50,0,0" />
                         </Grid>

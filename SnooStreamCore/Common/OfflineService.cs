@@ -370,7 +370,7 @@ namespace SnooStream.Common
 
         public Task<Thing> GetSubreddit(string name)
         {
-            return Task.Run(() => RetriveBlobImpl<Thing>(name, TimeSpan.FromDays(4096), false));
+            return Task.Run(() => RetriveBlobImpl<Thing>("subreddit:" + name, TimeSpan.FromDays(4096), false));
         }
 
         private Listing AllLinksImpl(string after)
@@ -461,7 +461,7 @@ namespace SnooStream.Common
 
         public Task StoreSubreddit(TypedThing<Subreddit> subreddit)
         {
-            return Task.Run(() => StoreBlobImpl("subreddit:" + subreddit.Data.Name, subreddit, false));
+            return Task.Run(() => StoreBlobImpl("subreddit:" + Reddit.MakePlainSubredditName(subreddit.Data.Url), subreddit, false));
         }
 
         public uint GetHash(string name)

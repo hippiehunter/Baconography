@@ -50,6 +50,7 @@
     <Compile Include="Common\LoggingService.cs" />
     <Compile Include="Common\NotificationService.cs" />
     <Compile Include="Common\PreviewLoadService.cs" />
+    <Compile Include="Common\SearchHelper.cs" />
     <Compile Include="Common\TaskExtensions.cs" />
     <Compile Include="Common\TaskSettings.cs" />
     <Compile Include="Common\ViewModelDumpUtility.cs" />
@@ -94,6 +95,8 @@
     <Compile Include="ViewModel\Popups\InputViewModel.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
     <Compile Include="ViewModel\Activities\ActivityViewModel.cs" />
+    <Compile Include="ViewModel\Search\SubredditSearch.cs" />
+    <Compile Include="ViewModel\Search\UsernameSearch.cs" />
     <Compile Include="ViewModel\SelfStreamViewModel.cs" />
     <Compile Include="ViewModel\Settings\AppearanceSettingsViewModel.cs" />
     <Compile Include="ViewModel\CommentReplyViewModel.cs" />
@@ -110,6 +113,7 @@
     <Compile Include="ViewModel\Settings\SettingsViewModel.cs" />
     <Compile Include="ViewModel\SnooStreamViewModel.cs" />
     <Compile Include="ViewModel\SoloContentStreamViewModel.cs" />
+    <Compile Include="ViewModel\SubredditModerationViewModel.cs" />
     <Compile Include="ViewModel\SubredditRiverViewModel.cs" />
     <Compile Include="ViewModel\UploadViewModel.cs" />
     <Compile Include="ViewModel\VotableViewModel.cs" />

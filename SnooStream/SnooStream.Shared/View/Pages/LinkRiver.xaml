@@ -57,6 +57,8 @@
             </AppBarButton>
             <AppBarButton Icon="Upload" Label="Post" IsEnabled="{Binding IsLoggedIn}" Command="{Binding CreateNewPostCommand}"/>
             <AppBarButton Icon="Find" Label="Find" Command="{Binding FindInSubredditCommand}"/>
+            <AppBarButton Label="Sidebar" Command="{Binding ShowAboutSubreddit}" />
+            <AppBarButton Label="Moderate" Command="{Binding ShowModeration}" Visibility="{Binding IsModerator, Converter={StaticResource booleanVisibilityConverter}}"/>
         </CommandBar>
     </common:SnooApplicationPage.BottomAppBar>
 </common:SnooApplicationPage>

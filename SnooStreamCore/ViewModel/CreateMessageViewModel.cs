@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using SnooStream.ViewModel.Search;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,11 @@ namespace SnooStream.ViewModel
                 return SnooStreamViewModel.RedditService.CurrentUserName;
             }
         }
-        private string _username;
+        public CreateMessageViewModel ()
+	    {
+            UsernameSearch = new UsernameSearch();
+	    }
+        public UsernameSearch UsernameSearch { get; set; }
         private string _topic;
         private string _contents;
         private bool _isReply;
@@ -26,11 +31,11 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return _username;
+                return UsernameSearch.SearchString;
             }
             set
             {
-                _username = value;
+                UsernameSearch.SearchString = value;
                 RaisePropertyChanged("Username");
                 RaisePropertyChanged("IsValid");
             }

@@ -21,6 +21,7 @@ namespace SnooStream.Services
         void NavigateToWeb(string url);
         void NavigateToSearch(SearchViewModel viewModel);
         void NavigateToAboutReddit(AboutRedditViewModel viewModel);
+        void NavigateToSubredditModeration(SubredditModerationViewModel viewModel);
         void NavigateToMultiRedditManagement(LinkRiverViewModel viewModel);
         void NavigateToSubredditCategorizer(LinkRiverViewModel viewModel);
         void NavigateToAboutUser(AboutUserViewModel viewModel);
@@ -35,6 +36,8 @@ namespace SnooStream.Services
         void ValidateStates(HashSet<string> validStates);
         ViewModelBase GetState(String guid);
         void RemoveState(String guid);
+
+
         
     }
 }

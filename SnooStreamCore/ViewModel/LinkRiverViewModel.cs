@@ -35,6 +35,17 @@ namespace SnooStream.ViewModel
             }
         }
 
+        public bool IsModerator
+        {
+            get
+            {
+                if (Thing == null)
+                    return false;
+                else
+                    return Thing.Moderator;
+            }
+        }
+
         public bool IsMultiReddit
         {
             get
@@ -413,6 +424,14 @@ namespace SnooStream.ViewModel
             get
             {
                 return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToSubredditCategorizer(this));
+            }
+        }
+
+        public RelayCommand ShowModeration
+        {
+            get
+            {
+                return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToSubredditModeration(new SubredditModerationViewModel(Thing)));
             }
         }
 

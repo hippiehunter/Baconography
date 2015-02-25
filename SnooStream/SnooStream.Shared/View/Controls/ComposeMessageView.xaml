@@ -28,9 +28,8 @@
                 </Grid>
                 <Grid Grid.Row="1">
                     <TextBlock Text="To:" Margin="0,12,0,0" />
-                    <TextBox Margin="35,-1,0,0" Height="40" Style="{StaticResource MessageTextBox}" BorderThickness="0"
-                            Padding="0" FontSize="22" Text="{Binding Path=Username, Mode=TwoWay}"
-                            KeyUp="TextBox_KeyUp"
+                    <local:AutoCompleteTextBox Margin="35,-1,0,0" Height="40" TextBoxStyle="{StaticResource MessageTextBox}" BorderThickness="0"
+                            Padding="0" FontSize="22" Text="{Binding Path=Username, Mode=TwoWay}" ItemsSource="{Binding UsernameSearch.SearchUserNames}"
                             IsEnabled="{Binding Path=IsReply, Converter={StaticResource invertedBooleanConverter}}" />
                     <Border HorizontalAlignment="Stretch" Height="1" BorderThickness=".5" Margin="0,50,0,0" />
                 </Grid>

@@ -95,6 +95,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="View\Controls\AutoCompleteTextBox.xaml.cs">
+      <DependentUpon>AutoCompleteTextBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Controls\ComboBoxOrPicker.xaml.cs">
       <DependentUpon>ComboBoxOrPicker.xaml</DependentUpon>
     </Compile>
@@ -118,6 +121,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Resources\StyleResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Controls\AutoCompleteTextBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

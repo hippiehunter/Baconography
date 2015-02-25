@@ -141,7 +141,26 @@ namespace SnooStream.PlatformServices
                 {
                     var inputViewModel = viewModel as InputViewModel;
                     var popup = new Flyout();
+#if WINDOWS_PHONE_APP
+                    var inputBox = new AutoSuggestBox { ItemsSource = inputViewModel.SearchOptions, Text = inputViewModel.InputValue };
+                    inputBox.TextChanged += (sender, args) =>
+                        {
+                            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+                                inputViewModel.InputValue = sender.Text;
+                        };
+                    inputBox.SuggestionChosen += (sender, args) =>
+                        {
+                            inputViewModel.InputValue = sender.Text;
+                            popup.Hide();
+                        };
+#else
                     var inputBox = new TextBox { Text = inputViewModel.InputValue };
+#endif
+                    inputBox.KeyDown += (sender, args) =>
+                        {
+                            if (args.Key == VirtualKey.Enter)
+                                popup.Hide();
+                        };
                     var stackPanel = new StackPanel { HorizontalAlignment = HorizontalAlignment.Stretch };
                     stackPanel.Children.Add(new TextBlock { Text = inputViewModel.Prompt });
                     stackPanel.Children.Add(inputBox);
@@ -261,6 +280,12 @@ namespace SnooStream.PlatformServices
         public void NavigateToOAuthLanding(LoginViewModel loginViewModel)
         {
             _frame.Navigate(typeof(OAuthLanding), "state=" + _navState.AddState(loginViewModel));
+        }
+
+
+        public void NavigateToSubredditModeration(SubredditModerationViewModel viewModel)
+        {
+            throw new NotImplementedException();
         }
     }
 }

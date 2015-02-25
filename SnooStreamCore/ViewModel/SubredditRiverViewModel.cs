@@ -20,6 +20,21 @@ namespace SnooStream.ViewModel
 {
     public class SubredditRiverViewModel : ViewModelBase
     {
+        public SubredditRiverViewModel()
+        {
+            _searchHelper = new SearchHelper(() =>
+            {
+                DetachCollection(SearchSubreddits);
+                SearchSubreddits = null;
+                AttachCollection(LocalSubreddits);
+            }, (searchString) =>
+            {
+                SearchSubreddits = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SubreditSearchLoader(searchString, this));
+                DetachCollection(LocalSubreddits);
+                AttachCollection(SearchSubreddits);
+            }, 3, "/");
+        }
+
         public class SubredditGroup
         {
             public string Name { get; set; }
@@ -49,6 +64,8 @@ namespace SnooStream.ViewModel
                         return result;
                     }
                 });
+
+                
             }
 
             public override string ToString()
@@ -117,7 +134,8 @@ namespace SnooStream.ViewModel
 
             void ShowCategoryPicker(object elementTarget)
             {
-                SnooStreamViewModel.NavigationService.ShowPopup(new InputViewModel { Prompt = "Choose a category to group this subreddit", InputValue = Category, Dismissed = new RelayCommand<string>(val => Category = val) }, elementTarget, SnooStreamViewModel.UIContextCancellationToken);
+                SnooStreamViewModel.NavigationService.ShowPopup(new InputViewModel("Choose a category to group this subreddit", Category, _context.SubredditCollection.Select(grp => grp.Name),
+                    new RelayCommand<string>(val => Category = val)), elementTarget, SnooStreamViewModel.UIContextCancellationToken);
             }
 
             public List<CommandViewModel.CommandItem> MakeSubredditManagmentCommands(object elementTarget)
@@ -326,71 +344,22 @@ namespace SnooStream.ViewModel
         }
 
         public LinkRiverViewModel SelectedRiver { get; private set; }
-		private string _searchString;
-		public string SearchString
-		{
-			get
-			{
-				return _searchString;
-			}
-			set
-			{
-				bool wasChanged = _searchString != value;
-				if (wasChanged)
-				{
-					_searchString = value;
-
-					if (_searchString.Length < 3)
-					{
-                        DetachCollection(SearchSubreddits);
-                        SearchSubreddits = null;
-                        AttachCollection(LocalSubreddits);
-						RevokeQueryTimer();
-					}
-					else
-					{
-						RestartQueryTimer();
-					}
-				}
-			}
-		}
-
-		Object _queryTimer;
-		void RevokeQueryTimer()
-		{
-			if (_queryTimer != null)
-			{
-				SnooStreamViewModel.SystemServices.StopTimer(_queryTimer);
-				_queryTimer = null;
-			}
-		}
-
-		void RestartQueryTimer()
-		{
-			// Start or reset a pending query
-			if (_queryTimer == null)
-			{
-				_queryTimer = SnooStreamViewModel.SystemServices.StartTimer(queryTimer_Tick, new TimeSpan(0, 0, 1), true);
-			}
-			else
-			{
-				SnooStreamViewModel.SystemServices.StopTimer(_queryTimer);
-				SnooStreamViewModel.SystemServices.RestartTimer(_queryTimer);
-			}
-		}
-
-		void queryTimer_Tick(object sender, object timer)
-		{
-			// Stop the timer so it doesn't fire again unless rescheduled
-			RevokeQueryTimer();
-
-			if (!(_searchString != null && _searchString.Contains("/")))
-			{
-				SearchSubreddits = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SubreditSearchLoader(_searchString, this));
-                DetachCollection(LocalSubreddits);
-                AttachCollection(SearchSubreddits);
+        private SearchHelper _searchHelper;
+        public string SearchString
+        {
+            get
+            {
+                return _searchHelper.SearchString;
             }
-		}
+            set
+            {
+                _searchHelper.SearchString = value;
+            }
+        }
+
+
+
+		
 
 		private class SubreditSearchLoader : IIncrementalCollectionLoader<SubredditWrapper>
 		{
@@ -489,7 +458,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public SubredditRiverViewModel(SubredditRiverInit initBlob)
+        public SubredditRiverViewModel(SubredditRiverInit initBlob) : this()
         {
             if (initBlob != null && initBlob.Local != null)
             {
