@@ -263,7 +263,7 @@ namespace SnooStream.ViewModel
                 if (queryParts.ContainsKey("sort"))
                     Sort = queryParts["sort"];
                 else
-                    Sort = "hot";
+                    Sort = "confidence";
 
                 BaseUrl = url.Substring(0, url.Length - uri.Query.Length);
                 var lastSlash = BaseUrl.LastIndexOf('/');
@@ -720,7 +720,7 @@ namespace SnooStream.ViewModel
                 else
                     subreddit = Link.Link.Subreddit;
 
-                var listing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(subreddit, (isContext) ? BaseUrl + ContextTargetID + "?context=3" : BaseUrl, null);
+                var listing = await SnooStreamViewModel.RedditService.GetCommentsOnPost(subreddit, (isContext) ? BaseUrl + ContextTargetID : BaseUrl, null, context: isContext ? "3" : null, sort: Sort);
 				lock(this)
 				{
 					var firstChild = listing.Data.Children.FirstOrDefault(thing => thing.Data is Comment);

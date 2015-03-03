@@ -30,7 +30,7 @@
             <TextBlock Grid.Row="0"
                    HorizontalAlignment="Left" TextWrapping="Wrap"
                    Style="{StaticResource SubheaderTextBlockStyle}"
-                   Text="{Binding Title}"
+                   Text="{Binding Title, Mode=OneTime}"
                    TextTrimming="WordEllipsis"
                    MaxHeight="200"
                    MinHeight="50">
@@ -41,7 +41,7 @@
 
             <!-- Link info, user / time / subreddit / domain -->
             <ContentControl x:Name="linkMetadata" Grid.Row="1"
-                            Margin="0,5,0,3"
+                            Margin="0,5,0,3" MinHeight="50"
                             HorizontalAlignment="Stretch" Content="{Binding Converter={StaticResource linkMetadataConverter}}"/>
 
             <!-- Content block -->
@@ -49,7 +49,7 @@
                     BorderThickness="0" Padding="0,0,0,0"
                     VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" Content=""
-                    Command="{Binding GotoLink}">
+                    Command="{Binding GotoLink, Mode=OneTime}">
             </Button>
 
             <!-- Action block, flyout menu / vote / comment count -->
@@ -69,11 +69,11 @@
                     </Grid>
                     <Button.Flyout>
                         <MenuFlyout>
-                            <MenuFlyoutItem Text="Share Link" Command="{Binding Share}"/>
-                            <MenuFlyoutItem Text="Report" Command="{Binding Report}"/>
-                            <MenuFlyoutItem Text="Save" Command="{Binding Save}"/>
-                            <MenuFlyoutItem Text="User Details" Command="{Binding GotoUserDetails}"/>
-                            <MenuFlyoutItem Text="Hide" Command="{Binding Hide}"/>
+                            <MenuFlyoutItem Text="Share Link" Command="{Binding Share, Mode=OneTime}"/>
+                            <MenuFlyoutItem Text="Report" Command="{Binding Report, Mode=OneTime}"/>
+                            <MenuFlyoutItem Text="Save" Command="{Binding Save, Mode=OneTime}"/>
+                            <MenuFlyoutItem Text="User Details" Command="{Binding GotoUserDetails, Mode=OneTime}"/>
+                            <MenuFlyoutItem Text="Hide" Command="{Binding Hide, Mode=OneTime}"/>
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>
@@ -84,7 +84,7 @@
                         HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
                         Margin="0,-12,2,0"
                         BorderThickness="0" Padding="0,0,0,0" 
-                        Command="{Binding GotoComments}" Tapped="Comments_Tapped">
+                        Command="{Binding GotoComments, Mode=OneTime}" Tapped="Comments_Tapped">
                     <local:CommentCountControl />
                 </Button>
             </Grid>
