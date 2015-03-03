@@ -21,7 +21,7 @@
                         <MenuFlyoutItem Text="Top" Command="{Binding SetSortCommand}" CommandParameter="top"/>
                         <MenuFlyoutItem Text="Rising" Command="{Binding SetSortCommand}" CommandParameter="rising"/>
                         <MenuFlyoutItem Text="Controversial" Command="{Binding SetSortCommand}" CommandParameter="controversial"/>
-                        <MenuFlyoutItem Text="Best" Command="{Binding SetSortCommand}" CommandParameter="best"/>
+                        <MenuFlyoutItem Text="Best" Command="{Binding SetSortCommand}" CommandParameter="confidence"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>

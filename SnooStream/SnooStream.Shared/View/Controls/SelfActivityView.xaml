@@ -27,11 +27,11 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock
                                 Grid.ColumnSpan="3"
-                                Text="{Binding FirstActivity.Author}" 
+                                Text="{Binding FirstActivity.Author, Mode=OneTime}" 
                                 FontFamily="Segoe SemiLight"
                                 FontSize="24"/>
                             <Border
-                                Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}}"
+                                Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}, Mode=OneTime}"
                                 Margin="24, 0, 8, 0"
                                 Grid.Row="1"
                                 BorderThickness="3, 0, 0, 0"
@@ -43,19 +43,19 @@
                                     Orientation="Vertical">
                                 <TextBlock
                                         FontWeight="Bold"
-                                        Text="{Binding FirstActivity.PreviewTitle}"/>
+                                        Text="{Binding FirstActivity.PreviewTitle, Mode=OneTime}"/>
                                 <TextBlock
-                                        Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}}"
-                                        Text="{Binding Converter={StaticResource activityGroupCountConverter}}"/>
+                                        Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}, Mode=OneTime}"
+                                        Text="{Binding Converter={StaticResource activityGroupCountConverter}, Mode=OneTime}"/>
                                 <TextBlock
-                                        Visibility="{Binding IsConversation, Converter={StaticResource invertedBooleanVisibilityConverter}}"
-                                        Text="{Binding FirstActivity.PreviewBody}" TextWrapping="Wrap"/>
+                                        Visibility="{Binding IsConversation, Converter={StaticResource invertedBooleanVisibilityConverter}, Mode=OneTime}"
+                                        Text="{Binding FirstActivity.PreviewBody, Mode=OneTime}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <TextBlock
                                 VerticalAlignment="Bottom"
                                 HorizontalAlignment="Right"
                                 Grid.Column="2" 
-                                Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}}"/>
+                                Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}, Mode=OneTime}"/>
                         </Grid>
                     </DataTemplate>
                 </selectors:UserActivityTemplateSelector.HeaderActivityTemplate>
@@ -80,20 +80,20 @@
                                     <ColumnDefinition MinWidth="60" Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock
-                                    Text="{Binding Author}" 
+                                    Text="{Binding Author, Mode=OneTime}" 
                                     FontSize="20" 
                                     FontFamily="Segoe SemiLight"/>
                                 <TextBlock
                                     Grid.ColumnSpan="2"
                                     Grid.Row="1"
-                                    Text="{Binding PreviewBody}"
+                                    Text="{Binding PreviewBody, Mode=OneTime}"
                                     TextWrapping="Wrap"
                                     MaxHeight="108"/>
                                 <TextBlock 
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
                                     Grid.Column="1" 
-                                    Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}}"/>
+                                    Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}, Mode=OneTime}"/>
                             </Grid>
                         </Grid>
                     </DataTemplate>
@@ -110,19 +110,19 @@
                                 <ColumnDefinition MinWidth="60" Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock
-                                Text="{Binding FirstActivity.Author}" 
+                                Text="{Binding FirstActivity.Author, Mode=OneTime}" 
                                 FontSize="20" 
                                 FontFamily="Segoe SemiLight"/>
                             <TextBlock
                                 Grid.Row="1"
-                                Text="{Binding FirstActivity.PreviewBody}"
+                                Text="{Binding FirstActivity.PreviewBody, Mode=OneTime}"
                                 TextWrapping="Wrap"
                                 MaxHeight="108"/>
                             <TextBlock 
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Bottom"
                                 Grid.Column="1" 
-                                Text="{Binding FirstActivity.CreatedUTC, Converter={StaticResource timeRelationConverter}}"/>
+                                Text="{Binding FirstActivity.CreatedUTC, Converter={StaticResource timeRelationConverter}, Mode=OneTime}"/>
                         </Grid>
                     </DataTemplate>
                 </selectors:UserActivityTemplateSelector.SingleActivityTemplate>

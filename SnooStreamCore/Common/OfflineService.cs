@@ -159,8 +159,8 @@ namespace SnooStream.Common
 
 
             var permalink = ((Link)linkThing.Data).Permalink;
-            if (permalink.EndsWith(".json?sort=hot"))
-                permalink = permalink.Replace(".json?sort=hot", "");
+            if (permalink.EndsWith(".json?sort=confidence"))
+                permalink = permalink.Replace(".json?sort=confidence", "");
 
             
             //we can cut down on IO by about 50% by stripping out the HTML bodies of comments since we dont have any need for them
@@ -325,8 +325,8 @@ namespace SnooStream.Common
 
         public Task<Listing> GetTopLevelComments(string permalink, int count)
         {
-            if (permalink.EndsWith(".json?sort=hot"))
-                permalink = permalink.Replace(".json?sort=hot", "");
+            if (permalink.EndsWith(".json?sort=confidence"))
+                permalink = permalink.Replace(".json?sort=confidence", "");
 
             return RetriveBlob<Listing>("comments:" + permalink, TimeSpan.FromDays(4096));
         }
