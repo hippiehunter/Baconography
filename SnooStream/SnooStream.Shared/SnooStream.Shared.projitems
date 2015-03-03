@@ -49,6 +49,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)PlatformServices\MarkdownProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlatformServices\NavigationService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlatformServices\SystemServices.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CancelOperationDialog.xaml.cs">
+      <DependentUpon>CancelOperationDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\CaptchaControl.xaml.cs">
       <DependentUpon>CaptchaControl.xaml</DependentUpon>
     </Compile>
@@ -164,6 +167,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\UserActivityTemplateSelector.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\CancelOperationDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\CaptchaControl.xaml">
       <SubType>Designer</SubType>
     </Page>

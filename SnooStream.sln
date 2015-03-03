@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22609.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SnooDom", "SnooDom", "{266F8396-F853-4C3B-940B-47CDA92B74A7}"
 EndProject
@@ -493,7 +493,6 @@ Global
 		{2C5D86F1-B80F-4483-9E54-5CC2EC729CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C5D86F1-B80F-4483-9E54-5CC2EC729CC2}.Debug|ARM.ActiveCfg = Debug|Any CPU
 		{2C5D86F1-B80F-4483-9E54-5CC2EC729CC2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{2C5D86F1-B80F-4483-9E54-5CC2EC729CC2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{2C5D86F1-B80F-4483-9E54-5CC2EC729CC2}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{2C5D86F1-B80F-4483-9E54-5CC2EC729CC2}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{2C5D86F1-B80F-4483-9E54-5CC2EC729CC2}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -520,7 +519,6 @@ Global
 		{0F1E1261-F934-4CB1-91E9-EEE6A26CF69E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F1E1261-F934-4CB1-91E9-EEE6A26CF69E}.Debug|ARM.ActiveCfg = Debug|Any CPU
 		{0F1E1261-F934-4CB1-91E9-EEE6A26CF69E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{0F1E1261-F934-4CB1-91E9-EEE6A26CF69E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{0F1E1261-F934-4CB1-91E9-EEE6A26CF69E}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{0F1E1261-F934-4CB1-91E9-EEE6A26CF69E}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{0F1E1261-F934-4CB1-91E9-EEE6A26CF69E}.Debug|x86.ActiveCfg = Debug|Any CPU

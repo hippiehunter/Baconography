@@ -179,6 +179,22 @@ namespace SnooStream.PlatformServices
                 else
                     throw new NotImplementedException();
             }
+            else if(viewModel is OperationCancellationViewModel)
+            {
+                var cancelViewModel = viewModel as OperationCancellationViewModel;
+                var popup = new Flyout();
+                popup.Content = new CancelOperationDialog { DataContext = cancelViewModel };
+                popup.Placement = Windows.UI.Xaml.Controls.Primitives.FlyoutPlacementMode.Bottom;
+
+                TaskCompletionSource<bool> completionSource = new TaskCompletionSource<bool>();
+                popup.Closed += (sender, args) =>
+                {
+                    completionSource.TrySetResult(true);
+                };
+
+                popup.ShowAt(Window.Current.Content as FrameworkElement);
+                return completionSource.Task;
+            }
             else
                 throw new NotImplementedException();
         }

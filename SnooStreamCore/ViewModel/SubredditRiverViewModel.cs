@@ -65,7 +65,7 @@ namespace SnooStream.ViewModel
                     }
                 });
 
-                
+
             }
 
             public override string ToString()
@@ -111,7 +111,7 @@ namespace SnooStream.ViewModel
             }
             public int HeaderImageWidth { get { return GetHeaderSizeOrDefault(true); } }
             public int HeaderImageHeight { get { return GetHeaderSizeOrDefault(false); } }
-        
+
             private Lazy<LinkRiverViewModel> _linkRiver;
             public LinkRiverViewModel LinkRiver
             {
@@ -216,7 +216,7 @@ namespace SnooStream.ViewModel
 
             }
         }
-		static ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooStreamViewModel>();
+        static ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooStreamViewModel>();
         Dictionary<string, LinkRiverViewModel> _madeSubreddits = new Dictionary<string, LinkRiverViewModel>();
         ObservableCollection<SubredditGroup> _subredditCollection;
         public ObservableCollection<SubredditGroup> SubredditCollection
@@ -238,7 +238,7 @@ namespace SnooStream.ViewModel
                 existingSubreddit.ProcessLinkThings(initialLinks);
                 existingSubreddit.LastRefresh = lastRefreshed;
                 return existingSubreddit;
-            } 
+            }
             else
             {
                 var result = new LinkRiverViewModel(this, category, thing, sort, initialLinks, lastRefreshed);
@@ -359,67 +359,67 @@ namespace SnooStream.ViewModel
 
 
 
-		
 
-		private class SubreditSearchLoader : IIncrementalCollectionLoader<SubredditWrapper>
-		{
-			string _afterSearch = "";
-			string _afterUri = "";
-			string _searchString;
-			bool _hasLoaded = false;
+
+        private class SubreditSearchLoader : IIncrementalCollectionLoader<SubredditWrapper>
+        {
+            string _afterSearch = "";
+            string _afterUri = "";
+            string _searchString;
+            bool _hasLoaded = false;
             SubredditRiverViewModel _context;
 
             public SubreditSearchLoader(string searchString, SubredditRiverViewModel context)
-			{
+            {
                 _context = context;
-				_searchString = searchString;
-			}
+                _searchString = searchString;
+            }
 
             public void Attach(ObservableCollection<SubredditWrapper> targetCollection) { }
 
             public Task AuxiliaryItemLoader(IEnumerable<SubredditWrapper> items, int timeout)
-			{
-				return Task.FromResult(true);
-			}
+            {
+                return Task.FromResult(true);
+            }
 
-			public bool IsStale
-			{
-				get { return false; }
-			}
+            public bool IsStale
+            {
+                get { return false; }
+            }
 
-			public bool HasMore()
-			{
-				return !_hasLoaded || !string.IsNullOrWhiteSpace(_afterSearch);
-			}
+            public bool HasMore()
+            {
+                return !_hasLoaded || !string.IsNullOrWhiteSpace(_afterSearch);
+            }
 
             public async Task<IEnumerable<SubredditWrapper>> LoadMore()
-			{
-				_hasLoaded = true;
+            {
+                _hasLoaded = true;
                 var result = new List<SubredditWrapper>();
-				if (string.IsNullOrWhiteSpace(_afterSearch))
-				{
-					var searchListing = await SnooStreamViewModel.RedditService.Search(_searchString, null, true, null);
-					if (searchListing != null)
-					{
-						_afterUri = searchListing.Item1;
-						_afterSearch = searchListing.Item2.Data.After;
-						foreach (var subreddit in searchListing.Item2.Data.Children)
-						{
+                if (string.IsNullOrWhiteSpace(_afterSearch))
+                {
+                    var searchListing = await SnooStreamViewModel.RedditService.Search(_searchString, null, true, null);
+                    if (searchListing != null)
+                    {
+                        _afterUri = searchListing.Item1;
+                        _afterSearch = searchListing.Item2.Data.After;
+                        foreach (var subreddit in searchListing.Item2.Data.Children)
+                        {
                             MakeSubreddit(result, subreddit, "");
                         }
-					}
-				}
-				else
-				{
-					var searchListing = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(_afterUri, _afterSearch);
-					_afterSearch = searchListing.Data.After;
-					foreach (var subreddit in searchListing.Data.Children)
+                    }
+                }
+                else
+                {
+                    var searchListing = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(_afterUri, _afterSearch);
+                    _afterSearch = searchListing.Data.After;
+                    foreach (var subreddit in searchListing.Data.Children)
                     {
                         MakeSubreddit(result, subreddit, "");
                     }
                 }
-				return result;
-			}
+                return result;
+            }
 
             private void MakeSubreddit(List<SubredditWrapper> result, Thing subreddit, string category)
             {
@@ -430,16 +430,16 @@ namespace SnooStream.ViewModel
             }
 
             public Task Refresh(ObservableCollection<SubredditWrapper> current, bool onlyNew)
-			{
-				throw new NotImplementedException();
-			}
+            {
+                throw new NotImplementedException();
+            }
 
 
-			public string NameForStatus
-			{
-				get { return "subreddit search result"; }
-			}
-		}
+            public string NameForStatus
+            {
+                get { return "subreddit search result"; }
+            }
+        }
 
         private bool _isShowingGroups = false;
         public bool IsShowingGroups
@@ -450,7 +450,7 @@ namespace SnooStream.ViewModel
             }
             set
             {
-                if(_isShowingGroups != value)
+                if (_isShowingGroups != value)
                 {
                     _isShowingGroups = value;
                     RaisePropertyChanged("IsShowingGroups");
@@ -463,7 +463,7 @@ namespace SnooStream.ViewModel
             if (initBlob != null && initBlob.Local != null)
             {
                 LocalSubreddits = new ObservableCollection<SubredditWrapper>();
-                foreach(var local in initBlob.Local.Select(blob => new SubredditWrapper(this, blob.Thing.Url, blob.Thing, blob.DefaultSort, blob.Category ?? "pinned")))
+                foreach (var local in initBlob.Local.Select(blob => new SubredditWrapper(this, blob.Thing.Url, blob.Thing, blob.DefaultSort, blob.Category ?? "pinned")))
                 {
                     AddToLocalSubreddits(local);
                 }
@@ -514,22 +514,25 @@ namespace SnooStream.ViewModel
 
         private async void LoadWithoutInitial()
         {
-            Listing subscribedListing = null;
-            string categoryName = "subscribed";
-            if (IsLoggedIn)
+            await SnooStreamViewModel.NotificationService.Report("loading subreddits", async () =>
             {
-                subscribedListing = await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing();
-            }
-            else
-            {
-                categoryName = "popular";
-                subscribedListing = await SnooStreamViewModel.RedditService.GetSubreddits(25, "popular");
-            }
+                Listing subscribedListing = null;
+                string categoryName = "subscribed";
+                if (IsLoggedIn)
+                {
+                    subscribedListing = await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing();
+                }
+                else
+                {
+                    categoryName = "popular";
+                    subscribedListing = await SnooStreamViewModel.RedditService.GetSubreddits(25, "popular");
+                }
 
-            foreach (var river in subscribedListing.Data.Children.Select(thing => new SubredditWrapper(this, ((Subreddit)thing.Data).Url, thing.Data as Subreddit, "hot", categoryName)))
-            {
-                AddToLocalSubreddits(river);
-            }
+                foreach (var river in subscribedListing.Data.Children.Select(thing => new SubredditWrapper(this, ((Subreddit)thing.Data).Url, thing.Data as Subreddit, "hot", categoryName)))
+                {
+                    AddToLocalSubreddits(river);
+                }
+            });
         }
 
         private async void ReloadSubscribed(bool required)
@@ -539,61 +542,61 @@ namespace SnooStream.ViewModel
 
             if (!required)
             {
-				if (SnooStreamViewModel.SystemServices == null)
-					await Task.Delay(1000);
-				//dump out something is very wrong
-				if (SnooStreamViewModel.SystemServices == null)
-					return;
+                if (SnooStreamViewModel.SystemServices == null)
+                    await Task.Delay(1000);
+                //dump out something is very wrong
+                if (SnooStreamViewModel.SystemServices == null)
+                    return;
 
                 if (!SnooStreamViewModel.SystemServices.IsLowPriorityNetworkOk)
                     return;
                 else
                     await Task.Delay(10000);
             }
-			try
-			{
-				var subscribedListing = await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing();
+            try
+            {
+                var subscribedListing = await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing();
 
-				var newRivers = new Dictionary<string, Subreddit>();
-				foreach (var subreddit in subscribedListing.Data.Children)
-				{
-					if (subreddit.Data is Subreddit && !newRivers.ContainsKey(((Subreddit)subreddit.Data).Id))
-						newRivers.Add(((Subreddit)subreddit.Data).Id, ((Subreddit)subreddit.Data));
-				}
+                var newRivers = new Dictionary<string, Subreddit>();
+                foreach (var subreddit in subscribedListing.Data.Children)
+                {
+                    if (subreddit.Data is Subreddit && !newRivers.ContainsKey(((Subreddit)subreddit.Data).Id))
+                        newRivers.Add(((Subreddit)subreddit.Data).Id, ((Subreddit)subreddit.Data));
+                }
 
                 var missingRivers = new List<SubredditWrapper>();
                 var existingRivers = new Dictionary<string, SubredditWrapper>();
                 foreach (var river in LocalSubreddits)
-				{
-					//ignore the frontpage
-					if (string.IsNullOrWhiteSpace(river.Thing.Id))
-						continue;
+                {
+                    //ignore the frontpage
+                    if (string.IsNullOrWhiteSpace(river.Thing.Id))
+                        continue;
 
-					if (!existingRivers.ContainsKey(river.Thing.Id))
-						existingRivers.Add(river.Thing.Id, river);
+                    if (!existingRivers.ContainsKey(river.Thing.Id))
+                        existingRivers.Add(river.Thing.Id, river);
 
-					if (river.Category != "subscribed" && !newRivers.ContainsKey(river.Thing.Id))
-						missingRivers.Add(river);
-					else if (newRivers.ContainsKey(river.Thing.Id))
-						river.Thing = newRivers[river.Thing.Id];
-				}
+                    if (river.Category != "subscribed" && !newRivers.ContainsKey(river.Thing.Id))
+                        missingRivers.Add(river);
+                    else if (newRivers.ContainsKey(river.Thing.Id))
+                        river.Thing = newRivers[river.Thing.Id];
+                }
 
 
-				foreach (var subredditTpl in newRivers)
-				{
-					if (!existingRivers.ContainsKey(subredditTpl.Key))
+                foreach (var subredditTpl in newRivers)
+                {
+                    if (!existingRivers.ContainsKey(subredditTpl.Key))
                         AddToLocalSubreddits(new SubredditWrapper(this, subredditTpl.Value.Url, subredditTpl.Value, "hot", "subscribed"));
-				}
+                }
 
-				foreach (var missingRiver in missingRivers)
-				{
+                foreach (var missingRiver in missingRivers)
+                {
                     LocalSubreddits.Remove(missingRiver);
-				}
-			}
-			catch (Exception ex)
-			{
-				_logger.Error("failed refreshing subscribed subreddits", ex);
-			}
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("failed refreshing subscribed subreddits", ex);
+            }
         }
 
         public void PinSubreddit(LinkRiverViewModel linkRiver)
@@ -601,14 +604,14 @@ namespace SnooStream.ViewModel
             AddToLocalSubreddits(new SubredditWrapper(this, linkRiver.Thing.Url, linkRiver.Thing, linkRiver.Sort, string.IsNullOrWhiteSpace(linkRiver.Category) ? "pinned" : linkRiver.Category));
         }
 
-		internal SubredditRiverInit Dump()
-		{
-			return new SubredditRiverInit
-			{
+        internal SubredditRiverInit Dump()
+        {
+            return new SubredditRiverInit
+            {
                 Local = LocalSubreddits
-					.Select(vm => vm.LinkRiver.Dump())
-					.ToList()
-			};
-		}
-	}
+                    .Select(vm => vm.LinkRiver.Dump())
+                    .ToList()
+            };
+        }
+    }
 }

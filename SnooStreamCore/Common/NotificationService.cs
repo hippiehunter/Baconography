@@ -1,10 +1,12 @@
 ﻿using GalaSoft.MvvmLight;
 using MetroLog;
+using SnooSharp;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -99,6 +101,37 @@ namespace SnooStream.Common
 
         }
 
+        DateTime _lastErrorTime = new DateTime();
+
+        private void MaybeShowError(string message)
+        {
+            if ((DateTime.Now - _lastErrorTime).TotalSeconds > 10)
+            {
+                SnooStreamViewModel.SystemServices.ShowMessage("Error", message);
+                _lastErrorTime = DateTime.Now;
+            }
+        }
+
+        private void ProcessFailure(Exception ex, string message)
+        {
+            if (!SnooStreamViewModel.SystemServices.IsHighPriorityNetworkOk)
+            {
+                MaybeShowError("Network unavailable at this time please try again later");
+            }
+            else if (ex is RedditNotFoundException)
+            {
+                MaybeShowError(message + " reported " + ex.Message);
+            }
+            else if (ex is RedditException)
+            {
+                MaybeShowError(message + " reported " + ex.Message);
+            }
+            else
+            {
+                _logger.Error("failed in reporting: " + message, ex);
+            }
+        }
+
         public async Task Report(string message, Func<Task> operation)
         {
             var notificationInfo = new NotificationInfo { Text = message, Progress = -1 };
@@ -109,7 +142,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-				_logger.Error("failed getting web content", ex);
+                ProcessFailure(ex, message);
             }
             finally
             {
@@ -132,7 +165,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-				_logger.Error("failed getting web content", ex);
+                ProcessFailure(ex, message);
             }
             finally
             {
@@ -148,7 +181,7 @@ namespace SnooStream.Common
                 AddNotificationInfo(notificationInfo);
                 CancellationTokenSource cancelationTokenSource = new CancellationTokenSource();
                 var opTask = operation(cancelationTokenSource.Token);
-                if (await Task.WhenAny(opTask, Task.Delay(1500, cancelationTokenSource.Token)) == opTask)
+                if (await Task.WhenAny(opTask, Task.Delay(2500, cancelationTokenSource.Token)) == opTask)
                 {
                     // task completed within timeout
                     cancelationTokenSource.Cancel();
@@ -157,7 +190,8 @@ namespace SnooStream.Common
                 {
                     // timeout logic
                     //show cancel dialog
-                    await opTask;
+                    await Task.WhenAny(SnooStreamViewModel.NavigationService.ShowPopup(new OperationCancellationViewModel(message, cancelationTokenSource), null, cancelationTokenSource.Token), opTask);
+                    cancelationTokenSource.Cancel();
                 }
             }
             catch (TaskCanceledException)
@@ -166,7 +200,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-				_logger.Info("Task Failed: " + message, ex);
+                ProcessFailure(ex, message);
             }
             finally
             {
