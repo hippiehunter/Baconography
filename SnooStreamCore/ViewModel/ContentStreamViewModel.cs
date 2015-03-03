@@ -14,8 +14,12 @@ namespace SnooStream.ViewModel
         private static async void DelayContentStreamAddition(IEnumerable<ILinkViewModel> rawBefore, ObservableCollection<ILinkViewModel> target)
         {
             await Task.Delay(100);
+            int insertCount = 0;
             foreach (var raw in rawBefore.Reverse())
             {
+                //if you dont give the list enough time to bind it thinks all of these insert(0,bla) are currently visible so delay the first couple
+                if (insertCount++ < 5)
+                    await Task.Delay(50);
                 target.Insert(0, raw);
             }
         }
@@ -43,7 +47,7 @@ namespace SnooStream.ViewModel
             ObservableCollection<ILinkViewModel> filteredCollection = new ObservableCollection<ILinkViewModel>(filteredList.Skip(selectedIndex));
             if(selectedIndex > 0)
             {
-                var rawBefore = filteredList.Take(selectedIndex - 1);
+                var rawBefore = filteredList.Take(selectedIndex);
                 DelayContentStreamAddition(rawBefore, filteredCollection);
             }
 
