@@ -13,6 +13,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)LiveTileUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ActivityManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FileUtilities.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)task_helper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">

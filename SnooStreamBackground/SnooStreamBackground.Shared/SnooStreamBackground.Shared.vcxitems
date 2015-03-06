@@ -30,6 +30,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)NetworkUtilities.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SimpleRedditService.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)task_helper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)FileUtilities.cpp" />

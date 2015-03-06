@@ -19,7 +19,7 @@ namespace SnooStreamBackground
         static concurrency::task<Lumia::Imaging::BufferImageSource^> GetImageSource(Platform::String^ url);
         static Platform::String^ ComputeMD5(Platform::String^ str);
         static Platform::String^ MakeTempFileName(Platform::String^ prefix, Platform::String^ url, int height, int width);
-        static concurrency::task<Platform::String^> MakeTileSizedImage(Lumia::Imaging::BufferImageSource^ imageSource, Platform::String^ url, float height, float width, Windows::Storage::StorageFolder^ targetFolder);
+        static concurrency::task<Platform::String^> MakeTileSizedImage(Lumia::Imaging::BufferImageSource^ imageSource, Platform::String^ url, float height, float width, Windows::Storage::StorageFolder^ targetFolder, concurrency::cancellation_token token);
         static concurrency::task<void> ClearOldTempImages();
     };
 
