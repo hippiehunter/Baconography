@@ -11,12 +11,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-    public class LoginViewModel : ViewModelBase
+    public class LoginViewModel : ViewModelBase, ICancellableViewModel
     {
+        CancellationToken _token;
 		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<LoginViewModel>();
         public LoginViewModel()
         {
@@ -247,7 +249,7 @@ namespace SnooStream.ViewModel
                 Finished = false;
                 SnooStreamViewModel.NavigationService.NavigateToOAuthLanding(this);
                 Working = true;
-                var oAuth = await SnooStreamViewModel.RedditService.RequestGrantCode(code);
+                var oAuth = await SnooStreamViewModel.RedditService.RequestGrantCode(code, _token);
                 SnooStreamViewModel.RedditUserState.OAuth = oAuth;
                 var currentAccount = await SnooStreamViewModel.RedditService.GetIdentity();
                 ResultText = "Successfully logged in as " + currentAccount.Name;
@@ -274,6 +276,12 @@ namespace SnooStream.ViewModel
                 Finished = true;
             }
 		}
+
+        public bool BindToken(CancellationToken token)
+        {
+            _token = token;
+            return true;
+        }
 
         public RelayCommand DoLogout { get { return new RelayCommand(Logout); } }
         public RelayCommand DoLogin { get { return new RelayCommand(Login); } }

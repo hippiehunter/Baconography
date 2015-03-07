@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Windows.Graphics.Display;
@@ -107,6 +108,8 @@ namespace SnooStream.Common
         }
 
         private bool _orientationLocked = false;
+        private bool _cancelForward = false;
+        private CancellationTokenSource _cancelTokenSource = new CancellationTokenSource();
         private void OnSettingsChanged(SettingsChangedMessage message)
         {
             _orientationLocked = SnooStreamViewModel.Settings.OrientationLock;
@@ -135,6 +138,9 @@ namespace SnooStream.Common
         {
             base.OnNavigatedFrom(e);
             Window.Current.SizeChanged -= sizeChanged;
+            if (e.NavigationMode == NavigationMode.Back || _cancelForward)
+                _cancelTokenSource.Cancel();
+
         }
 
         string _stateGuid;
@@ -168,6 +174,10 @@ namespace SnooStream.Common
 					{
                         ((IRefreshable)_dataContext).MaybeRefresh();
 					}
+                    if (_dataContext is ICancellableViewModel)
+                    {
+                        _cancelForward = ((ICancellableViewModel)_dataContext).BindToken(_cancelTokenSource.Token);
+                    }
 				}
 
                 if (DataContext != null && e.NavigationMode == NavigationMode.Back)
