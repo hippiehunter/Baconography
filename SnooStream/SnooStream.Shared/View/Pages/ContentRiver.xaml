@@ -4,6 +4,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream.View.Pages"
     xmlns:common="using:SnooStream.Common"
+	xmlns:selector="using:SnooStream.View.Selectors"
+	xmlns:content="using:SnooStream.View.Controls.Content"
+	xmlns:controls="using:SnooStream.View.Controls"
+	xmlns:gif="using:GifRenderer"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -24,9 +28,50 @@
                     Duration="0:0:0.25"
                     From="1" To="0"/>
         </Storyboard>
+        <selector:ContentTemplateSelector x:Name="contentSelector">
+            <selector:ContentTemplateSelector.ImageContainerTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <controls:OverlayControl />
+                        <gif:ZoomableImageControl Grid.Row="1" DataContext="{Binding Content.Url}" />
+                    </Grid>
+                </DataTemplate>
+            </selector:ContentTemplateSelector.ImageContainerTemplate>
+            <selector:ContentTemplateSelector.AlbumViewTemplate>
+                <DataTemplate>
+                    <content:AlbumControl DataContext="{Binding Content}"/>
+                </DataTemplate>
+            </selector:ContentTemplateSelector.AlbumViewTemplate>
+            <selector:ContentTemplateSelector.VideoTemplate>
+                <DataTemplate>
+                    <content:VideoControl DataContext="{Binding Content}"/>
+                </DataTemplate>
+            </selector:ContentTemplateSelector.VideoTemplate>
+            <selector:ContentTemplateSelector.PlainWebTemplate>
+                <DataTemplate>
+                    <content:PlainWebControl DataContext="{Binding Content}"/>
+                </DataTemplate>
+            </selector:ContentTemplateSelector.PlainWebTemplate>
+
+            <selector:ContentTemplateSelector.CommentsViewTemplate>
+                <DataTemplate>
+                    <controls:CommentsView DataContext="{Binding Content}"/>
+                </DataTemplate>
+            </selector:ContentTemplateSelector.CommentsViewTemplate>
+
+            <selector:ContentTemplateSelector.SelfViewTemplate>
+                <DataTemplate>
+                    <controls:CommentsView DataContext="{Binding Content.Comments}" />
+                </DataTemplate>
+            </selector:ContentTemplateSelector.SelfViewTemplate>
+        </selector:ContentTemplateSelector>
     </common:SnooApplicationPage.Resources>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <FlipView x:Name="flipView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <FlipView x:Name="flipView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemTemplateSelector="{Binding Selector, Source={StaticResource contentSelector}}">
             <FlipView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel Orientation="Horizontal" VirtualizingStackPanel.VirtualizationMode="Standard"/>
@@ -38,11 +83,6 @@
                     <Setter Property="VerticalContentAlignment" Value="Stretch" />
                 </Style>
             </FlipView.ItemContainerStyle>
-            <FlipView.ItemTemplate>
-                <DataTemplate>
-                    <ContentControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="{Binding Converter={StaticResource contentConverter}}"/>
-                </DataTemplate>
-            </FlipView.ItemTemplate>
         </FlipView>
     </Grid>
     <common:SnooApplicationPage.BottomAppBar>

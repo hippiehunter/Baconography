@@ -32,12 +32,6 @@
             <m2:Task Type="deviceUse" />
           </BackgroundTasks>
         </Extension>
-        <Extension Category="windows.backgroundTasks" EntryPoint="SnooDomBackground.ServicingBackgroundTask">
-          <BackgroundTasks>
-            <Task Type="systemEvent" />
-            <Task Type="pushNotification" />
-          </BackgroundTasks>
-        </Extension>
       </Extensions>
     </Application>
   </Applications>

@@ -93,15 +93,14 @@ namespace SnooStream.View.Pages
 
         private T FindContentType<T>(FlipViewItem itemContainer) where T : class
         {
-            var itemContentControl = itemContainer.ContentTemplateRoot as ContentControl;
-            if (itemContentControl != null)
-            {
-                var nestedContentControl = itemContentControl.ContentTemplateRoot as T;
-                if (nestedContentControl != null)
-                {
-                    return nestedContentControl as T;
-                }
-            }
+			if (itemContainer != null)
+			{
+				var itemContentControl = itemContainer.ContentTemplateRoot as T;
+				if (itemContentControl != null)
+				{
+					return itemContentControl;
+				}
+			}
             return null;
         }
 

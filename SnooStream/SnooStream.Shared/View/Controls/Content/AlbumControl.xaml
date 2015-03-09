@@ -22,7 +22,7 @@
                   SelectionChanged="albumSlideView_SelectionChanged" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.IsVerticalRailEnabled="True">
             <FlipView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <VirtualizingStackPanel Orientation="Vertical" VirtualizingStackPanel.VirtualizationMode="Recycling"/>
+                    <VirtualizingStackPanel Orientation="Vertical" VirtualizingStackPanel.VirtualizationMode="Standard"/>
                 </ItemsPanelTemplate>
             </FlipView.ItemsPanel>
             <FlipView.ItemContainerStyle>

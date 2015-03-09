@@ -69,6 +69,10 @@ namespace task_helper
 			{
 				return concurrency::task_from_exception<void>(ex);
 			}
+			catch (...)
+			{
+				return errorHandler(ref new Platform::Exception(1337, "unknown exception"));
+			}
 		});
 	}
 
@@ -93,6 +97,10 @@ namespace task_helper
 			{
 				return errorHandler(ex);
 			}
+			catch (...)
+			{
+				return errorHandler(ref new Platform::Exception(1337, "unknown exception"));
+			}
 		});
 	}
 
@@ -115,6 +123,10 @@ namespace task_helper
 			catch (Platform::Exception^ ex)
 			{
 				return errorHandler(ex);
+			}
+			catch (...)
+			{
+				return errorHandler(ref new Platform::Exception(1337, "unknown exception"));
 			}
 		});
 	}
@@ -141,6 +153,10 @@ namespace task_helper
 			{
 				return errorHandler(ex);
 			}
+			catch (...)
+			{
+				return errorHandler(ref new Platform::Exception(1337, "unknown exception"));
+			}
 		});
 	}
 
@@ -165,6 +181,10 @@ namespace task_helper
 			{
 				return errorHandler(ex);
 			}
+			catch (...)
+			{
+				return errorHandler(ref new Platform::Exception(1337, "unknown exception"));
+			}
 		});
 	}
 
@@ -188,6 +208,10 @@ namespace task_helper
 			{
 				return errorHandler(ex);
 			}
+			catch (...)
+			{
+				return errorHandler(ref new Platform::Exception(1337, "unknown exception"));
+			}
 		});
 	}
 
@@ -208,6 +232,10 @@ namespace task_helper
 			catch (Platform::Exception^ ex)
 			{
 				errorHandler(ex);
+			}
+			catch (...)
+			{
+				errorHandler(ref new Platform::Exception(1337, "unknown exception"));
 			}
 		});
 	}

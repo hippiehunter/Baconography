@@ -17,11 +17,11 @@
     <SynthesizeLinkMetadata>true</SynthesizeLinkMetadata>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>41f840f1</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>8c9f00f0</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <EnableProjectNCompatibleProfile>false</EnableProjectNCompatibleProfile>
-    <AppxBundlePlatforms>arm</AppxBundlePlatforms>
     <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>arm</AppxBundlePlatforms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -170,6 +170,9 @@
     <SDKReference Include="Microsoft.PlayerFramework.Xaml, Version=2.0.0.0">
       <Name>Microsoft Player Framework</Name>
     </SDKReference>
+    <SDKReference Include="Microsoft.VCLibs, Version=12.0">
+      <Name>Microsoft Visual C++ 2013 Runtime Package for Windows Phone</Name>
+    </SDKReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight, Version=5.1.0.21498, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
@@ -217,10 +220,10 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\KitaroDB.2.2.1\build\wpa81\KitaroDB.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\KitaroDB.2.2.1\build\wpa81\KitaroDB.targets'))" />
-    <Error Condition="!Exists('..\..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets'))" />
+    <Error Condition="!Exists('..\..\packages\LumiaImagingSDK.2.0.208\build\wpa81\LumiaImagingSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LumiaImagingSDK.2.0.208\build\wpa81\LumiaImagingSDK.targets'))" />
   </Target>
   <Import Project="..\..\packages\KitaroDB.2.2.1\build\wpa81\KitaroDB.targets" Condition="Exists('..\..\packages\KitaroDB.2.2.1\build\wpa81\KitaroDB.targets')" />
-  <Import Project="..\..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets" Condition="Exists('..\..\packages\LumiaImagingSDK.2.0.184\build\wpa81\LumiaImagingSDK.targets')" />
+  <Import Project="..\..\packages\LumiaImagingSDK.2.0.208\build\wpa81\LumiaImagingSDK.targets" Condition="Exists('..\..\packages\LumiaImagingSDK.2.0.208\build\wpa81\LumiaImagingSDK.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

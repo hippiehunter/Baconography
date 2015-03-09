@@ -162,6 +162,7 @@
       <DependentUpon>SnooHubMark2.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\CommentTemplateSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\ContentTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\DataTemplateSelectorControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\TypedTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\UserActivityTemplateSelector.cs" />
