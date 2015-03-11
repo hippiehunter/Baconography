@@ -23,37 +23,6 @@ namespace SnooStream.Common
     class PlatformImageAcquisition : ImageAcquisition
     {
 		static protected ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<ImageAcquisition>();
-		
-		public static string ComputeMD5(string str)
-		{
-			var alg = HashAlgorithmProvider.OpenAlgorithm("MD5");
-			IBuffer buff = CryptographicBuffer.ConvertStringToBinary(str, BinaryStringEncoding.Utf8);
-			var hashed = alg.HashData(buff);
-			var res = CryptographicBuffer.EncodeToHexString(hashed);
-			return res;
-		}
-
-		private static void RegisterCancel(CancellationToken cancelToken, IAsyncInfo asyncOperation)
-		{
-			WeakReference<object> _weakRef = new WeakReference<object>(asyncOperation);
-			cancelToken.Register(() =>
-				{
-					try
-					{
-						object target;
-						if (_weakRef.TryGetTarget(out target))
-						{
-                            if(target is IAsyncInfo)
-							    ((IAsyncInfo)target).Cancel();
-						}
-						_weakRef = null;
-					}
-					catch 
-					{
-						_weakRef = null;
-					}
-				});
-		}
 
 		public static async Task<String> ImagePreviewFromUrl(string url, CancellationToken cancelToken)
 		{

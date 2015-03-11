@@ -24,6 +24,20 @@ namespace SnooStream.View.Pages
 			InitializeComponent();
 		}
 
+        public static void Shuffle<T>(IList<T> list)
+        {
+            Random rng = new Random();
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
+
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -40,7 +54,7 @@ namespace SnooStream.View.Pages
 
 				if (taskHistory.LockScreenImages.Count >= 1)
                 {
-					BackgroundTaskManager.Shuffle(taskHistory.LockScreenImages);
+					Shuffle(taskHistory.LockScreenImages);
 					vm.LockScreen.SelectedImage = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + taskHistory.LockScreenImages.First().OriginalUrl;
                 }
                 else
