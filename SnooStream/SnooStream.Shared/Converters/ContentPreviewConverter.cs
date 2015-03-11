@@ -54,7 +54,7 @@ namespace SnooStream.Converters
                 }
                 else
                 {
-                    return new CardPreviewTextControl { DataContext = preview };
+                    return new CardPreviewTextControl { DataContext = preview, MaxHeight = 175 };
                 }
 			}
 			else if (preview is PreviewImage)

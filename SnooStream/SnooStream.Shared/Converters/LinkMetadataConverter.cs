@@ -21,9 +21,10 @@ namespace SnooStream.Converters
 			var pp = new Paragraph();
 			rtb.IsTextSelectionEnabled = false;
 			rtb.Blocks.Add(pp);
+			rtb.FontFamily = new FontFamily("Calibri");
 			rtb.FontSize = 14;
 			rtb.FontStyle = Windows.UI.Text.FontStyle.Normal;
-			rtb.FontWeight = FontWeights.Normal;
+			rtb.FontWeight = FontWeights.SemiBold;
 			List<Inline> inlinesCollection = new List<Inline>();
 			
 			var subredditLink = new Run { Text = linkViewModel.Link.Subreddit };

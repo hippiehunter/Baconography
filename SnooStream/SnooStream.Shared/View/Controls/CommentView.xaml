@@ -10,10 +10,7 @@
 
     <UserControl.Resources>
         <DataTemplate x:Name="textTemplate">
-            <TextBlock x:Name="plainTextControl"
-                       FontFamily="Segoe WP" FontSize="17" FontWeight="Normal" FontStyle="Normal"
-                        HorizontalAlignment="Left" TextWrapping="WrapWholeWords"
-                        Margin="6,0,0,0" Text="{Binding Mode=OneTime}"/>
+            <TextBlock x:Name="plainTextControl" Margin="6,0,6,0" Style="{StaticResource MarkdownTextBlockStyle}" Text="{Binding Mode=OneTime}"/>
         </DataTemplate>
         <DataTemplate x:Name="editingTemplate">
             <local:ComposeComment DataContext="{Binding ReplyViewModel}"/>
@@ -23,9 +20,8 @@
                     Markdown="{Binding Mode=OneTime}"
                     StyleProvider="{StaticResource markdownHelpers}"
                     CommandFactory="{StaticResource markdownHelpers}"
-                    FontFamily="Segoe WP" FontSize="17" FontWeight="Normal" FontStyle="Normal"
                     HorizontalAlignment="Stretch"
-                    Margin="5,0,0,0"/>
+                    Margin="6,0,6,0"/>
         </DataTemplate>
     </UserControl.Resources>
     
@@ -63,14 +59,13 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Border Margin="2,0,2,0" BorderThickness="0" Background="{Binding PosterFlair, Mode=OneTime, Converter={StaticResource authorFlairKindConverter}}">
-                                    <TextBlock Foreground="{Binding PosterFlair, Mode=OneTime, Converter={StaticResource fgAuthorFlairKindConverter}}" FontSize="16" Margin="0,1,0,0" Text="{Binding PosterName}" />
+                                    <TextBlock Style="{StaticResource PlainButtonTextBlock}" Foreground="{Binding PosterFlair, Mode=OneTime, Converter={StaticResource fgAuthorFlairKindConverter}}" Margin="0,1,0,0" Text="{Binding PosterName}" />
                                 </Border>
 
-                                <TextBlock Opacity="0.6" FontStyle="Italic"
-                                   FontSize="15" Text="{Binding Path=AuthorFlairText, Mode=OneTime}" Margin="4,2,2,0"
+                                <TextBlock Style="{StaticResource PlainButtonTextBlock}" Opacity="0.6" FontStyle="Italic" Text="{Binding Path=AuthorFlairText, Mode=OneTime}" Margin="4,2,2,0"
                                    Visibility="{Binding HasAuthorFlair, Mode=OneTime, Converter={StaticResource booleanVisibilityConverter}}"/>
                             </StackPanel>
-                            <TextBlock Foreground="Gray" FontSize="14" FontWeight="SemiBold" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="2,0,0,0" />
+                            <TextBlock Opacity="0.6" Style="{StaticResource PlainButtonTextBlock}" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="2,0,0,0" />
                         </StackPanel>                        
                     </Button.Content>
                     <FlyoutBase.AttachedFlyout>
@@ -100,12 +95,12 @@
                      Command="{Binding MinimizeCommand, Mode=OneTime}" CommandParameter="{Binding Mode=OneTime}">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="0,0,12,0" Text="[+]" />
+                        <TextBlock Style="{StaticResource PlainButtonTextBlock}" Margin="0,0,12,0" Text="[+]" />
                         <StackPanel Margin="0,-6,0,0">
                             <Border Margin="0,0,0,0" BorderThickness="0" Padding="0" Background="{Binding PosterFlair, Mode=OneTime, Converter={StaticResource authorFlairKindConverter}}">
-                                <TextBlock Foreground="Gray" FontSize="14" Margin="0,0,0,0" Text="{Binding PosterName, Mode=OneTime}" />
+                                <TextBlock Style="{StaticResource PlainButtonTextBlock}" Opacity="0.6" Margin="0,0,0,0" Text="{Binding PosterName, Mode=OneTime}" />
                             </Border>
-                            <TextBlock Foreground="Gray" FontSize="14" FontWeight="SemiBold" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="2,0,0,0" />
+                            <TextBlock Style="{StaticResource PlainButtonTextBlock}" Opacity="0.6" Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="2,0,0,0" />
                         </StackPanel>
                     </StackPanel>
                 </Button.Content>

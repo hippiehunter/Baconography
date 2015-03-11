@@ -14,10 +14,11 @@ using Windows.UI.Xaml.Media;
 using Windows.Foundation;
 using Windows.UI.Xaml.Data;
 using SnooStream.Converters;
+using System.ComponentModel;
 
 namespace SnooStream.View.Controls
 {
-	public partial class CommentsView : UserControl
+	public partial class CommentsView : UserControl, INotifyPropertyChanged
 	{
 		public CommentsView ()
 		{
@@ -103,5 +104,21 @@ namespace SnooStream.View.Controls
             var loadFullVM = (sender as Button).DataContext as LoadFullCommentsViewModel;
             loadFullVM.LoadFully();
         }
+
+		private void LayoutRoot_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			if (PropertyChanged != null)
+				PropertyChanged(this, new PropertyChangedEventArgs("FullWidth"));
+		}
+
+		public double FullWidth
+		{
+			get
+			{
+				return ActualWidth;
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
     }
 }

@@ -15,7 +15,7 @@
         </Grid.Background>
         
         <Border Padding="12,12,12,12">
-            <TextBlock Margin="0,0,0,0" Text="{Binding Synopsis}" FontSize="14" TextWrapping="Wrap" TextTrimming="WordEllipsis"
+            <TextBlock Margin="0,0,0,0" Text="{Binding Synopsis}" Style="{StaticResource MarkdownTextBlockStyle}" TextTrimming="WordEllipsis"
                    VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
         </Border>
         

@@ -13,10 +13,6 @@
 
     <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}"
           HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,24,0,6">
-            <TextBlock HorizontalAlignment="Right" FontSize="22" Margin="12,0,12,0"
-                Text="{Binding Title}" TextWrapping="Wrap" 
-                x:Name="caption"/>
-        </ScrollViewer>
+        <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{Binding Title}" x:Name="caption"/>
     </Grid>
 </UserControl>
