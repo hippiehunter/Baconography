@@ -7,6 +7,7 @@
     xmlns:common="using:SnooStream.Common"
     xmlns:snoodom="using:SnooDom"
     mc:Ignorable="d"
+    x:Name="root" SizeChanged="LayoutRoot_SizeChanged"
     d:DesignHeight="480" d:DesignWidth="480">
 
     <UserControl.Resources>
@@ -24,7 +25,7 @@
                   ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <ContentControl HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" MinHeight="25" />
+                    <ContentControl Width="{Binding FullWidth, ElementName=root}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" MinHeight="25" />
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListView.ItemContainerTransitions>

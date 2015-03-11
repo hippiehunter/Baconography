@@ -14,10 +14,10 @@
 
     <UserControl.Resources>
         <DataTemplate x:Key="Type:ReadableText">
-            <TextBlock HorizontalAlignment="Left" FontSize="20" Padding="0" Margin="10" Text="{Binding Text}" TextWrapping="Wrap"/>
+            <TextBlock HorizontalAlignment="Left" FontSize="14" FontWeight="SemiBold" FontFamily="Calibri" Padding="0" Margin="20,0,20,0" Text="{Binding Text}" TextWrapping="Wrap"/>
         </DataTemplate>
         <DataTemplate x:Key="Type:ReadableImage">
-            <gif:ZoomableImageControl DataContext="{Binding Url}" HorizontalAlignment="Stretch" Margin="10"/>
+            <gif:ZoomableImageControl DataContext="{Binding Url}" HorizontalAlignment="Stretch" Margin="20,0,20,0"/>
         </DataTemplate>
         <selectors:TypedTemplateSelector x:Name="articleTemplateSelector" />
     </UserControl.Resources>

@@ -13,7 +13,7 @@
     d:DataContext="{Binding SubredditRiver.SelectedRiver, Source={StaticResource SnooStream}}"
     x:Name="root"
     NavigationCacheMode="Required">
-    <Grid x:Name="LayoutRoot" Background="Transparent">
+    <Grid x:Name="LayoutRoot" Background="Transparent" SizeChanged="LayoutRoot_SizeChanged">
         <Grid>
             <ListView x:Name="linksListView" Grid.Column="0"  Margin="0,0,0,0"
                       SelectionMode="None"
@@ -28,7 +28,7 @@
                       ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <local:CardLinkView/>
+                        <local:CardLinkView Width="{Binding FullWidth, ElementName=root}"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
                 <ListView.ItemContainerTransitions>

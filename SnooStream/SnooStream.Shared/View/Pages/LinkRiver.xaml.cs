@@ -13,10 +13,11 @@ using SnooStream.View.Controls;
 using Windows.UI.Xaml.Controls;
 using GalaSoft.MvvmLight;
 using Windows.UI.Xaml.Media.Animation;
+using System.ComponentModel;
 
 namespace SnooStream.View.Pages
 {
-    public partial class LinkRiver : SnooApplicationPage
+    public partial class LinkRiver : SnooApplicationPage, INotifyPropertyChanged
     {
         public LinkRiver()
         {
@@ -59,5 +60,21 @@ namespace SnooStream.View.Pages
             base.SetFocusedViewModel(viewModel);
             linksListView.SafeScrollIntoView(linksListView.SelectedItem = viewModel);
         }
-    }
+
+		private void LayoutRoot_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			if (PropertyChanged != null)
+				PropertyChanged(this, new PropertyChangedEventArgs("FullWidth"));
+		}
+
+		public double FullWidth
+		{
+			get
+			{
+				return ActualWidth;
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+	}
 }

@@ -28,8 +28,7 @@
 
             <!-- Title block -->
             <TextBlock Grid.Row="0"
-                   HorizontalAlignment="Left" TextWrapping="Wrap"
-                   Style="{StaticResource SubheaderTextBlockStyle}"
+                   Style="{StaticResource TitleTextBlock}"
                    Text="{Binding Title, Mode=OneTime}"
                    TextTrimming="WordEllipsis"
                    MaxHeight="200"
@@ -41,7 +40,7 @@
 
             <!-- Link info, user / time / subreddit / domain -->
             <ContentControl x:Name="linkMetadata" Grid.Row="1"
-                            Margin="0,5,0,3" MinHeight="50"
+                            Margin="0,5,0,-6" MinHeight="25"
                             HorizontalAlignment="Stretch" Content="{Binding Converter={StaticResource linkMetadataConverter}}"/>
 
             <!-- Content block -->

@@ -13,8 +13,8 @@
                 BorderThickness="0" Margin="0,-12,0,0" Padding="0"
                 Command="{Binding Votable.ToggleVote}">
         <StackPanel Orientation="Horizontal">
-            <TextBlock Margin="0,0,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=1, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol"/>
-            <TextBlock Margin="-6,4,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=0, Mode=TwoWay}" FontSize="18" Text="&#xE110;" FontFamily="Segoe UI Symbol">
+            <TextBlock Style="{StaticResource VoteArrowTextBlock}" Margin="0,0,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=1, Mode=TwoWay}" />
+            <TextBlock Style="{StaticResource VoteArrowTextBlock}" Margin="-6,4,0,0" Foreground="{Binding Votable, Converter={StaticResource voteColorConverter}, ConverterParameter=0, Mode=TwoWay}" >
                 <TextBlock.RenderTransform>
                     <RotateTransform Angle="180" CenterX="9" CenterY="12" />
                 </TextBlock.RenderTransform>
