@@ -40,8 +40,7 @@
                             Text="{Binding Path=Topic, Mode=TwoWay}" />
                     <Border HorizontalAlignment="Stretch" Height="1" BorderThickness=".5" Margin="0,50,0,0" />
                 </Grid>
-                <TextBox KeyUp="TextBox_KeyUp" Grid.Row="3" AcceptsReturn="True" IsSpellCheckEnabled="True" TextChanged="TextBox_TextChanged" InputScope="Chat" 
-                         HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" TextWrapping="Wrap" Text="{Binding Path=Contents, Mode=TwoWay}" />
+                <local:MarkdownEditorControl Grid.Row="3" DataContext="{Binding EditingVM}"/>
             </Grid>
         </ScrollViewer>
     </Grid>

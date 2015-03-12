@@ -27,6 +27,15 @@ namespace SnooStream.ViewModel
             _name = link.Name;
             Editing = true;
         }
+
+		MarkdownEditingVM EditingVM
+		{
+			get
+			{
+				return new MarkdownEditingVM(Text, (value) => Text = value);
+			}
+		}
+
         private bool _editing = false;
         public bool Editing
         {

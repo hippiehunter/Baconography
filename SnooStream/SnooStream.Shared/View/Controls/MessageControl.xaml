@@ -29,7 +29,6 @@
                 <snoodom:MarkdownControl x:Name="markdownControl" 
                     StyleProvider="{StaticResource markdownHelpers}"
                     CommandFactory="{StaticResource markdownHelpers}"
-                    FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
                     HorizontalAlignment="Stretch"
                     Margin="3,0,0,0"/>
             </StackPanel>

@@ -27,6 +27,8 @@ namespace SnooStream.ViewModel
         private string _contents;
         private bool _isReply;
 
+		public string Contents { get { return _contents; } set { _contents = value; } }
+
         public string Username
         {
             get
@@ -53,19 +55,15 @@ namespace SnooStream.ViewModel
                 RaisePropertyChanged("IsValid");
             }
         }
-        public string Contents
-        {
-            get
-            {
-                return _contents;
-            }
-            set
-            {
-                _contents = value;
-                RaisePropertyChanged("Contents");
-                RaisePropertyChanged("IsValid");
-            }
-        }
+
+		MarkdownEditingVM EditingVM
+		{
+			get
+			{
+				return new MarkdownEditingVM(_contents, (value) => _contents = value);
+			}
+		}
+
         public bool IsReply
         {
             get
@@ -86,7 +84,7 @@ namespace SnooStream.ViewModel
                 return !String.IsNullOrWhiteSpace(LoggedInUser) &&
                     !String.IsNullOrWhiteSpace(Username) &&
                     !String.IsNullOrWhiteSpace(Topic) &&
-                    !String.IsNullOrWhiteSpace(Contents);
+					!String.IsNullOrWhiteSpace(_contents);
 
             }
         }
@@ -100,7 +98,7 @@ namespace SnooStream.ViewModel
                     {
                         try
                         {
-                            await SnooStreamViewModel.RedditService.AddMessage(Username, Topic, Contents);
+							await SnooStreamViewModel.RedditService.AddMessage(Username, Topic, _contents);
                             SnooStreamViewModel.NavigationService.GoBack();
                         }
                         catch

@@ -67,7 +67,7 @@ namespace SnooStream.Common
 
         public void GotoEditPost(ViewModelBase currentContext, LinkViewModel source)
         {
-            throw new NotImplementedException();
+			source.IsEditing = true;
         }
 
         public async void GotoLink(object contextObj, string url)

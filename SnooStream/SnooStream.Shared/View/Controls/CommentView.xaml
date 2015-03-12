@@ -76,6 +76,9 @@
                             <MenuFlyoutItem Text="User Details" Command="{Binding GotoUserDetails, Mode=OneTime}"/>
                             <MenuFlyoutItem Text="Reply" Command="{Binding GotoReply, Mode=OneTime}"/>
                             <MenuFlyoutItem Text="Minimize" Command="{Binding MinimizeCommand, Mode=OneTime}" />
+                            <MenuFlyoutItem Text="Edit" Command="{Binding Edit, Mode=OneTime}" Visibility="{Binding CanEdit, Converter={StaticResource booleanVisibilityConverter}}"/>
+                            <MenuFlyoutItem Text="Delete" Command="{Binding Delete, Mode=OneTime}" Visibility="{Binding CanDelete, Converter={StaticResource booleanVisibilityConverter}}" />
+                            
                         </MenuFlyout>
                     </FlyoutBase.AttachedFlyout>
                 </Button>

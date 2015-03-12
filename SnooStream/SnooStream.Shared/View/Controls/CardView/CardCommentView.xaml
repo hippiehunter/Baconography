@@ -39,8 +39,16 @@
                             Margin="0,5,0,-6" MinHeight="25"
                             HorizontalAlignment="Stretch" Content="{Binding Converter={StaticResource linkMetadataConverter}}"/>
 
-            <!-- Content block -->
-            <ContentControl x:Name="contentSection" Grid.Row="2" Margin="0,0,0,0"
+            <!-- Non Editing Content block -->
+            <ContentControl Visibility="{Binding IsEditing, Converter={StaticResource invertedBooleanVisibilityConverter}}"  
+                            x:Name="contentSection" Grid.Row="2" Margin="0,0,0,0"
+                            BorderThickness="0"
+                            VerticalContentAlignment="Stretch" VerticalAlignment="Center"
+                            HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" />
+
+            <!-- Editing Content block -->
+            <local:MarkdownEditorControl Visibility="{Binding IsEditing, Converter={StaticResource booleanVisibilityConverter}}"  
+                            x:Name="editSection" Grid.Row="2" Margin="0,0,0,0"
                             BorderThickness="0"
                             VerticalContentAlignment="Stretch" VerticalAlignment="Center"
                             HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" />
@@ -66,6 +74,8 @@
                             <MenuFlyoutItem Text="Report" Command="{Binding Report}"/>
                             <MenuFlyoutItem Text="Save" Command="{Binding Save}"/>
                             <MenuFlyoutItem Text="User Details" Command="{Binding GotoUserDetails}"/>
+                            <MenuFlyoutItem Text="Edit" Command="{Binding Edit}" Visibility="{Binding CanEdit, Converter={StaticResource booleanVisibilityConverter}}" />
+                            <MenuFlyoutItem Text="Delete" Command="{Binding Delete}" Visibility="{Binding CanDelete, Converter={StaticResource booleanVisibilityConverter}}" />
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>

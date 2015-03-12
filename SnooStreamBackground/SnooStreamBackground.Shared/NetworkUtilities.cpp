@@ -51,9 +51,8 @@ bool NetworkUtilities::IsHighPriorityNetworkOk()
         return false;
 
     auto connectionCost = connectionProfile->GetConnectionCost();
-	
-	if (!connectionProfile->IsWlanConnectionProfile && !connectionProfile->IsWwanConnectionProfile)
-		return false;
+    bool isConnection = connectionProfile->IsWlanConnectionProfile || connectionProfile->IsWwanConnectionProfile;
 
-    return connectionCost != nullptr && (connectionProfile->GetSignalBars() != nullptr || !connectionProfile->IsWwanConnectionProfile) && !connectionCost->OverDataLimit;
+
+    return connectionCost != nullptr && (connectionProfile->GetSignalBars() != nullptr || !isConnection) && !connectionCost->OverDataLimit;
 }

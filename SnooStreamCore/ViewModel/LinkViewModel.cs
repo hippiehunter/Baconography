@@ -38,6 +38,12 @@ namespace SnooStream.ViewModel
             }
         }
 
+		private bool _isEditing;
+		public bool IsEditing { get { return _isEditing; } set { _isEditing = value; RaisePropertyChanged("IsEditing"); } }
+
+		public bool CanEdit { get { return string.Compare(SnooStreamViewModel.RedditService.CurrentUserName, Link.Author, StringComparison.CurrentCultureIgnoreCase) == 0 && Link.IsSelf; } }
+		public bool CanDelete { get { return string.Compare(SnooStreamViewModel.RedditService.CurrentUserName, Link.Author, StringComparison.CurrentCultureIgnoreCase) == 0; } }
+
         public ViewModelBase Context { get; private set; }
         public CommentsViewModel Comments { get; internal set; }
         public Link Link { get; private set; }
@@ -50,6 +56,14 @@ namespace SnooStream.ViewModel
             Link.CommentCount = link.CommentCount;
             RaisePropertyChanged("CommentCount");
         }
+
+		MarkdownEditingVM EditingVM
+		{
+			get
+			{
+				return new MarkdownEditingVM(Link.Selftext, (value) => Link.Selftext = value);
+			}
+		}
 
         public MarkdownData SelfText
         {
@@ -205,6 +219,9 @@ namespace SnooStream.ViewModel
                 ((IHasFocus)Context).CurrentlyFocused = this;
         }
 
+		public RelayCommand Edit { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.CommandDispatcher.GotoEditPost(Context, this); }); } }
+		public RelayCommand SubmitEdit { get { return new RelayCommand(async () => { SetFocused(); RaisePropertyChanged("SelfText"); await SnooStreamViewModel.NotificationService.Report("updating post", async () => await SnooStreamViewModel.RedditService.EditPost(Link.Selftext, Link.Name)); }); } }
+		public RelayCommand Delete { get { return new RelayCommand(async () => { SetFocused(); await SnooStreamViewModel.NotificationService.Report("deleting post", async () => await SnooStreamViewModel.RedditService.DeleteLinkOrComment(Link.Name)); });} }
         public RelayCommand Share { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.SystemServices.ShareLink(Url, Title, "posted by " + Author + " to " + Subreddit); }); } }
         public RelayCommand GotoWeb { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.NavigationService.NavigateToWeb(Link.Url); }); } }
         public RelayCommand GotoLink { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.CommandDispatcher.GotoLink(this, Link.Url); }); } }
