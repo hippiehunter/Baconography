@@ -144,13 +144,21 @@ namespace SnooStream.ViewModel
 			}
 		}
 
-        public bool IsEditable
+        public bool CanEdit
         {
             get
             {
                 return string.Compare(SnooStreamViewModel.RedditService.CurrentUserName, PosterName, StringComparison.CurrentCultureIgnoreCase) == 0;
             }
         }
+
+		public bool CanDelete
+		{
+			get
+			{
+				return string.Compare(SnooStreamViewModel.RedditService.CurrentUserName, PosterName, StringComparison.CurrentCultureIgnoreCase) == 0;
+			}
+		}
 
         CommentReplyViewModel _replyViewModel;
         public CommentReplyViewModel ReplyViewModel
@@ -193,7 +201,13 @@ namespace SnooStream.ViewModel
         public RelayCommand Report { get { return new RelayCommand(ReportImpl); } }
         public RelayCommand Save { get { return new RelayCommand(SaveImpl); } }
         public RelayCommand GotoReply { get { return new RelayCommand(GotoReplyImpl); } }
-        public RelayCommand GotoEdit { get { return new RelayCommand(GotoEditImpl); } }
+        public RelayCommand Edit { get { return new RelayCommand(GotoEditImpl); } }
+		public RelayCommand Delete { get { return new RelayCommand(DeleteImpl); } }
+
+		private async void DeleteImpl()
+		{
+			await SnooStreamViewModel.NotificationService.Report("deleting comment", async () => await SnooStreamViewModel.RedditService.DeleteLinkOrComment(Thing.Name));
+		}
         public RelayCommand GotoUserDetails { get { return new RelayCommand(GotoUserDetailsImpl); } }
 
         private void ShareContextImpl()

@@ -14,62 +14,11 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
         </Grid.RowDefinitions>
-        
-        <StackPanel Margin="12,0,0,0" Grid.Row="0" Orientation="Horizontal">
-            <Button Margin="0"
-                HorizontalAlignment="Right"
-                FontFamily="Segoe UI Symbol" FontSize="14"
-                Width="44" Height="44"
-                Content="strike" Style="{StaticResource RoundButtonStyle}"
-                Command="{Binding AddStrike}"/>
-            <Button Margin="0"
-                HorizontalAlignment="Right"
-                FontFamily="Segoe UI Symbol" FontSize="14"
-                Width="44" Height="44"
-                Content="super" Style="{StaticResource RoundButtonStyle}"
-                Command="{Binding AddSuper}"/>
-            <Button Margin="0"
-                HorizontalAlignment="Right"
-                FontFamily="Segoe UI Symbol" FontSize="14"
-                Width="44" Height="44"
-                Content="link" Style="{StaticResource RoundButtonStyle}"
-                Command="{Binding AddLink}"/>
 
-            <Button Margin="0"
-                HorizontalAlignment="Right"
-                FontFamily="Segoe UI Symbol" FontSize="14"
-                Width="44" Height="44"
-                Content="code" Style="{StaticResource RoundButtonStyle}"
-                Command="{Binding AddCode}"/>
-            <Button Margin="0"
-                HorizontalAlignment="Right"
-                FontFamily="Segoe UI Symbol" FontSize="14"
-                Width="44" Height="44"
-                Content="bullet" Style="{StaticResource RoundButtonStyle}"
-                Command="{Binding AddBullets}"/>
-            <Button Margin="0"
-                HorizontalAlignment="Right"
-                FontFamily="Segoe UI Symbol" FontSize="16"
-                Width="44" Height="44"
-                Content="1." Style="{StaticResource RoundButtonStyle}"
-                Command="{Binding AddNumbers}"/>
-        </StackPanel>
+        <local:MarkdownEditorControl DataContext="{Binding EditingVM}"/>
         
-        <TextBox Grid.Row="1" AcceptsReturn="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" TextWrapping="Wrap"
-                 InputScope="Chat" IsSpellCheckEnabled="True" Text="{Binding ReplyBody, Mode=TwoWay}" TextChanged="TextBox_TextChanged"/>
-        
-        <snoodom:MarkdownControl
-            Grid.Row="2"
-            Markdown="{Binding ReplyBodyMD}"
-            StyleProvider="{StaticResource markdownHelpers}"
-            CommandFactory="{StaticResource markdownHelpers}"
-            FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
-            HorizontalAlignment="Stretch"
-            Margin="3,0,0,0"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="3">
+        <StackPanel Orientation="Horizontal" Grid.Row="1">
             <Button Content="Submit" Command="{Binding Submit}"/>
             <Button Margin="15,0,0,0" Content="Cancel" Command="{Binding Cancel}"/>
         </StackPanel>
