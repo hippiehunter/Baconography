@@ -21,11 +21,27 @@
                 </DataTemplate>
             </HubSection>
 
-            <HubSection Header="self">
+            <HubSection Header="activity">
                 <DataTemplate>
                     <Grid>
                         <local:SelfActivityView DataContext="{Binding SelfStream}" Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}"/>
                         <local:LoginView DataContext="{Binding Login}" Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>
+                    </Grid>
+                </DataTemplate>
+            </HubSection>
+
+            <HubSection Header="self"  Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}">
+                <DataTemplate>
+                    <Grid>
+                        
+                    </Grid>
+                </DataTemplate>
+            </HubSection>
+
+            <HubSection Header="moderator"  Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}">
+                <DataTemplate>
+                    <Grid>
+
                     </Grid>
                 </DataTemplate>
             </HubSection>

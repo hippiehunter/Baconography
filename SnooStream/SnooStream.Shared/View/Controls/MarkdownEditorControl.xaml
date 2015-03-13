@@ -23,7 +23,7 @@
         </Grid.ColumnDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
             <TextBlock Text="Posting as "/>
-            <TextBlock Text="{Binding Path=EditingVM.PostingAs, ElementName=root}"/>
+            <TextBlock Text="{Binding Path=PostingAs}"/>
         </StackPanel>
 
         <Button Grid.Column="1" Grid.Row="0"
@@ -36,21 +36,21 @@
             </Grid>
             <Button.Flyout>
                 <MenuFlyout>
-                    <MenuFlyoutItem Text="Insert Link" Command="{Binding Path=EditingVM.InsertLink, ElementName=root}"/>
-                    <MenuFlyoutItem Text="Insert Bold" Command="{Binding Path=EditingVM.InsertBold, ElementName=root}"/>
-                    <MenuFlyoutItem Text="Insert Italic" Command="{Binding Path=EditingVM.InsertItalic, ElementName=root}"/>
-                    <MenuFlyoutItem Text="Insert Quote" Command="{Binding Path=EditingVM.InsertQuote, ElementName=root}"/>
-                    <MenuFlyoutItem Text="Insert Bullet" Command="{Binding Path=EditingVM.InsertBullet, ElementName=root}"/>
-                    <MenuFlyoutItem Text="Insert List" Command="{Binding Path=EditingVM.InsertList, ElementName=root}"/>
-                    <MenuFlyoutItem Text="&#x3232;_&#x3232;" Command="{Binding Path=EditingVM.InsertDisapproval, ElementName=root}"/>
+                    <MenuFlyoutItem Text="Insert Link" Command="{Binding Path=InsertLink}"/>
+                    <MenuFlyoutItem Text="Insert Bold" Command="{Binding Path=InsertBold}"/>
+                    <MenuFlyoutItem Text="Insert Italic" Command="{Binding Path=InsertItalic}"/>
+                    <MenuFlyoutItem Text="Insert Quote" Command="{Binding Path=InsertQuote}"/>
+                    <MenuFlyoutItem Text="Insert Bullet" Command="{Binding Path=InsertBullet}"/>
+                    <MenuFlyoutItem Text="Insert List" Command="{Binding Path=InsertList}"/>
+                    <MenuFlyoutItem Text="&#x0CA0;_&#x0CA0;" Command="{Binding Path=InsertDisapproval}"/>
                 </MenuFlyout>
             </Button.Flyout>
         </Button>
 
         <TextBox x:Name="textBox" KeyUp="TextBox_KeyUp" AcceptsReturn="True" IsSpellCheckEnabled="True" TextChanged="TextBox_TextChanged" InputScope="Chat" 
-                 Text="{Binding Path=EditingVM.Text, Mode=TwoWay}" HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Row="1" Grid.ColumnSpan="2" />
+                 Text="{Binding Path=Text, Mode=TwoWay}" HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Row="1" Grid.ColumnSpan="2" />
 
-        <snoodom:MarkdownControl Markdown="{Binding Path=EditingVM.Markdown, ElementName=root}" Grid.Row="2" Grid.ColumnSpan="2"
+        <snoodom:MarkdownControl Markdown="{Binding Path=Markdown}" Grid.Row="2" Grid.ColumnSpan="2"
                 StyleProvider="{StaticResource markdownHelpers}"
                 CommandFactory="{StaticResource markdownHelpers}"
                 HorizontalAlignment="Stretch" />
