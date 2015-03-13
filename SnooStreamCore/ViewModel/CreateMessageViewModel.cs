@@ -56,7 +56,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-		MarkdownEditingVM EditingVM
+		public MarkdownEditingVM EditingVM
 		{
 			get
 			{

@@ -47,11 +47,13 @@
                             HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" />
 
             <!-- Editing Content block -->
-            <local:MarkdownEditorControl Visibility="{Binding IsEditing, Converter={StaticResource booleanVisibilityConverter}}"  
+            <Grid Visibility="{Binding IsEditing, Converter={StaticResource booleanVisibilityConverter}}">
+                <local:MarkdownEditorControl DataContext="{Binding EditingVM}"
                             x:Name="editSection" Grid.Row="2" Margin="0,0,0,0"
                             BorderThickness="0"
                             VerticalContentAlignment="Stretch" VerticalAlignment="Center"
                             HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" />
+            </Grid>
 
             <!-- Action block, flyout menu / vote / comment count -->
             <Grid x:Name="actionButtons" Grid.Row="3" Margin="0,0,0,0" HorizontalAlignment="Stretch">

@@ -27,7 +27,7 @@ namespace SnooStream.ViewModel
 		}
 
 		private object _markdownDom;
-		public object MarkdownDom
+		public object Markdown
 		{
 			get
 			{
@@ -36,7 +36,7 @@ namespace SnooStream.ViewModel
 			set
 			{
 				_markdownDom = value;
-				RaisePropertyChanged("MarkdownDom");
+				RaisePropertyChanged("Markdown");
 			}
 		}
 
@@ -60,7 +60,7 @@ namespace SnooStream.ViewModel
 							var madeMarkdown = SnooStreamViewModel.MarkdownProcessor.Process(value);
 							SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() =>
 								{
-									MarkdownDom = madeMarkdown;
+                                    Markdown = madeMarkdown;
 								});
 						}
 						return Task.FromResult(true);
@@ -142,7 +142,7 @@ namespace SnooStream.ViewModel
 		private string _codeFormattingString = "    {0}";
 		private string _bulletFormattingString = "*{0}";
 		private string _numberFormattingString = "1. {0}";
-		private string _disapprovalFormattingString = "&#x3232;_&#x3232; {0}";
+        private string _disapprovalFormattingString = "&#x0CA0;_&#x0CA0; {0}";
 
 		public RelayCommand AddBold { get { return new RelayCommand(AddBoldImpl); } }
 		public RelayCommand AddItalic { get { return new RelayCommand(AddItalicImpl); } }

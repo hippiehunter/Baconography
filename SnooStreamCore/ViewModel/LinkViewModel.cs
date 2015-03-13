@@ -57,7 +57,7 @@ namespace SnooStream.ViewModel
             RaisePropertyChanged("CommentCount");
         }
 
-		MarkdownEditingVM EditingVM
+		public MarkdownEditingVM EditingVM
 		{
 			get
 			{
