@@ -11,7 +11,7 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Grid Margin="0,12,0,12">
+    <Grid Margin="0,12,0,12" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="2*"/>
@@ -22,12 +22,11 @@
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
-            <TextBlock Text="Posting as "/>
-            <TextBlock Text="{Binding Path=PostingAs}"/>
+            <TextBlock Style="{StaticResource BodyTextBlockStyle}"><Run Text="Posting as:" /> <Run Text="{Binding Path=PostingAs}"/></TextBlock>
         </StackPanel>
 
         <Button Grid.Column="1" Grid.Row="0"
-                    HorizontalContentAlignment="Right"
+                    HorizontalAlignment="Right"
                     BorderThickness="0" Padding="0" 
                     Margin="0,-12,-12,0"
                     FontFamily="Segoe UI Symbol">

@@ -15,7 +15,7 @@ namespace SnooStream.ViewModel
 		public MarkdownEditingVM(string text, Action<string> textChanged)
 		{
 			_textChanged = textChanged;
-			_text = text;
+			Text = text;
 		}
 
 		public string PostingAs
@@ -58,13 +58,17 @@ namespace SnooStream.ViewModel
 						if (_text == value)
 						{
 							var madeMarkdown = SnooStreamViewModel.MarkdownProcessor.Process(value);
-							SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() =>
-								{
-                                    Markdown = madeMarkdown;
-								});
+							if (madeMarkdown != null && madeMarkdown.MarkdownDom != null)
+							{
+								SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() =>
+									{
+										Markdown = madeMarkdown.MarkdownDom;
+									});
+							}
 						}
+						SnooStreamViewModel.SystemServices.StopTimer(args);
 						return Task.FromResult(true);
-					}, TimeSpan.FromSeconds(3));
+					}, TimeSpan.FromSeconds(1));
 			}
 		}
 
@@ -144,16 +148,16 @@ namespace SnooStream.ViewModel
 		private string _numberFormattingString = "1. {0}";
         private string _disapprovalFormattingString = "&#x0CA0;_&#x0CA0; {0}";
 
-		public RelayCommand AddBold { get { return new RelayCommand(AddBoldImpl); } }
-		public RelayCommand AddItalic { get { return new RelayCommand(AddItalicImpl); } }
-		public RelayCommand AddStrike { get { return new RelayCommand(AddStrikeImpl); } }
-		public RelayCommand AddSuper { get { return new RelayCommand(AddSuperImpl); } }
-		public RelayCommand AddLink { get { return new RelayCommand(AddLinkImpl); } }
-		public RelayCommand AddQuote { get { return new RelayCommand(AddQuoteImpl); } }
-		public RelayCommand AddCode { get { return new RelayCommand(AddCodeImpl); } }
-		public RelayCommand AddBullets { get { return new RelayCommand(AddBulletsImpl); } }
-		public RelayCommand AddNumbers { get { return new RelayCommand(AddNumbersImpl); } }
-		public RelayCommand AddDisapproval { get { return new RelayCommand(AddDisapprovalImpl); } }
+		public RelayCommand InsertBold { get { return new RelayCommand(AddBoldImpl); } }
+		public RelayCommand InsertItalic { get { return new RelayCommand(AddItalicImpl); } }
+		public RelayCommand InsertStrike { get { return new RelayCommand(AddStrikeImpl); } }
+		public RelayCommand InsertSuper { get { return new RelayCommand(AddSuperImpl); } }
+		public RelayCommand InsertLink { get { return new RelayCommand(AddLinkImpl); } }
+		public RelayCommand InsertQuote { get { return new RelayCommand(AddQuoteImpl); } }
+		public RelayCommand InsertCode { get { return new RelayCommand(AddCodeImpl); } }
+		public RelayCommand InsertBullets { get { return new RelayCommand(AddBulletsImpl); } }
+		public RelayCommand InsertNumbers { get { return new RelayCommand(AddNumbersImpl); } }
+		public RelayCommand InsertDisapproval { get { return new RelayCommand(AddDisapprovalImpl); } }
 
 		private void AddDisapprovalImpl()
 		{

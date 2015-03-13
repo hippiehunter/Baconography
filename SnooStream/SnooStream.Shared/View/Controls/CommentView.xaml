@@ -13,7 +13,7 @@
             <TextBlock x:Name="plainTextControl" Margin="6,0,6,0" Style="{StaticResource MarkdownTextBlockStyle}" Text="{Binding Mode=OneTime}"/>
         </DataTemplate>
         <DataTemplate x:Name="editingTemplate">
-            <local:ComposeComment DataContext="{Binding ReplyViewModel}"/>
+            <local:ComposeComment HorizontalAlignment="Stretch" DataContext="{Binding ReplyViewModel}"/>
         </DataTemplate>
         <DataTemplate x:Name="markdownTemplate">
             <snoodom:MarkdownControl
@@ -86,7 +86,7 @@
                 <!-- Votable Section -->
                 <local:VotableControl Grid.Column="1" />
             </Grid>
-            <ContentControl x:Name="contentControl" Grid.Row="1" Margin="0,0,12,0"/>
+            <ContentControl x:Name="contentControl" Grid.Row="1" Margin="0,0,12,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
         </Grid>
 
         <!-- Collapsed Comment Header -->

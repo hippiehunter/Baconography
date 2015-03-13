@@ -75,18 +75,17 @@ namespace SnooStream.View.Controls
             {
                 var body = viewModel.Body;
                 var loadToken = LoadCancelSource.Token;
-                var markdownTpl = await SnooStreamViewModel.SystemServices.RunAsyncIdle(() =>
+                var markdown = await SnooStreamViewModel.SystemServices.RunAsyncIdle(() =>
                 {
                     try
                     {
                         var markdownInner = SnooStreamViewModel.MarkdownProcessor.Process(body);
-                        var isPlainText = SnooStreamViewModel.MarkdownProcessor.IsPlainText(markdownInner);
-                        return Tuple.Create(markdownInner, isPlainText);
+						return markdownInner;
                     }
                     catch (Exception)
                     {
                         //TODO log this failure
-                        return Tuple.Create<MarkdownData, bool>(null, true);
+						return null;
                     }
                 }, loadToken);
 
@@ -94,19 +93,9 @@ namespace SnooStream.View.Controls
                 if (loadToken.IsCancellationRequested)
                     return;
 
-                if (!markdownTpl.Item2)
-                {
-                    contentControl.ContentTemplate = Resources["markdownTemplate"] as DataTemplate;
-                    contentControl.Content = markdownTpl.Item1.MarkdownDom;
-
-                }
-                else if (contentControl.Content == null)
-                {
-                    var textContent = (Resources["textTemplate"] as DataTemplate).LoadContent() as FrameworkElement;
-                    textContent.DataContext = body;
-                    contentControl.Content = textContent;
-                    contentControl.MinHeight = 0;
-                }
+                contentControl.ContentTemplate = Resources["markdownTemplate"] as DataTemplate;
+				contentControl.Content = markdown.MarkdownDom;
+                
                 LoadPhase = 3;
             }
             catch (TaskCanceledException)
@@ -146,11 +135,12 @@ namespace SnooStream.View.Controls
         {
             if (e.PropertyName == "IsEditing")
             {
+				contentControl.ContentTemplate = null;
                 if (((CommentViewModel)DataContext).IsEditing)
                 {
                     var editContent = (Resources["editingTemplate"] as DataTemplate).LoadContent() as FrameworkElement;
-                    editContent.DataContext = ((CommentViewModel)DataContext).ReplyViewModel;
                     contentControl.Content = editContent;
+					editContent.DataContext = ((CommentViewModel)DataContext).ReplyViewModel;
                     contentControl.MinHeight = 0;
                 }
                 else

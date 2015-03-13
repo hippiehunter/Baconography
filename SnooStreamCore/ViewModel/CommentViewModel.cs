@@ -27,7 +27,7 @@ namespace SnooStream.ViewModel
             _linkId = linkId;
             Depth = depth;
             AuthorFlair = SnooStreamViewModel.RedditService.GetUsernameModifiers(_comment.Author, _linkId, _comment.Subreddit);
-            AuthorFlairText = _comment.AuthorFlairText;
+            AuthorFlairText = HttpUtility.HtmlDecode(_comment.AuthorFlairText);
 			Body = HttpUtility.HtmlDecode(_comment.Body);
         }
 

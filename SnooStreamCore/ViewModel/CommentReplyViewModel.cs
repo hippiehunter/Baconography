@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using NBoilerpipePortable.Util;
 using SnooSharp;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace SnooStream.ViewModel
             {
                 Editing = true;
                 EditingId = ((Comment)replyTarget.Data).Name;
-				_text = ((Comment)replyTarget.Data).Body;
+				_text = HttpUtility.HtmlDecode(((Comment)replyTarget.Data).Body);
             }
 			else
 			{
@@ -49,6 +50,8 @@ namespace SnooStream.ViewModel
                 {
                     if (edit)
                     {
+						((Comment)_replyTarget.Data).Body = _text;
+						_context.Body = _text;
 						await SnooStreamViewModel.RedditService.EditComment(EditingId, _text);
                     }
                     else
@@ -82,6 +85,14 @@ namespace SnooStream.ViewModel
                     _context.IsEditing = false;
                 });
         }
+
+		public RelayCommand Submit
+		{
+			get
+			{
+				return new RelayCommand(SubmitImpl);
+			}
+		}
 
         public RelayCommand Cancel
         {
