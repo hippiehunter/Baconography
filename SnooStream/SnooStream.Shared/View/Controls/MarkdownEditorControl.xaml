@@ -11,45 +11,42 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
+    <UserControl.Resources>
+        <MenuFlyout x:Name="insertFlyout">
+            
+        </MenuFlyout>
+    </UserControl.Resources>
     <Grid Margin="0,12,0,12" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="2*"/>
-        </Grid.ColumnDefinitions>
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
-            <TextBlock Style="{StaticResource BodyTextBlockStyle}"><Run Text="Posting as:" /> <Run Text="{Binding Path=PostingAs}"/></TextBlock>
-        </StackPanel>
 
-        <Button Grid.Column="1" Grid.Row="0"
-                    HorizontalAlignment="Right"
-                    BorderThickness="0" Padding="0" 
-                    Margin="0,-12,-12,0"
-                    FontFamily="Segoe UI Symbol">
-            <Grid>
-                <TextBlock Margin="0,0,0,0" FontSize="35" Text="&#xE10C;" />
-            </Grid>
-            <Button.Flyout>
-                <MenuFlyout>
-                    <MenuFlyoutItem Text="Insert Link" Command="{Binding Path=InsertLink}"/>
-                    <MenuFlyoutItem Text="Insert Bold" Command="{Binding Path=InsertBold}"/>
-                    <MenuFlyoutItem Text="Insert Italic" Command="{Binding Path=InsertItalic}"/>
-                    <MenuFlyoutItem Text="Insert Quote" Command="{Binding Path=InsertQuote}"/>
-                    <MenuFlyoutItem Text="Insert Bullet" Command="{Binding Path=InsertBullet}"/>
-                    <MenuFlyoutItem Text="Insert List" Command="{Binding Path=InsertList}"/>
-                    <MenuFlyoutItem Text="&#x0CA0;_&#x0CA0;" Command="{Binding Path=InsertDisapproval}"/>
-                </MenuFlyout>
-            </Button.Flyout>
-        </Button>
+        <ListView VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VariableSizedWrapGrid Orientation="Horizontal" ItemWidth="50"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListViewItem DataContext="{Binding Path=InsertBold}" Tapped="Button_Tapped">
+                <TextBlock FontSize="22" FontWeight="Bold" Text="B"/>
+            </ListViewItem>
+            <ListViewItem DataContext="{Binding Path=InsertItalic}" Tapped="Button_Tapped">
+                <TextBlock FontSize="22" FontStyle="Italic" Text="i"/>
+            </ListViewItem>
+            <ListViewItem DataContext="{Binding Path=InsertLink}" Content="&#xE167;" FontFamily="Segoe UI Symbol" FontSize="22" Tapped="Button_Tapped"/>
+            <ListViewItem DataContext="{Binding Path=InsertQuote}" Content="&#x201D;" FontSize="22" Tapped="Button_Tapped"/>
+            <ListViewItem DataContext="{Binding Path=InsertBullet}" Content="&#x2022;" FontSize="22" Tapped="Button_Tapped"/>
+            <ListViewItem DataContext="{Binding Path=InsertList}" Content="&#xE14C;" FontFamily="Segoe UI Symbol" FontSize="22"  Tapped="Button_Tapped"/>
+            <ListViewItem DataContext="{Binding Path=InsertDisapproval}" Content="&#x0CA0;_&#x0CA0;" FontSize="22"  Tapped="Button_Tapped"/>
+        </ListView>
 
         <TextBox x:Name="textBox" KeyUp="TextBox_KeyUp" AcceptsReturn="True" IsSpellCheckEnabled="True" TextChanged="TextBox_TextChanged" InputScope="Chat" 
-                 Text="{Binding Path=Text, Mode=TwoWay}" HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Row="1" Grid.ColumnSpan="2" />
+                 Text="{Binding Path=Text, Mode=TwoWay}" HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Row="1" 
+                 SelectionStart="{Binding SelectionStart, Mode=TwoWay}" SelectionLength="{Binding SelectionLength, Mode=TwoWay}"/>
 
-        <snoodom:MarkdownControl Markdown="{Binding Path=Markdown}" Grid.Row="2" Grid.ColumnSpan="2"
+        <snoodom:MarkdownControl Markdown="{Binding Path=Markdown}" Grid.Row="2"
                 StyleProvider="{StaticResource markdownHelpers}"
                 CommandFactory="{StaticResource markdownHelpers}"
                 HorizontalAlignment="Stretch" />

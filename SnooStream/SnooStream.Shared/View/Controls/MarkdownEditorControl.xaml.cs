@@ -1,11 +1,14 @@
-﻿using System;
+﻿using SnooStream.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Windows.Input;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -44,5 +47,12 @@ namespace SnooStream.View.Controls
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		private void Button_Tapped(object sender, TappedRoutedEventArgs e)
+		{
+			textBox.Focus(FocusState.Pointer);
+			((ICommand)((ListViewItem)sender).DataContext).Execute(null);
+			e.Handled = true;
+		}
 	}
 }

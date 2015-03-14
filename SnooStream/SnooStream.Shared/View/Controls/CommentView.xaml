@@ -13,7 +13,7 @@
             <TextBlock x:Name="plainTextControl" Margin="6,0,6,0" Style="{StaticResource MarkdownTextBlockStyle}" Text="{Binding Mode=OneTime}"/>
         </DataTemplate>
         <DataTemplate x:Name="editingTemplate">
-            <local:ComposeComment HorizontalAlignment="Stretch" DataContext="{Binding ReplyViewModel}"/>
+            <local:ComposeComment HorizontalAlignment="Stretch" Margin="6,0,6,0" DataContext="{Binding ReplyViewModel}"/>
         </DataTemplate>
         <DataTemplate x:Name="markdownTemplate">
             <snoodom:MarkdownControl
