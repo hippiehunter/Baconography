@@ -91,6 +91,7 @@ namespace SnooStream.ViewModel
 
         public AboutUserViewModel(Account thing, DateTime? lastRefresh)
         {
+			LastRefresh = lastRefresh;
             Thing = thing;
             Groups = new ObservableSortedUniqueCollection<string, ActivityGroupViewModel>(new ActivityGroupViewModel.ActivityAgeComparitor());
             Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new UserActivityLoader(this));
@@ -102,7 +103,7 @@ namespace SnooStream.ViewModel
             {
                 Loading = true;
                 RaisePropertyChanged("Loading");
-                Thing = (await SnooStreamViewModel.RedditService.GetUserInfo(username, "about", null)).Data as Account;
+				await SnooStreamViewModel.NotificationService.Report("Loading user details", async () => Thing = (await SnooStreamViewModel.RedditService.GetUserInfo(username, "about", null)).Data as Account);
                 LastRefresh = DateTime.UtcNow;
                 RaisePropertyChanged("Thing");
                 RaisePropertyChanged("Cakeday");
@@ -134,7 +135,7 @@ namespace SnooStream.ViewModel
 
         private async Task PullNew()
         {
-            LastRefresh = DateTime.Now;
+            LastRefresh = DateTime.UtcNow;
             Listing activity = null;
             await SnooStreamViewModel.NotificationService.Report("getting activitiy for " + Thing.Name, async () =>
             {

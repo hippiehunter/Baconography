@@ -151,8 +151,7 @@ namespace SnooStreamBackground
 					{
 						std::wstring url(std::get<1>(message)->Begin(), std::get<1>(message)->End());
 						if (ends_with(url, L".jpg") ||
-							ends_with(url, L".jpeg") ||
-							ends_with(url, L".png"))
+							ends_with(url, L".jpeg"))
 						{
 							liveTileImageUrls.push_back(message);
 						}

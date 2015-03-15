@@ -11,15 +11,6 @@
     <Grid x:Name="LayoutRoot">
         <ScrollViewer>
             <StackPanel>
-                <ContentControl x:Name="header"
-                                CharacterSpacing="-10"
-                                FontSize="40"
-                                HorizontalAlignment="Left" Margin="0,6,0,24"
-                                Content="login">
-                    <ContentControl.RenderTransform>
-                        <TranslateTransform x:Name="headerTransform"/>
-                    </ContentControl.RenderTransform>
-                </ContentControl>
                 <StackPanel Visibility="{Binding HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}">
                     <ListView
                         HorizontalAlignment="Stretch"
@@ -31,13 +22,16 @@
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                             </Style>
                         </ListView.ItemContainerStyle>
-                        
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Username}"/>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
                     </ListView>
                 </StackPanel>
                 <Button Style="{StaticResource SubtextButton}"
                         Visibility="{Binding Working, Converter={StaticResource invertedBooleanVisibilityConverter}}"
-                        Command="{Binding DoLogin}"
-                        Margin="12,0,0,-8">
+                        Command="{Binding DoLogin}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             LOGIN

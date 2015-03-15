@@ -52,6 +52,11 @@ namespace SnooStream.ViewModel
 			SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
 			SelfStream = new SelfStreamViewModel(_initializationBlob.Self);
 			MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
+
+			if (RedditUserState.Username != null)
+			{
+				SelfUser = new AboutUserViewModel(RedditUserState.Username);
+			}
 		}
 
         private void OnUserLoggedIn(UserLoggedInMessage obj)
@@ -60,6 +65,9 @@ namespace SnooStream.ViewModel
             {
                 _initializationBlob.DefaultUser = RedditUserState;
             }
+
+			SelfUser = new AboutUserViewModel(obj.NewAccount, DateTime.UtcNow);
+			RaisePropertyChanged("SelfUser");
 			_logger.Info("user logged in " + RedditUserState.Username);
         }
 
@@ -78,6 +86,7 @@ namespace SnooStream.ViewModel
         public static ISystemServices SystemServices { get; set; }
         public static IActivityManager ActivityManager { get; set; }
 
+		public AboutUserViewModel SelfUser { get; private set; }
         public SelfStreamViewModel SelfStream { get; private set; }
 		public LoginViewModel Login { get; private set; }
         public SettingsViewModel SettingsHub { get; private set; }

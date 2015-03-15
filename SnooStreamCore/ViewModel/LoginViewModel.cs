@@ -259,7 +259,7 @@ namespace SnooStream.ViewModel
                 SnooStreamViewModel.RedditUserState.NeedsCaptcha = false;
                 Username = SnooStreamViewModel.RedditUserState.Username = currentAccount.Name;
                 SnooStreamViewModel.RedditUserState.IsDefault = IsAutoLogin;
-                GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = IsAutoLogin });
+                GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = IsAutoLogin, NewAccount = currentAccount });
                 Success = true;
             }
             catch(Exception ex)

@@ -25,7 +25,18 @@
                 <DataTemplate>
                     <Grid>
                         <local:SelfActivityView DataContext="{Binding SelfStream}" Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}"/>
-                        <local:LoginView DataContext="{Binding Login}" Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>
+                        <StackPanel Orientation="Vertical" Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource invertedBooleanVisibilityConverter}}">
+                            <ContentControl x:Name="header"
+                                CharacterSpacing="-10"
+                                FontSize="40"
+                                HorizontalAlignment="Left" Margin="0,6,0,24"
+                                Content="login">
+                                <ContentControl.RenderTransform>
+                                    <TranslateTransform x:Name="headerTransform"/>
+                                </ContentControl.RenderTransform>
+                            </ContentControl>
+                            <local:LoginView Margin="12,0,0,-8" DataContext="{Binding Login}" />
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
             </HubSection>
@@ -33,12 +44,38 @@
             <HubSection Header="self"  Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}">
                 <DataTemplate>
                     <Grid>
-                        
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.ColumnSpan="3" FontSize="24" Text="{Binding SelfUser.Thing.Name}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Link Karma: "/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelfUser.Thing.LinkKarma}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Comment Karma: "/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelfUser.Thing.CommentKarma}"/>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Is a Gold Member: "/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelfUser.Thing.IsGold}"/>
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Is a subreddit mod: "/>
+                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelfUser.Thing.IsMod}"/>
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Cakeday: "/>
+                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelfUser.CakeDay}"/>
+                        <local:LoginView Grid.Row="6" Grid.ColumnSpan="3" DataContext="{Binding Login}"/>
                     </Grid>
                 </DataTemplate>
             </HubSection>
 
-            <HubSection Header="moderator"  Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}">
+            <HubSection Header="moderator"  Visibility="{Binding Login.IsModerator, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}">
                 <DataTemplate>
                     <Grid>
 

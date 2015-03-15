@@ -11,5 +11,6 @@ namespace SnooStream.Messages
     public class UserLoggedInMessage : MessageBase
     {
         public bool IsDefault { get; set; }
+		public Account NewAccount { get; set; }
     }
 }
