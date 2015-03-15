@@ -12,7 +12,7 @@ namespace SnooStream.PlatformServices
     {
         public MarkdownData Process(string markdown)
         {
-            var processed = SnooDom.SnooDom.MarkdownToDOM(System.Net.WebUtility.HtmlDecode(markdown));
+			var processed = SnooDom.SnooDom.MarkdownToDOM(System.Net.WebUtility.HtmlDecode(markdown) ?? "");
 			return new MarkdownData { MarkdownDom = processed };
         }
 

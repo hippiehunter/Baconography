@@ -132,7 +132,8 @@ namespace SnooStream.ViewModel
         public static ActivityViewModel CreateActivity(Thing thing)
         {
             ActivityViewModel result;
-            if (!SelfStreamViewModel.ActivityLookup.TryGetValue(((ThingData)thing.Data).Name, out result))
+			var activityIdentifier = ActivityGroupViewModel.MakeActivityIdentifier(thing);
+			if (!SelfStreamViewModel.ActivityLookup.TryGetValue(activityIdentifier, out result))
             {
                 if (thing.Data is Link)
                     result = new PostedLinkActivityViewModel(thing.Data as Link);
@@ -168,7 +169,7 @@ namespace SnooStream.ViewModel
                 else
                     throw new ArgumentOutOfRangeException();
 
-                SelfStreamViewModel.ActivityLookup.Add(((ThingData)thing.Data).Name, result);
+				SelfStreamViewModel.ActivityLookup.Add(activityIdentifier, result);
 
             }
             return result;

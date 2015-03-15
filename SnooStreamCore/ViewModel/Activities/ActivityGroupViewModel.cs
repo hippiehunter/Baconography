@@ -156,24 +156,7 @@ namespace SnooStream.ViewModel
             {
                 foreach (var child in listing.Data.Children)
                 {
-                    var childName = ActivityViewModel.GetActivityGroupName(child);
-                    ActivityGroupViewModel existingGroup;
-                    if (groups.TryGetValue(childName, out existingGroup))
-                    {
-                        if (existingGroup.Activities.Count <= 1)
-                        {
-                            existingGroup.Merge(child);
-                        }
-                        else
-                            existingGroup.Merge(child);
-
-                        groups.Remove(childName);
-                        groups.Add(childName, existingGroup);
-                    }
-                    else
-                    {
-                        groups.Add(childName, ActivityGroupViewModel.MakeActivityGroup(childName, child));
-                    }
+					ProcessThing(groups, child);
                 }
 
                 if (string.IsNullOrWhiteSpace(after))
@@ -181,6 +164,28 @@ namespace SnooStream.ViewModel
             }
             return after;
         }
+
+		public static void ProcessThing(ObservableSortedUniqueCollection<string, ActivityGroupViewModel> groups, Thing child)
+		{
+			var childName = ActivityViewModel.GetActivityGroupName(child);
+			ActivityGroupViewModel existingGroup;
+			if (groups.TryGetValue(childName, out existingGroup))
+			{
+				if (existingGroup.Activities.Count <= 1)
+				{
+					existingGroup.Merge(child);
+				}
+				else
+					existingGroup.Merge(child);
+
+				groups.Remove(childName);
+				groups.Add(childName, existingGroup);
+			}
+			else
+			{
+				groups.Add(childName, ActivityGroupViewModel.MakeActivityGroup(childName, child));
+			}
+		}
 
         public static ActivityGroupViewModel MakeActivityGroup(string activityGroupName, Thing thing)
         {
@@ -199,11 +204,26 @@ namespace SnooStream.ViewModel
             Activities = new ObservableSortedUniqueCollection<string, ActivityViewModel>(new ActivityViewModel.ActivityAgeComparitor());
         }
 
+		public static string MakeActivityIdentifier(Thing thing)
+		{
+			var ident = "";
+			if (thing.Data is Message)
+			{
+				var message = thing.Data as Message;
+				ident += message.Author;
+				ident += message.Body.GetHashCode();
+				ident += message.CreatedUTC;
+			}
+			else
+				ident = ((ThingData)thing.Data).Name;
+			return ident;
+		}
+
         public void Merge(Thing additional)
         {
             var currentFirstActivity = FirstActivity;
 
-            var thingName = ((ThingData)additional.Data).Name;
+			var thingName = MakeActivityIdentifier(additional);
             if (!Activities.ContainsKey(thingName))
             {
                 var targetActivity = ActivityViewModel.CreateActivity(additional);

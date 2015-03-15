@@ -60,7 +60,7 @@ namespace SnooStream.ViewModel
 		{
 			get
 			{
-				return new MarkdownEditingVM(_contents, (value) => _contents = value);
+				return new MarkdownEditingVM(_contents, (value) => { _contents = value; RaisePropertyChanged("IsValid"); });
 			}
 		}
 
@@ -99,6 +99,7 @@ namespace SnooStream.ViewModel
                         try
                         {
 							await SnooStreamViewModel.RedditService.AddMessage(Username, Topic, _contents);
+							SnooStreamViewModel.Current.SelfStream.AddMessageActivity(Username, Topic, _contents);
                             SnooStreamViewModel.NavigationService.GoBack();
                         }
                         catch

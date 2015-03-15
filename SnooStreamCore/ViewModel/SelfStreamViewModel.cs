@@ -134,6 +134,24 @@ namespace SnooStream.ViewModel
             ProcessActivityManager();
         }
 
+		public void AddMessageActivity(string targetUser, string topic, string contents)
+		{
+			ActivityGroupViewModel.ProcessThing(Groups, new Thing
+			{
+				Kind = "t4",
+				Data = new Message
+					{
+						Author = SnooStreamViewModel.RedditUserState.Username,
+						Body = contents,
+						Destination = targetUser,
+						Subject = topic,
+						Created = DateTime.Now,
+						CreatedUTC = DateTime.UtcNow
+					}
+			});
+		}
+
+
         private async void ProcessActivityManager()
         {
             var resultTpl = await Task.Run(() =>

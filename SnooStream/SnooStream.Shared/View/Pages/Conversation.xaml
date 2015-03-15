@@ -23,7 +23,7 @@
             </ListView.HeaderTemplate>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <controls:MessageControl/>
+                    <controls:MessageControl Margin="12,12,12,0"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

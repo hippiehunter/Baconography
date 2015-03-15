@@ -32,7 +32,14 @@ namespace SnooStream.ViewModel
             {
                 
                 IsEditing = true;
-                Reply = new CreateMessageViewModel { Username = ActivityViewModel.GetAuthor(CurrentGroup.FirstActivity), Topic = CurrentGroup.FirstActivity.PreviewTitle, IsReply = true };
+				string targetUser = ActivityViewModel.GetAuthor(CurrentGroup.FirstActivity);
+				if (targetUser == SnooStreamViewModel.RedditUserState.Username)
+				{
+					var betterActivity = ((IEnumerable<ActivityViewModel>)CurrentGroup.Activities).FirstOrDefault(vm => ActivityViewModel.GetAuthor(vm) != SnooStreamViewModel.RedditUserState.Username);
+					if (betterActivity != null)
+						targetUser = ActivityViewModel.GetAuthor(betterActivity);
+				}
+				Reply = new CreateMessageViewModel { Username = targetUser, Topic = CurrentGroup.FirstActivity.PreviewTitle, IsReply = true };
                 RaisePropertyChanged("Reply");
                 RaisePropertyChanged("IsEditing");
             });
