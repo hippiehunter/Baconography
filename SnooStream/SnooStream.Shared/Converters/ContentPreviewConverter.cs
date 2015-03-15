@@ -37,12 +37,14 @@ namespace SnooStream.Converters
             {
                 if (existingControl is CardMarkdownControl)
                 {
-                    ((CardMarkdownControl)existingControl).DataContext = ((SelfViewModel)linkViewModel.Content).Markdown;
+					((CardMarkdownControl)existingControl).SetBinding(FrameworkElement.DataContextProperty, new Binding() { Path = new PropertyPath("Markdown"), Source = linkViewModel.Content } );
                     return existingControl as FrameworkElement;
                 }
                 else
                 {
-                    return new CardMarkdownControl { DataContext = ((SelfViewModel)linkViewModel.Content).Markdown };
+                    var newControl = new CardMarkdownControl();
+					((CardMarkdownControl)newControl).SetBinding(FrameworkElement.DataContextProperty, new Binding() { Path = new PropertyPath("Markdown"), Source = linkViewModel.Content });
+					return newControl;
                 }
             }
 			if (preview is PreviewText)

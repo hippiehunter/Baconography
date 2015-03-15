@@ -171,5 +171,10 @@ namespace SnooStream.ViewModel.Content
                 _focused = value;
             }
         }
+
+		public virtual void RefreshUnderlying()
+		{
+			RaisePropertyChanged("Title");
+		}
 	}
 }

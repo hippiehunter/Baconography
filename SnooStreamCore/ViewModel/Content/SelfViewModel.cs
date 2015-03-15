@@ -17,7 +17,6 @@ namespace SnooStream.ViewModel.Content
             UIThreadLoad = true;
 		}
 
-
         public CommentsViewModel Comments
         {
             get
@@ -45,6 +44,13 @@ namespace SnooStream.ViewModel.Content
 		protected override Task StartLoad()
 		{
 			return _selfLink.Comments.LoadFull();
+		}
+
+		public override void RefreshUnderlying()
+		{
+			base.RefreshUnderlying();
+			RaisePropertyChanged("SelfText");
+			RaisePropertyChanged("Markdown");
 		}
 	}
 }

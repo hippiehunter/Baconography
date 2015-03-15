@@ -3,10 +3,12 @@ using SnooStream.ViewModel;
 using SnooStream.ViewModel.Content;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace SnooStream.Common
 {
@@ -149,6 +151,7 @@ namespace SnooStream.Common
 
 		private static Task LoadPreview(SelfViewModel selfViewModel, PreviewText target, CancellationToken cancel)
 		{
+			target.BindChangeHandler(selfViewModel, "SelfText");
 			target.Synopsis = selfViewModel.SelfText;
             target.IsFullyLoaded = true;
             return Task.FromResult<string>(null);
@@ -162,7 +165,19 @@ namespace SnooStream.Common
 	}
 	public class PreviewText : Preview
 	{
+		internal INotifyPropertyChanged ObjectSource;
+		internal PropertyChangedEventHandler _changeHandler;
+		internal string TargetProperty;
 		private string _synopsis;
+
+		public void BindChangeHandler(INotifyPropertyChanged objectSource, string targetProperty)
+		{
+			TargetProperty = targetProperty;
+			ObjectSource = objectSource;
+			_changeHandler = ChangeHandler;
+			ObjectSource.PropertyChanged += _changeHandler;
+		}
+
 		public string Synopsis
 		{
 			get
@@ -173,6 +188,14 @@ namespace SnooStream.Common
 			{
 				_synopsis = value;
 				SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() => RaisePropertyChanged("Synopsis"));
+			}
+		}
+
+		private void ChangeHandler(object sender, PropertyChangedEventArgs args)
+		{
+			if (args.PropertyName == TargetProperty)
+			{
+				Synopsis = ObjectSource.GetType().GetTypeInfo().GetDeclaredProperty(TargetProperty).GetValue(ObjectSource, null) as string;
 			}
 		}
 	}

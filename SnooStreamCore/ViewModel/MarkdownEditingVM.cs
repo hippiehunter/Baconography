@@ -12,10 +12,16 @@ namespace SnooStream.ViewModel
 	public class MarkdownEditingVM : ViewModelBase
 	{
 		Action<string> _textChanged;
+		private string _initialText;
 		public MarkdownEditingVM(string text, Action<string> textChanged)
 		{
 			_textChanged = textChanged;
-			Text = text;
+			Text = _initialText = text;
+		}
+
+		public void Cancel()
+		{
+			Text = _initialText;
 		}
 
 		public string PostingAs

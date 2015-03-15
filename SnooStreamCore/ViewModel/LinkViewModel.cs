@@ -57,11 +57,15 @@ namespace SnooStream.ViewModel
             RaisePropertyChanged("CommentCount");
         }
 
+		MarkdownEditingVM _editingVM;
 		public MarkdownEditingVM EditingVM
 		{
 			get
 			{
-				return new MarkdownEditingVM(Link.Selftext, (value) => Link.Selftext = value);
+				if (_editingVM == null)
+					_editingVM = new MarkdownEditingVM(Link.Selftext, (value) => Link.Selftext = value);
+
+				return _editingVM;
 			}
 		}
 
@@ -220,7 +224,22 @@ namespace SnooStream.ViewModel
         }
 
 		public RelayCommand Edit { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.CommandDispatcher.GotoEditPost(Context, this); }); } }
-		public RelayCommand SubmitEdit { get { return new RelayCommand(async () => { SetFocused(); RaisePropertyChanged("SelfText"); await SnooStreamViewModel.NotificationService.Report("updating post", async () => await SnooStreamViewModel.RedditService.EditPost(Link.Selftext, Link.Name)); }); } }
+		public RelayCommand CancelEdit { get { return new RelayCommand(() => { SetFocused(); IsEditing = false; EditingVM.Cancel(); }); } }
+		public RelayCommand SubmitEdit 
+		{ 
+			get 
+			{ 
+				return new RelayCommand(async () => 
+				{ 
+					SetFocused(); 
+					RaisePropertyChanged("SelfText");
+					Content.RefreshUnderlying();
+					_editingVM = null; 
+					IsEditing = false; 
+					await SnooStreamViewModel.NotificationService.Report("updating post", async () => await SnooStreamViewModel.RedditService.EditPost(Link.Selftext, Link.Name)); 
+				}); 
+			} 
+		}
 		public RelayCommand Delete { get { return new RelayCommand(async () => { SetFocused(); await SnooStreamViewModel.NotificationService.Report("deleting post", async () => await SnooStreamViewModel.RedditService.DeleteLinkOrComment(Link.Name)); });} }
         public RelayCommand Share { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.SystemServices.ShareLink(Url, Title, "posted by " + Author + " to " + Subreddit); }); } }
         public RelayCommand GotoWeb { get { return new RelayCommand(() => { SetFocused(); SnooStreamViewModel.NavigationService.NavigateToWeb(Link.Url); }); } }

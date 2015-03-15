@@ -10,12 +10,6 @@
     x:Name="root"
     d:DesignHeight="300"
     d:DesignWidth="400">
-
-    <UserControl.Resources>
-        <MenuFlyout x:Name="insertFlyout">
-            
-        </MenuFlyout>
-    </UserControl.Resources>
     <Grid Margin="0,12,0,12" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -23,10 +17,10 @@
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
-        <ListView VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center">
+        <ListView Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <VariableSizedWrapGrid Orientation="Horizontal" ItemWidth="50"/>
+                    <WrapGrid Orientation="Horizontal" ItemWidth="50"/>
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
             <ListViewItem DataContext="{Binding Path=InsertBold}" Tapped="Button_Tapped">
