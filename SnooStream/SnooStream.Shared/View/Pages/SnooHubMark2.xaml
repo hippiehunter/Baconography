@@ -35,16 +35,7 @@
                 </DataTemplate>
 
                 <DataTemplate x:Name="loginTemplate">
-                    <StackPanel Grid.Row="1" Orientation="Vertical">
-                        <ContentControl 
-                                CharacterSpacing="-10"
-                                FontSize="40"
-                                HorizontalAlignment="Left"
-                                Content="login">
-                        </ContentControl>
-
-                        <local:LoginView Margin="12" DataContext="{Binding Login}"/>
-                    </StackPanel>
+                    <local:LoginView Margin="12" DataContext="{Binding Login}"/>
                 </DataTemplate>
 
                 <DataTemplate x:Name="selfTemplate">
@@ -55,12 +46,6 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <StackPanel Orientation="Vertical" Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}">
-                                <ContentControl x:Name="header"
-                                CharacterSpacing="-10"
-                                FontSize="40"
-                                HorizontalAlignment="Left"
-                                Content="about">
-                                </ContentControl>
                                 <Grid Margin="12">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
@@ -91,13 +76,6 @@
 
 
                             <StackPanel Grid.Row="1" Orientation="Vertical">
-                                <ContentControl 
-                                CharacterSpacing="-10"
-                                FontSize="40"
-                                HorizontalAlignment="Left"
-                                Content="login">
-                                </ContentControl>
-
                                 <local:LoginView Margin="12" DataContext="{Binding Login}"/>
                             </StackPanel>
                         </Grid>

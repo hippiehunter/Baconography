@@ -130,22 +130,9 @@
         </Grid.Resources>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
-        <ContentControl x:Name="header"
-                        Grid.Row="0"
-                        CharacterSpacing="-10"
-                        FontSize="40"
-                        HorizontalAlignment="Left" Margin="-6,6,0,24"
-                        Content="activity">
-            <ContentControl.RenderTransform>
-                <TranslateTransform x:Name="headerTransform"/>
-            </ContentControl.RenderTransform>
-        </ContentControl>
-
-        <ListView Grid.Row="1" x:Name="listBox" ItemsSource="{Binding Activities}"
+        <ListView x:Name="listBox" ItemsSource="{Binding Activities}"
                 ItemTemplateSelector="{Binding Selector, Source={StaticResource activityTemplateSelector}}" 
                 HorizontalContentAlignment="Stretch"
                 ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
