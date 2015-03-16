@@ -36,7 +36,7 @@ namespace SnooStream.Services
             return _userInfoDb;
         }
 
-        private void AddStoredCredentialImpl(UserCredential newCredential, string password)
+        private void AddStoredCredentialImpl(UserCredential newCredential)
         {
             var userInfoDb = GetUserInfoDB();
 
@@ -46,42 +46,11 @@ namespace SnooStream.Services
                 var existingCredential = currentCredentials.FirstOrDefault(credential => credential.Username == newCredential.Username);
                 if (existingCredential != null)
                 {
-                    var lastCookie = existingCredential.LoginCookie;
-                    //we already exist in the credentials, just update our login token and password (if its set)
-                    if (existingCredential.LoginCookie != newCredential.LoginCookie ||
-                        existingCredential.IsDefault != newCredential.IsDefault)
-                    {
-                        existingCredential.LoginCookie = newCredential.LoginCookie;
-                        existingCredential.IsDefault = newCredential.IsDefault;
-
-                        //go find the one we're updating and actually do it
-                        var userCredentialsCursor = userInfoDb.Select(userInfoDb.GetKeys().First(), "credentials", DBReadFlags.AutoLock);
-                        if (userCredentialsCursor != null)
-                        {
-                            using (userCredentialsCursor)
-                            {
-                                do
-                                {
-                                    var credential = JsonConvert.DeserializeObject<UserCredential>(userCredentialsCursor.GetString());
-                                    if (credential.Username == newCredential.Username)
-                                    {
-                                        userCredentialsCursor.Update(JsonConvert.SerializeObject(existingCredential));
-                                        break;
-                                    }
-                                } while (userCredentialsCursor.MoveNext());
-                            }
-                        }
-                    }
-                    if (!string.IsNullOrWhiteSpace(password))
-                    {
-                        AddOrUpdateWindowsCredential(existingCredential, password, lastCookie);
-                    }
-                }
+                    UpdateWindowsCredential(existingCredential);
+				}
                 else
                 {
                     userInfoDb.Insert("credentials", JsonConvert.SerializeObject(newCredential));
-                    var newPassData = new PasswordData { Password = password, LastCookie = newCredential.LoginCookie };
-                    userInfoDb.Insert("passwords", JsonConvert.SerializeObject(newPassData));
                 }
             }
             catch
@@ -95,7 +64,6 @@ namespace SnooStream.Services
             try
             {
                 var userInfoDb = GetUserInfoDB();
-                List<string> lastCookies = new List<string>();
                 //go find the one we're updating and actually do it
                 var userCredentialsCursor = userInfoDb.Select(userInfoDb.GetKeys().First(), "credentials", DBReadFlags.AutoLock);
                 if (userCredentialsCursor != null)
@@ -107,26 +75,9 @@ namespace SnooStream.Services
                             var credential = JsonConvert.DeserializeObject<UserCredential>(userCredentialsCursor.GetString());
                             if (credential.Username == username)
                             {
-                                lastCookies.Add(credential.LoginCookie);
                                 userCredentialsCursor.Delete();
                             }
                         } while (userCredentialsCursor.MoveNext());
-                    }
-                }
-
-                var passwordCursor = userInfoDb.Select(userInfoDb.GetKeys().First(), "passwords", DBReadFlags.AutoLock);
-                if (passwordCursor != null)
-                {
-                    using (passwordCursor)
-                    {
-                        do
-                        {
-                            var passwordData = JsonConvert.DeserializeObject<PasswordData>(passwordCursor.GetString());
-                            if (lastCookies.Contains(passwordData.LastCookie))
-                            {
-                                passwordCursor.Delete();
-                            }
-                        } while (passwordCursor.MoveNext());
                     }
                 }
             }
@@ -137,29 +88,27 @@ namespace SnooStream.Services
 
         }
 
-        private void AddOrUpdateWindowsCredential(UserCredential existingCredential, string password, string lastCookie)
+        private void UpdateWindowsCredential(UserCredential existingCredential)
         {
             var userInfoDb = GetUserInfoDB();
             try
             {
 
-                var passwordCursor = userInfoDb.Select(userInfoDb.GetKeys().First(), "passwords", DBReadFlags.AutoLock);
-                if (passwordCursor != null)
-                {
-                    using (passwordCursor)
-                    {
-                        do
-                        {
-                            var passwordData = JsonConvert.DeserializeObject<PasswordData>(passwordCursor.GetString());
-                            if (lastCookie == passwordData.LastCookie)
-                            {
-                                var newPassData = new PasswordData { Password = password, LastCookie = existingCredential.LoginCookie };
-                                passwordCursor.Update(JsonConvert.SerializeObject(newPassData));
-                                break;
-                            }
-                        } while (passwordCursor.MoveNext());
-                    }
-                }
+				var userCredentialsCursor = userInfoDb.Select(userInfoDb.GetKeys().First(), "credentials", DBReadFlags.AutoLock);
+				if (userCredentialsCursor != null)
+				{
+					using (userCredentialsCursor)
+					{
+						do
+						{
+							var credential = JsonConvert.DeserializeObject<UserCredential>(userCredentialsCursor.GetString());
+							if (credential.Username == existingCredential.Username)
+							{
+								userCredentialsCursor.Update(JsonConvert.SerializeObject(existingCredential));
+							}
+						} while (userCredentialsCursor.MoveNext());
+					}
+				}
             }
             catch
             {
@@ -186,22 +135,14 @@ namespace SnooStream.Services
             return credentials;
         }
 
-        private class PasswordData
-        {
-            [JsonProperty("lastcookie")]
-            public string LastCookie { get; set; }
-            [JsonProperty("password")]
-            public string Password { get; set; }
-        }
-
         public Task<IEnumerable<UserCredential>> StoredCredentials()
         {
             return Task.Run(() => (IEnumerable<UserCredential>)GetStoredCredentialsImpl());
         }
 
-        public Task AddStoredCredential(UserCredential newCredential, string password)
+        public Task AddStoredCredential(UserCredential newCredential)
         {
-            return Task.Run(() => AddStoredCredentialImpl(newCredential, password));
+            return Task.Run(() => AddStoredCredentialImpl(newCredential));
         }
 
         public Task RemoveStoredCredential(string username)

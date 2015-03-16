@@ -213,7 +213,7 @@ namespace SnooStreamBackground
             
             if (!_external && activityManager->NeedsRefresh)
             {
-                return create_task(activityManager->Refresh(settings->RedditOAuth, nullptr))
+                return create_task(activityManager->Refresh(settings->RedditOAuth, nullptr, true))
                     .then([=]()
                 {
                     activityManager->StoreState();

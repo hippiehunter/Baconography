@@ -42,30 +42,41 @@ ActivityManager::ActivityManager()
     }
 }
 
-void ActivityManager::StoreState()
+void ActivityManager::ClearState()
 {
-    auto serializedObject = ref new JsonObject();
-    auto toastHistory = ref new JsonArray();
-    for (auto toast : _alreadyToasted)
-    {
-        if (toastHistory->Size < 100)
-            toastHistory->Append(JsonValue::CreateStringValue(toast));
-    }
-
-    serializedObject->SetNamedValue("toasted", toastHistory);
-    serializedObject->SetNamedValue("received", JsonValue::CreateStringValue(ReceivedBlob));
-    serializedObject->SetNamedValue("sent", JsonValue::CreateStringValue(SentBlob));
-    serializedObject->SetNamedValue("activity", JsonValue::CreateStringValue(ActivityBlob));
-    serializedObject->SetNamedValue("updateSinceActivity", JsonValue::CreateNumberValue(UpdateCountSinceActivity));
-    serializedObject->SetNamedValue("lastUpdate", JsonValue::CreateNumberValue(_lastUpdate.count()));
-
-    auto serializedString = serializedObject->Stringify();
     wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
     localPath += L"\\bgtaskActivity.txt";
     wofstream activityFile(localPath, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc, _SH_DENYRW);
-    wstring activityFileString(serializedString->Data(), serializedString->Length());
-    activityFile << activityFileString;
     activityFile.close();
+}
+
+void ActivityManager::StoreState()
+{
+    if (_canStore)
+    {
+        auto serializedObject = ref new JsonObject();
+        auto toastHistory = ref new JsonArray();
+        for (auto toast : _alreadyToasted)
+        {
+            if (toastHistory->Size < 100)
+                toastHistory->Append(JsonValue::CreateStringValue(toast));
+        }
+
+        serializedObject->SetNamedValue("toasted", toastHistory);
+        serializedObject->SetNamedValue("received", JsonValue::CreateStringValue(ReceivedBlob));
+        serializedObject->SetNamedValue("sent", JsonValue::CreateStringValue(SentBlob));
+        serializedObject->SetNamedValue("activity", JsonValue::CreateStringValue(ActivityBlob));
+        serializedObject->SetNamedValue("updateSinceActivity", JsonValue::CreateNumberValue(UpdateCountSinceActivity));
+        serializedObject->SetNamedValue("lastUpdate", JsonValue::CreateNumberValue(_lastUpdate.count()));
+
+        auto serializedString = serializedObject->Stringify();
+        wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
+        localPath += L"\\bgtaskActivity.txt";
+        wofstream activityFile(localPath, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc, _SH_DENYRW);
+        wstring activityFileString(serializedString->Data(), serializedString->Length());
+        activityFile << activityFileString;
+        activityFile.close();
+    }
 }
 
 //grab new data if its been at least 60 minutes since the last time we checked or 5 minutes (increasing by 5 minutes each refresh without a toast)
@@ -124,10 +135,11 @@ void ActivityManager::MakeToast(String^ id, String^ text, String^ context, Typed
     notifier->Show(notification);
 }
 
-IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHandler<ToastNotification^, Object^>^ activatedHandler)
+IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHandler<ToastNotification^, Object^>^ activatedHandler, bool canStore)
 {
+    _canStore = canStore;
     std::shared_ptr<SimpleRedditService> redditService = make_shared<SimpleRedditService>(RedditOAuth::Deserialize(oAuthBlob));
-    UpdateCountSinceActivity++;
+    UpdateCountSinceActivity = UpdateCountSinceActivity + 1;
     //grab new data
     return concurrency::create_async([=]()
     {

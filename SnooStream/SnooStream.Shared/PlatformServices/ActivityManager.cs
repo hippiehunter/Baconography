@@ -15,7 +15,13 @@ namespace SnooStream.PlatformServices
         string _oAuthBlob;
         public ActivityManager()
         {
+			CanStore = true;
         }
+
+		public void Clear()
+		{
+			_activityManager.ClearState();
+		}
 
         static Listing empty = new Listing { Data = new ListingData { Children = new List<Thing>() } };
 
@@ -78,9 +84,14 @@ namespace SnooStream.PlatformServices
             }
         }
 
-        public bool NeedsRefresh()
+		public bool CanStore { get; set; }
+
+        public bool NeedsRefresh(bool appStart)
         {
-            return _activityManager.NeedsRefresh;
+			if (appStart && _activityManager.UpdateCountSinceActivity < 5)
+				return true;
+			else
+				return _activityManager.NeedsRefresh;
         }
 
         public async Task Refresh()
@@ -96,7 +107,13 @@ namespace SnooStream.PlatformServices
                             //toast.Tag
 #endif
 
-                        });
+						}, CanStore);
+						if(SnooStreamViewModel.RedditUserState.Username != null)
+						{
+							var currentAccount = await SnooStreamViewModel.RedditService.GetIdentity();
+							SnooStreamViewModel.RedditUserState.IsMod = currentAccount.IsMod;
+							SnooStreamViewModel.RedditUserState.IsGold = currentAccount.IsGold;
+						}
                     });
             });
             

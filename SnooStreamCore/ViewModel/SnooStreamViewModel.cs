@@ -42,6 +42,8 @@ namespace SnooStream.ViewModel
             SnooStreamViewModel.ActivityManager.OAuth = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.OAuth != null ?
                     JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
 
+			SnooStreamViewModel.ActivityManager.CanStore = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.IsDefault;
+
             NotificationService = new Common.NotificationService();
 			CaptchaProvider = new CaptchaService();
 			RedditService = new Reddit(_listingFilter, RedditUserState, OfflineService, CaptchaProvider, "3m9rQtBinOg_rA", null, "http://www.google.com");
@@ -91,7 +93,6 @@ namespace SnooStream.ViewModel
 		public LoginViewModel Login { get; private set; }
         public SettingsViewModel SettingsHub { get; private set; }
         public SubredditRiverViewModel SubredditRiver { get; private set; }
-
         public UploadViewModel UploadHub { get; private set; }
         public string FeaturedImage { get; private set; }
 

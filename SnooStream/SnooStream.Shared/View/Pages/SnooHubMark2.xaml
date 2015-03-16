@@ -13,85 +13,98 @@
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <Grid x:Name="LayoutRoot" Margin="0,24,0,0">
-        <Hub>
-            <!--Panorama item one-->
-            <HubSection Header="subreddits">
-                <DataTemplate>
+        <common:ItemsHub ItemsSource="{Binding HubSections}">
+            <common:ItemsHub.Resources>
+                <DataTemplate x:Name="activityTemplate">
+                    <local:SelfActivityView DataContext="{Binding SelfStream}"/>
+                </DataTemplate>
+                <DataTemplate x:Name="subredditTemplate">
                     <local:SubredditRiver DataContext="{Binding SubredditRiver}"/>
                 </DataTemplate>
-            </HubSection>
 
-            <HubSection Header="activity">
-                <DataTemplate>
+                <DataTemplate x:Name="settingsTemplate">
                     <Grid>
-                        <local:SelfActivityView DataContext="{Binding SelfStream}" Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}"/>
-                        <StackPanel Orientation="Vertical" Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource invertedBooleanVisibilityConverter}}">
-                            <ContentControl x:Name="header"
+                        <local:HubSettingsView DataContext="{Binding SettingsHub}"/>
+                    </Grid>
+                </DataTemplate>
+
+                <DataTemplate x:Name="moderatorTemplate">
+                    <Grid>
+
+                    </Grid>
+                </DataTemplate>
+
+                <DataTemplate x:Name="loginTemplate">
+                    <StackPanel Grid.Row="1" Orientation="Vertical">
+                        <ContentControl 
                                 CharacterSpacing="-10"
                                 FontSize="40"
-                                HorizontalAlignment="Left" Margin="0,6,0,24"
+                                HorizontalAlignment="Left"
                                 Content="login">
-                                <ContentControl.RenderTransform>
-                                    <TranslateTransform x:Name="headerTransform"/>
-                                </ContentControl.RenderTransform>
-                            </ContentControl>
-                            <local:LoginView Margin="12,0,0,-8" DataContext="{Binding Login}" />
-                        </StackPanel>
-                    </Grid>
+                        </ContentControl>
+
+                        <local:LoginView Margin="12" DataContext="{Binding Login}"/>
+                    </StackPanel>
                 </DataTemplate>
-            </HubSection>
 
-            <HubSection Header="self"  Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}">
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*"/>
-                            <ColumnDefinition Width="1*"/>
-                            <ColumnDefinition Width="1*"/>
-                        </Grid.ColumnDefinitions>
+                <DataTemplate x:Name="selfTemplate">
+                    <ScrollViewer>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Vertical" Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}">
+                                <ContentControl x:Name="header"
+                                CharacterSpacing="-10"
+                                FontSize="40"
+                                HorizontalAlignment="Left"
+                                Content="about">
+                                </ContentControl>
+                                <Grid Margin="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource SubtextButtonTitleTextBlock}" FontWeight="Bold" Text="{Binding SelfUser.Thing.Name}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource SubtextButtonSubtextTextBlock}" FontWeight="Bold" Text="Link Karma "/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource SubtextButtonSubtextTextBlock}" FontWeight="Bold" Text="{Binding SelfUser.Thing.LinkKarma}"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource SubtextButtonSubtextTextBlock}" FontWeight="Bold" Text="Comment Karma "/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource SubtextButtonSubtextTextBlock}" FontWeight="Bold" Text="{Binding SelfUser.Thing.CommentKarma}"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource SubtextButtonSubtextTextBlock}" FontWeight="Bold" Text="Is a Gold Member "/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource SubtextButtonSubtextTextBlock}" FontWeight="Bold" Text="{Binding SelfUser.Thing.IsGold}"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource SubtextButtonSubtextTextBlock}" FontWeight="Bold" Text="Is a subreddit mod " Margin="0,0,12,0"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Style="{StaticResource SubtextButtonSubtextTextBlock}" FontWeight="Bold" Text="{Binding SelfUser.Thing.IsMod}"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource SubtextButtonSubtextTextBlock}" FontWeight="Bold" Text="Cakeday "/>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Style="{StaticResource SubtextButtonSubtextTextBlock}" FontWeight="Bold" Text="{Binding SelfUser.CakeDay}"/>
+                                </Grid>
+                            </StackPanel>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.ColumnSpan="3" FontSize="24" Text="{Binding SelfUser.Thing.Name}"/>
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Link Karma: "/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelfUser.Thing.LinkKarma}"/>
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Comment Karma: "/>
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelfUser.Thing.CommentKarma}"/>
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Is a Gold Member: "/>
-                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelfUser.Thing.IsGold}"/>
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Is a subreddit mod: "/>
-                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelfUser.Thing.IsMod}"/>
-                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Cakeday: "/>
-                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelfUser.CakeDay}"/>
-                        <local:LoginView Grid.Row="6" Grid.ColumnSpan="3" DataContext="{Binding Login}"/>
-                    </Grid>
+
+                            <StackPanel Grid.Row="1" Orientation="Vertical">
+                                <ContentControl 
+                                CharacterSpacing="-10"
+                                FontSize="40"
+                                HorizontalAlignment="Left"
+                                Content="login">
+                                </ContentControl>
+
+                                <local:LoginView Margin="12" DataContext="{Binding Login}"/>
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
                 </DataTemplate>
-            </HubSection>
-
-            <HubSection Header="moderator"  Visibility="{Binding Login.IsModerator, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}">
-                <DataTemplate>
-                    <Grid>
-
-                    </Grid>
-                </DataTemplate>
-            </HubSection>
-
-            <!--Panorama item two-->
-            <HubSection Header="settings" DataContext="{Binding SettingsHub}">
-                <DataTemplate>
-                    <Grid>
-                        <local:HubSettingsView />
-                    </Grid>
-                </DataTemplate>
-            </HubSection>
-        </Hub>
+            </common:ItemsHub.Resources>
+        </common:ItemsHub>
     </Grid>
 
 </common:SnooApplicationPage>

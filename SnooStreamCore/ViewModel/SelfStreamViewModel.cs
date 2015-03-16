@@ -49,7 +49,7 @@ namespace SnooStream.ViewModel
 
 			public async Task Refresh(System.Collections.ObjectModel.ObservableCollection<ViewModelBase> current, bool onlyNew)
 			{
-				await _selfStream.PullNew(!onlyNew);
+				await _selfStream.PullNew(false, !onlyNew);
 			}
 
 			public string NameForStatus
@@ -73,20 +73,22 @@ namespace SnooStream.ViewModel
                 ProcessActivityManager();
                 RunActivityUpdater();
             }
-
-			MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
 		}
 
-		private async void OnUserLoggedIn(UserLoggedInMessage obj)
+		public async void OnUserLoggedIn(UserLoggedInMessage obj)
 		{
             SnooStreamViewModel.ActivityManager.OAuth = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.OAuth != null ?
                     JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
+			SnooStreamViewModel.ActivityManager.CanStore = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.IsDefault;
             RaisePropertyChanged("IsLoggedIn");
 			RaisePropertyChanged("Activities");
+			OldestMessage = null;
+			OldestSentMessage = null;
+			OldestActivity = null;
 			Groups.Clear();
             if (IsLoggedIn)
             {
-                await PullNew(true);
+				await PullNew(false, true);
                 if (!_runningActivityUpdater)
                 {
                     RunActivityUpdater();
@@ -122,13 +124,13 @@ namespace SnooStream.ViewModel
 		public ObservableSortedUniqueCollection<string, ActivityGroupViewModel> Groups { get; private set; }
 		public ObservableCollection<ViewModelBase> Activities { get; private set; }
         public static Dictionary<string, ActivityViewModel> ActivityLookup = new Dictionary<string, ActivityViewModel>();
-		public async Task PullNew(bool force)
+		public async Task PullNew(bool userInitiated, bool appStart)
         {
             LastRefresh = DateTime.Now;
             if (!IsLoggedIn)
                 throw new InvalidOperationException("User must be logged in to do this");
 
-            if (SnooStreamViewModel.ActivityManager.NeedsRefresh() || force)
+			if (SnooStreamViewModel.ActivityManager.NeedsRefresh(appStart) || userInitiated)
                 await SnooStreamViewModel.ActivityManager.Refresh();
 
             ProcessActivityManager();
@@ -175,13 +177,13 @@ namespace SnooStream.ViewModel
             try
             {
                 var cancelToken = SnooStreamViewModel.BackgroundCancellationToken;
-                await PullNew(true);
+                await PullNew(false, true);
                 while (!cancelToken.IsCancellationRequested)
                 {
                     //check every 5 minutes since that is the minimum time we might refresh at
-                    if (SnooStreamViewModel.ActivityManager.NeedsRefresh())
+                    if (SnooStreamViewModel.ActivityManager.NeedsRefresh(false))
                     {
-                        await PullNew(true);
+                        await PullNew(false, true);
                     }
                     await Task.Delay(1000 * 60 * 5, cancelToken);
                 }
@@ -210,10 +212,22 @@ namespace SnooStream.ViewModel
             {
                 await SnooStreamViewModel.NotificationService.Report("getting additional " + displayName, async () =>
                 {
-                    activity = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(uriFormat, oldest, null);
+					try
+					{
+						activity = await SnooStreamViewModel.RedditService.GetAdditionalFromListing(uriFormat, oldest, null);
+					}
+					catch //make this silent, we get failures here when there arent any more items
+					{
+						oldest = null;
+					}
                 });
 
-                return ActivityGroupViewModel.ProcessListing(Groups, activity, oldest);
+				if (activity != null)
+				{
+					return ActivityGroupViewModel.ProcessListing(Groups, activity, oldest);
+				}
+				else
+					return oldest;
             }
             else
                 return oldest;
@@ -245,7 +259,7 @@ namespace SnooStream.ViewModel
 			if (!onlyNew)
 			{
 				Groups.Clear();
-				await PullNew(true);
+				await PullNew(true, false);
 			}
 		}
 	}

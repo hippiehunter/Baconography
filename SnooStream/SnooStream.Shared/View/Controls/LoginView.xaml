@@ -5,6 +5,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:SnooStream.View.Controls"
     xmlns:common="using:SnooStream.Common"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:corei="using:Microsoft.Xaml.Interactions.Core"
     mc:Ignorable="d"
     d:DesignHeight="579.524" d:DesignWidth="480">
 
@@ -12,29 +14,48 @@
         <ScrollViewer>
             <StackPanel>
                 <StackPanel Visibility="{Binding HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}">
-                    <ListView
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch"
-                        Margin="-12,0,-12,0" ItemsSource="{Binding StoredCredentials}">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.ItemTemplate>
+                    <TextBlock Text="STORED LOGINS" Style="{StaticResource SubtextButtonTitleTextBlock}" FontWeight="Bold"/>
+                    <ComboBox x:Name="usernameSelector" Grid.Row="0" Grid.ColumnSpan="3" ItemsSource="{Binding StoredCredentials}" 
+                                  SelectedItem="{Binding SelectedCredential, Mode=TwoWay}" HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Username}"/>
+                                <TextBlock Text="{Binding Username}" />
                             </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </StackPanel>
+
                 <Button Style="{StaticResource SubtextButton}"
-                        Visibility="{Binding Working, Converter={StaticResource invertedBooleanVisibilityConverter}}"
+                        Visibility="{Binding IsLoggedIn, Converter={StaticResource booleanVisibilityConverter}}"
+                        Command="{Binding DoLogout}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            LOGOUT
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Logout from current user account
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource SubtextButton}"
+                        Visibility="{Binding IsLoggedIn, Converter={StaticResource booleanVisibilityConverter}}"
+                        Command="{Binding DoDelete}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            DELETE
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Delete authorization from this device
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource SubtextButton}"
                         Command="{Binding DoLogin}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
-                            LOGIN
+                            NEW LOGIN
                         </TextBlock>
                         <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
                             Login via OAuth on reddit.com

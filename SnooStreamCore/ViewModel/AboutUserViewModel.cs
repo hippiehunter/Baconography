@@ -75,7 +75,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return Thing.CreatedUTC.ToString("MMMM d");
+				return (Thing != null ? Thing.CreatedUTC : new DateTime()).ToString("MMMM d");
             }
         }
         public bool Loading { get; set; }

@@ -12,8 +12,8 @@ namespace SnooStream.Services
     [DataContract]
     public class UserCredential
     {
-        [JsonProperty("logincookie")]
-        public string LoginCookie { get; set; }
+        [JsonProperty("oauth")]
+		public RedditOAuth OAuth { get; set; }
         [JsonProperty("username")]
         public string Username { get; set; }
         [JsonProperty("me")]
@@ -25,7 +25,7 @@ namespace SnooStream.Services
     public interface IUserCredentialService
     {
         Task<IEnumerable<UserCredential>> StoredCredentials();
-        Task AddStoredCredential(UserCredential newCredential, string password);
+        Task AddStoredCredential(UserCredential newCredential);
         Task RemoveStoredCredential(string username);
     }
 }

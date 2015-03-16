@@ -16,6 +16,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Common\BufferedIncrementalLoadCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\ItemsHub.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\LinkViewLayoutManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\ManipulationController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\MarkdownHelpers.cs" />

@@ -20,9 +20,9 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding ResultText}"/>
-        <CheckBox Grid.Row="1" Content="Remember credentials" IsChecked="{Binding IsRememberLogin, Mode=TwoWay}" Visibility="{Binding Success, Converter={StaticResource booleanVisibilityConverter}}"/>
-        <CheckBox Grid.Row="2" Content="Login automatically" IsChecked="{Binding IsAutoLogin, Mode=TwoWay}" Visibility="{Binding Success, Converter={StaticResource booleanVisibilityConverter}}"/>
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" FontSize="20" Text="{Binding ResultText}"/>
+        <CheckBox Grid.Row="1" Grid.ColumnSpan="2" Content="Remember credentials" IsChecked="{Binding IsRememberLogin, Mode=TwoWay}" Visibility="{Binding Success, Converter={StaticResource booleanVisibilityConverter}}"/>
+        <CheckBox Grid.Row="2" Grid.ColumnSpan="2" Content="Login automatically" IsChecked="{Binding IsAutoLogin, Mode=TwoWay}" Visibility="{Binding Success, Converter={StaticResource booleanVisibilityConverter}}"/>
         <ProgressBar Grid.Row="3" Grid.ColumnSpan="2" IsIndeterminate="True" Visibility="{Binding Working, Converter={StaticResource booleanVisibilityConverter}}"/>
         <Button Grid.Row="3" Content="Continue" Command="{Binding ContinueOAuthCommand}" Visibility="{Binding Finished, Converter={StaticResource booleanVisibilityConverter}}"/>
         <Button Grid.Row="3" Content="Retry" Command="{Binding RetryOAuthCommand}" Visibility="{Binding Success, Converter={StaticResource invertedBooleanVisibilityConverter}}"/>

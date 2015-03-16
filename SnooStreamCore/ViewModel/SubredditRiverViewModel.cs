@@ -496,7 +496,7 @@ namespace SnooStream.ViewModel
             LocalSubreddits.Clear();
             _madeSubreddits.Clear();
             EnsureFrontPage();
-            ReloadSubscribed(true);
+			ReloadSubscribed(true);
         }
 
         private void EnsureFrontPage()
@@ -555,7 +555,12 @@ namespace SnooStream.ViewModel
             }
             try
             {
-                var subscribedListing = await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing();
+                var subscribedListing = IsLoggedIn ?  
+					await SnooStreamViewModel.RedditService.GetSubscribedSubredditListing() :
+					await SnooStreamViewModel.RedditService.GetSubreddits(25, "popular");
+
+				if ((subscribedListing.Data == null || subscribedListing.Data.Children == null || subscribedListing.Data.Children.Count == 0) && IsLoggedIn)
+					subscribedListing = await SnooStreamViewModel.RedditService.GetSubreddits(25, "popular");
 
                 var newRivers = new Dictionary<string, Subreddit>();
                 foreach (var subreddit in subscribedListing.Data.Children)
@@ -564,6 +569,7 @@ namespace SnooStream.ViewModel
                         newRivers.Add(((Subreddit)subreddit.Data).Id, ((Subreddit)subreddit.Data));
                 }
 
+				string newCategory = IsLoggedIn ? "subscribed" : "popular";
                 var missingRivers = new List<SubredditWrapper>();
                 var existingRivers = new Dictionary<string, SubredditWrapper>();
                 foreach (var river in LocalSubreddits)
@@ -575,7 +581,7 @@ namespace SnooStream.ViewModel
                     if (!existingRivers.ContainsKey(river.Thing.Id))
                         existingRivers.Add(river.Thing.Id, river);
 
-                    if (river.Category != "subscribed" && !newRivers.ContainsKey(river.Thing.Id))
+                    if (river.Category == "subscribed" && !newRivers.ContainsKey(river.Thing.Id))
                         missingRivers.Add(river);
                     else if (newRivers.ContainsKey(river.Thing.Id))
                         river.Thing = newRivers[river.Thing.Id];
@@ -585,7 +591,7 @@ namespace SnooStream.ViewModel
                 foreach (var subredditTpl in newRivers)
                 {
                     if (!existingRivers.ContainsKey(subredditTpl.Key))
-                        AddToLocalSubreddits(new SubredditWrapper(this, subredditTpl.Value.Url, subredditTpl.Value, "hot", "subscribed"));
+						AddToLocalSubreddits(new SubredditWrapper(this, subredditTpl.Value.Url, subredditTpl.Value, "hot", newCategory));
                 }
 
                 foreach (var missingRiver in missingRivers)

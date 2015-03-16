@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using Newtonsoft.Json;
+using SnooStream.Messages;
 using SnooStream.PlatformServices;
 using SnooStream.Services;
 using SnooStream.ViewModel;
@@ -35,6 +36,9 @@ namespace SnooStream.Common
 
                 if (!IsInDesignMode)
                 {
+					MakeHubSections();
+					RaisePropertyChanged("HubSections");
+
                     LockScreenSettings lsSettings = new LockScreenSettings();
                     lsSettings.LiveTileSettings = new List<LiveTileSettings>
                     {
@@ -44,6 +48,8 @@ namespace SnooStream.Common
                         JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
 
                     lsSettings.Store();
+
+					MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
 
                     Task.Delay(10000).ContinueWith(async (tskTop) =>
                         {
@@ -84,6 +90,50 @@ namespace SnooStream.Common
                 throw ex;
             }
         }
+
+		private void MakeHubSections()
+		{
+			if (Login.IsLoggedIn)
+			{
+				HubSections = new List<HubSection>
+						{
+							new HubSection { Header = "subreddit" },
+							new HubSection { Header = "activity" },
+							new HubSection { Header = "self" },
+							new HubSection { Header = "settings" }
+						};
+			}
+			else if (Login.IsMod)
+			{
+				HubSections = new List<HubSection>
+						{
+							new HubSection { Header = "subreddit" },
+							new HubSection { Header = "activity" },
+							new HubSection { Header = "mod" },
+							new HubSection { Header = "self" },
+							new HubSection { Header = "settings" }
+						};
+			}
+			else
+			{
+				HubSections = new List<HubSection>
+						{
+							new HubSection { Header = "subreddit" },
+							new HubSection { Header = "login" },
+							new HubSection { Header = "settings" }
+						};
+			}
+
+			RaisePropertyChanged("HubSections");
+		}
+
+		private void OnUserLoggedIn(UserLoggedInMessage obj)
+		{
+			SnooStreamViewModel.ActivityManager.Clear();
+			SnooStreamViewModel.ActivityManager = new SnooStream.PlatformServices.ActivityManager();
+			SelfStream.OnUserLoggedIn(obj);
+			MakeHubSections();
+		}
 
         public static BackgroundTaskRegistration RegisterBackgroundTask(
                                                 string taskEntryPoint,
@@ -142,5 +192,16 @@ namespace SnooStream.Common
         {
             SnooApplicationPage.Current.SetFocusedViewModel(viewModel);
         }
+
+
+		public List<HubSection> HubSections { get; private set; }
+		public class HubSection
+		{
+			public string Header { get; set; }
+			public override string ToString()
+			{
+				return Header;
+			}
+		}
     }
 }

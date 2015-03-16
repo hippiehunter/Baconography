@@ -11,6 +11,7 @@ namespace SnooStreamBackground
     private:
        std::vector<Platform::String^> _alreadyToasted;
        std::chrono::seconds _lastUpdate;
+       bool _canStore;
 
        void MakeToast(Platform::String^ id, Platform::String^ text, Platform::String^ context, Windows::Foundation::TypedEventHandler<Windows::UI::Notifications::ToastNotification^, Object^>^ activatedHandler);
         
@@ -24,8 +25,9 @@ namespace SnooStreamBackground
             bool get();
         }
         property int UpdateCountSinceActivity;
-        Windows::Foundation::IAsyncAction^ Refresh(Platform::String^ oAuthBlob, Windows::Foundation::TypedEventHandler<Windows::UI::Notifications::ToastNotification^, Object^>^ activatedHandler);
+        Windows::Foundation::IAsyncAction^ Refresh(Platform::String^ oAuthBlob, Windows::Foundation::TypedEventHandler<Windows::UI::Notifications::ToastNotification^, Object^>^ activatedHandler, bool canStore);
         void StoreState();
         Platform::String^ ContextForId(Platform::String^ id);
+        void ClearState();
     };
 }
