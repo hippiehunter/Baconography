@@ -39,7 +39,7 @@ namespace SnooStream.ViewModel
 					if (betterActivity != null)
 						targetUser = ActivityViewModel.GetAuthor(betterActivity);
 				}
-				Reply = new CreateMessageViewModel { Username = targetUser, Topic = CurrentGroup.FirstActivity.PreviewTitle, IsReply = true };
+				Reply = new CreateMessageViewModel { Username = targetUser, Topic = CurrentGroup.FirstActivity.SubTitle, IsReply = true };
                 RaisePropertyChanged("Reply");
                 RaisePropertyChanged("IsEditing");
             });

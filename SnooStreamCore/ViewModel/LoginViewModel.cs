@@ -370,7 +370,15 @@ namespace SnooStream.ViewModel
 				SnooStreamViewModel.RedditUserState.IsDefault = IsAutoLogin;
 				if (IsRememberLogin)
 				{
-					await SnooStreamViewModel.UserCredentialService.AddStoredCredential(new UserCredential { Username = Username, IsDefault = IsAutoLogin, Me = new Thing { Data = currentAccount, Kind = "t2" }, OAuth = oAuth });
+                    var newCredential = new UserCredential { Username = Username, IsDefault = IsAutoLogin, Me = new Thing { Data = currentAccount, Kind = "t2" }, OAuth = oAuth };
+                    await SnooStreamViewModel.UserCredentialService.AddStoredCredential(newCredential);
+                    StoredCredentials.Add(newCredential);
+
+                    //dont fire the login stuff just use the field directly
+                    _selectedCredential = newCredential;
+
+                    RaisePropertyChanged("HasStoredLogins");
+                    RaisePropertyChanged("SelectedCredential");
 				}
 				GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<UserLoggedInMessage>(new UserLoggedInMessage { IsDefault = IsAutoLogin, NewAccount = currentAccount });
 			}

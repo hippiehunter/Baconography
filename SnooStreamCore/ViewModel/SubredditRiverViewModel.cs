@@ -251,10 +251,26 @@ namespace SnooStream.ViewModel
         ObservableCollection<SubredditWrapper> SearchSubreddits { get; set; }
         ObservableCollection<SubredditWrapper> AttachedCollection { get; set; }
 
-        void AddToLocalSubreddits(SubredditWrapper wrapper)
+        void AddToLocalSubreddits(SubredditWrapper wrapper, bool first = false)
         {
-            if (!LocalSubreddits.Any((local) => local.Name == wrapper.Name))
-                LocalSubreddits.Add(wrapper);
+            var existing = LocalSubreddits.FirstOrDefault((local) => local.Name == wrapper.Name);
+            if (existing != null && existing.Category != wrapper.Category)
+            {
+                LocalSubreddits[LocalSubreddits.IndexOf(existing)] = wrapper;
+            }
+            
+            if (existing == null)
+            {
+                if (first)
+                    LocalSubreddits.Insert(0, wrapper);
+                else
+                    LocalSubreddits.Add(wrapper);
+            }
+            else if(first)
+            {
+                if (LocalSubreddits[0] != wrapper)
+                    LocalSubreddits.Move(LocalSubreddits.IndexOf(existing), 0);
+            }
         }
 
         private void AttachCollection(ObservableCollection<SubredditWrapper> sourceCollection)
@@ -467,11 +483,12 @@ namespace SnooStream.ViewModel
                 {
                     AddToLocalSubreddits(local);
                 }
-                EnsureFrontPage();
                 if (IsLoggedIn)
                     ReloadSubscribed(false);
                 else
                     LoadWithoutInitial();
+
+                EnsureFrontPage();
             }
             else
             {
@@ -493,15 +510,16 @@ namespace SnooStream.ViewModel
 
         private void OnUserLoggedIn(UserLoggedInMessage obj)
         {
-            LocalSubreddits.Clear();
-            _madeSubreddits.Clear();
+            var removalList = LocalSubreddits.Where(wrapper => wrapper.Category == "popular").ToList();
+            foreach (var item in removalList)
+                LocalSubreddits.Remove(item);
+            ReloadSubscribed(true);
             EnsureFrontPage();
-			ReloadSubscribed(true);
         }
 
         private void EnsureFrontPage()
         {
-            AddToLocalSubreddits(new SubredditWrapper(this, "/", new Subreddit("/"), "hot", IsLoggedIn ? "subscribed" : "popular"));
+            AddToLocalSubreddits(new SubredditWrapper(this, "/", new Subreddit("/"), "hot", IsLoggedIn ? "subscribed" : "popular"), true);
         }
 
         private bool IsLoggedIn

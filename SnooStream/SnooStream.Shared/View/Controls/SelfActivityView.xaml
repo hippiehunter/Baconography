@@ -27,7 +27,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock
                                 Grid.ColumnSpan="3"
-                                Text="{Binding FirstActivity.Author, Mode=OneTime}" 
+                                Text="{Binding FirstActivity.Title, Mode=OneTime}" 
                                 FontFamily="Segoe SemiLight"
                                 FontSize="24"/>
                             <Border
@@ -43,7 +43,7 @@
                                     Orientation="Vertical">
                                 <TextBlock
                                         FontWeight="Bold"
-                                        Text="{Binding FirstActivity.PreviewTitle, Mode=OneTime}"/>
+                                        Text="{Binding FirstActivity.SubTitle, Mode=OneTime}"/>
                                 <TextBlock
                                         Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}, Mode=OneTime}"
                                         Text="{Binding Converter={StaticResource activityGroupCountConverter}, Mode=OneTime}"/>

@@ -93,23 +93,23 @@ namespace SnooStream.Common
 
 		private void MakeHubSections()
 		{
-			if (Login.IsLoggedIn)
-			{
-				HubSections = new List<HubSection>
-						{
-							new HubSection { Header = "subreddit" },
-							new HubSection { Header = "activity" },
-							new HubSection { Header = "self" },
-							new HubSection { Header = "settings" }
-						};
-			}
-			else if (Login.IsMod)
-			{
-				HubSections = new List<HubSection>
+            if (Login.IsMod)
+            {
+                HubSections = new List<HubSection>
 						{
 							new HubSection { Header = "subreddit" },
 							new HubSection { Header = "activity" },
 							new HubSection { Header = "mod" },
+							new HubSection { Header = "self" },
+							new HubSection { Header = "settings" }
+						};
+            }
+			else if (Login.IsLoggedIn)
+			{
+				HubSections = new List<HubSection>
+						{
+							new HubSection { Header = "subreddit" },
+							new HubSection { Header = "activity" },
 							new HubSection { Header = "self" },
 							new HubSection { Header = "settings" }
 						};

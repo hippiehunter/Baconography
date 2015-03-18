@@ -31,7 +31,8 @@ namespace SnooStream.ViewModel
         }
         public abstract Thing GetThing();
         public DateTime CreatedUTC { get; protected set; }
-		public string PreviewTitle { get; set; }
+        public string Title { get; set; }
+		public string SubTitle { get; set; }
 		public string PreviewBody { get; set; }
 		internal static string Elipsis(string text, int maxLength)
 		{
@@ -84,6 +85,14 @@ namespace SnooStream.ViewModel
             });
         }
 
+        private static string StripCommonPrefix(string subject)
+        {
+            if (subject.ToLower().StartsWith("re:"))
+                return subject.Substring(3).Trim();
+            else
+                return subject.Trim();
+        }
+
         public static string GetActivityGroupName(Thing thing)
         {
             if (thing == null)
@@ -110,7 +119,7 @@ namespace SnooStream.ViewModel
                 }
                 else
                 {
-                    return messageThing.Subject;
+                    return StripCommonPrefix(messageThing.Subject);
                 }
             }
             else if (thing.Data is ModAction)
@@ -205,7 +214,8 @@ namespace SnooStream.ViewModel
             CreatedUTC = link.CreatedUTC;
             LinkVM = new LinkViewModel(this, link);
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
-			PreviewTitle = Elipsis(Link.Title, 50);
+			SubTitle = Elipsis(Link.Title, 50);
+            Title = link.Author;
             IsNew = false;
         }
 
@@ -256,7 +266,8 @@ namespace SnooStream.ViewModel
             Comment = comment;
             CreatedUTC = comment.CreatedUTC;
             Body = Comment.Body;
-            Subject = PreviewTitle = Elipsis(comment.LinkTitle, 50);
+            Subject = SubTitle = Elipsis(comment.LinkTitle, 50);
+            Title = comment.Author;
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
             IsNew = false;
         }
@@ -283,7 +294,8 @@ namespace SnooStream.ViewModel
             CreatedUTC = messageThing.CreatedUTC;
             Body = Message.Body;
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
-			PreviewTitle = Elipsis(Subject, 50);
+			SubTitle = Elipsis(Subject, 50);
+            Title = Author;
             IsNew = Message.New;
         }
         public string Body
@@ -369,7 +381,8 @@ namespace SnooStream.ViewModel
             Body = messageThing.Body;
             IsNew = MessageThing.New;
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
-			PreviewTitle = Elipsis(messageThing.Subject, 50);
+			SubTitle = Elipsis(messageThing.Subject, 50);
+            Title = messageThing.Author;
         }
         public string Body
         {
@@ -433,7 +446,8 @@ namespace SnooStream.ViewModel
             CreatedUTC = messageThing.CreatedUTC;
             MessageThing = messageThing;
 			PreviewBody = messageThing.Body.Length > 100 ? messageThing.Body.Remove(100) : messageThing.Body;
-			PreviewTitle = Elipsis(messageThing.Subject, 50);
+			SubTitle = Elipsis(messageThing.Subject, 50);
+            Title = messageThing.Author;
             IsNew = MessageThing.New;
         }
 

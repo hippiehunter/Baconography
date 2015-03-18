@@ -164,14 +164,20 @@ namespace SnooStreamBackground
 					});
 
 					return create_task(ImageUtilities::MakeLiveTileImages(vector<ImageInfo^> {}, history, liveTileImageUrls, GetTileCountTarget(true)))
-						.then([=](vector<ImageInfo^> liveTileImageUrls)
+						.then([=](task<vector<ImageInfo^>> liveTileImageUrlsTask)
 					{
-						if (liveTileImageUrls.size() > 0)
-						{
-							auto tileUpdater = Windows::UI::Notifications::TileUpdateManager::CreateTileUpdaterForApplication();
-							history->CurrentTileImages = ref new Platform::Collections::Vector<ImageInfo^>(liveTileImageUrls);
-							LiveTileUtilities::MakeLiveTile(history, liveTile, liveTileImageUrls, tileUpdater);
-						}
+                        try
+                        {
+                            auto liveTileImageUrls = liveTileImageUrlsTask.get();
+                            if (liveTileImageUrls.size() > 0)
+                            {
+                                auto tileUpdater = Windows::UI::Notifications::TileUpdateManager::CreateTileUpdaterForApplication();
+                                history->CurrentTileImages = ref new Platform::Collections::Vector<ImageInfo^>(liveTileImageUrls);
+                                LiveTileUtilities::MakeLiveTile(history, liveTile, liveTileImageUrls, tileUpdater);
+                            }
+                        }
+                        catch (...) {}
+                        return concurrency::task_from_result();
 					});
 				}
 				catch (...)

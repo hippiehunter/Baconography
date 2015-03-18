@@ -14,7 +14,7 @@
         <ScrollViewer>
             <StackPanel>
                 <StackPanel Visibility="{Binding HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}">
-                    <TextBlock Text="STORED LOGINS" Style="{StaticResource SubtextButtonTitleTextBlock}" FontWeight="Bold"/>
+                    <TextBlock Text="STORED LOGINS" Style="{StaticResource SubtextButtonTitleTextBlock}"/>
                     <ComboBox x:Name="usernameSelector" Grid.Row="0" Grid.ColumnSpan="3" ItemsSource="{Binding StoredCredentials}" 
                                   SelectedItem="{Binding SelectedCredential, Mode=TwoWay}" HorizontalAlignment="Stretch">
                         <ComboBox.ItemTemplate>
