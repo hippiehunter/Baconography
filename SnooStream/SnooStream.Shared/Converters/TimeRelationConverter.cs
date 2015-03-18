@@ -16,20 +16,33 @@ namespace SnooStream.Converters
 
 		public static string GetRelationString(object value)
 		{
-			var currentTime = DateTime.UtcNow;
+			var currentTime = DateTime.Now;
+			var targetTime = ((DateTime)value).ToLocalTime();
 			if (((DateTime)value).Year == 1)
 				return "the dawn of reddit";
-			var timeDifference = DateTimeSpan.CompareDates(currentTime, (DateTime)value);
+			var timeDifference = DateTimeSpan.CompareDates(currentTime, targetTime);
 			if (timeDifference.Years > 0)
 				return string.Format("{0} year{1} ago", timeDifference.Years, timeDifference.Years > 1 ? "s" : "");
+			else if (timeDifference.Months == 1)
+				return "last month";
 			else if (timeDifference.Months > 0)
 				return string.Format("{0} month{1} ago", timeDifference.Months, timeDifference.Months > 1 ? "s" : "");
+			else if (timeDifference.Days == 1)
+				return "yesterday";
+			else if (timeDifference.Days > 7 && timeDifference.Days < 15)
+				return "last week";
+			else if (timeDifference.Days > 14 && timeDifference.Days < 22)
+				return "2 weeks ago";
+			else if (timeDifference.Days > 21 && timeDifference.Days < 28)
+				return "3 weeks ago";
+			else if (timeDifference.Days > 28)
+				return "about a month ago";
 			else if (timeDifference.Days > 0)
-				return string.Format("{0} day{1} ago", timeDifference.Days, timeDifference.Days > 1 ? "s" : "");
+				return targetTime.ToString("ddd");
 			else if (timeDifference.Hours > 0)
-				return string.Format("{0} hour{1} ago", timeDifference.Hours, timeDifference.Hours > 1 ? "s" : "");
+				return targetTime.ToString("h:mmt");
 			else if (timeDifference.Minutes > 0)
-				return string.Format("{0} minute{1} ago", timeDifference.Minutes, timeDifference.Minutes > 1 ? "s" : "");
+				return targetTime.ToString("h:mmt");
 			else
 				return "just now";
 		}

@@ -28,14 +28,14 @@
                     </Grid>
                 </DataTemplate>
 
-                <DataTemplate x:Name="moderatorTemplate">
+                <DataTemplate x:Name="modTemplate">
                     <Grid>
 
                     </Grid>
                 </DataTemplate>
 
                 <DataTemplate x:Name="loginTemplate">
-                    <local:LoginView Margin="12" DataContext="{Binding Login}"/>
+                    <local:LoginView Margin="12,0,12,0" DataContext="{Binding Login}"/>
                 </DataTemplate>
 
                 <DataTemplate x:Name="selfTemplate">
@@ -46,7 +46,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <StackPanel Orientation="Vertical" Visibility="{Binding Login.IsLoggedIn, Source={StaticResource SnooStream}, Converter={StaticResource booleanVisibilityConverter}}">
-                                <Grid Margin="12">
+                                <Grid Margin="12,0,12,12">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
@@ -76,7 +76,7 @@
 
 
                             <StackPanel Grid.Row="1" Orientation="Vertical">
-                                <local:LoginView Margin="12" DataContext="{Binding Login}"/>
+                                <local:LoginView Margin="12,12,12,0" DataContext="{Binding Login}"/>
                             </StackPanel>
                         </Grid>
                     </ScrollViewer>

@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using NBoilerpipePortable.Util;
 using SnooSharp;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,7 @@ namespace SnooStream.ViewModel
         }
         public abstract Thing GetThing();
         public DateTime CreatedUTC { get; protected set; }
+		public bool IsSelf { get; set; }
         public string Title { get; set; }
 		public string SubTitle { get; set; }
 		public string PreviewBody { get; set; }
@@ -119,7 +121,7 @@ namespace SnooStream.ViewModel
                 }
                 else
                 {
-                    return StripCommonPrefix(messageThing.Subject);
+					return string.IsNullOrWhiteSpace(messageThing.FirstMessageName) ? messageThing.Name : messageThing.FirstMessageName;
                 }
             }
             else if (thing.Data is ModAction)
@@ -217,12 +219,13 @@ namespace SnooStream.ViewModel
 			SubTitle = Elipsis(Link.Title, 50);
             Title = link.Author;
             IsNew = false;
+			IsSelf = string.Compare(link.Author, SnooStreamViewModel.RedditUserState.Username, StringComparison.CurrentCultureIgnoreCase) == 0;
         }
 
         public string Author { get { return Link.Author; } }
         public string Subject { get { return Link.Title; } }
         public string Subreddit { get { return Link.Subreddit; } }
-        public string Body { get { return Link.Selftext; } }
+		public string Body { get { return HttpUtility.HtmlDecode(Link.Selftext); } }
 
 
         public override Thing GetThing()
@@ -260,16 +263,16 @@ namespace SnooStream.ViewModel
         public string Subject { get; set; }
         public string Subreddit { get { return Comment.Subreddit; } }
         public string ParentId { get; private set; }
-
         public PostedCommentActivityViewModel(Comment comment)
         {
             Comment = comment;
             CreatedUTC = comment.CreatedUTC;
-            Body = Comment.Body;
+            Body = HttpUtility.HtmlDecode(Comment.Body);
             Subject = SubTitle = Elipsis(comment.LinkTitle, 50);
             Title = comment.Author;
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
             IsNew = false;
+			IsSelf = string.Compare(comment.Author, SnooStreamViewModel.RedditUserState.Username, StringComparison.CurrentCultureIgnoreCase) == 0;
         }
 
         public override Thing GetThing()
@@ -281,7 +284,9 @@ namespace SnooStream.ViewModel
         {
             ActivityViewModel.NavigateToCommentContext(Comment.LinkUrl + Comment.Id + "?context=3", Comment.Name, Comment.Id, Comment.LinkId);
         }
-    }
+
+		
+	}
 
     public class RecivedCommentReplyActivityViewModel : ActivityViewModel
     {
@@ -292,11 +297,12 @@ namespace SnooStream.ViewModel
         {
             Message = messageThing;
             CreatedUTC = messageThing.CreatedUTC;
-            Body = Message.Body;
+            Body = HttpUtility.HtmlDecode(Message.Body);
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
 			SubTitle = Elipsis(Subject, 50);
             Title = Author;
             IsNew = Message.New;
+			IsSelf = string.Compare(Author, SnooStreamViewModel.RedditUserState.Username, StringComparison.CurrentCultureIgnoreCase) == 0;
         }
         public string Body
         {
@@ -383,6 +389,7 @@ namespace SnooStream.ViewModel
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
 			SubTitle = Elipsis(messageThing.Subject, 50);
             Title = messageThing.Author;
+			IsSelf = string.Compare(Author, SnooStreamViewModel.RedditUserState.Username, StringComparison.CurrentCultureIgnoreCase) == 0;
         }
         public string Body
         {
@@ -408,7 +415,7 @@ namespace SnooStream.ViewModel
         public object BodyMD { get; private set; }
         public string Subject { get { return MessageThing.Subject; } }
         public string ParentId { get { return MessageThing.ParentId; } }
-
+		public string Destination { get { return MessageThing.Destination; } }
         public override void Tapped()
         {
             SnooStreamViewModel.NavigationService.NavigateToConversation(ActivityViewModel.GetActivityGroupName(GetThing()));
@@ -424,6 +431,7 @@ namespace SnooStream.ViewModel
             ModAction = modAction;
             CreatedUTC = modAction.CreatedUTC;
             IsNew = false;
+			IsSelf = false;
         }
 
         public override Thing GetThing()
@@ -449,6 +457,7 @@ namespace SnooStream.ViewModel
 			SubTitle = Elipsis(messageThing.Subject, 50);
             Title = messageThing.Author;
             IsNew = MessageThing.New;
+			IsSelf = string.Compare(messageThing.Author, SnooStreamViewModel.RedditUserState.Username, StringComparison.CurrentCultureIgnoreCase) == 0;
         }
 
         public override Thing GetThing()

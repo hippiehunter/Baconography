@@ -209,6 +209,13 @@
 
     </Style>
 
+    <Style x:Key="SubtextButtonBodyTextBlock" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Foreground" Value="#99FFFFFF" />
+    </Style>
+
     <Style x:Key="SubtextButton" TargetType="Button">
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />

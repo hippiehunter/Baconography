@@ -9,59 +9,43 @@
         xmlns:s="using:System;assembly=mscorlib"
         mc:Ignorable="d" d:DesignHeight="480" d:DesignWidth="480">
 
-    <Grid x:Name="LayoutRoot" Margin="12,0,12,0">
+    <Grid x:Name="LayoutRoot" Margin="12,-12,12,0">
         <Grid.Resources>
             <converters:ActivityGroupCountConverter x:Name="activityGroupCountConverter" />
             <selectors:UserActivityTemplateSelector x:Key="activityTemplateSelector">
                 <selectors:UserActivityTemplateSelector.HeaderActivityTemplate>
                     <DataTemplate>
-                        <Grid HorizontalAlignment="Stretch" Tapped="Grid_Tapped">
+                        <Grid Margin="8, 12, 8, 0" HorizontalAlignment="Stretch" Tapped="Grid_Tapped">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock
-                                Grid.ColumnSpan="3"
-                                Text="{Binding FirstActivity.Title, Mode=OneTime}" 
-                                FontFamily="Segoe SemiLight"
-                                FontSize="24"/>
-                            <Border
-                                Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}, Mode=OneTime}"
-                                Margin="24, 0, 8, 0"
-                                Grid.Row="1"
-                                BorderThickness="3, 0, 0, 0"
-                                BorderBrush="Gray"/>
-                            <StackPanel
-                                    Grid.Column="1"
-                                    Grid.ColumnSpan="2"
-                                    Grid.Row="1"
-                                    Orientation="Vertical">
-                                <TextBlock
-                                        FontWeight="Bold"
-                                        Text="{Binding FirstActivity.SubTitle, Mode=OneTime}"/>
-                                <TextBlock
-                                        Visibility="{Binding IsConversation, Converter={StaticResource booleanVisibilityConverter}, Mode=OneTime}"
-                                        Text="{Binding Converter={StaticResource activityGroupCountConverter}, Mode=OneTime}"/>
-                                <TextBlock
-                                        Visibility="{Binding IsConversation, Converter={StaticResource invertedBooleanVisibilityConverter}, Mode=OneTime}"
-                                        Text="{Binding FirstActivity.PreviewBody, Mode=OneTime}" TextWrapping="Wrap"/>
+                            <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}" Grid.ColumnSpan="3" Text="{Binding Title}" />
+                            <Border Margin="24, 0, 8, 0"  Grid.Row="1" BorderThickness="3, 0, 0, 0" BorderBrush="Gray"/>
+                            <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Vertical">
+                                <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}" Text="{Binding SubTitle}"/>
+                                <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}" 
+                                           Text="{Binding Converter={StaticResource activityGroupCountConverter}}"/>
                             </StackPanel>
-                            <TextBlock
-                                VerticalAlignment="Bottom"
-                                HorizontalAlignment="Right"
-                                Grid.Column="2" 
-                                Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}, Mode=OneTime}"/>
+                            <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}" FontSize="10"
+                                VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                                Grid.Column="2" Grid.Row="0"
+                                Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}}"/>
+                            <TextBlock FontFamily="Segoe UI Symbol" FontWeight="Bold" FontSize="10"
+                                VerticalAlignment="Top" HorizontalAlignment="Right"
+                                Grid.Column="2" Grid.Row="1"
+                                Text="{Binding Status}"/>
                         </Grid>
                     </DataTemplate>
                 </selectors:UserActivityTemplateSelector.HeaderActivityTemplate>
                 <selectors:UserActivityTemplateSelector.BodyActivityTemplate>
                     <DataTemplate>
-                        <Grid Margin="24, 0, 0, 0" HorizontalAlignment="Stretch" Tapped="Grid_Tapped">
+                        <Grid Margin="32, 0, 8, 0" HorizontalAlignment="Stretch" Tapped="Grid_Tapped">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition/>
@@ -76,23 +60,14 @@
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition MinWidth="60" Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock
-                                    Text="{Binding Author, Mode=OneTime}" 
-                                    FontSize="20" 
-                                    FontFamily="Segoe SemiLight"/>
-                                <TextBlock
-                                    Grid.ColumnSpan="2"
-                                    Grid.Row="1"
-                                    Text="{Binding PreviewBody, Mode=OneTime}"
-                                    TextWrapping="Wrap"
-                                    MaxHeight="108"/>
-                                <TextBlock 
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Bottom"
-                                    Grid.Column="1" 
+                                <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{Binding Author, Mode=OneTime}"/>
+                                <TextBlock Style="{StaticResource SubtextButtonBodyTextBlock}" Grid.ColumnSpan="2" Grid.Row="1" 
+                                    Text="{Binding PreviewBody, Mode=OneTime}" TextWrapping="Wrap" MaxLines="2" TextTrimming="WordEllipsis"/>
+                                <TextBlock  HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="1" 
+                                            Style="{StaticResource SubtextButtonTitleTextBlock}" FontSize="10"
                                     Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}, Mode=OneTime}"/>
                             </Grid>
                         </Grid>
@@ -100,29 +75,28 @@
                 </selectors:UserActivityTemplateSelector.BodyActivityTemplate>
                 <selectors:UserActivityTemplateSelector.SingleActivityTemplate>
                     <DataTemplate>
-                        <Grid Margin="8, 8, 0, 12" HorizontalAlignment="Stretch" Tapped="Grid_Tapped">
+                        <Grid Margin="8, 12, 8, 0" HorizontalAlignment="Stretch" Tapped="Grid_Tapped">
                             <Grid.RowDefinitions>
+                                <RowDefinition/>
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition MinWidth="60" Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock
-                                Text="{Binding FirstActivity.Author, Mode=OneTime}" 
-                                FontSize="20" 
-                                FontFamily="Segoe SemiLight"/>
-                            <TextBlock
-                                Grid.Row="1"
-                                Text="{Binding FirstActivity.PreviewBody, Mode=OneTime}"
-                                TextWrapping="Wrap"
-                                MaxHeight="108"/>
-                            <TextBlock 
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Bottom"
-                                Grid.Column="1" 
-                                Text="{Binding FirstActivity.CreatedUTC, Converter={StaticResource timeRelationConverter}, Mode=OneTime}"/>
+                            <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}" Grid.Row="0" Text="{Binding Title}"/>
+                            <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}" Grid.Row="1" Text="{Binding SubTitle}"/>
+                            <TextBlock Style="{StaticResource SubtextButtonBodyTextBlock}" Grid.Row="2" Text="{Binding PreviewBody}"
+                                TextWrapping="Wrap" MaxLines="2" TextTrimming="WordEllipsis"/>
+                            <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}" FontSize="10"
+                                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                Grid.Column="1" Grid.Row="0"
+                                Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}, Mode=OneTime}"/>
+                            <TextBlock FontFamily="Segoe UI Symbol" FontWeight="Bold" FontSize="10"
+                                VerticalAlignment="Top" HorizontalAlignment="Right"
+                                Grid.Column="1" Grid.Row="1"
+                                Text="{Binding Status}"/>
                         </Grid>
                     </DataTemplate>
                 </selectors:UserActivityTemplateSelector.SingleActivityTemplate>

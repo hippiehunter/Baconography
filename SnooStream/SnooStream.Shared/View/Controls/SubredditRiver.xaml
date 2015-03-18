@@ -102,7 +102,7 @@
 			x:Name="listBox"
 			HorizontalAlignment="Stretch"
 			HorizontalContentAlignment="Stretch"
-			Margin="-12,0,-12,0" ItemsSource="{Binding Source={StaticResource subredditViewSource}}">
+			Margin="-12,-1,-12,0" ItemsSource="{Binding Source={StaticResource subredditViewSource}}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />

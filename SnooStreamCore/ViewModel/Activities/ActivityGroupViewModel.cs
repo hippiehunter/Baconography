@@ -14,6 +14,12 @@ namespace SnooStream.ViewModel
 {
     public class ActivityGroupViewModel : ViewModelBase
     {
+		private static string ReplyStatusIcon = "\uE172";
+		private static string ReplyAllStatusIcon = "\uE165";
+		private static string SoloPostedStatusIcon = "\uE11C";
+		private static string SoloCommentStatusIcon = "\uE110";
+		private static string SoloMessageStatusIcon = "\uE122";
+
         public class SelfActivityAggregate
         {
             ObservableCollection<ViewModelBase> _targetCollection;
@@ -237,22 +243,78 @@ namespace SnooStream.ViewModel
                 else if (Activities.Count > 0)
                     Activities.Add(thingName, targetActivity);
 
-                if (!IsConversation && Activities.Count > 2)
+                if (!IsConversation && Activities.Count > 1)
                 {
                     IsConversation = true;
                     RaisePropertyChanged("IsConversation");
                 }
             }
 
-            CreatedUTC = FirstActivity.CreatedUTC;
+			ActivityViewModel firstActivity = null;
+			if (Activities.Count == 0)
+				firstActivity = _innerFirstActivity;
+			else
+				firstActivity = ((IEnumerable<ActivityViewModel>)Activities).First();
 
-            ActivityViewModel.FixupFirstActivity(FirstActivity, Activities);
+			if (firstActivity.IsSelf)
+			{
+				var betterFirstActivity = ((IEnumerable<ActivityViewModel>)Activities).FirstOrDefault(activity => !activity.IsSelf);
+				if (betterFirstActivity != null)
+				{
+					if (betterFirstActivity is MessageActivityViewModel || betterFirstActivity is ModeratorMessageActivityViewModel)
+						Status = ReplyStatusIcon;
+					else
+						Status = ReplyAllStatusIcon;
 
-            if (currentFirstActivity != FirstActivity)
-                RaisePropertyChanged("FirstActivity");
+					firstActivity = betterFirstActivity;
+					ActivityViewModel.FixupFirstActivity(firstActivity, Activities);
+					Title = firstActivity.Title;
+				}
+				else
+				{
+					ActivityViewModel.FixupFirstActivity(firstActivity, Activities);
+					if (firstActivity is PostedLinkActivityViewModel)
+					{
+						Title = ((PostedLinkActivityViewModel)firstActivity).Subreddit;
+						Status = SoloPostedStatusIcon;
+					}
+					else if (firstActivity is PostedCommentActivityViewModel)
+					{
+						Title = ((PostedCommentActivityViewModel)firstActivity).Subreddit;
+						Status = SoloCommentStatusIcon;
+					}
+					else if(firstActivity is RecivedCommentReplyActivityViewModel)
+					{
+						Title = ((RecivedCommentReplyActivityViewModel)firstActivity).Subreddit;
+					}
+					else if (firstActivity is MessageActivityViewModel)
+					{
+						Status = SoloMessageStatusIcon;
+						Title = ((MessageActivityViewModel)firstActivity).Destination;
+					}
+				}
+			}
+			else
+			{
+				ActivityViewModel.FixupFirstActivity(firstActivity, Activities);
+				Title = firstActivity.Title;
+			}
+
+			CreatedUTC = firstActivity.CreatedUTC;
+			PreviewBody = firstActivity.PreviewBody;
+			SubTitle = firstActivity.SubTitle;
+
+			RaisePropertyChanged("CreatedUTC");
+			RaisePropertyChanged("PreviewBody");
+			RaisePropertyChanged("Title");
+			RaisePropertyChanged("SubTitle");
         }
         public string Id { get; set; }
         public DateTime CreatedUTC {get; protected set;}
+		public string Title { get; protected set; }
+		public string SubTitle { get; protected set; }
+		public string PreviewBody { get; protected set; }
+		public string Status { get; protected set; }
         private ActivityViewModel _innerFirstActivity;
         private string _innerFirstActivityName;
         public ActivityViewModel FirstActivity 

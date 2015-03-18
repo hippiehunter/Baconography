@@ -9,9 +9,8 @@
     
     <Grid x:Name="LayoutRoot">
         <ScrollViewer>
-            <StackPanel Margin="0,0,0,0">
+            <StackPanel Margin="0,-3,0,0">
                 <Button Style="{StaticResource SubtextButton}"
-                        Margin="0,0,0,-8"
                         Tapped="Content_Tap">
                     <StackPanel>
                         <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
@@ -23,8 +22,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Style="{StaticResource SubtextButton}"
-                        Margin="0,0,0,-8">
+                <Button Style="{StaticResource SubtextButton}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             LAYOUT
@@ -35,9 +33,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Style="{StaticResource SubtextButton}"
-                        Margin="0,0,0,-8"
-                        Tapped="LockScreen_Tap">
+                <Button Style="{StaticResource SubtextButton}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             LOCK SCREEN
@@ -48,8 +44,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Style="{StaticResource SubtextButton}"
-                        Margin="0,0,0,-8">
+                <Button Style="{StaticResource SubtextButton}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             LIVE TILE
@@ -60,8 +55,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Style="{StaticResource SubtextButton}"
-                        Margin="0,0,0,-8">
+                <Button Style="{StaticResource SubtextButton}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             OFFLINE DATA
@@ -73,9 +67,7 @@
                 </Button>
 
                 <Button Style="{StaticResource SubtextButton}"
-                        Margin="0,0,0,-8"
-                        Visibility="{Binding Settings.AllowAdvertising, Mode=TwoWay, Converter={StaticResource booleanVisibilityConverter}}"
-                        Tapped="AdFreeUpgrade_Tap">
+                        Visibility="{Binding Settings.AllowAdvertising, Mode=TwoWay, Converter={StaticResource booleanVisibilityConverter}}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
                             DISABLE ADS
@@ -87,7 +79,6 @@
                 </Button>
 
                 <Button Style="{StaticResource SubtextButton}"
-                        Margin="0,0,0,-8"
                         IsEnabled="False"
                         Visibility="{Binding Settings.AllowAdvertising, Mode=TwoWay, Converter={StaticResource invertedBooleanVisibilityConverter}}">
                     <StackPanel>

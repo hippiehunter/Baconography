@@ -17,7 +17,7 @@
         <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 BorderThickness="0" Padding="0" Margin="0"
                 Background="White">
-            <Grid HorizontalAlignment="Stretch">
+            <Grid HorizontalAlignment="Stretch" Height="50">
                 <Image Source="{Binding Thing.HeaderImage, Mode=OneTime}"
                    MaxHeight="50" MaxWidth="125" Height="{Binding HeaderImageHeight, Mode=OneTime}"
                    Width="{Binding HeaderImageWidth, Mode=OneTime}" Margin="0"
@@ -28,7 +28,7 @@
                     </Border.Background>
 
                     <TextBlock Foreground="White" VerticalAlignment="Bottom" HorizontalAlignment="Right"
-                        Margin="24,0,6,0" Style="{StaticResource SubheaderTextBlockStyle}" FontWeight="Bold" Text="{Binding Thing.DisplayName, Mode=OneTime}"/>
+                        Margin="24,0,6,0" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{Binding Thing.DisplayName, Mode=OneTime}"/>
                 </Border>
             </Grid>
         </Border>
