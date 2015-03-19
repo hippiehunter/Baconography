@@ -30,6 +30,15 @@ namespace SnooStream.ViewModel
                 }
             }
         }
+
+        public static Tuple<string, bool> CleanAuthor(string author)
+        {
+            if (string.Compare(author, SnooStreamViewModel.RedditUserState.Username, StringComparison.CurrentCultureIgnoreCase) == 0)
+                return Tuple.Create("Me", true);
+            else
+                return Tuple.Create(author, false);
+        }
+
         public abstract Thing GetThing();
         public DateTime CreatedUTC { get; protected set; }
 		public bool IsSelf { get; set; }
@@ -217,9 +226,10 @@ namespace SnooStream.ViewModel
             LinkVM = new LinkViewModel(this, link);
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
 			SubTitle = Elipsis(Link.Title, 50);
-            Title = link.Author;
             IsNew = false;
-			IsSelf = string.Compare(link.Author, SnooStreamViewModel.RedditUserState.Username, StringComparison.CurrentCultureIgnoreCase) == 0;
+            var authorTpl = CleanAuthor(link.Author);
+            IsSelf = authorTpl.Item2;
+            Title = authorTpl.Item1;
         }
 
         public string Author { get { return Link.Author; } }
@@ -269,10 +279,11 @@ namespace SnooStream.ViewModel
             CreatedUTC = comment.CreatedUTC;
             Body = HttpUtility.HtmlDecode(Comment.Body);
             Subject = SubTitle = Elipsis(comment.LinkTitle, 50);
-            Title = comment.Author;
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
             IsNew = false;
-			IsSelf = string.Compare(comment.Author, SnooStreamViewModel.RedditUserState.Username, StringComparison.CurrentCultureIgnoreCase) == 0;
+            var authorTpl = CleanAuthor(comment.Author);
+            IsSelf = authorTpl.Item2;
+            Title = authorTpl.Item1;
         }
 
         public override Thing GetThing()
@@ -300,9 +311,10 @@ namespace SnooStream.ViewModel
             Body = HttpUtility.HtmlDecode(Message.Body);
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
 			SubTitle = Elipsis(Subject, 50);
-            Title = Author;
             IsNew = Message.New;
-			IsSelf = string.Compare(Author, SnooStreamViewModel.RedditUserState.Username, StringComparison.CurrentCultureIgnoreCase) == 0;
+            var authorTpl = CleanAuthor(Author);
+            IsSelf = authorTpl.Item2;
+            Title = authorTpl.Item1;
         }
         public string Body
         {
@@ -388,8 +400,9 @@ namespace SnooStream.ViewModel
             IsNew = MessageThing.New;
 			PreviewBody = Body.Length > 100 ? Body.Remove(100) : Body;
 			SubTitle = Elipsis(messageThing.Subject, 50);
-            Title = messageThing.Author;
-			IsSelf = string.Compare(Author, SnooStreamViewModel.RedditUserState.Username, StringComparison.CurrentCultureIgnoreCase) == 0;
+            var authorTpl = CleanAuthor(Author);
+            IsSelf = authorTpl.Item2;
+            Title = authorTpl.Item1;
         }
         public string Body
         {
@@ -455,9 +468,10 @@ namespace SnooStream.ViewModel
             MessageThing = messageThing;
 			PreviewBody = messageThing.Body.Length > 100 ? messageThing.Body.Remove(100) : messageThing.Body;
 			SubTitle = Elipsis(messageThing.Subject, 50);
-            Title = messageThing.Author;
             IsNew = MessageThing.New;
-			IsSelf = string.Compare(messageThing.Author, SnooStreamViewModel.RedditUserState.Username, StringComparison.CurrentCultureIgnoreCase) == 0;
+            var authorTpl = CleanAuthor(messageThing.Author);
+            IsSelf = authorTpl.Item2;
+            Title = authorTpl.Item1;
         }
 
         public override Thing GetThing()

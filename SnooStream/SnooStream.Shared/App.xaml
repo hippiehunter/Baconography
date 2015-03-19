@@ -11,6 +11,7 @@
             <converters:InvertedBooleanVisibilityConverter x:Key="invertedBooleanVisibilityConverter" />
             <converters:LinkGlyphConverter x:Key="linkGlyphConverter" />
             <converters:TimeRelationConverter x:Key="timeRelationConverter" />
+            <converters:ShortTimeRelationConverter x:Key="shortTimeRelationConverter" />
             <converters:DomainConverter x:Key="domainConverter" />
             <converters:VisitedLinkConverter x:Key="visitedLinkConverter" />
             <converters:VisitedMainLinkConverter x:Key="visitedMainLinkConverter" />

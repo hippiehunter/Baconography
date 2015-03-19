@@ -35,7 +35,7 @@
                             <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}" FontSize="10"
                                 VerticalAlignment="Bottom" HorizontalAlignment="Right"
                                 Grid.Column="2" Grid.Row="0"
-                                Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}}"/>
+                                Text="{Binding CreatedUTC, Converter={StaticResource shortTimeRelationConverter}}"/>
                             <TextBlock FontFamily="Segoe UI Symbol" FontWeight="Bold" FontSize="10"
                                 VerticalAlignment="Top" HorizontalAlignment="Right"
                                 Grid.Column="2" Grid.Row="1"
@@ -63,12 +63,12 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{Binding Author, Mode=OneTime}"/>
+                                <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{Binding Title, Mode=OneTime}"/>
                                 <TextBlock Style="{StaticResource SubtextButtonBodyTextBlock}" Grid.ColumnSpan="2" Grid.Row="1" 
                                     Text="{Binding PreviewBody, Mode=OneTime}" TextWrapping="Wrap" MaxLines="2" TextTrimming="WordEllipsis"/>
                                 <TextBlock  HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="1" 
                                             Style="{StaticResource SubtextButtonTitleTextBlock}" FontSize="10"
-                                    Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}, Mode=OneTime}"/>
+                                    Text="{Binding CreatedUTC, Converter={StaticResource shortTimeRelationConverter}, Mode=OneTime}"/>
                             </Grid>
                         </Grid>
                     </DataTemplate>
@@ -92,7 +92,7 @@
                             <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}" FontSize="10"
                                 HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                 Grid.Column="1" Grid.Row="0"
-                                Text="{Binding CreatedUTC, Converter={StaticResource timeRelationConverter}, Mode=OneTime}"/>
+                                Text="{Binding CreatedUTC, Converter={StaticResource shortTimeRelationConverter}, Mode=OneTime}"/>
                             <TextBlock FontFamily="Segoe UI Symbol" FontWeight="Bold" FontSize="10"
                                 VerticalAlignment="Top" HorizontalAlignment="Right"
                                 Grid.Column="1" Grid.Row="1"
