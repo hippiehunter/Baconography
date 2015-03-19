@@ -27,6 +27,8 @@ namespace SnooStream.Common
         public string AfterSelfSentMessage { get; set; }
         public string AfterSelfAction { get; set; }
         public List<Thing> SelfThings { get; set; }
+		public List<Thing> ModThings { get; set; }
+		public List<string> DisabledModeration { get; set; }
     }
 
     public class SubredditRiverInit

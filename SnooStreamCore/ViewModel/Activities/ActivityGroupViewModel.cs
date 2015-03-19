@@ -20,7 +20,7 @@ namespace SnooStream.ViewModel
 		private static string SoloCommentStatusIcon = "\uE110";
 		private static string SoloMessageStatusIcon = "\uE122";
 
-        public class SelfActivityAggregate
+        public class ActivityAggregate
         {
             ObservableCollection<ViewModelBase> _targetCollection;
             public bool HasItems
@@ -30,7 +30,7 @@ namespace SnooStream.ViewModel
                     return _targetCollection.Count > 0;
                 }
             }
-            public SelfActivityAggregate(INotifyCollectionChanged sourceCollection, ObservableCollection<ViewModelBase> targetCollection)
+            public ActivityAggregate(INotifyCollectionChanged sourceCollection, ObservableCollection<ViewModelBase> targetCollection)
             {
                 _targetCollection = targetCollection;
                 sourceCollection.CollectionChanged += _groups_CollectionChanged;

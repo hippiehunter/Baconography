@@ -17,7 +17,7 @@ namespace SnooStream.ViewModel
         public class UserActivityLoader : IIncrementalCollectionLoader<ViewModelBase>
         {
             AboutUserViewModel _user;
-            ActivityGroupViewModel.SelfActivityAggregate _activityAggregate;
+            ActivityGroupViewModel.ActivityAggregate _activityAggregate;
             bool _hasLoaded;
             public UserActivityLoader(AboutUserViewModel user)
             {
@@ -64,7 +64,7 @@ namespace SnooStream.ViewModel
 
             public void Attach(System.Collections.ObjectModel.ObservableCollection<ViewModelBase> targetCollection)
             {
-                _activityAggregate = new ActivityGroupViewModel.SelfActivityAggregate(_user.Groups, targetCollection);
+                _activityAggregate = new ActivityGroupViewModel.ActivityAggregate(_user.Groups, targetCollection);
             }
         }
 

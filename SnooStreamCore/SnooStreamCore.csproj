@@ -92,6 +92,7 @@
     <Compile Include="ViewModel\IRefreshable.cs" />
     <Compile Include="ViewModel\LoadFullCommentsViewModel.cs" />
     <Compile Include="ViewModel\MarkdownEditingVM.cs" />
+    <Compile Include="ViewModel\ModStreamViewModel.cs" />
     <Compile Include="ViewModel\MoreViewModel.cs" />
     <Compile Include="ViewModel\OperationCancellationViewModel.cs" />
     <Compile Include="ViewModel\Popups\CommandViewModel.cs" />

@@ -9,19 +9,20 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-	public class SelfStreamViewModel : ViewModelBase, IRefreshable
+	public class ModStreamViewModel : ViewModelBase
 	{
-		public class SelfActivityLoader : IIncrementalCollectionLoader<ViewModelBase>
+		public class ModActivityLoader : IIncrementalCollectionLoader<ViewModelBase>
 		{
-			SelfStreamViewModel _selfStream;
+			ModStreamViewModel _modStream;
             ActivityGroupViewModel.ActivityAggregate _activityAggregate;
-			public SelfActivityLoader(SelfStreamViewModel selfStream)
+			public ModActivityLoader(ModStreamViewModel modStream)
 			{
-				_selfStream = selfStream;
+				_modStream = modStream;
 			}
 
 			public Task AuxiliaryItemLoader(IEnumerable<ViewModelBase> items, int timeout)
@@ -31,48 +32,52 @@ namespace SnooStream.ViewModel
 
 			public bool IsStale
 			{
-				get { return _selfStream.LastRefresh == null || (DateTime.Now - _selfStream.LastRefresh.Value).TotalMinutes > 30; }
+				get { return _modStream.LastRefresh == null || (DateTime.Now - _modStream.LastRefresh.Value).TotalMinutes > 30; }
 			}
 
 			public bool HasMore()
 			{
-				return _selfStream.OldestActivity != null ||
-					_selfStream.OldestMessage != null ||
-					_selfStream.OldestSentMessage != null;
+				//TODO deal with active subreddit mods
+				return _modStream.OldestModMail != null;
 			}
 
 			public async Task<IEnumerable<ViewModelBase>> LoadMore()
 			{
-				await _selfStream.PullOlder();
+				await _modStream.PullOlder();
 				return Enumerable.Empty<ViewModelBase>();
 			}
 
 			public async Task Refresh(System.Collections.ObjectModel.ObservableCollection<ViewModelBase> current, bool onlyNew)
 			{
-				await _selfStream.PullNew(false, !onlyNew);
+				await _modStream.PullNew(false, !onlyNew);
 			}
 
 			public string NameForStatus
 			{
-				get { return "activitie"; }
+				get { return "mod activitie"; }
 			}
 
 			public void Attach(System.Collections.ObjectModel.ObservableCollection<ViewModelBase> targetCollection)
 			{
-                _activityAggregate = new ActivityGroupViewModel.ActivityAggregate(_selfStream.Groups, targetCollection);
+                _activityAggregate = new ActivityGroupViewModel.ActivityAggregate(_modStream.Groups, targetCollection);
 			}
 		}
 
-		public SelfStreamViewModel(SelfInit selfInit)
+		public ModStreamViewModel(SelfInit selfInit)
 		{
 			//load up the activities
 			Groups = new ObservableSortedUniqueCollection<string, ActivityGroupViewModel>(new ActivityGroupViewModel.ActivityAgeComparitor());
-			Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SelfActivityLoader(this), 100);
+			Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new ModActivityLoader(this), 100);
+			Subreddits = new List<SubredditMod>();
             if (selfInit != null && IsLoggedIn)
 			{
-                ProcessActivityManager();
-                RunActivityUpdater();
+				InitialLoad();
             }
+		}
+
+		private async void InitialLoad()
+		{
+			await PullNew(true, true);
 		}
 
 		public async void OnUserLoggedIn(UserLoggedInMessage obj)
@@ -82,17 +87,10 @@ namespace SnooStream.ViewModel
 			SnooStreamViewModel.ActivityManager.CanStore = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.IsDefault;
             RaisePropertyChanged("IsLoggedIn");
 			RaisePropertyChanged("Activities");
-			OldestMessage = null;
-			OldestSentMessage = null;
-			OldestActivity = null;
 			Groups.Clear();
             if (IsLoggedIn)
             {
 				await PullNew(false, true);
-                if (!_runningActivityUpdater)
-                {
-                    RunActivityUpdater();
-                }
             }
 			
 		}
@@ -117,9 +115,16 @@ namespace SnooStream.ViewModel
 			return things;
 		}
 
-		private string OldestMessage { get; set; }
-		private string OldestSentMessage { get; set; }
-		private string OldestActivity { get; set; }
+		public class SubredditMod
+		{
+			public string OldestQueue {get; set;}
+			public string Subreddit {get; set;}
+			public bool Enabled {get; set;}
+		}
+
+		private string OldestModMail { get; set; }
+		private List<SubredditMod> Subreddits {get; set;}
+		private List<string> DisabledModeration { get; set; }
 		public DateTime? LastRefresh { get; set; }
 		public ObservableSortedUniqueCollection<string, ActivityGroupViewModel> Groups { get; private set; }
 		public ObservableCollection<ViewModelBase> Activities { get; private set; }
@@ -130,10 +135,36 @@ namespace SnooStream.ViewModel
             if (!IsLoggedIn)
                 throw new InvalidOperationException("User must be logged in to do this");
 
-			if (SnooStreamViewModel.ActivityManager.NeedsRefresh(appStart) || userInitiated)
-                await SnooStreamViewModel.ActivityManager.Refresh();
+			//update moderator listing
+			var modSubs = await SnooStreamViewModel.RedditService.GetModeratorSubredditListing(CancellationToken.None);
+			//load mod mail
+			var modMail = await SnooStreamViewModel.RedditService.GetModMail(100);
 
-            ProcessActivityManager();
+			OldestModMail = ActivityGroupViewModel.ProcessListing(Groups, modMail, null);
+			//load mod queue for each subreddit
+			foreach (var modSub in modSubs.Data.Children)
+			{
+				if(modSub.Data is Subreddit)
+				{
+					var subredditName = Reddit.MakePlainSubredditName(((Subreddit)modSub.Data).Url);
+					if(!DisabledModeration.Contains(subredditName))
+					{
+						var modQueue = await SnooStreamViewModel.RedditService.GetModQueue(subredditName, 20);
+						var newModSub = new SubredditMod
+						{
+							Enabled = true,
+							Subreddit = subredditName,
+							OldestQueue = ActivityGroupViewModel.ProcessListing(Groups, modQueue, null)
+						};
+
+						Subreddits.Add(newModSub);
+					}
+					else
+					{
+						Subreddits.Add(new SubredditMod { Enabled = false, OldestQueue = null, Subreddit = subredditName });
+					}
+				}
+			}
         }
 
 		public void AddMessageActivity(string targetUser, string topic, string contents)
@@ -153,46 +184,6 @@ namespace SnooStream.ViewModel
 			});
 		}
 
-
-        private async void ProcessActivityManager()
-        {
-            var resultTpl = await Task.Run(() =>
-                {
-                    Listing inbox = SnooStreamViewModel.ActivityManager.Received;
-                    Listing outbox = SnooStreamViewModel.ActivityManager.Sent;
-                    Listing activity = SnooStreamViewModel.ActivityManager.Activity;
-                    return Tuple.Create(inbox, outbox, activity);
-                });
-
-
-            OldestMessage = ActivityGroupViewModel.ProcessListing(Groups, resultTpl.Item1, OldestMessage);
-            OldestSentMessage = ActivityGroupViewModel.ProcessListing(Groups, resultTpl.Item2, OldestSentMessage);
-            OldestActivity = ActivityGroupViewModel.ProcessListing(Groups, resultTpl.Item3, OldestActivity);
-        }
-
-        bool _runningActivityUpdater = false;
-        public async void RunActivityUpdater()
-        {
-            _runningActivityUpdater = true;
-            try
-            {
-                var cancelToken = SnooStreamViewModel.BackgroundCancellationToken;
-                await PullNew(false, true);
-                while (!cancelToken.IsCancellationRequested)
-                {
-                    //check every 5 minutes since that is the minimum time we might refresh at
-                    if (SnooStreamViewModel.ActivityManager.NeedsRefresh(false))
-                    {
-                        await PullNew(false, true);
-                    }
-                    await Task.Delay(1000 * 60 * 5, cancelToken);
-                }
-            }
-            catch (TaskCanceledException) { }
-            catch (OperationCanceledException) { }
-            _runningActivityUpdater = false;
-        }
-
 		public async Task PullOlder()
 		{
 			LastRefresh = DateTime.Now;
@@ -200,9 +191,15 @@ namespace SnooStream.ViewModel
 			if (!IsLoggedIn)
 				throw new InvalidOperationException("User must be logged in to do this");
 
-            OldestMessage = await PullActivity(OldestMessage, "inbox", string.Format(Reddit.MailBaseUrlFormat, "inbox"));
-            OldestSentMessage = await PullActivity(OldestSentMessage, "outbox", string.Format(Reddit.MailBaseUrlFormat, "sent"));
-            OldestActivity = await PullActivity(OldestActivity, "activity", string.Format(Reddit.PostByUserBaseFormat, SnooStreamViewModel.RedditService.CurrentUserName));
+			OldestModMail = await PullActivity(OldestModMail, "mod mail", string.Format(Reddit.MailBaseUrlFormat, "moderator"));
+			//foreach mod sub whos Oldest Queue isnt null grab more
+			foreach (var subMod in Subreddits)
+			{
+				if (subMod.Enabled)
+				{
+					subMod.OldestQueue = await PullActivity(OldestModMail, "mod mail", string.Format(Reddit.SubredditAboutBaseUrlFormat, subMod.Subreddit, "modqueue"));
+				}
+			}
 		}
 
         private async Task<string> PullActivity(string oldest, string displayName, string uriFormat)
@@ -233,18 +230,6 @@ namespace SnooStream.ViewModel
                 return oldest;
         }
 
-		internal SelfInit Dump()
-		{
-			return new SelfInit
-			{
-				LastRefresh = LastRefresh,
-				SelfThings = new List<Thing>(DumpThings(Groups)),
-				AfterSelfAction = OldestActivity,
-				AfterSelfMessage = OldestMessage,
-				AfterSelfSentMessage = OldestSentMessage
-			};
-		}
-
 		public async Task MaybeRefresh()
 		{
 			if (!string.IsNullOrWhiteSpace(SnooStreamViewModel.RedditUserState.Username))
@@ -264,4 +249,3 @@ namespace SnooStream.ViewModel
 		}
 	}
 }
-
