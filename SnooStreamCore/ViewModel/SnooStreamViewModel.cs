@@ -53,6 +53,7 @@ namespace SnooStream.ViewModel
 			CommandDispatcher = new CommandDispatcher();
 			SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
 			SelfStream = new SelfStreamViewModel(_initializationBlob.Self);
+			ModStream = new ModStreamViewModel(_initializationBlob.Self);
 			MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
 
 			if (RedditUserState.Username != null)
@@ -90,6 +91,7 @@ namespace SnooStream.ViewModel
 
 		public AboutUserViewModel SelfUser { get; private set; }
         public SelfStreamViewModel SelfStream { get; private set; }
+		public ModStreamViewModel ModStream { get; private set; }
 		public LoginViewModel Login { get; private set; }
         public SettingsViewModel SettingsHub { get; private set; }
         public SubredditRiverViewModel SubredditRiver { get; private set; }

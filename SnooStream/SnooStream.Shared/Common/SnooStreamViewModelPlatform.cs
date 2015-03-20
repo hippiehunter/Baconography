@@ -93,7 +93,7 @@ namespace SnooStream.Common
 
 		private void MakeHubSections()
 		{
-            if (Login.IsMod)
+			if (RedditUserState != null && RedditUserState.IsMod)
             {
                 HubSections = new List<HubSection>
 						{

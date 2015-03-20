@@ -37,8 +37,9 @@ namespace SnooStream.ViewModel
 
 			public bool HasMore()
 			{
+				var anyQueue = _modStream.Subreddits.Any(sr => sr.Enabled && !string.IsNullOrWhiteSpace(sr.OldestQueue));
 				//TODO deal with active subreddit mods
-				return _modStream.OldestModMail != null;
+				return SnooStreamViewModel.RedditUserState.IsMod && (_modStream.OldestModMail != null || anyQueue);
 			}
 
 			public async Task<IEnumerable<ViewModelBase>> LoadMore()
@@ -69,6 +70,7 @@ namespace SnooStream.ViewModel
 			Groups = new ObservableSortedUniqueCollection<string, ActivityGroupViewModel>(new ActivityGroupViewModel.ActivityAgeComparitor());
 			Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new ModActivityLoader(this), 100);
 			Subreddits = new List<SubredditMod>();
+			DisabledModeration = new List<string>();
             if (selfInit != null && IsLoggedIn)
 			{
 				InitialLoad();
@@ -135,33 +137,37 @@ namespace SnooStream.ViewModel
             if (!IsLoggedIn)
                 throw new InvalidOperationException("User must be logged in to do this");
 
-			//update moderator listing
-			var modSubs = await SnooStreamViewModel.RedditService.GetModeratorSubredditListing(CancellationToken.None);
-			//load mod mail
-			var modMail = await SnooStreamViewModel.RedditService.GetModMail(100);
 
-			OldestModMail = ActivityGroupViewModel.ProcessListing(Groups, modMail, null);
-			//load mod queue for each subreddit
-			foreach (var modSub in modSubs.Data.Children)
+			if (SnooStreamViewModel.RedditUserState.IsMod)
 			{
-				if(modSub.Data is Subreddit)
-				{
-					var subredditName = Reddit.MakePlainSubredditName(((Subreddit)modSub.Data).Url);
-					if(!DisabledModeration.Contains(subredditName))
-					{
-						var modQueue = await SnooStreamViewModel.RedditService.GetModQueue(subredditName, 20);
-						var newModSub = new SubredditMod
-						{
-							Enabled = true,
-							Subreddit = subredditName,
-							OldestQueue = ActivityGroupViewModel.ProcessListing(Groups, modQueue, null)
-						};
+				//update moderator listing
+				var modSubs = await SnooStreamViewModel.RedditService.GetModeratorSubredditListing(CancellationToken.None);
+				//load mod mail
+				//var modMail = await SnooStreamViewModel.RedditService.GetModMail(null);
 
-						Subreddits.Add(newModSub);
-					}
-					else
+				//OldestModMail = ActivityGroupViewModel.ProcessListing(Groups, modMail, null);
+				//load mod queue for each subreddit
+				foreach (var modSub in modSubs.Data.Children)
+				{
+					if (modSub.Data is Subreddit)
 					{
-						Subreddits.Add(new SubredditMod { Enabled = false, OldestQueue = null, Subreddit = subredditName });
+						var subredditName = Reddit.MakePlainSubredditName(((Subreddit)modSub.Data).Url);
+						if (!DisabledModeration.Contains(subredditName))
+						{
+							var modQueue = await SnooStreamViewModel.RedditService.GetModQueue(subredditName, 20);
+							var newModSub = new SubredditMod
+							{
+								Enabled = true,
+								Subreddit = subredditName,
+								OldestQueue = ActivityGroupViewModel.ProcessListing(Groups, modQueue, null)
+							};
+
+							Subreddits.Add(newModSub);
+						}
+						else
+						{
+							Subreddits.Add(new SubredditMod { Enabled = false, OldestQueue = null, Subreddit = subredditName });
+						}
 					}
 				}
 			}
@@ -191,13 +197,16 @@ namespace SnooStream.ViewModel
 			if (!IsLoggedIn)
 				throw new InvalidOperationException("User must be logged in to do this");
 
-			OldestModMail = await PullActivity(OldestModMail, "mod mail", string.Format(Reddit.MailBaseUrlFormat, "moderator"));
-			//foreach mod sub whos Oldest Queue isnt null grab more
-			foreach (var subMod in Subreddits)
+			if (SnooStreamViewModel.RedditUserState.IsMod)
 			{
-				if (subMod.Enabled)
+				OldestModMail = await PullActivity(OldestModMail, "mod mail", string.Format(Reddit.MailBaseUrlFormat, "moderator"));
+				//foreach mod sub whos Oldest Queue isnt null grab more
+				foreach (var subMod in Subreddits)
 				{
-					subMod.OldestQueue = await PullActivity(OldestModMail, "mod mail", string.Format(Reddit.SubredditAboutBaseUrlFormat, subMod.Subreddit, "modqueue"));
+					if (subMod.Enabled)
+					{
+						subMod.OldestQueue = await PullActivity(subMod.OldestQueue, "mod queue", string.Format(Reddit.SubredditAboutBaseUrlFormat, subMod.Subreddit, "modqueue"));
+					}
 				}
 			}
 		}
