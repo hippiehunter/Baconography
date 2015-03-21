@@ -9,6 +9,8 @@ using System.Linq;
 using Windows.UI.Text;
 using Windows.UI;
 using Windows.UI.Xaml.Media;
+using SnooSharp;
+using Windows.UI.Xaml;
 
 namespace SnooStream.Converters
 {
@@ -91,4 +93,64 @@ namespace SnooStream.Converters
 			throw new NotImplementedException();
 		}
 	}
+
+    public class ActivityMetadataConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            var activityViewModel = value as ActivityGroupViewModel;
+            var thing = activityViewModel.FirstActivity.GetThing();
+            var rtb = new RichTextBlock();
+            var pp = new Paragraph();
+            rtb.IsTextSelectionEnabled = false;
+            rtb.Blocks.Add(pp);
+            rtb.Style = App.Current.Resources["SubtextButtonSubtextTextBlock"] as Style;
+            List<Inline> inlinesCollection = new List<Inline>();
+
+            if (thing.Data is Link)
+            {
+                var link = thing.Data as Link;
+                var subredditLink = new Run { Text = link.Subreddit };
+                var authorLink = new Run { Text = link.Author };
+
+                if (link.Over18)
+                    inlinesCollection.Add(new Run { Text = "NSFW", Foreground = new SolidColorBrush(Colors.Red) });
+
+                inlinesCollection.Add(subredditLink);
+                inlinesCollection.Add(authorLink);
+                inlinesCollection.Add(new Run { Text = TimeRelationConverter.GetRelationString(link.CreatedUTC) });
+                inlinesCollection.Add(new Run { Text = DomainConverter.GetDomain(link.Url) });
+            }
+            else if (thing.Data is Comment)
+            {
+                var comment = thing.Data as Comment;
+                var subredditLink = new Run { Text = comment.Subreddit };
+                var authorLink = new Run { Text = comment.Author };
+
+                inlinesCollection.Add(subredditLink);
+                inlinesCollection.Add(authorLink);
+                inlinesCollection.Add(new Run { Text = TimeRelationConverter.GetRelationString(comment.CreatedUTC) });
+            }
+
+            for (int i = 0; i < inlinesCollection.Count; i++)
+            {
+                pp.Inlines.Add(inlinesCollection[i]);
+                if (i == (inlinesCollection.Count - 1))
+                {
+                }
+                else
+                {
+                    pp.Inlines.Add(new Run { Text = "  \u2022  " });
+                }
+            }
+
+            return rtb;
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

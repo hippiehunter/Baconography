@@ -67,6 +67,14 @@ namespace SnooStream.Converters
                 else
                     return noHistory;
             }
+            else if (value is PostedLinkActivityViewModel)
+            {
+                var vm = value as PostedLinkActivityViewModel;
+                if (SnooStreamViewModel.OfflineService.HasHistory(vm.Link.IsSelf ? vm.Link.Permalink : vm.Link.Url) || (vm.Link.Visited ?? false))
+                    return history;
+                else
+                    return noHistory;
+            }
             else
                 return noHistory;
         }

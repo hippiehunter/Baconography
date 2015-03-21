@@ -31,8 +31,7 @@
                    Style="{StaticResource TitleTextBlock}"
                    Text="{Binding Title, Mode=OneTime}"
                    TextTrimming="WordEllipsis"
-                   MaxHeight="200"
-                   MinHeight="50">
+                   MaxLines="3">
                 <TextBlock.Foreground>
                     <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
                 </TextBlock.Foreground>
@@ -40,7 +39,7 @@
 
             <!-- Link info, user / time / subreddit / domain -->
             <ContentControl x:Name="linkMetadata" Grid.Row="1"
-                            Margin="0,5,0,-6" MinHeight="25"
+                            Margin="0,5,0,-6"
                             HorizontalAlignment="Stretch" Content="{Binding Converter={StaticResource linkMetadataConverter}}"/>
 
             <!-- Content block -->

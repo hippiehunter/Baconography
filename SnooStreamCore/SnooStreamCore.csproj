@@ -97,6 +97,7 @@
     <Compile Include="ViewModel\OperationCancellationViewModel.cs" />
     <Compile Include="ViewModel\Popups\CommandViewModel.cs" />
     <Compile Include="ViewModel\Popups\InputViewModel.cs" />
+    <Compile Include="ViewModel\Popups\ReportReasonInputViewModel.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
     <Compile Include="ViewModel\Activities\ActivityViewModel.cs" />
     <Compile Include="ViewModel\Search\SubredditSearch.cs" />

@@ -156,13 +156,13 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public static string ProcessListing(ObservableSortedUniqueCollection<string, ActivityGroupViewModel> groups, Listing listing, string after)
+        public static string ProcessListing(ObservableSortedUniqueCollection<string, ActivityGroupViewModel> groups, Listing listing, string after, bool isMod = false)
         {
             if (listing != null)
             {
                 foreach (var child in listing.Data.Children)
                 {
-					ProcessThing(groups, child);
+                    ProcessThing(groups, child, isMod);
                 }
 
                 if (string.IsNullOrWhiteSpace(after))
@@ -171,7 +171,7 @@ namespace SnooStream.ViewModel
             return after;
         }
 
-		public static void ProcessThing(ObservableSortedUniqueCollection<string, ActivityGroupViewModel> groups, Thing child)
+		public static void ProcessThing(ObservableSortedUniqueCollection<string, ActivityGroupViewModel> groups, Thing child, bool isMod = false)
 		{
 			var childName = ActivityViewModel.GetActivityGroupName(child);
 			ActivityGroupViewModel existingGroup;
@@ -189,23 +189,24 @@ namespace SnooStream.ViewModel
 			}
 			else
 			{
-				groups.Add(childName, ActivityGroupViewModel.MakeActivityGroup(childName, child));
+                groups.Add(childName, ActivityGroupViewModel.MakeActivityGroup(childName, child, isMod));
 			}
 		}
 
-        public static ActivityGroupViewModel MakeActivityGroup(string activityGroupName, Thing thing)
+        public static ActivityGroupViewModel MakeActivityGroup(string activityGroupName, Thing thing, bool isMod = false)
         {
             if (thing == null)
                 throw new ArgumentNullException();
 
-            var group = new ActivityGroupViewModel(activityGroupName);
+            var group = new ActivityGroupViewModel(activityGroupName, isMod);
 
             group.Merge(thing);
             return group;
         }
 
-        public ActivityGroupViewModel(string activityGroupName)
+        public ActivityGroupViewModel(string activityGroupName, bool isMod)
         {
+            IsMod = isMod;
             Id = activityGroupName;
             Activities = new ObservableSortedUniqueCollection<string, ActivityViewModel>(new ActivityViewModel.ActivityAgeComparitor());
         }
@@ -236,27 +237,53 @@ namespace SnooStream.ViewModel
 
                 if (Activities.Count == 0)
                 {
-                    _innerFirstActivity = targetActivity;
-                    _innerFirstActivityName = thingName;
+                    FirstActivity = targetActivity;
                     Activities.Add(thingName, targetActivity);
+                    if (IsMod)
+                    {
+                        if(targetActivity is PostedLinkActivityViewModel)
+                        {
+                            foreach (var modAction in ((Link)targetActivity.GetThing().Data).ModReports)
+                            {
+                                IsConversation = true;
+                                Activities.Add(modAction[1], new ReportActivityViewModel(modAction, true));
+                            }
+                            foreach (var modAction in ((Link)targetActivity.GetThing().Data).UserReports)
+                            {
+                                IsConversation = true;
+                                Activities.Add(modAction[1], new ReportActivityViewModel(modAction, false));
+                            }
+                        }
+                        else if(targetActivity is PostedCommentActivityViewModel)
+                        {
+                            foreach (var modAction in ((Comment)targetActivity.GetThing().Data).ModReports)
+                            {
+                                IsConversation = true;
+                                Activities.Add(modAction[1], new ReportActivityViewModel(modAction, true));
+                            }
+                            foreach (var modAction in ((Comment)targetActivity.GetThing().Data).UserReports)
+                            {
+                                IsConversation = true;
+                                Activities.Add(modAction[1], new ReportActivityViewModel(modAction, false));
+                            }
+                        }
+                    }
                 }
-                else if (Activities.Count > 0)
-                    Activities.Add(thingName, targetActivity);
-
-                if (!IsConversation && Activities.Count > 1)
+                else
                 {
-                    IsConversation = true;
-                    RaisePropertyChanged("IsConversation");
+                    Activities.Add(thingName, targetActivity);
+                    if (!IsConversation)
+                    {
+                        IsConversation = true;
+                        RaisePropertyChanged("IsConversation");
+                        FirstActivity = ((IEnumerable<ActivityViewModel>)Activities).First();
+                    }
                 }
             }
 
-			ActivityViewModel firstActivity = null;
-			if (Activities.Count == 0)
-				firstActivity = _innerFirstActivity;
-			else
-				firstActivity = ((IEnumerable<ActivityViewModel>)Activities).First();
+            Status = "";
 
-			if (firstActivity.IsSelf)
+            if (FirstActivity.IsSelf && !IsMod)
 			{
 				var betterFirstActivity = ((IEnumerable<ActivityViewModel>)Activities).FirstOrDefault(activity => !activity.IsSelf);
 				if (betterFirstActivity != null)
@@ -266,67 +293,63 @@ namespace SnooStream.ViewModel
 					else
 						Status = ReplyAllStatusIcon;
 
-					firstActivity = betterFirstActivity;
-					ActivityViewModel.FixupFirstActivity(firstActivity, Activities);
-					Title = firstActivity.Title;
+                    FirstActivity = betterFirstActivity;
+                    ActivityViewModel.FixupFirstActivity(FirstActivity, Activities);
+                    Title = FirstActivity.Title;
 				}
 				else
 				{
-					ActivityViewModel.FixupFirstActivity(firstActivity, Activities);
-					if (firstActivity is PostedLinkActivityViewModel)
+                    ActivityViewModel.FixupFirstActivity(FirstActivity, Activities);
+                    if (FirstActivity is PostedLinkActivityViewModel)
 					{
-						Title = ((PostedLinkActivityViewModel)firstActivity).Subreddit;
+                        Title = ((PostedLinkActivityViewModel)FirstActivity).Subreddit;
 						Status = SoloPostedStatusIcon;
 					}
-					else if (firstActivity is PostedCommentActivityViewModel)
+                    else if (FirstActivity is PostedCommentActivityViewModel)
 					{
-						Title = ((PostedCommentActivityViewModel)firstActivity).Subreddit;
+                        Title = ((PostedCommentActivityViewModel)FirstActivity).Subreddit;
 						Status = SoloCommentStatusIcon;
 					}
-					else if(firstActivity is RecivedCommentReplyActivityViewModel)
+                    else if (FirstActivity is RecivedCommentReplyActivityViewModel)
 					{
-						Title = ((RecivedCommentReplyActivityViewModel)firstActivity).Subreddit;
+                        Title = ((RecivedCommentReplyActivityViewModel)FirstActivity).Subreddit;
 					}
-					else if (firstActivity is MessageActivityViewModel)
+                    else if (FirstActivity is MessageActivityViewModel)
 					{
 						Status = SoloMessageStatusIcon;
-						Title = ((MessageActivityViewModel)firstActivity).Destination;
+                        Title = ((MessageActivityViewModel)FirstActivity).Destination;
 					}
 				}
 			}
 			else
 			{
-				ActivityViewModel.FixupFirstActivity(firstActivity, Activities);
-				Title = firstActivity.Title;
+                ActivityViewModel.FixupFirstActivity(FirstActivity, Activities);
+                Title = FirstActivity.Title;
 			}
 
-			CreatedUTC = firstActivity.CreatedUTC;
-			PreviewBody = firstActivity.PreviewBody;
-			SubTitle = firstActivity.SubTitle;
+            if (FirstActivity is PostedCommentActivityViewModel)
+                IsComment = true;
+
+            CreatedUTC = FirstActivity.CreatedUTC;
+            PreviewBody = FirstActivity.PreviewBody;
+            SubTitle = FirstActivity.SubTitle;
 
 			RaisePropertyChanged("CreatedUTC");
 			RaisePropertyChanged("PreviewBody");
 			RaisePropertyChanged("Title");
 			RaisePropertyChanged("SubTitle");
+            RaisePropertyChanged("IsComment");
+            RaisePropertyChanged("FirstActivity");
         }
+        private bool IsMod { get; set; }
         public string Id { get; set; }
         public DateTime CreatedUTC {get; protected set;}
 		public string Title { get; protected set; }
 		public string SubTitle { get; protected set; }
 		public string PreviewBody { get; protected set; }
 		public string Status { get; protected set; }
-        private ActivityViewModel _innerFirstActivity;
-        private string _innerFirstActivityName;
-        public ActivityViewModel FirstActivity 
-        {
-            get
-            {
-                if (Activities.Count == 0)
-                    return _innerFirstActivity;
-                else
-                    return ((IEnumerable<ActivityViewModel>)Activities).First();
-            }
-        }
+        public bool IsComment { get; protected set; }
+        public ActivityViewModel FirstActivity { get; set; }
 
         private bool _isExpanded;
         public bool IsExpanded 
@@ -348,7 +371,7 @@ namespace SnooStream.ViewModel
             }
             else
             {
-                things.Add(_innerFirstActivity.GetThing());
+                things.Add(FirstActivity.GetThing());
             }
         }
         public void Tapped()

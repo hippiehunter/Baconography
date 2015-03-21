@@ -113,6 +113,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\MessageControl.xaml.cs">
       <DependentUpon>MessageControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Controls\ModActivityView.xaml.cs">
+      <DependentUpon>ModActivityView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Controls\MoreCommentsView.xaml.cs">
       <DependentUpon>MoreCommentsView.xaml</DependentUpon>
     </Compile>
@@ -167,6 +170,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\CommentTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\ContentTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\DataTemplateSelectorControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\ModActivityTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\TypedTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\UserActivityTemplateSelector.cs" />
   </ItemGroup>
@@ -245,6 +249,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Controls\MessageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Controls\ModActivityView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

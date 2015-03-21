@@ -25,7 +25,7 @@ namespace SnooStream.ViewModel
 
             if (CurrentGroup == null)
             {
-                CurrentGroup = new ActivityGroupViewModel("");
+                CurrentGroup = new ActivityGroupViewModel("", false);
             }
 
             GotoReply = new RelayCommand(() =>

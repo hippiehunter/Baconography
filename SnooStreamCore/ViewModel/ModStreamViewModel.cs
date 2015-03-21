@@ -79,6 +79,7 @@ namespace SnooStream.ViewModel
 
 		private async void InitialLoad()
 		{
+            await Task.Delay(5000);
 			await PullNew(true, true);
 		}
 
@@ -149,26 +150,32 @@ namespace SnooStream.ViewModel
 				//load mod queue for each subreddit
 				foreach (var modSub in modSubs.Data.Children)
 				{
-					if (modSub.Data is Subreddit)
-					{
-						var subredditName = Reddit.MakePlainSubredditName(((Subreddit)modSub.Data).Url);
-						if (!DisabledModeration.Contains(subredditName))
-						{
-							var modQueue = await SnooStreamViewModel.RedditService.GetModQueue(subredditName, 20);
-							var newModSub = new SubredditMod
-							{
-								Enabled = true,
-								Subreddit = subredditName,
-								OldestQueue = ActivityGroupViewModel.ProcessListing(Groups, modQueue, null)
-							};
+                    try
+                    {
+                        if (modSub.Data is Subreddit)
+                        {
+                            var subredditName = Reddit.MakePlainSubredditName(((Subreddit)modSub.Data).Url);
+                            if (!DisabledModeration.Contains(subredditName))
+                            {
+                                var modQueue = await SnooStreamViewModel.RedditService.GetModQueue(subredditName, 20);
+                                var newModSub = new SubredditMod
+                                {
+                                    Enabled = true,
+                                    Subreddit = subredditName,
+                                    OldestQueue = ActivityGroupViewModel.ProcessListing(Groups, modQueue, null, true)
+                                };
 
-							Subreddits.Add(newModSub);
-						}
-						else
-						{
-							Subreddits.Add(new SubredditMod { Enabled = false, OldestQueue = null, Subreddit = subredditName });
-						}
-					}
+                                Subreddits.Add(newModSub);
+                            }
+                            else
+                            {
+                                Subreddits.Add(new SubredditMod { Enabled = false, OldestQueue = null, Subreddit = subredditName });
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
 				}
 			}
         }
@@ -187,7 +194,7 @@ namespace SnooStream.ViewModel
 						Created = DateTime.Now,
 						CreatedUTC = DateTime.UtcNow
 					}
-			});
+			}, true);
 		}
 
 		public async Task PullOlder()

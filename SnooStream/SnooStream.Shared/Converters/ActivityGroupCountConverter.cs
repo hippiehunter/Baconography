@@ -20,6 +20,8 @@ namespace SnooStream.Converters
             {
                 return "activities";
             }
+            else if (viewModel is ReportActivityViewModel)
+                return "reports";
             else if (viewModel is PostedLinkActivityViewModel || viewModel is PostedCommentActivityViewModel ||
                 viewModel is RecivedCommentReplyActivityViewModel || viewModel is MentionActivityViewModel)
             {
@@ -35,7 +37,7 @@ namespace SnooStream.Converters
             {
                 return "unread";
             }
-            else if (viewModel is ModeratorActivityViewModel)
+            else if (viewModel is ModeratorActivityViewModel || viewModel is ReportActivityViewModel)
             {
                 return "unreviewed";
             }
@@ -60,7 +62,6 @@ namespace SnooStream.Converters
             }
 
             var adjustedCount = group.FirstActivity is PostedLinkActivityViewModel ? group.Activities.Count - 1 : group.Activities.Count;
-
             return string.Format("{0} {1}, {2} {3}", adjustedCount, MessageGroupText(group.FirstActivity), adjustedCount - readCount, NewnessGroupText(group.FirstActivity));
         }
 

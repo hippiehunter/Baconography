@@ -156,19 +156,42 @@ namespace SnooStream.PlatformServices
 #else
                     var inputBox = new TextBox { Text = inputViewModel.InputValue };
 #endif
+                    bool oked = false;
                     inputBox.KeyDown += (sender, args) =>
                         {
                             if (args.Key == VirtualKey.Enter)
+                            {
+                                oked = true;
                                 popup.Hide();
+                            }
                         };
                     var stackPanel = new StackPanel { HorizontalAlignment = HorizontalAlignment.Stretch };
                     stackPanel.Children.Add(new TextBlock { Text = inputViewModel.Prompt });
                     stackPanel.Children.Add(inputBox);
+                    var buttons = new StackPanel { HorizontalAlignment = HorizontalAlignment.Stretch, Orientation = Orientation.Horizontal};
+                    stackPanel.Children.Add(stackPanel);
+                    var okButton = new Button { Content = "Ok"};
+                    var cancelButton = new Button { Content = "Cancel"};
+                    buttons.Children.Add(okButton);
+                    buttons.Children.Add(cancelButton);
                     popup.Content = stackPanel;
+                    
+                    okButton.Tapped += (sender, args) =>
+                        {
+                            oked = true;
+                            popup.Hide();
+                        };
+
+                    cancelButton.Tapped += (sender, args) =>
+                        {
+                            oked = false;
+                            popup.Hide();
+                        };
+
                     TaskCompletionSource<bool> completionSource = new TaskCompletionSource<bool>();
                     popup.Closed += (sender, args) =>
                         {
-                            if (inputViewModel.Dismissed != null)
+                            if (inputViewModel.Dismissed != null && oked)
                                 inputViewModel.Dismissed.Execute(string.IsNullOrWhiteSpace(inputBox.Text) ? "pinned" : inputBox.Text);
                             completionSource.TrySetResult(true);
                         };

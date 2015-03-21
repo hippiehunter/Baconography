@@ -1,10 +1,13 @@
 ﻿using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using NBoilerpipePortable.Util;
 using SnooSharp;
+using SnooStream.ViewModel.Popups;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
@@ -236,7 +239,7 @@ namespace SnooStream.ViewModel
         public string Subject { get { return Link.Title; } }
         public string Subreddit { get { return Link.Subreddit; } }
 		public string Body { get { return HttpUtility.HtmlDecode(Link.Selftext); } }
-
+        public string LinkTitle { get { return Link.Title; } }
 
         public override Thing GetThing()
         {
@@ -247,6 +250,13 @@ namespace SnooStream.ViewModel
         {
             SnooStreamViewModel.NavigationService.NavigateToContentRiver(new SoloContentStreamViewModel(LinkVM));
         }
+
+        public RelayCommand Report { get { return new RelayCommand(() => SnooStreamViewModel.NavigationService.ShowPopup(new ReportReasonInputViewModel(Link), null, CancellationToken.None)); } }
+        public RelayCommand Spam { get { return new RelayCommand(async () => await SnooStreamViewModel.RedditService.RemoveThing(Link.Name, true)); } }
+        public RelayCommand Approve { get { return new RelayCommand(async () => await SnooStreamViewModel.RedditService.ApproveThing(Link.Name)); } }
+        public RelayCommand Remove { get { return new RelayCommand(async () => await SnooStreamViewModel.RedditService.RemoveThing(Link.Name, false)); } }
+        public RelayCommand IgnoreReports { get { return new RelayCommand(async () => await SnooStreamViewModel.RedditService.IgnoreReportsOnThing(Link.Name)); } }
+        public RelayCommand GotoUserDetails { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoUserDetails(Link.Author)); } }
     }
 
     public class PostedCommentActivityViewModel : ActivityViewModel
@@ -268,6 +278,7 @@ namespace SnooStream.ViewModel
             }
         }
 
+        public string LinkTitle { get { return Comment.LinkTitle; } }
         public string Author { get { return Comment.Author; } }
         public object BodyMD { get; private set; }
         public string Subject { get; set; }
@@ -296,7 +307,12 @@ namespace SnooStream.ViewModel
             ActivityViewModel.NavigateToCommentContext(Comment.LinkUrl + Comment.Id + "?context=3", Comment.Name, Comment.Id, Comment.LinkId);
         }
 
-		
+        public RelayCommand Report { get { return new RelayCommand(() => SnooStreamViewModel.NavigationService.ShowPopup(new ReportReasonInputViewModel(Comment), null, CancellationToken.None)); } }
+        public RelayCommand Spam { get { return new RelayCommand(async () => await SnooStreamViewModel.RedditService.RemoveThing(Comment.Name, true)); } }
+        public RelayCommand Approve { get { return new RelayCommand(async () => await SnooStreamViewModel.RedditService.ApproveThing(Comment.Name)); } }
+        public RelayCommand Remove { get { return new RelayCommand(async () => await SnooStreamViewModel.RedditService.RemoveThing(Comment.Name, false)); } }
+        public RelayCommand IgnoreReports { get { return new RelayCommand(async () => await SnooStreamViewModel.RedditService.IgnoreReportsOnThing(Comment.Name)); } }
+        public RelayCommand GotoUserDetails { get { return new RelayCommand(() => SnooStreamViewModel.CommandDispatcher.GotoUserDetails(Comment.Author)); } }
 	}
 
     public class RecivedCommentReplyActivityViewModel : ActivityViewModel
@@ -433,6 +449,11 @@ namespace SnooStream.ViewModel
         {
             SnooStreamViewModel.NavigationService.NavigateToConversation(ActivityViewModel.GetActivityGroupName(GetThing()));
         }
+
+        RelayCommand Report { get { return new RelayCommand(() => SnooStreamViewModel.NavigationService.ShowPopup(new ReportReasonInputViewModel(MessageThing), null, CancellationToken.None)); } }
+        RelayCommand Spam { get { return new RelayCommand(async () => await SnooStreamViewModel.RedditService.RemoveThing(MessageThing.Name, true)); } }
+        RelayCommand Remove { get { return new RelayCommand(async () => await SnooStreamViewModel.RedditService.RemoveThing(MessageThing.Name, false)); } }
+        
     }
 
     public class ModeratorActivityViewModel :ActivityViewModel
@@ -482,6 +503,27 @@ namespace SnooStream.ViewModel
         public override void Tapped()
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class ReportActivityViewModel : ActivityViewModel
+    {
+        private static int _uniqueifier = 1;
+        public ReportActivityViewModel(string[] reportInfo, bool isMod)
+        {
+            Title = (isMod ? "[Mod]" : "[User]") + reportInfo[1];
+            SubTitle = reportInfo[0];
+            CreatedUTC = DateTime.UtcNow.Subtract(TimeSpan.FromDays(9001).Add(TimeSpan.FromTicks(_uniqueifier++)));
+        }
+
+        public override Thing GetThing()
+        {
+            return new Thing { Data = new ThingData { Id = "", Name = "" } };
+        }
+
+        public override void Tapped()
+        {
+            
         }
     }
 }

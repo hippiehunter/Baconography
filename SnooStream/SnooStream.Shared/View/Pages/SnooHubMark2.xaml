@@ -29,7 +29,7 @@
                 </DataTemplate>
 
                 <DataTemplate x:Name="modTemplate">
-                    <local:SelfActivityView DataContext="{Binding ModStream}"/>
+                    <local:ModActivityView DataContext="{Binding ModStream}"/>
                 </DataTemplate>
 
                 <DataTemplate x:Name="loginTemplate">
