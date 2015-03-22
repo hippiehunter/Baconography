@@ -491,63 +491,63 @@ namespace SnooStream.ViewModel
             }
         }
 
-        private void MergeDisplayReplacement(bool isFull, IEnumerable<ViewModelBase> replacements)
-        {
-            //need to find the above and do insertion of everything above
-            //then insert the below
-            //the middle needs to be merged and have the shells set to an edited 
-            //origin type so we can display the differences caused by the load
+		//private void MergeDisplayReplacement(bool isFull, IEnumerable<ViewModelBase> replacements)
+		//{
+		//	//need to find the above and do insertion of everything above
+		//	//then insert the below
+		//	//the middle needs to be merged and have the shells set to an edited 
+		//	//origin type so we can display the differences caused by the load
 
-            var replacementsList = replacements.ToList();
+		//	var replacementsList = replacements.ToList();
 
-            //get rid of the load full sentinels since we're filling in the real versions, only if this is actually a context change
-            if (isFull)
-                while (FlatComments.Remove(_loadFullSentinel)) { }
-
-
-            var firstExistingId = GetId(FlatComments.First());
-            var lastExistingId = GetId(FlatComments.Last());
+		//	//get rid of the load full sentinels since we're filling in the real versions, only if this is actually a context change
+		//	if (isFull)
+		//		while (FlatComments.Remove(_loadFullSentinel)) { }
 
 
-            var aboveComments = replacements.TakeWhile((vm) => GetId(vm) != firstExistingId).Reverse().ToList();
+		//	var firstId = GetId(replacements.First());
+		//	var lastId = GetId(replacements.Last());
 
-            List<ViewModelBase> mergableComments = new List<ViewModelBase>();
-            foreach (var item in replacements.SkipWhile((vm) => GetId(vm) != firstExistingId))
-            {
-                mergableComments.Add(item);
-                if (GetId(item) == lastExistingId)
-                    break;
-            }
 
-            var belowComments = replacements.SkipWhile((vm) => GetId(vm) != lastExistingId).Skip(1).ToList();
+		//	var aboveComments = FlatComments.TakeWhile((vm) => GetId(vm) != firstId).Reverse().ToList();
+
+		//	List<ViewModelBase> mergableComments = new List<ViewModelBase>();
+		//	foreach (var item in replacements.SkipWhile((vm) => GetId(vm) != firstId))
+		//	{
+		//		mergableComments.Add(item);
+		//		if (GetId(item) == lastId)
+		//			break;
+		//	}
+
+		//	var belowComments = replacements.SkipWhile((vm) => GetId(vm) != lastId).Skip(1).ToList();
 
             
 
-            if (mergableComments.Count != FlatComments.Count) //otherwise nothing to do, just add in the above and below
-            {
+		//	if (mergableComments.Count != FlatComments.Count) //otherwise nothing to do, just add in the above and below
+		//	{
 
-				while (mergableComments.Count < FlatComments.Count && FlatComments.Count > 0)
-					FlatComments.RemoveAt(FlatComments.Count - 1);
-                for (int flatI = 0, mergableI = 0; flatI < FlatComments.Count && mergableI < mergableComments.Count; flatI++, mergableI++)
-                {
-                    if (FlatComments[flatI] != mergableComments[mergableI])
-                    {
-                        //need to skip ahead one on flatI since we just added another one and we dont want that to be the new comparison point
-                        FlatComments.Insert(flatI++, mergableComments[mergableI]);
-                    }
-                }
-            } 
+		//		while (mergableComments.Count < FlatComments.Count && FlatComments.Count > 0)
+		//			FlatComments.RemoveAt(FlatComments.Count - 1);
+		//		for (int flatI = 0, mergableI = 0; flatI < FlatComments.Count && mergableI < mergableComments.Count; flatI++, mergableI++)
+		//		{
+		//			if (FlatComments[flatI] != mergableComments[mergableI])
+		//			{
+		//				//need to skip ahead one on flatI since we just added another one and we dont want that to be the new comparison point
+		//				FlatComments.Insert(flatI++, mergableComments[mergableI]);
+		//			}
+		//		}
+		//	} 
 
-            foreach (var comment in aboveComments)
-            {
-                FlatComments.Insert(0, comment);
-            }
+		//	foreach (var comment in aboveComments)
+		//	{
+		//		FlatComments.Insert(0, comment);
+		//	}
 
-            foreach (var comment in belowComments)
-            {
-                FlatComments.Add(comment);
-            }
-        }
+		//	foreach (var comment in belowComments)
+		//	{
+		//		FlatComments.Add(comment);
+		//	}
+		//}
 
         private string GetId(ViewModelBase viewModel)
         {
@@ -833,20 +833,18 @@ namespace SnooStream.ViewModel
 
             if (flatChildren.Count > 0)
             {
-                if (FlatComments.Count == 0)
+                if (FlatComments.Count != 0)
                 {
-                    if (isContext)
-                        FlatComments.Add(_loadFullSentinel);
+					FlatComments.Clear();
+                }
 
-                    foreach (var comment in flatChildren)
-                    {
-                        FlatComments.Add(comment);
-                    }
-                }
-                else
-                {
-                    MergeDisplayReplacement(true, flatChildren);
-                }
+				if (isContext)
+					FlatComments.Add(_loadFullSentinel);
+
+				foreach (var comment in flatChildren)
+				{
+					FlatComments.Add(comment);
+				}
             }
         }
 
