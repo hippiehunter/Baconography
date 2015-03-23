@@ -17,7 +17,7 @@
                 <EntranceThemeTransition FromHorizontalOffset="400" />
             </TransitionCollection>
         </Border.Transitions>
-        <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0" x:Name="rootGrid" Visibility="Collapsed">
+        <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0" x:Name="rootGrid">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

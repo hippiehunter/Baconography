@@ -72,7 +72,6 @@ namespace SnooStream.View.Controls
                         return true;
                     case 1:
                         CurrentLoadPhase++;
-                        rootGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
                         var finishLoad2 = new Action(async () =>
                         {
                             try

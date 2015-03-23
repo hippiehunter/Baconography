@@ -1,7 +1,9 @@
 ﻿using CommonResourceAcquisition.ImageAcquisition;
 using CommonResourceAcquisition.VideoAcquisition;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
 using SnooSharp;
+using SnooStream.Messages;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -51,13 +53,17 @@ namespace SnooStream.Common
             var commentsViewModel = currentContext as CommentsViewModel;
             if (commentsViewModel != null)
             {
-                commentsViewModel.AddReplyComment(source.Thing.Name);
+				commentsViewModel.CurrentlyFocused = commentsViewModel.AddReplyComment(source.Thing.Name);
+				Messenger.Default.Send<FocusChangedMessage>(new FocusChangedMessage(commentsViewModel));
             }
         }
 
         public void GotoReplyToPost(ViewModelBase currentContext, CommentsViewModel source)
         {
-            source.AddReplyComment(null);
+
+			source.CurrentlyFocused = source.AddReplyComment(null);
+			Messenger.Default.Send<FocusChangedMessage>(new FocusChangedMessage(source));
+			
         }
 
         public void GotoEditComment(ViewModelBase currentContext, CommentViewModel source)

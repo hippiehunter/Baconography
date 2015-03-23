@@ -35,6 +35,7 @@ namespace SnooStream.Common
 			{
 				_orientationManager = Application.Current.Resources["orientationManager"] as OrientationManager;
 				Messenger.Default.Register<SettingsChangedMessage>(this, OnSettingsChanged);
+				Messenger.Default.Register<FocusChangedMessage>(this, OnFocusChanged);
 				OnSettingsChanged(null);
                 Loaded += OnLoaded;
 			}
@@ -42,6 +43,17 @@ namespace SnooStream.Common
 			{
 			}
         }
+
+		private void OnFocusChanged(FocusChangedMessage obj)
+		{
+			if (_dataContext != null)
+			{
+				if (obj.Sender == _dataContext && _dataContext is IHasFocus)
+				{
+					SetFocusedViewModel(((IHasFocus)_dataContext).CurrentlyFocused);
+				}
+			}
+		}
 
         protected virtual void OnLoaded(object sender, RoutedEventArgs e)
         {

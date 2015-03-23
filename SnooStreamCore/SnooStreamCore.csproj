@@ -54,6 +54,7 @@
     <Compile Include="Common\TaskExtensions.cs" />
     <Compile Include="Common\TaskSettings.cs" />
     <Compile Include="Common\ViewModelDumpUtility.cs" />
+    <Compile Include="Messages\FocusChangedMessage.cs" />
     <Compile Include="Messages\SelectLinkMessage.cs" />
     <Compile Include="Messages\SettingsChangedMessage.cs" />
     <Compile Include="Messages\UserLoggedInMessage.cs" />
