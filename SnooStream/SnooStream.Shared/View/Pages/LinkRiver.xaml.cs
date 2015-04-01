@@ -71,7 +71,7 @@ namespace SnooStream.View.Pages
 		{
 			get
 			{
-				return ActualWidth;
+				return linksListView.ActualWidth;
 			}
 		}
 

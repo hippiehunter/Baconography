@@ -205,7 +205,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ListView x:Name="listBox" ItemsSource="{Binding Activities}"
+        <ListView x:Name="listBox" ItemsSource="{Binding}"
                 ItemTemplateSelector="{Binding Selector, Source={StaticResource activityTemplateSelector}}" 
                 HorizontalContentAlignment="Stretch"
                 ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">

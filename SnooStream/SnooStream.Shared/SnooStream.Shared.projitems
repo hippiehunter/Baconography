@@ -167,6 +167,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\Pages\SnooHubMark2.xaml.cs">
       <DependentUpon>SnooHubMark2.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Pages\SubredditModeration.xaml.cs">
+      <DependentUpon>SubredditModeration.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Pages\Wiki.xaml.cs">
+      <DependentUpon>Wiki.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\CommentTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\ContentTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Selectors\DataTemplateSelectorControl.cs" />
@@ -314,6 +320,14 @@
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\Pages\SnooHubMark2.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Pages\SubredditModeration.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Pages\Wiki.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

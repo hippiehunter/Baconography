@@ -93,18 +93,7 @@ namespace SnooStream.Common
 
 		private void MakeHubSections()
 		{
-			if (RedditUserState != null && RedditUserState.IsMod)
-            {
-                HubSections = new List<HubSection>
-						{
-							new HubSection { Header = "subreddit" },
-							new HubSection { Header = "activity" },
-							new HubSection { Header = "mod" },
-							new HubSection { Header = "self" },
-							new HubSection { Header = "settings" }
-						};
-            }
-			else if (Login.IsLoggedIn)
+			if (Login.IsLoggedIn)
 			{
 				HubSections = new List<HubSection>
 						{

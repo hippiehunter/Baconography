@@ -38,6 +38,9 @@ namespace SnooStream.Common
 				Messenger.Default.Register<FocusChangedMessage>(this, OnFocusChanged);
 				OnSettingsChanged(null);
                 Loaded += OnLoaded;
+#if WINDOWS_PHONE_APP
+                ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseVisible);
+#endif
 			}
 			catch
 			{

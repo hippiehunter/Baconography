@@ -1,0 +1,101 @@
+﻿<common:SnooApplicationPage x:Class="SnooStream.View.Pages.SubredditModeration"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:SnooStream.View.Controls"
+        xmlns:common="using:SnooStream.Common" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid x:Name="LayoutRoot" Margin="0,24,0,0">
+            <Hub>
+                <HubSection Header="queue">
+                    <DataTemplate>
+                        <ListView x:Name="queueListView" Grid.Column="0" Margin="0,0,0,0" SelectionMode="None"
+                                ItemsSource="{Binding ModQueue}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                ContainerContentChanging="linksListView_ContainerContentChanging"
+                                ShowsScrollingPlaceholders="True" IsItemClickEnabled="False"
+                                IncrementalLoadingTrigger="Edge" IncrementalLoadingThreshold="10"
+                                VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid HorizontalAlignment="Stretch" Margin="8,0,8,12">
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Title block -->
+                                        <TextBlock Grid.Row="0" Style="{StaticResource SubtextButtonTitleTextBlock}"
+                                                Text="{Binding Title, Mode=OneTime}"
+                                                TextTrimming="WordEllipsis" MaxLines="3" TextWrapping="WrapWholeWords">
+                                            <TextBlock.Foreground>
+                                                <Binding Converter="{StaticResource visitedMainLinkConverter}" />
+                                            </TextBlock.Foreground>
+                                        </TextBlock>
+
+                                        <!-- Link info, user / time / subreddit / domain -->
+                                        <ContentControl x:Name="linkMetadata" Grid.Row="3" Margin="0,5,0,-6"
+                                                MinHeight="25" HorizontalAlignment="Stretch"
+                                                Content="{Binding Converter={StaticResource activityMetadataConverter}}" />
+
+                                        <TextBlock Grid.Row="2" Style="{StaticResource SubtextButtonSubtextTextBlock}"
+                                                Visibility="{Binding IsComment, Converter={StaticResource booleanVisibilityConverter}}"
+                                                Text="{Binding Body, Mode=OneTime}"
+                                                TextTrimming="WordEllipsis" TextWrapping="WrapWholeWords" MaxLines="3">
+                                        </TextBlock>
+
+                                        <!-- Action block, flyout menu / vote / comment count -->
+                                        <Grid x:Name="actionButtons" Grid.Row="1" Margin="0,0,0,0"
+                                                HorizontalAlignment="Stretch">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="1*" />
+                                                <ColumnDefinition Width="1*" />
+                                                <ColumnDefinition Width="1*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Button Grid.Column="0" HorizontalContentAlignment="Left"
+                                                    HorizontalAlignment="Stretch" Style="{StaticResource SubtextButton}"
+                                                    FontFamily="Segoe UI Symbol" FontSize="35" Content="&#xE10C;">
+                                                <Button.Flyout>
+                                                    <MenuFlyout>
+                                                        <MenuFlyoutItem Text="Ignore Reports"
+                                                                Command="{Binding IgnoreReports, Mode=OneTime}" />
+                                                        <MenuFlyoutItem Text="Report"
+                                                                Command="{Binding Report, Mode=OneTime}" />
+                                                        <MenuFlyoutItem Text="User Details"
+                                                                Command="{Binding GotoUserDetails, Mode=OneTime}" />
+                                                    </MenuFlyout>
+                                                </Button.Flyout>
+                                            </Button>
+
+                                            <Button Grid.Column="1" HorizontalContentAlignment="Left" Margin="12,0,0,0"
+                                                    Style="{StaticResource SubtextButton}" FontFamily="Segoe UI Symbol"
+                                                    FontSize="35" Content="&#xE107;"
+                                                    Command="{Binding Remove}" />
+
+                                            <Button Grid.Column="2" HorizontalContentAlignment="Left" Margin="12,0,0,0"
+                                                    Style="{StaticResource SubtextButton}" FontFamily="Segoe UI Symbol"
+                                                    FontSize="35" Content="&#xE10B;"
+                                                    Command="{Binding Approve}" />
+                                        </Grid>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                            <ListView.ItemContainerTransitions>
+                                <TransitionCollection>
+                                    <EntranceThemeTransition IsStaggeringEnabled="False" />
+                                    <AddDeleteThemeTransition />
+                                </TransitionCollection>
+                            </ListView.ItemContainerTransitions>
+                        </ListView>
+
+                    </DataTemplate>
+                </HubSection>
+                <HubSection Header="log">
+                </HubSection>
+            </Hub>
+        </Grid>
+    </Grid>
+</common:SnooApplicationPage>
