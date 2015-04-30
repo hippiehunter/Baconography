@@ -391,6 +391,11 @@ namespace SnooStream.PlatformServices
 			return new BufferedAuxiliaryIncrementalLoadCollection<T>(loader, loadIncrement, auxiliaryTimeout);
 		}
 
+        public ObservableCollection<T> MakeFilteredIncrementalLoadCollection<T>(ObservableCollection<T> sourceCollection, Func<T, bool> filter) where T : class
+        {
+            return new FilteredIncrementalLoadCollection<T, BufferedAuxiliaryIncrementalLoadCollection<T>>(sourceCollection as BufferedAuxiliaryIncrementalLoadCollection<T>, filter);
+        }
+
         public ObservableCollection<T> FilterAttachIncrementalLoadCollection<T, T2>(ObservableCollection<T2> incrementalSource, ObservableCollection<T> filteredCollection)
         {
             var result = (filteredCollection as AttachedIncrementalLoadCollection<T>) ?? new AttachedIncrementalLoadCollection<T>();

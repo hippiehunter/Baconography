@@ -61,18 +61,7 @@ namespace SnooStream.PlatformServices
 
         public void NavigateToLinkRiver(LinkRiverViewModel viewModel)
         {
-            //if the current frame is already the hub just change pages and dont introduce any back stack
-            if (_frame.Content is LinkRiver)
-            {
-				var hub = _frame.Content as LinkRiver;
-                var ssvm = hub.DataContext as LinkRiverViewModel;
-                hub.DataContext = viewModel;
-                ssvm.Context.SelectSubreddit(viewModel);
-            }
-            else
-            {
-				_frame.Navigate(typeof(LinkRiver), "state=" + _navState.AddState(viewModel));
-            }
+			_frame.Navigate(typeof(LinkRiver), "state=" + _navState.AddState(viewModel));
         }
 
         public void NavigateToPost(PostViewModel viewModel)

@@ -27,6 +27,7 @@ namespace SnooStream.Services
 		void HideProgress();
 		void QueueNonCriticalUI(Action action);
 		ObservableCollection<T> MakeIncrementalLoadCollection<T>(IIncrementalCollectionLoader<T> loader, int loadIncrement = 20, int auxiliaryTimeout = 2500);
+        ObservableCollection<T> MakeFilteredIncrementalLoadCollection<T>(ObservableCollection<T> sourceCollection, Func<T, bool> filter) where T : class;
         ObservableCollection<T> FilterAttachIncrementalLoadCollection<T,T2>(ObservableCollection<T2> incrementalSource, ObservableCollection<T> filteredCollection);
         void FilterDetachIncrementalLoadCollection<T,T2>(ObservableCollection<T> filteredCollection, ObservableCollection<T2> incrementalSource);
 		IWrappedCollectionViewSource MakeCollectionViewSource(object source);

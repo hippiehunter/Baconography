@@ -7,6 +7,8 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Data;
+using Windows.Foundation;
+using System.Collections.Specialized;
 
 namespace SnooStream.Common
 {
@@ -118,6 +120,63 @@ namespace SnooStream.Common
 			}
 		}
 	}
+
+    public class FilteredIncrementalLoadCollection<T, COL> : ObservableCollection<T>, ISupportIncrementalLoading, IRefreshable where COL : ObservableCollection<T>, ISupportIncrementalLoading, IRefreshable where T : class
+    {
+        COL _sourceCollection;
+        Func<T, bool> _filter;
+        public FilteredIncrementalLoadCollection(COL sourceCollection, Func<T, bool> filter)
+        {
+            _filter = filter;
+            _sourceCollection = sourceCollection;
+            _sourceCollection.CollectionChanged += _sourceCollection_CollectionChanged;
+        }
+
+        private void _sourceCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if(_filter(e.NewItems[0] as T))
+                        Add(e.NewItems[0] as T);
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    Clear();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public bool HasMoreItems
+        {
+            get
+            {
+                return _sourceCollection.HasMoreItems;
+            }
+        }
+
+        public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        {
+            return _sourceCollection.LoadMoreItemsAsync(count);
+        }
+
+        public Task MaybeRefresh()
+        {
+            return _sourceCollection.MaybeRefresh();
+        }
+
+        public Task Refresh(bool onlyNew)
+        {
+            return _sourceCollection.Refresh(onlyNew);
+        }
+    }
 
     public class AttachedIncrementalLoadCollection<T> : ObservableCollection<T>, ISupportIncrementalLoading
     {
