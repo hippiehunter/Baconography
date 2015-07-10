@@ -1,6 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using MetroLog;
 using SnooSharp;
 using SnooStream.Messages;
 using SnooStream.Services;
@@ -19,7 +18,6 @@ namespace SnooStream.ViewModel
 	public class LoginViewModel : ViewModelBase, ICancellableViewModel
 	{
 		CancellationToken _token;
-		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<LoginViewModel>();
 		public LoginViewModel()
 		{
 			IsAutoLogin = true;
@@ -61,7 +59,7 @@ namespace SnooStream.ViewModel
 			}
 			catch (Exception ex)
 			{
-				_logger.Error("failed loading stored credentials", ex);
+				//_logger.Error("failed loading stored credentials", ex);
 			}
 		}
 
@@ -243,7 +241,7 @@ namespace SnooStream.ViewModel
 			}
 			catch(Exception ex)
 			{
-				_logger.Error("failure while deleting authorization", ex);
+				//_logger.Error("failure while deleting authorization", ex);
 			}
 		}
 

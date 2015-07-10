@@ -1,7 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using MetroLog;
 using SnooSharp;
 using SnooStream.Common;
 using SnooStream.Messages;
@@ -45,180 +44,9 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public class SubredditWrapper : ViewModelBase
-        {
-            public SubredditWrapper(SubredditRiverViewModel context, string name, Subreddit thing, string sort, string category)
-            {
-                Thing = thing;
-                Name = name;
-                _category = category;
-                _context = context;
-                _linkRiver = new Lazy<LinkRiverViewModel>(() =>
-                {
-                    if (_context._madeSubreddits.ContainsKey(name))
-                        return _context._madeSubreddits[name];
-                    else
-                    {
-                        var result = new LinkRiverViewModel(_context, category, thing, sort, null, null);
-                        _context._madeSubreddits.Add(name, result);
-                        return result;
-                    }
-                });
-
-
-            }
-
-            public override string ToString()
-            {
-                return "SubredditWrapper: " + Category;
-            }
-
-            private SubredditRiverViewModel _context;
-            public string Name { get; set; }
-            public Subreddit Thing { get; set; }
-            private string _category;
-            public string Category
-            {
-                get
-                {
-                    return _category;
-                }
-                set
-                {
-                    if (_category != value)
-                    {
-                        _category = value;
-                        RaisePropertyChanged("Category");
-
-                        if (_linkRiver.IsValueCreated)
-                        {
-                            _linkRiver.Value.Category = value;
-                        }
-
-                        if (_context != null)
-                        {
-                            if (_context.LocalSubreddits != null)
-                            {
-                                if (!_context.LocalSubreddits.Contains(this))
-                                    _context.AddToLocalSubreddits(this);
-                            }
-                            _context.RemoveFromCategory(_context.SubredditCollection, this);
-                            _context.AddToCategory(_context.SubredditCollection, this);
-                        }
-                    }
-
-                }
-            }
-            public int HeaderImageWidth { get { return GetHeaderSizeOrDefault(true); } }
-            public int HeaderImageHeight { get { return GetHeaderSizeOrDefault(false); } }
-
-            private Lazy<LinkRiverViewModel> _linkRiver;
-            public LinkRiverViewModel LinkRiver
-            {
-                get
-                {
-                    return _linkRiver.Value;
-                }
-            }
-
-            private const int DefaultHeaderWidth = 125;
-            private const int DefaultHeaderHeight = 50;
-
-            private int GetHeaderSizeOrDefault(bool width)
-            {
-                if (Thing.HeaderSize == null || Thing.HeaderSize.Length < 2)
-                    return width ? DefaultHeaderWidth : DefaultHeaderHeight;
-                else
-                    return width ? Thing.HeaderSize[0] : Thing.HeaderSize[1];
-            }
-
-            void ShowCategoryPicker(object elementTarget)
-            {
-                SnooStreamViewModel.NavigationService.ShowPopup(new InputViewModel("Choose a category to group this subreddit", Category, _context.SubredditCollection.Select(grp => grp.Name),
-                    new RelayCommand<string>(val => Category = val)), elementTarget, SnooStreamViewModel.UIContextCancellationToken);
-            }
-
-            public List<CommandViewModel.CommandItem> MakeSubredditManagmentCommands(object elementTarget)
-            {
-                var result = new List<CommandViewModel.CommandItem>();
-
-                if (LinkRiver.IsUserMultiReddit)
-                {
-                    //About
-                    result.Add(new CommandViewModel.CommandItem
-                    {
-                        DisplayText = "About",
-                        Command = LinkRiver.ShowAboutSubreddit
-                    });
-                    //Modify
-                    result.Add(new CommandViewModel.CommandItem
-                    {
-                        DisplayText = "Modify",
-                        Command = LinkRiver.ShowMultiRedditManagement
-                    });
-                    //Delete
-                    result.Add(new CommandViewModel.CommandItem
-                    {
-                        DisplayText = "Delete",
-                        Command = LinkRiver.DeleteMultiReddit
-                    });
-                }
-                else
-                {
-                    //About
-                    if (!LinkRiver.IsMultiReddit)
-                    {
-                        result.Add(new CommandViewModel.CommandItem
-                        {
-                            DisplayText = "About",
-                            Command = LinkRiver.ShowAboutSubreddit
-                        });
-                    }
-
-
-                    if (!Thing.Subscribed)
-                    {
-                        //Subscribe
-                        result.Add(new CommandViewModel.CommandItem
-                        {
-                            DisplayText = "Subscribe",
-                            Command = LinkRiver.Subscribe
-                        });
-
-                        if (LinkRiver.Context != null && !LinkRiver.Context.LocalSubreddits.Contains(this))
-                        {
-                            result.Add(new CommandViewModel.CommandItem
-                            {
-                                DisplayText = "Pin",
-                                Command = LinkRiver.Pin
-                            });
-                        }
-                    }
-                    else
-                    {
-                        //Unsubscribe
-                        result.Add(new CommandViewModel.CommandItem
-                        {
-                            DisplayText = "Unsubscribe",
-                            Command = LinkRiver.Unsubscribe
-                        });
-                    }
-                }
-
-                //Change Category
-                result.Add(new CommandViewModel.CommandItem
-                {
-                    DisplayText = "Change Category",
-                    Command = new RelayCommand(() => ShowCategoryPicker(elementTarget))
-                });
-
-                return result;
-
-            }
-        }
-        static ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooStreamViewModel>();
-        Dictionary<string, LinkRiverViewModel> _madeSubreddits = new Dictionary<string, LinkRiverViewModel>();
-        ObservableCollection<SubredditGroup> _subredditCollection;
+        
+        internal Dictionary<string, LinkRiverViewModel> _madeSubreddits = new Dictionary<string, LinkRiverViewModel>();
+        internal ObservableCollection<SubredditGroup> _subredditCollection;
         public ObservableCollection<SubredditGroup> SubredditCollection
         {
             get
@@ -247,11 +75,11 @@ namespace SnooStream.ViewModel
             }
         }
 
-        ObservableCollection<SubredditWrapper> LocalSubreddits { get; set; }
-        ObservableCollection<SubredditWrapper> SearchSubreddits { get; set; }
-        ObservableCollection<SubredditWrapper> AttachedCollection { get; set; }
+        internal ObservableCollection<SubredditWrapper> LocalSubreddits { get; set; }
+        internal ObservableCollection<SubredditWrapper> SearchSubreddits { get; set; }
+        internal ObservableCollection<SubredditWrapper> AttachedCollection { get; set; }
 
-        void AddToLocalSubreddits(SubredditWrapper wrapper, bool first = false)
+        internal void AddToLocalSubreddits(SubredditWrapper wrapper, bool first = false)
         {
             var existing = LocalSubreddits.FirstOrDefault((local) => local.Name == wrapper.Name);
             if (existing != null && existing.Category != wrapper.Category)
@@ -316,7 +144,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        private void AddToCategory(ObservableCollection<SubredditGroup> target, SubredditWrapper viewModel)
+        internal void AddToCategory(ObservableCollection<SubredditGroup> target, SubredditWrapper viewModel)
         {
             var category = viewModel.Category;
             var existingCategory = target.FirstOrDefault((group) => string.Compare(group.Name, category, StringComparison.CurrentCultureIgnoreCase) == 0);
@@ -331,7 +159,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        private void RemoveFromCategory(ObservableCollection<SubredditGroup> target, SubredditWrapper viewModel)
+        internal void RemoveFromCategory(ObservableCollection<SubredditGroup> target, SubredditWrapper viewModel)
         {
             var category = viewModel.Category;
             var existingCategory = target.FirstOrDefault((group) => group.Collection.Contains(viewModel));
@@ -619,7 +447,7 @@ namespace SnooStream.ViewModel
             }
             catch (Exception ex)
             {
-                _logger.Error("failed refreshing subscribed subreddits", ex);
+                //_logger.Error("failed refreshing subscribed subreddits", ex);
             }
         }
 
@@ -636,6 +464,178 @@ namespace SnooStream.ViewModel
                     .Select(vm => vm.LinkRiver.Dump())
                     .ToList()
             };
+        }
+    }
+
+    public class SubredditWrapper : ViewModelBase
+    {
+        public SubredditWrapper(SubredditRiverViewModel context, string name, Subreddit thing, string sort, string category)
+        {
+            Thing = thing;
+            Name = name;
+            _category = category;
+            _context = context;
+            _linkRiver = new Lazy<LinkRiverViewModel>(() =>
+            {
+                if (_context._madeSubreddits.ContainsKey(name))
+                    return _context._madeSubreddits[name];
+                else
+                {
+                    var result = new LinkRiverViewModel(_context, category, thing, sort, null, null);
+                    _context._madeSubreddits.Add(name, result);
+                    return result;
+                }
+            });
+
+
+        }
+
+        public override string ToString()
+        {
+            return "SubredditWrapper: " + Category;
+        }
+
+        private SubredditRiverViewModel _context;
+        public string Name { get; set; }
+        public Subreddit Thing { get; set; }
+        private string _category;
+        public string Category
+        {
+            get
+            {
+                return _category;
+            }
+            set
+            {
+                if (_category != value)
+                {
+                    _category = value;
+                    RaisePropertyChanged("Category");
+
+                    if (_linkRiver.IsValueCreated)
+                    {
+                        _linkRiver.Value.Category = value;
+                    }
+
+                    if (_context != null)
+                    {
+                        if (_context.LocalSubreddits != null)
+                        {
+                            if (!_context.LocalSubreddits.Contains(this))
+                                _context.AddToLocalSubreddits(this);
+                        }
+                        _context.RemoveFromCategory(_context.SubredditCollection, this);
+                        _context.AddToCategory(_context.SubredditCollection, this);
+                    }
+                }
+
+            }
+        }
+        public int HeaderImageWidth { get { return GetHeaderSizeOrDefault(true); } }
+        public int HeaderImageHeight { get { return GetHeaderSizeOrDefault(false); } }
+
+        private Lazy<LinkRiverViewModel> _linkRiver;
+        public LinkRiverViewModel LinkRiver
+        {
+            get
+            {
+                return _linkRiver.Value;
+            }
+        }
+
+        private const int DefaultHeaderWidth = 125;
+        private const int DefaultHeaderHeight = 50;
+
+        private int GetHeaderSizeOrDefault(bool width)
+        {
+            if (Thing.HeaderSize == null || Thing.HeaderSize.Length < 2)
+                return width ? DefaultHeaderWidth : DefaultHeaderHeight;
+            else
+                return width ? Thing.HeaderSize[0] : Thing.HeaderSize[1];
+        }
+
+        void ShowCategoryPicker(object elementTarget)
+        {
+            SnooStreamViewModel.NavigationService.ShowPopup(new InputViewModel("Choose a category to group this subreddit", Category, _context.SubredditCollection.Select(grp => grp.Name),
+                new RelayCommand<string>(val => Category = val)), elementTarget, SnooStreamViewModel.UIContextCancellationToken);
+        }
+
+        public List<CommandViewModel.CommandItem> MakeSubredditManagmentCommands(object elementTarget)
+        {
+            var result = new List<CommandViewModel.CommandItem>();
+
+            if (LinkRiver.IsUserMultiReddit)
+            {
+                //About
+                result.Add(new CommandViewModel.CommandItem
+                {
+                    DisplayText = "About",
+                    Command = LinkRiver.ShowAboutSubreddit
+                });
+                //Modify
+                result.Add(new CommandViewModel.CommandItem
+                {
+                    DisplayText = "Modify",
+                    Command = LinkRiver.ShowMultiRedditManagement
+                });
+                //Delete
+                result.Add(new CommandViewModel.CommandItem
+                {
+                    DisplayText = "Delete",
+                    Command = LinkRiver.DeleteMultiReddit
+                });
+            }
+            else
+            {
+                //About
+                if (!LinkRiver.IsMultiReddit)
+                {
+                    result.Add(new CommandViewModel.CommandItem
+                    {
+                        DisplayText = "About",
+                        Command = LinkRiver.ShowAboutSubreddit
+                    });
+                }
+
+
+                if (!Thing.Subscribed)
+                {
+                    //Subscribe
+                    result.Add(new CommandViewModel.CommandItem
+                    {
+                        DisplayText = "Subscribe",
+                        Command = LinkRiver.Subscribe
+                    });
+
+                    if (LinkRiver.Context != null && !LinkRiver.Context.LocalSubreddits.Contains(this))
+                    {
+                        result.Add(new CommandViewModel.CommandItem
+                        {
+                            DisplayText = "Pin",
+                            Command = LinkRiver.Pin
+                        });
+                    }
+                }
+                else
+                {
+                    //Unsubscribe
+                    result.Add(new CommandViewModel.CommandItem
+                    {
+                        DisplayText = "Unsubscribe",
+                        Command = LinkRiver.Unsubscribe
+                    });
+                }
+            }
+
+            //Change Category
+            result.Add(new CommandViewModel.CommandItem
+            {
+                DisplayText = "Change Category",
+                Command = new RelayCommand(() => ShowCategoryPicker(elementTarget))
+            });
+
+            return result;
+
         }
     }
 }

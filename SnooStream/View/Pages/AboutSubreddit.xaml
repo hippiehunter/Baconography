@@ -1,0 +1,114 @@
+﻿<common:SnooApplicationPage
+    x:Class="SnooStream.View.Pages.AboutSubreddit"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream.View.Pages"
+    xmlns:controls="using:SnooStream.View.Controls"
+    xmlns:common="using:SnooStream.Common"
+    xmlns:vm="using:SnooStream.ViewModel"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:snoodom="using:SnooDom"
+    mc:Ignorable="d">
+
+    <common:SnooApplicationPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/SubredditSmallView.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </common:SnooApplicationPage.Resources>
+    
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Pivot Title="SNOO STREAM > ABOUT SUBREDDIT" x:Name="pivot">
+            <PivotItem Header="overview">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Grid x:Name="LayoutRoot" Background="Transparent">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock TextWrapping="Wrap" Text="{Binding Thing.DisplayName}" />
+
+                        <CheckBox Grid.Row="1" Content="Subscribed" IsChecked="{Binding Thing.Subscribed, Mode=TwoWay}"/>
+                        <StackPanel Margin="6,4,0,4" Grid.Row="2" Orientation="Horizontal">
+                            <TextBlock Text="{Binding Thing.Subscribers}"/>
+                            <TextBlock Text=" Subscribers"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="6,4,0,4" Grid.Row="3" Orientation="Horizontal">
+                            <TextBlock Text="Created "/>
+                            <TextBlock Text="{Binding Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}"/>
+                        </StackPanel>
+
+                        <TextBlock Margin="6,4,0,4" Grid.Row="4" Visibility="{Binding Thing.Over18, Converter={StaticResource booleanVisibilityConverter}}" Text="NSFW" Foreground="Red"/>
+
+                        <snoodom:MarkdownControl HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="5" 
+                                                     Markdown="{Binding DescriptionMD}"
+                                                     StyleProvider="{StaticResource markdownHelpers}"
+                                                    CommandFactory="{StaticResource markdownHelpers}"
+                                                    FontFamily="Segoe WP" FontSize="16" FontWeight="Normal" FontStyle="Normal"
+                                                    Margin="3,0,0,0"/>
+                    </Grid>
+                </ScrollViewer>
+            </PivotItem>
+
+            <PivotItem Header="recommendations">
+                <ListView ItemsSource="{Binding Recomendations}" 
+                            HorizontalContentAlignment="Stretch"
+                            ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate 
+                            x:DataType="vm:SubredditWrapper">
+                            <Grid HorizontalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                BorderThickness="0" Padding="0" Margin="0"
+                                Background="White">
+                                    <Grid HorizontalAlignment="Stretch" Height="50">
+                                        <Image Source="{x:Bind Thing.HeaderImage}"
+                            MaxHeight="50" MaxWidth="125" Height="{x:Bind HeaderImageHeight}"
+                            Width="{x:Bind HeaderImageWidth}" Margin="0"
+                            HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        <Border>
+                                            <Border.Background>
+                                                <SolidColorBrush Color="Black" Opacity="0.35" />
+                                            </Border.Background>
+
+                                            <TextBlock Foreground="White" VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                                            Margin="24,0,6,0" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+
+            <PivotItem Header="moderators">
+                <ListView ItemsSource="{Binding Moderators}" 
+                            HorizontalContentAlignment="Stretch"
+                            ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Button Margin="0" HorizontalAlignment="Left" Padding="0" BorderThickness="0" Content="{Binding Thing.Name}" Command="{Binding ShowUserDetails}" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+
+        </Pivot>
+    </Grid>
+</common:SnooApplicationPage>

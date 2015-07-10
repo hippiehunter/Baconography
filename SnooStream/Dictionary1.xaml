@@ -1,0 +1,10 @@
+﻿<ResourceDictionary
+    x:Class="SnooStream.ResDict"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream"
+    xmlns:core="using:SnooStream.ViewModel">
+    <DataTemplate x:Key="fred" x:DataType="core:LinkViewModel" >
+        <TextBlock/>
+    </DataTemplate>
+</ResourceDictionary>

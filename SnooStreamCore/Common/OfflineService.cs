@@ -1,5 +1,4 @@
 ﻿using KitaroDB;
-using MetroLog;
 using Newtonsoft.Json;
 using SnooSharp;
 using SnooStream.ViewModel;
@@ -27,7 +26,6 @@ namespace SnooStream.Common
         private DB _subredditStatisticsDb;
         private DB _domainStatisticsDb;
         private DB _actionDeferalDb;
-		static ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<OfflineService>();
         public void Clear()
         {
             Cleanup(_blobsDb, 4, 20, 2, TimeSpan.FromTicks(0));
@@ -144,9 +142,9 @@ namespace SnooStream.Common
 
                         StoreCommentsImpl(listing);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-						_logger.Error("exception while storing comments", ex);
+						//_logger.Error("exception while storing comments", ex);
                     }
                 });
         }
@@ -188,7 +186,7 @@ namespace SnooStream.Common
                     var linkMeta = producer(null);
                     if (linkMeta == null)
                     {
-						_logger.Error("error while storing link metadata, null result from producer");
+						//_logger.Error("error while storing link metadata, null result from producer");
                     }
                     else
                     {
@@ -266,9 +264,9 @@ namespace SnooStream.Common
                         _linksDb.Insert(combinedSpace);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-				_logger.Error("exception while storing link", ex);
+				//_logger.Error("exception while storing link", ex);
             }
         }
 
@@ -303,9 +301,9 @@ namespace SnooStream.Common
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-				_logger.Error("exception while getting link metadata", ex);
+				//_logger.Error("exception while getting link metadata", ex);
             }
             return null;
         }
@@ -516,9 +514,9 @@ namespace SnooStream.Common
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.Error("while storing blob received", ex);
+                //_logger.Error("while storing blob received", ex);
             }       
         }
 
@@ -567,9 +565,9 @@ namespace SnooStream.Common
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-				_logger.Error("while loading blob recived", ex);
+				//_logger.Error("while loading blob recived", ex);
             }
 
             return default(T);
@@ -604,9 +602,9 @@ namespace SnooStream.Common
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
 			{
-				_logger.Error("recived exception while deque'ing deferal", ex);
+				//_logger.Error("recived exception while deque'ing deferal", ex);
             }
             return null;
         }
@@ -614,7 +612,6 @@ namespace SnooStream.Common
 
     internal static class UsageStatisticsUtility
     {
-		static ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<OfflineService>();
         static readonly int SubIdKeySpaceSize = 12;
         static readonly int DomainHashKeySpaceSize = 4;
 
@@ -687,9 +684,9 @@ namespace SnooStream.Common
                     .ToList();
                 return retval;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-				_logger.Error("encountered exception while getting subreddit aggregate list", ex);
+				//_logger.Error("encountered exception while getting subreddit aggregate list", ex);
             }
             return new List<SubredditAggregate>();
         }
@@ -722,9 +719,9 @@ namespace SnooStream.Common
                     .ToList();
                 return retval;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-				_logger.Error("encountered exception while getting domain aggregate list", ex);
+				//_logger.Error("encountered exception while getting domain aggregate list", ex);
             }
             return new List<DomainAggregate>();
         }
@@ -771,9 +768,9 @@ namespace SnooStream.Common
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-				_logger.Error("encountered error while incrementing domain statistics", ex);
+				//_logger.Error("encountered error while incrementing domain statistics", ex);
             }
         }
 
@@ -819,9 +816,9 @@ namespace SnooStream.Common
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-				_logger.Error("encountered error while incrementing subreddit statistics", ex);
+				//_logger.Error("encountered error while incrementing subreddit statistics", ex);
             }
         }
     }

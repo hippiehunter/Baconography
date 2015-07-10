@@ -1,6 +1,5 @@
 ﻿using CommonResourceAcquisition.ImageAcquisition;
 using GalaSoft.MvvmLight;
-using MetroLog;
 using Newtonsoft.Json;
 using SnooSharp;
 using SnooStream.Common;
@@ -20,7 +19,6 @@ namespace SnooStream.ViewModel
     public abstract class SnooStreamViewModel : ViewModelBase
     {
         public static string CWD { get; set; }
-		protected ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<SnooStreamViewModel>();
 		protected void FinishInit()
 		{
             Current = this;
@@ -71,7 +69,7 @@ namespace SnooStream.ViewModel
 
 			SelfUser = new AboutUserViewModel(obj.NewAccount, DateTime.UtcNow);
 			RaisePropertyChanged("SelfUser");
-			_logger.Info("user logged in " + RedditUserState.Username);
+			//_logger.Info("user logged in " + RedditUserState.Username);
         }
 
         private InitializationBlob _initializationBlob;
@@ -119,7 +117,7 @@ namespace SnooStream.ViewModel
 
         public void DumpInitBlob(string navigationBlob = null)
         {
-			_logger.Info("dumping init blob");
+			//_logger.Info("dumping init blob");
             _initializationBlob.Settings = Settings.Dump();
 			_initializationBlob.Self = SelfStream.Dump();
 
@@ -130,7 +128,7 @@ namespace SnooStream.ViewModel
 			_initializationBlob.Subreddits = SubredditRiver.Dump();
             OfflineService.StoreInitializationBlob(_initializationBlob);
 			OfflineService.StoreHistory();
-			_logger.Info("dump init blob finished");
+			//_logger.Info("dump init blob finished");
         }
 
 		public string GetNavigationBlob() {  return _initializationBlob.NavigationBlob; }

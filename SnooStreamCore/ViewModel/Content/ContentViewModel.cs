@@ -1,7 +1,6 @@
 ﻿using CommonResourceAcquisition.ImageAcquisition;
 using CommonResourceAcquisition.VideoAcquisition;
 using GalaSoft.MvvmLight;
-using MetroLog;
 using SnooSharp;
 using SnooStream.Model;
 using System;
@@ -15,7 +14,6 @@ namespace SnooStream.ViewModel.Content
 {
 	public abstract class ContentViewModel : ViewModelBase
 	{
-		static protected ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<ContentViewModel>();
 		protected CancellationTokenSource CancelToken = new CancellationTokenSource(SnooStreamViewModel.Settings.ContentTimeout);
 		public string Glyph { get; set; }
 		public string Title { get; set; }
@@ -151,7 +149,7 @@ namespace SnooStream.ViewModel.Content
 			}
 			catch (Exception ex)
 			{
-				_logger.Error("failed getting content", ex);
+				//_logger.Error("failed getting content", ex);
 				SetErrorStatus(ex.Message);
 			}
 		}

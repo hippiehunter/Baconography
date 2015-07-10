@@ -1,5 +1,4 @@
 ﻿using GalaSoft.MvvmLight;
-using MetroLog;
 using SnooSharp;
 using SnooStream.ViewModel;
 using System;
@@ -15,7 +14,6 @@ namespace SnooStream.Common
 {
     public class NotificationService : ViewModelBase
     {
-		ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<NotificationService>();
         public string NotificationText { get; private set; }
         public double ProgressPercent { get; private set; }
         public bool ProgressActive { get; private set; }
@@ -128,7 +126,7 @@ namespace SnooStream.Common
             }
             else
             {
-                _logger.Error("failed in reporting: " + message, ex);
+                //_logger.Error("failed in reporting: " + message, ex);
             }
         }
 
@@ -196,7 +194,7 @@ namespace SnooStream.Common
             }
             catch (TaskCanceledException)
             {
-				_logger.Info("Task Canceled: " + message);
+				//_logger.Info("Task Canceled: " + message);
             }
             catch (Exception ex)
             {

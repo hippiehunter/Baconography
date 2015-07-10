@@ -1,5 +1,4 @@
 ﻿using GalaSoft.MvvmLight;
-using MetroLog;
 using Newtonsoft.Json;
 using SnooSharp;
 using SnooStream.ViewModel;
@@ -14,7 +13,6 @@ namespace SnooStream.Common
 {
     public class ViewModelDumpUtility
     {
-        static ILogger _logger = LogManagerFactory.DefaultLogManager.GetLogger<ViewModelDumpUtility>();
         public static ViewModelBase LoadFromDump(string dump, ViewModelBase context, SnooStreamViewModel rootContext)
         {
             try
@@ -113,7 +111,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-                _logger.Fatal(string.Format("dump was {0}", dump), ex);
+                ////_logger.Fatal(string.Format("dump was {0}", dump), ex);
                 throw;
             }
         }
@@ -190,7 +188,7 @@ namespace SnooStream.Common
             }
             catch (Exception ex)
             {
-                _logger.Fatal(string.Format("type was {0}", viewModel != null ? viewModel.GetType().FullName : "null"), ex);
+                //_logger.Fatal(string.Format("type was {0}", viewModel != null ? viewModel.GetType().FullName : "null"), ex);
                 throw;
             }
         }

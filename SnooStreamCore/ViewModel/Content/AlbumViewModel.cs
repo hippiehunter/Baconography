@@ -32,7 +32,7 @@ namespace SnooStream.ViewModel.Content
 			_title = title;
 			RedditThumbnail = linkThumbnailUrl;
 			_apiResult = new Lazy<Task<IEnumerable<Tuple<string, string>>>>(LoadAPI);
-			_images = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection<ImageViewModel>(new AlbumLoader(this));
+			_images = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection<ImageViewModel>(new AlbumLoader(this), eager: true);
 		}
 
 		private class AlbumLoader : IIncrementalCollectionLoader<ImageViewModel>

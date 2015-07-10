@@ -1,0 +1,41 @@
+﻿<UserControl
+    x:Class="SnooStream.View.Controls.Content.PlainWebControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream.View.Controls.Content"
+    xmlns:controls="using:SnooStream.View.Controls"
+    xmlns:gif="using:GifRenderer"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="Type:ReadableText">
+            <TextBlock HorizontalAlignment="Left" FontSize="14" FontWeight="SemiBold" FontFamily="Calibri" Padding="0" Margin="20,0,20,0" Text="{Binding Text}" TextWrapping="Wrap"/>
+        </DataTemplate>
+        <DataTemplate x:Key="Type:ReadableImage">
+            <gif:ZoomableImageControl DataContext="{Binding Url}" HorizontalAlignment="Stretch" Margin="20,0,20,0"/>
+        </DataTemplate>
+        <!--selectors:TypedTemplateSelector x:Name="articleTemplateSelector" /-->
+    </UserControl.Resources>
+    <Grid x:Name="controlRoot">
+        <ListView ItemsSource="{Binding WebParts}"
+                Margin="0" Padding="0"
+                BorderThickness="0" VerticalAlignment="Stretch" 
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                IsItemClickEnabled="False"
+                IsTapEnabled="False"
+                SelectionMode="None"
+                IsSwipeEnabled="False"
+                HorizontalContentAlignment="Stretch"
+                ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
+            <ListView.Header>
+                <controls:OverlayControl MaxHeight="400" Padding="0,0,0,6" />
+            </ListView.Header>
+        </ListView>
+    </Grid>
+    
+</UserControl>
