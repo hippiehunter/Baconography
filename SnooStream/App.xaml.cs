@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SnooStream.Common;
 using SnooStream.PlatformServices;
 using SnooStream.View.Pages;
 using SnooStream.ViewModel;
@@ -11,6 +12,8 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Foundation.Metadata;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -150,8 +153,47 @@ namespace SnooStream
             {
                 DispatchToInitialPage(rootFrame, e.Arguments);
             }
+
+            if (ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1, 0))
+            {
+                Windows.Phone.UI.Input.HardwareButtons.BackPressed += (s, a) =>
+                {
+                    a.Handled = HandleBackPressed(true);
+                };
+            }
+            else
+            {
+                Windows.UI.Core.SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
+                Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += (s, a) =>
+                {
+                    a.Handled = HandleBackPressed(false);
+                };
+            }
+
             // Ensure the current window is active
             Window.Current.Activate();
+        }
+
+        private bool HandleBackPressed(bool isHardware)
+        {
+            var rootFrame = Window.Current.Content as Frame;
+            var appPage = rootFrame.Content as SnooApplicationPage;
+            if (appPage.PopNavState())
+            {
+                return true;
+            }
+            else if (rootFrame.CanGoBack)
+            {
+                rootFrame.GoBack();
+                //Indicate the back button press is handled so the app does not exit		
+                return true;
+            }
+            else if(isHardware)
+            {
+                var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
+                snooStreamViewModel.DumpInitBlob(); 
+            }
+            return false;
         }
 
         /// <summary>

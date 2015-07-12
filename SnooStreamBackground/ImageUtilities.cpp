@@ -68,7 +68,8 @@ static void ThrowIfFailed(HRESULT hr)
 {
 	if (FAILED(hr))
 	{
-		throw Platform::Exception::CreateException(hr);
+    OutputDebugString(L"bad hr");
+		//throw Platform::Exception::CreateException(hr);
 	}
 }
 

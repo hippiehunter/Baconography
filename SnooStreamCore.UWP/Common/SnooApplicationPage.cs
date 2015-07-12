@@ -12,7 +12,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Windows.Foundation.Metadata;
 using Windows.Graphics.Display;
+using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -28,39 +30,39 @@ namespace SnooStream.Common
         OrientationManager _orientationManager;
         public SnooApplicationPage()
         {
-			try
-			{
-				_orientationManager = Application.Current.Resources["orientationManager"] as OrientationManager;
-				Messenger.Default.Register<SettingsChangedMessage>(this, OnSettingsChanged);
-				Messenger.Default.Register<FocusChangedMessage>(this, OnFocusChanged);
-				OnSettingsChanged(null);
+            try
+            {
+                _orientationManager = Application.Current.Resources["orientationManager"] as OrientationManager;
+                Messenger.Default.Register<SettingsChangedMessage>(this, OnSettingsChanged);
+                Messenger.Default.Register<FocusChangedMessage>(this, OnFocusChanged);
+                OnSettingsChanged(null);
                 Loaded += OnLoaded;
 #if WINDOWS_PHONE_APP
                 ApplicationView.GetForCurrentView().SetDesiredBoundsMode(ApplicationViewBoundsMode.UseVisible);
 #endif
-			}
-			catch
-			{
-			}
+            }
+            catch
+            {
+            }
         }
 
-		private void OnFocusChanged(FocusChangedMessage obj)
-		{
-			if (_dataContext != null)
-			{
-				if (obj.Sender == _dataContext && _dataContext is IHasFocus)
-				{
-					SetFocusedViewModel(((IHasFocus)_dataContext).CurrentlyFocused);
-				}
-			}
-		}
+        private void OnFocusChanged(FocusChangedMessage obj)
+        {
+            if (_dataContext != null)
+            {
+                if (obj.Sender == _dataContext && _dataContext is IHasFocus)
+                {
+                    SetFocusedViewModel(((IHasFocus)_dataContext).CurrentlyFocused);
+                }
+            }
+        }
 
         protected virtual void OnLoaded(object sender, RoutedEventArgs e)
         {
             if (_dataContext != null)
             {
                 DataContext = _dataContext;
-                if(_dataContext is IHasFocus)
+                if (_dataContext is IHasFocus)
                 {
                     SetFocusedViewModel(((IHasFocus)_dataContext).CurrentlyFocused);
                 }
@@ -133,17 +135,17 @@ namespace SnooStream.Common
             }
         }
 
-		private string GetStateGuid(string query)
-		{
-			if (query != null && query.Contains("state="))
-			{
-				var splitQuery = query.Split('=').ToList();
-				return splitQuery[splitQuery.IndexOf("state") + 1];
-			}
-			else
-				return null;
+        private string GetStateGuid(string query)
+        {
+            if (query != null && query.Contains("state="))
+            {
+                var splitQuery = query.Split('=').ToList();
+                return splitQuery[splitQuery.IndexOf("state") + 1];
+            }
+            else
+                return null;
 
-		}
+        }
 
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -158,39 +160,39 @@ namespace SnooStream.Common
         string _stateGuid;
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            
-			try
-			{
-				//_logger.Info("navigating to page " + GetType().Name);
-				var validParameters = Frame.ForwardStack
-					.Concat(Frame.BackStack)
-					.Select(stackEntry => GetStateGuid(stackEntry.Parameter as string))
-					.ToList();
 
-				if (e.Parameter is string && !string.IsNullOrWhiteSpace((string)e.Parameter))
-				{
-					_stateGuid = GetStateGuid(e.Parameter as string);
-					validParameters.Add(_stateGuid);
-				}
+            try
+            {
+                //_logger.Info("navigating to page " + GetType().Name);
+                var validParameters = Frame.ForwardStack
+                    .Concat(Frame.BackStack)
+                    .Select(stackEntry => GetStateGuid(stackEntry.Parameter as string))
+                    .ToList();
 
-				var parameterHash = new HashSet<string>(validParameters);
-				SnooStreamViewModel.NavigationService.ValidateStates(parameterHash);
+                if (e.Parameter is string && !string.IsNullOrWhiteSpace((string)e.Parameter))
+                {
+                    _stateGuid = GetStateGuid(e.Parameter as string);
+                    validParameters.Add(_stateGuid);
+                }
+
+                var parameterHash = new HashSet<string>(validParameters);
+                SnooStreamViewModel.NavigationService.ValidateStates(parameterHash);
 
                 Window.Current.SizeChanged += sizeChanged;
 
-				if (_stateGuid != null && (DataContext == null || e.NavigationMode == NavigationMode.New))
-				{
-					//_logger.Info("loading state guid for page " + GetType().Name);
+                if (_stateGuid != null && (DataContext == null || e.NavigationMode == NavigationMode.New))
+                {
+                    //_logger.Info("loading state guid for page " + GetType().Name);
                     _dataContext = NavigationStateUtility.GetDataContext(_stateGuid);
-					if (_dataContext is IRefreshable)
-					{
+                    if (_dataContext is IRefreshable)
+                    {
                         ((IRefreshable)_dataContext).MaybeRefresh();
-					}
+                    }
                     if (_dataContext is ICancellableViewModel)
                     {
                         _cancelForward = ((ICancellableViewModel)_dataContext).BindToken(_cancelTokenSource.Token);
                     }
-				}
+                }
 
                 if (DataContext != null && e.NavigationMode == NavigationMode.Back)
                 {
@@ -199,14 +201,14 @@ namespace SnooStream.Common
                         SetFocusedViewModel(((IHasFocus)DataContext).CurrentlyFocused);
                     }
                 }
-				
-			}
-			catch(Exception ex)
-			{
-				//_logger.Error("Failed navigating to page " + GetType().Name, ex);
-			}
-			base.OnNavigatedTo(e);
-			//_logger.Info("finished loading page " + GetType().Name);
+
+            }
+            catch (Exception ex)
+            {
+                //_logger.Error("Failed navigating to page " + GetType().Name, ex);
+            }
+            base.OnNavigatedTo(e);
+            //_logger.Info("finished loading page " + GetType().Name);
         }
 
         private async void sizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
@@ -215,8 +217,8 @@ namespace SnooStream.Common
             await AdjustForOrientation(currentView.Orientation);
         }
 
-		public bool PopNavState()
-		{
+        public bool PopNavState()
+        {
             if (_navState.Count > 0)
             {
                 var poppedState = _navState.Pop();
@@ -224,7 +226,7 @@ namespace SnooStream.Common
                 return true;
             }
             return false;
-		}
+        }
 
         public bool PopNavState(string popTarget)
         {
@@ -283,8 +285,8 @@ namespace SnooStream.Common
         }
 
         public virtual void SetFocusedViewModel(ViewModelBase viewModel)
-        { 
-            
+        {
+
         }
     }
 
@@ -303,7 +305,7 @@ namespace SnooStream.Common
         public static void Execute(object sender, string parameter)
         {
             var appPage = FindAncestor<SnooApplicationPage>(sender as DependencyObject);
-            if(appPage != null)
+            if (appPage != null)
                 appPage.PushNavState(sender, parameter);
         }
     }
