@@ -1,0 +1,24 @@
+﻿<ResourceDictionary
+    x:Class="SnooStream.Resources.VotableControlTemplate"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream.Resources"
+    xmlns:vm="using:SnooStream.ViewModel"
+    xmlns:local="using:SnooStream.Resources">
+    <DataTemplate x:Key="VotableControl"  x:DataType="vm:VotableViewModel">
+        <Button HorizontalContentAlignment="Center" HorizontalAlignment="Stretch"
+                BorderThickness="0" Margin="0,-12,0,0" Padding="0" Background="Transparent"
+                Command="{Binding ToggleVote}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource VoteArrowTextBlock}" Margin="0,0,0,0" Foreground="{x:Bind Converter={StaticResource voteColorConverter}, ConverterParameter=1, Mode=TwoWay}" />
+                <TextBlock Style="{StaticResource VoteArrowTextBlock}" Margin="-6,4,0,0" Foreground="{x:Bind Converter={StaticResource voteColorConverter}, ConverterParameter=0, Mode=TwoWay}" >
+                    <TextBlock.RenderTransform>
+                        <RotateTransform Angle="180" CenterX="9" CenterY="12" />
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <TextBlock Margin="-2,0,0,0" Text="{x:Bind TotalVotes}"
+                            Foreground="{x:Bind Converter={StaticResource voteColorConverter}, Mode=TwoWay}"/>
+            </StackPanel>
+        </Button>
+    </DataTemplate>
+</ResourceDictionary>

@@ -110,7 +110,7 @@
             </ListView.ItemContainerStyle>
 			<ListView.ItemTemplate>
                 <DataTemplate x:DataType="vm:SubredditWrapper">
-                    <Button Margin="0,0,0,-18" BorderThickness="0" Tapped="listBox_ItemTap" Holding="Button_Holding"
+                    <Button Margin="0,0,0,0" Background="Transparent" BorderThickness="0" Tapped="listBox_ItemTap" Holding="Button_Holding"
                             HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{x:Bind Thing.DisplayName}"
                             ContentTemplate="{StaticResource SubredditSmallView}">
                     </Button>

@@ -142,9 +142,6 @@
     <Compile Include="View\Controls\CardView\CardPreviewTextControl.xaml.cs">
       <DependentUpon>CardPreviewTextControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Controls\CommentCountControl.xaml.cs">
-      <DependentUpon>CommentCountControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\Controls\CommentsView.xaml.cs">
       <DependentUpon>CommentsView.xaml</DependentUpon>
     </Compile>
@@ -196,9 +193,6 @@
     </Compile>
     <Compile Include="View\Controls\SubredditRiver.xaml.cs">
       <DependentUpon>SubredditRiver.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\Controls\VotableControl.xaml.cs">
-      <DependentUpon>VotableControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Pages\AboutSubreddit.xaml.cs">
       <DependentUpon>AboutSubreddit.xaml</DependentUpon>
@@ -263,6 +257,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Resources\CardLinkViewTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Resources\CommentCountControlTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
     <Page Include="Resources\StyleResources.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -270,6 +274,11 @@
     <Page Include="Resources\SubredditSmallViewTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\VotableControlTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
     <Page Include="View\Controls\CancelOperationDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -296,10 +305,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Controls\CardView\CardPreviewTextControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="View\Controls\CommentCountControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -371,10 +376,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\Controls\VotableControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="View\Pages\AboutSubreddit.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -442,12 +443,12 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="KitaroDB, Version=1.0.0.0, Culture=neutral, PublicKeyToken=114c5dbb1312a8bc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\libs\KitaroDB\KitaroDB.dll</HintPath>
+      <HintPath>..\packages\KitaroDB.2.3.0.0\lib\win\KitaroDB.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="KitaroDBWINRT, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\libs\KitaroDB\$(Platform)\KitaroDBWINRT.winmd</HintPath>
+    <Reference Include="KitaroDBWinRT, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\KitaroDB.2.3.0.0\lib\win\KitaroDBWinRT.winmd</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.ApplicationInsights, Version=0.14.3.177, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.0.14.3-build00177\lib\portable-win81+wpa81\Microsoft.ApplicationInsights.dll</HintPath>
@@ -532,8 +533,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.16-beta\build\portable-net45+win8+wpa81\Microsoft.Diagnostics.Tracing.EventSource.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.16-beta\build\portable-net45+win8+wpa81\Microsoft.Diagnostics.Tracing.EventSource.Redist.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.ApplicationInsights.0.14.3-build00177\build\portable-win81+wpa81\Microsoft.ApplicationInsights.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ApplicationInsights.0.14.3-build00177\build\portable-win81+wpa81\Microsoft.ApplicationInsights.targets'))" />
+    <Error Condition="!Exists('..\packages\KitaroDB.2.3.0.0\build\win\KitaroDB.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\KitaroDB.2.3.0.0\build\win\KitaroDB.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.ApplicationInsights.0.14.3-build00177\build\portable-win81+wpa81\Microsoft.ApplicationInsights.targets" Condition="Exists('..\packages\Microsoft.ApplicationInsights.0.14.3-build00177\build\portable-win81+wpa81\Microsoft.ApplicationInsights.targets')" />
+  <Import Project="..\packages\KitaroDB.2.3.0.0\build\win\KitaroDB.targets" Condition="Exists('..\packages\KitaroDB.2.3.0.0\build\win\KitaroDB.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -45,7 +45,60 @@ namespace SnooStream.View.Pages
             }
 		}
 
-		private async void Refresh_Click(object sender, RoutedEventArgs e)
+        internal bool PhaseLoad(ListViewBase sender, ContainerContentChangingEventArgs args)
+        {
+            var dataContext = args.Item as LinkViewModel;
+
+            if (args.InRecycleQueue)
+            {
+                cancelSource.Cancel();
+                cancelSource = new CancellationTokenSource();
+
+                if (previewSection != null)
+                {
+                    if (previewSection.Content is CardPreviewImageControl)
+                    {
+                        var imageControl = previewSection.Content as CardPreviewImageControl;
+                        if (imageControl.hqImageControl.Source is BitmapSource)
+                        {
+                            ((BitmapSource)imageControl.hqImageControl.Source).SetSource(_streamHack);
+                        }
+                    }
+                }
+            }
+
+            if (!args.InRecycleQueue)
+            {
+                switch (args.Phase)
+                {
+                    case 0:
+                        return true;
+                    case 1:
+                        var finishLoad2 = new Action(async () =>
+                        {
+                            try
+                            {
+                                var cancelToken = cancelSource.Token;
+                                var previewControl = await ContentPreviewConverter.MakePreviewControl(DataContext as LinkViewModel, cancelToken, previewSection.Content);
+                                if (!cancelToken.IsCancellationRequested)
+                                {
+                                    if (previewSection.Content != previewControl)
+                                        previewSection.Content = previewControl;
+                                }
+                            }
+                            catch (TaskCanceledException)
+                            {
+                            }
+                        });
+                        finishLoad2();
+                        return false;
+                }
+            }
+
+            return false;
+        }
+
+        private async void Refresh_Click(object sender, RoutedEventArgs e)
 		{
 			if (DataContext is LinkRiverViewModel)
 			{

@@ -42,59 +42,7 @@ namespace SnooStream.View.Controls
 		}
 
         private int CurrentLoadPhase = 0;
-		internal bool PhaseLoad(ListViewBase sender, ContainerContentChangingEventArgs args)
-		{
-			if (args.InRecycleQueue || (args.Phase == 0 && CurrentLoadPhase != 0))
-			{
-                CurrentLoadPhase = 0;
-                cancelSource.Cancel();
-                cancelSource = new CancellationTokenSource();
-
-				if (previewSection != null)
-				{
-					if (previewSection.Content is CardPreviewImageControl)
-					{
-						var imageControl = previewSection.Content as CardPreviewImageControl;
-                        if (imageControl.hqImageControl.Source is BitmapSource)
-                        {
-                            ((BitmapSource)imageControl.hqImageControl.Source).SetSource(_streamHack);
-                        }
-					}
-				}
-			}
-
-            if (!args.InRecycleQueue)
-            {
-                switch (CurrentLoadPhase)
-                {
-                    case 0:
-                        CurrentLoadPhase++;
-                        return true;
-                    case 1:
-                        CurrentLoadPhase++;
-                        var finishLoad2 = new Action(async () =>
-                        {
-                            try
-                            {
-                                var cancelToken = cancelSource.Token;
-                                var previewControl = await ContentPreviewConverter.MakePreviewControl(DataContext as LinkViewModel, cancelToken, previewSection.Content);
-                                if (!cancelToken.IsCancellationRequested)
-                                {
-                                    if (previewSection.Content != previewControl)
-                                        previewSection.Content = previewControl;
-                                }
-                            }
-                            catch (TaskCanceledException)
-                            {
-                            }
-                        });
-                        finishLoad2();
-                        return false;
-                }
-            }
-
-            return false;
-		}
+		
 
         private void Comments_Tapped(object sender, TappedRoutedEventArgs e)
         {
