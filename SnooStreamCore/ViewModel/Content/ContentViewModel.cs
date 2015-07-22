@@ -14,12 +14,19 @@ namespace SnooStream.ViewModel.Content
 {
 	public abstract class ContentViewModel : ViewModelBase
 	{
-		protected CancellationTokenSource CancelToken = new CancellationTokenSource(SnooStreamViewModel.Settings.ContentTimeout);
+		protected CancellationTokenSource CancelTokenSource = new CancellationTokenSource(SnooStreamViewModel.Settings.ContentTimeout);
 		public string Glyph { get; set; }
 		public string Title { get; set; }
         protected bool UIThreadLoad { get; set; }
         public string Url { get; set; }
-		VotableViewModel Votable { get; set; }
+        public CancellationToken CancelToken
+        {
+            get
+            {
+                return CancelTokenSource.Token;
+            }
+        }
+        VotableViewModel Votable { get; set; }
 
 		public static ContentViewModel MakeContentViewModel(string url, string title = null, ILinkViewModel selfLink = null, string redditThumbnail = null)
 		{
@@ -119,7 +126,7 @@ namespace SnooStream.ViewModel.Content
 
 		public void CancelLoad()
 		{
-			CancelToken.Cancel();
+			CancelTokenSource.Cancel();
 		}
 
 		protected void SetErrorStatus(string errorText)
@@ -129,12 +136,14 @@ namespace SnooStream.ViewModel.Content
 
 		public void Retry()
 		{
-			CancelToken = new CancellationTokenSource(SnooStreamViewModel.Settings.ContentTimeout);
+			CancelTokenSource = new CancellationTokenSource(SnooStreamViewModel.Settings.ContentTimeout);
 		}
 
 		public async void StartLoad(int? timeout)
 		{
-			CancelToken = new CancellationTokenSource(timeout ?? SnooStreamViewModel.Settings.ContentTimeout);
+            if(CancelTokenSource.IsCancellationRequested)
+			    CancelTokenSource = new CancellationTokenSource(timeout ?? SnooStreamViewModel.Settings.ContentTimeout);
+
 			try
 			{
                 if (UIThreadLoad)

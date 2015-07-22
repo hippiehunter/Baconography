@@ -18,6 +18,9 @@ namespace SnooStream.Converters
 	{
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{
+            if (value == null)
+                return null;
+
 			var linkViewModel = value as LinkViewModel;
 			var rtb = new RichTextBlock();
 			var pp = new Paragraph();

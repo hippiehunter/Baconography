@@ -101,6 +101,7 @@
     <Compile Include="Converters\ActivityGroupCountConverter.cs" />
     <Compile Include="Converters\AuthorFlairKindConverter.cs" />
     <Compile Include="Converters\BoolToAccentBrushConverter.cs" />
+    <Compile Include="Converters\ClearableImageConverter.cs" />
     <Compile Include="Converters\CommentDepthColorConverter.cs" />
     <Compile Include="Converters\CommentDepthMarginConverter.cs" />
     <Compile Include="Converters\ContentConverter.cs" />
@@ -109,6 +110,8 @@
     <Compile Include="Converters\InvertedBooleanConverter.cs" />
     <Compile Include="Converters\LinkGlyphConverter.cs" />
     <Compile Include="Converters\LinkMetadataConverter.cs" />
+    <Compile Include="Converters\NullToEmptyConverter.cs" />
+    <Compile Include="Converters\NullToOpacityConverter.cs" />
     <Compile Include="Converters\StringCaseConverter.cs" />
     <Compile Include="Converters\TimeRelationConverter.cs" />
     <Compile Include="Converters\UnixTimeConverter.cs" />
@@ -121,6 +124,15 @@
     <Compile Include="Resources\SubredditSmallViewTemplate.xaml.cs">
       <DependentUpon>SubredditSmallViewTemplate.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Resources\VotableControlTemplate.xaml.cs">
+      <DependentUpon>VotableControlTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\CommentCountControlTemplate.xaml.cs">
+      <DependentUpon>CommentCountControlTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\CardLinkViewTemplate.xaml.cs">
+      <DependentUpon>CardLinkViewTemplate.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Controls\CancelOperationDialog.xaml.cs">
       <DependentUpon>CancelOperationDialog.xaml</DependentUpon>
     </Compile>
@@ -129,9 +141,6 @@
     </Compile>
     <Compile Include="View\Controls\CardView\CardCommentView.xaml.cs">
       <DependentUpon>CardCommentView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\Controls\CardView\CardLinkView.xaml.cs">
-      <DependentUpon>CardLinkView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Controls\CardView\CardMarkdownControl.xaml.cs">
       <DependentUpon>CardMarkdownControl.xaml</DependentUpon>
@@ -234,6 +243,7 @@
       <DependentUpon>Wiki.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Selectors\ContentTemplateSelector.cs" />
+    <Compile Include="View\Selectors\PreviewTemplateSelector.cs" />
     <Compile Include="View\Selectors\UserActivityTemplateSelector.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -289,10 +299,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Controls\CardView\CardCommentView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="View\Controls\CardView\CardLinkView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

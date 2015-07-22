@@ -3,8 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:SnooStream.View.Controls"
         xmlns:common="using:SnooStream.Common" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:snoodom="using:SnooDom"
+        xmlns:resources="using:SnooStream.Resources"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
 
+    <common:SnooApplicationPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <resources:CardLinkViewTemplate />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </common:SnooApplicationPage.Resources>
+    
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid x:Name="LayoutRoot" Margin="0,24,0,0">
             <Hub>
@@ -15,12 +24,8 @@
                                 ShowsScrollingPlaceholders="True" IsItemClickEnabled="False"
                                 IncrementalLoadingTrigger="Edge" IncrementalLoadingThreshold="10"
                                 VirtualizingStackPanel.VirtualizationMode="Recycling"
-                                ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <local:CardLinkView />
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
+                                ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}"
+                                  ItemTemplate="{StaticResource CardLinkView}">
                             <ListView.ItemContainerTransitions>
                                 <TransitionCollection>
                                     <EntranceThemeTransition IsStaggeringEnabled="False" />
@@ -87,7 +92,7 @@
                                                 </FlyoutBase.AttachedFlyout>
                                             </Button>
                                             <!-- Votable Section -->
-                                            <local:VotableControl Grid.Column="1" />
+                                            <ContentControl Grid.Column="1" DataContext="{Binding Votable}" ContentTemplate="{StaticResource VotableControl}" />
                                         </Grid>
                                         <snoodom:MarkdownControl
                                             Markdown="{Binding BodyMD, Mode=OneTime}"

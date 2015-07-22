@@ -59,7 +59,7 @@ namespace SnooStream.Common
 			}
 			else if (content is AlbumViewModel)
 			{
-				result = new PreviewImage { ThumbnailUrl = ((AlbumViewModel)content).RedditThumbnail };
+				result = new PreviewImage { ThumbnailUrl = ((AlbumViewModel)content).RedditThumbnail, HQThumbnailUrl = ((AlbumViewModel)content).HQThumbnailUrl };
 				result.FinishLoad = (cancel) => LoadPreview(content as AlbumViewModel, result as PreviewImage, cancel); 
 			}
 			else if (content is PlainWebViewModel)
@@ -98,7 +98,7 @@ namespace SnooStream.Common
             {
                 var previewUrl = await SnooStreamViewModel.SystemServices.ImagePreviewFromUrl(imageViewModel.Url, cancel);
                 if(!cancel.IsCancellationRequested)
-                    SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() => target.HQThumbnailUrl = previewUrl);
+                    SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() => imageViewModel.HQThumbnail = target.HQThumbnailUrl = previewUrl);
             }
             catch (OperationCanceledException)
             {
@@ -112,7 +112,7 @@ namespace SnooStream.Common
 			{
 				var previewUrl = await albumViewModel.FirstUrl();
                 if (!cancel.IsCancellationRequested)
-                    SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() => target.HQThumbnailUrl = previewUrl);
+                    SnooStreamViewModel.SystemServices.QueueNonCriticalUI(() => albumViewModel.HQThumbnailUrl = target.HQThumbnailUrl = previewUrl);
 			}
 			catch(TaskCanceledException)
 			{
@@ -178,7 +178,7 @@ namespace SnooStream.Common
 			ObjectSource.PropertyChanged += _changeHandler;
 		}
 
-		public string Synopsis
+        public string Synopsis
 		{
 			get
 			{
@@ -215,5 +215,5 @@ namespace SnooStream.Common
 				RaisePropertyChanged("PlayLogo");
 			}
 		}
-	}
+    }
 }

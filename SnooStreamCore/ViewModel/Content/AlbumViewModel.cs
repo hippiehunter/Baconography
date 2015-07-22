@@ -16,7 +16,8 @@ namespace SnooStream.ViewModel.Content
 		private string _title;
 
 		public string RedditThumbnail { get; private set; }
-		Lazy<Task<IEnumerable<Tuple<string, string>>>> _apiResult;
+        public string HQThumbnailUrl { get; set; }
+        Lazy<Task<IEnumerable<Tuple<string, string>>>> _apiResult;
 
 		ObservableCollection<ImageViewModel> _images;
 		public ObservableCollection<ImageViewModel> Images

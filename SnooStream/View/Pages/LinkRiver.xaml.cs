@@ -14,6 +14,8 @@ using Windows.UI.Xaml.Controls;
 using GalaSoft.MvvmLight;
 using Windows.UI.Xaml.Media.Animation;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using SnooStream.Converters;
 
 namespace SnooStream.View.Pages
 {
@@ -34,57 +36,37 @@ namespace SnooStream.View.Pages
 
 		private void linksListView_ContainerContentChanging(Windows.UI.Xaml.Controls.ListViewBase sender, Windows.UI.Xaml.Controls.ContainerContentChangingEventArgs args)
 		{
-			var card = args.ItemContainer.ContentTemplateRoot as CardLinkView;
-            if (card != null)
-            {
-                if (card.PhaseLoad(sender, args))
-                    args.RegisterUpdateCallback(linksListView_ContainerContentChanging);
-            }
-            else
-            {
-            }
+            if (PhaseLoad(sender, args))
+                args.RegisterUpdateCallback(linksListView_ContainerContentChanging);
 		}
 
         internal bool PhaseLoad(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
             var dataContext = args.Item as LinkViewModel;
-
+            var button = ((FrameworkElement)args.ItemContainer.ContentTemplateRoot).FindName("previewSection") as Button;
             if (args.InRecycleQueue)
             {
-                cancelSource.Cancel();
-                cancelSource = new CancellationTokenSource();
-
-                if (previewSection != null)
-                {
-                    if (previewSection.Content is CardPreviewImageControl)
-                    {
-                        var imageControl = previewSection.Content as CardPreviewImageControl;
-                        if (imageControl.hqImageControl.Source is BitmapSource)
-                        {
-                            ((BitmapSource)imageControl.hqImageControl.Source).SetSource(_streamHack);
-                        }
-                    }
-                }
+                dataContext.Content.CancelLoad();
+                button.Content = null;
             }
-
-            if (!args.InRecycleQueue)
+            else
             {
                 switch (args.Phase)
                 {
                     case 0:
+                        var result = Preview.LoadLinkPreview(dataContext.Content);
+                        button.Content = result;
                         return true;
                     case 1:
+                        var preview = button.Content as Preview;
                         var finishLoad2 = new Action(async () =>
                         {
                             try
                             {
-                                var cancelToken = cancelSource.Token;
-                                var previewControl = await ContentPreviewConverter.MakePreviewControl(DataContext as LinkViewModel, cancelToken, previewSection.Content);
-                                if (!cancelToken.IsCancellationRequested)
+                                await Task.Run(async () =>
                                 {
-                                    if (previewSection.Content != previewControl)
-                                        previewSection.Content = previewControl;
-                                }
+                                    await preview.FinishLoad(dataContext.Content.CancelToken);
+                                });
                             }
                             catch (TaskCanceledException)
                             {

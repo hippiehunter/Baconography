@@ -43,12 +43,12 @@ namespace SnooStream.ViewModel.Content
 
 		internal Task<string> StillUrl()
 		{
-			return _videoResult.Value.PreviewUrl(CancelToken.Token);
+			return _videoResult.Value.PreviewUrl(CancelTokenSource.Token);
 		}
 
 		protected override async Task StartLoad()
 		{
-			var playableStreams = await _videoResult.Value.PlayableStreams(CancelToken.Token);
+			var playableStreams = await _videoResult.Value.PlayableStreams(CancelTokenSource.Token);
 			SnooStreamViewModel.SystemServices.RunUIAsync(() =>
 				{
 					if (playableStreams != null && playableStreams.Count() > 0)

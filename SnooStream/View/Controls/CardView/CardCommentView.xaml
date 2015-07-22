@@ -93,14 +93,14 @@
                     </Button.Flyout>
                 </Button>
 
-                <local:VotableControl Grid.Column="1" />
+                <!--local:VotableControl Grid.Column="1" /-->
 
                 <Button Grid.Column="2"
                         HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
                         Margin="0,-12,2,0"
                         BorderThickness="0" Padding="0,0,0,0" 
                         IsEnabled="False">
-                    <local:CommentCountControl />
+                    <!--local:CommentCountControl /-->
                 </Button>
             </Grid>
         </Grid>

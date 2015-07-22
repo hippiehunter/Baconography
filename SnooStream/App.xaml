@@ -10,6 +10,9 @@
     RequestedTheme="Dark">
     <Application.Resources>
         <ResourceDictionary>
+            <converters:NullToEmptyConverter x:Key="nullToEmptyConverter" />
+            <converters:NullToOpacityConverter x:Key="nullToOpacityConverter" />
+            <converters:ClearableImageConverter x:Key="clearableImageConverter"/>
             <common:SnooStreamViewModelPlatform x:Key="SnooStream" />
             <converters:ContentConverter x:Key="contentConverter" />
             <converters:ActivityMetadataConverter x:Key="activityMetadataConverter" />

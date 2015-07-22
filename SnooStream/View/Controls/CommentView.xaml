@@ -4,25 +4,33 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:SnooStream.View.Controls"
+    xmlns:resources="using:SnooStream.Resources"
     xmlns:snoodom="using:SnooDom"
     mc:Ignorable="d"
     d:DesignHeight="480" d:DesignWidth="480" DataContextChanged="UserControl_DataContextChanged">
 
     <UserControl.Resources>
-        <DataTemplate x:Name="textTemplate">
-            <TextBlock x:Name="plainTextControl" Margin="6,0,6,0" Style="{StaticResource MarkdownTextBlockStyle}" Text="{Binding Mode=OneTime}"/>
-        </DataTemplate>
-        <DataTemplate x:Name="editingTemplate">
-            <local:ComposeComment HorizontalAlignment="Stretch" Margin="6,0,6,0" DataContext="{Binding ReplyViewModel}"/>
-        </DataTemplate>
-        <DataTemplate x:Name="markdownTemplate">
-            <snoodom:MarkdownControl
-                    Markdown="{Binding Mode=OneTime}"
-                    StyleProvider="{StaticResource markdownHelpers}"
-                    CommandFactory="{StaticResource markdownHelpers}"
-                    HorizontalAlignment="Stretch"
-                    Margin="6,0,6,0"/>
-        </DataTemplate>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <resources:VotableControlTemplate />
+                <resources:CommentCountControlTemplate />
+            </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate x:Name="textTemplate">
+                <TextBlock x:Name="plainTextControl" Margin="6,0,6,0" Style="{StaticResource MarkdownTextBlockStyle}" Text="{Binding Mode=OneTime}"/>
+            </DataTemplate>
+            <DataTemplate x:Name="editingTemplate">
+                <local:ComposeComment HorizontalAlignment="Stretch" Margin="6,0,6,0" DataContext="{Binding ReplyViewModel}"/>
+            </DataTemplate>
+            <DataTemplate x:Name="markdownTemplate">
+                <snoodom:MarkdownControl
+                        Markdown="{Binding Mode=OneTime}"
+                        StyleProvider="{StaticResource markdownHelpers}"
+                        CommandFactory="{StaticResource markdownHelpers}"
+                        HorizontalAlignment="Stretch"
+                        Margin="6,0,6,0"/>
+            </DataTemplate>
+        </ResourceDictionary>
     </UserControl.Resources>
     
     <Grid HorizontalAlignment="Stretch"
@@ -84,7 +92,7 @@
                 </Button>
 
                 <!-- Votable Section -->
-                <local:VotableControl Grid.Column="1" />
+                <ContentControl Grid.Column="1" DataContext="{Binding Votable}" ContentTemplate="{StaticResource VotableControl}" />
             </Grid>
             <ContentControl x:Name="contentControl" Grid.Row="1" Margin="0,0,12,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
         </Grid>
