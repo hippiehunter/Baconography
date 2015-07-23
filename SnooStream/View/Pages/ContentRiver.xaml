@@ -49,13 +49,8 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <controls:OverlayControl />
-                <FlipView Grid.Row="1" x:Name="albumSlideView" ItemsSource="{x:Bind Content.(vmc:AlbumViewModel.Images)}" HorizontalAlignment="Stretch" 
-                  VerticalAlignment="Stretch" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.IsVerticalRailEnabled="True">
-                    <FlipView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Vertical"/>
-                        </ItemsPanelTemplate>
-                    </FlipView.ItemsPanel>
+                <FlipView Grid.Row="1" x:Name="albumSlideView" ItemsSource="{x:Bind Content.(vmc:AlbumViewModel.Images)}" HorizontalAlignment="Stretch" Background="Transparent"
+                  VerticalAlignment="Stretch" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.IsVerticalRailEnabled="True" ItemsPanel="{StaticResource VerticalItemsPanel}">
                     <FlipView.ItemContainerStyle>
                         <Style TargetType="FlipViewItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -103,13 +98,8 @@
                                           SelfViewTemplate="{StaticResource selfContentTemplate}"/>
 
     </common:SnooApplicationPage.Resources>
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <FlipView x:Name="flipView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemTemplateSelector="{StaticResource contentSelector}">
-            <FlipView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel Orientation="Horizontal" VirtualizingStackPanel.VirtualizationMode="Standard"/>
-                </ItemsPanelTemplate>
-            </FlipView.ItemsPanel>
+    <Grid>
+        <FlipView x:Name="flipView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemTemplateSelector="{StaticResource contentSelector}" ItemsPanel="{StaticResource HorizontalItemsPanel}" Background="Transparent">
             <FlipView.ItemContainerStyle>
                 <Style TargetType="FlipViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />

@@ -24,6 +24,7 @@
 
                 <DataTemplate x:Name="settingsTemplate">
                     <Grid>
+                        
                         <local:HubSettingsView DataContext="{Binding SettingsHub}"/>
                     </Grid>
                 </DataTemplate>

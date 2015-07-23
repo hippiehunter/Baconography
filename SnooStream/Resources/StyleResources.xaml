@@ -577,14 +577,25 @@
                                            PointerOverBackground="{ThemeResource SystemControlHighlightListLowBrush}" 
                                            ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}" 
                                            SelectedPressedBackground="{ThemeResource SystemControlHighlightListAccentHighBrush}" 
-                                           SelectionCheckMarkVisualEnabled="True" 
-                                           SelectedForeground="{ThemeResource SystemControlHighlightAltBaseHighBrush}" 
+                                           SelectionCheckMarkVisualEnabled="False" 
+                                           SelectedForeground="{ThemeResource SystemControlForegroundBaseHighBrush}" 
                                            SelectedPointerOverBackground="{ThemeResource SystemControlHighlightListAccentMediumBrush}" 
-                                           SelectedBackground="{ThemeResource SystemControlHighlightListAccentLowBrush}" 
+                                           SelectedBackground= "Transparent" 
                                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
+    <ItemsPanelTemplate x:Key="HorizontalItemsPanel">
+        <VirtualizingStackPanel AreScrollSnapPointsRegular="True" Orientation="Horizontal" />
+    </ItemsPanelTemplate>
 
+    <ItemsPanelTemplate x:Key="VerticalItemsPanel">
+        <VirtualizingStackPanel AreScrollSnapPointsRegular="True" Orientation="Vertical" />
+    </ItemsPanelTemplate>
+
+    <Style TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    
 </ResourceDictionary>

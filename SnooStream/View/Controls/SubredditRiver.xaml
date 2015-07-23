@@ -85,7 +85,7 @@
         </Grid.RowDefinitions>
 
 
-        <Button x:Name="search" Grid.RowSpan="2" Padding="0" Margin="-24,0,0,0" BorderThickness="0" VerticalAlignment="Top" HorizontalAlignment="Left"
+        <Button x:Name="search" Grid.RowSpan="2" Padding="0" Background="Transparent" Margin="-24,0,0,0" BorderThickness="0" VerticalAlignment="Top" HorizontalAlignment="Left"
                 Width="50" Click="search_Click">
             <SymbolIcon Symbol="Find"/>
         </Button>
@@ -99,15 +99,10 @@
         </TextBox>
         <ListView Grid.Column="1" Grid.Row="1"
 			x:Name="listBox"
-			HorizontalAlignment="Stretch"
+			HorizontalAlignment="Stretch" SelectionMode="None"
 			HorizontalContentAlignment="Stretch"
-			Margin="-12,-1,-12,0" ItemsSource="{Binding Source={StaticResource subredditViewSource}}">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
+			Margin="-12,-1,-12,0" ItemsSource="{Binding Source={StaticResource subredditViewSource}}"
+                  ItemContainerStyle="{StaticResource FullWidthListViewContainer}">
 			<ListView.ItemTemplate>
                 <DataTemplate x:DataType="vm:SubredditWrapper">
                     <Button Margin="0,0,0,0" Background="Transparent" BorderThickness="0" Tapped="listBox_ItemTap" Holding="Button_Holding"
