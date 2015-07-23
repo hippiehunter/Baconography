@@ -65,7 +65,7 @@ void LiveTileUtilities::MakeLiveTile(LockScreenHistory^ history, LiveTileSetting
 				}
 				case LiveTileStyle::TextImage:
 				{
-					tileTemplate = Windows::UI::Notifications::TileUpdateManager::GetTemplateContent(Windows::UI::Notifications::TileTemplateType::TileWide310x150ImageAndText01);
+					tileTemplate = Windows::UI::Notifications::TileUpdateManager::GetTemplateContent(Windows::UI::Notifications::TileTemplateType::TileWide310x150PeekImageAndText01);
 					auto tileAttributes = tileTemplate->GetElementsByTagName("image");
 					tileTemplate->GetElementsByTagName("text")->Item(0)->AppendChild(tileTemplate->CreateTextNode(option->Title));
 					tileAttributes->GetAt(0)->Attributes->GetNamedItem("src")->InnerText = "ms-appdata:///local/" + option->LocalWideUrl;

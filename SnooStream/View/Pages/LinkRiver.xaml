@@ -28,13 +28,13 @@
                       ItemsSource="{Binding Links}"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                       ContainerContentChanging="linksListView_ContainerContentChanging"
-                      ShowsScrollingPlaceholders="True"
+                      ShowsScrollingPlaceholders="False"
                       IsItemClickEnabled="False"
                       IncrementalLoadingTrigger="Edge"
                       IncrementalLoadingThreshold="10" 
                       VirtualizingStackPanel.VirtualizationMode="Recycling"
-                      ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}"
-                      ItemTemplate="{StaticResource CardLinkView}">
+                      ItemTemplate="{StaticResource CardLinkView}" 
+                      ItemContainerStyle="{StaticResource FullWidthListViewContainer}">
                 <ListView.ItemContainerTransitions>
                     <TransitionCollection>
                         <EntranceThemeTransition IsStaggeringEnabled="False"/>
