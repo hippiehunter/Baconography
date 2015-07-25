@@ -121,16 +121,37 @@
     <Compile Include="Converters\VoteIndicatorConverter.cs" />
     <Compile Include="PlatformServices\NavigationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources\SubredditSmallViewTemplate.xaml.cs">
+    <Compile Include="View\Templates\AboutSubredditTemplate.xaml.cs">
+      <DependentUpon>AboutSubredditTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Templates\AboutUserTemplate.xaml.cs">
+      <DependentUpon>AboutUserTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Templates\CommentsTemplate.xaml.cs">
+      <DependentUpon>CommentsTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Templates\ComposePostTemplate.xaml.cs">
+      <DependentUpon>ComposePostTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Templates\LoginViewTemplate.xaml.cs">
+      <DependentUpon>LoginViewTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Templates\OverlayControlTemplate.xaml.cs">
+      <DependentUpon>OverlayControlTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Templates\SelfActivityViewTemplate.xaml.cs">
+      <DependentUpon>SelfActivityViewTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Templates\SubredditSmallViewTemplate.xaml.cs">
       <DependentUpon>SubredditSmallViewTemplate.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Resources\VotableControlTemplate.xaml.cs">
+    <Compile Include="View\Templates\VotableControlTemplate.xaml.cs">
       <DependentUpon>VotableControlTemplate.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Resources\CommentCountControlTemplate.xaml.cs">
+    <Compile Include="View\Templates\CommentCountControlTemplate.xaml.cs">
       <DependentUpon>CommentCountControlTemplate.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Resources\CardLinkViewTemplate.xaml.cs">
+    <Compile Include="View\Templates\CardLinkViewTemplate.xaml.cs">
       <DependentUpon>CardLinkViewTemplate.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Controls\CancelOperationDialog.xaml.cs">
@@ -276,12 +297,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Resources\CardLinkViewTemplate.xaml">
+    <Page Include="View\Templates\AboutSubredditTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Templates\AboutUserTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Templates\CardLinkViewTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
-    <Page Include="Resources\CommentCountControlTemplate.xaml">
+    <Page Include="View\Templates\CommentCountControlTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -290,11 +319,31 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Resources\SubredditSmallViewTemplate.xaml">
+    <Page Include="View\Templates\CommentsTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Resources\VotableControlTemplate.xaml">
+    <Page Include="View\Templates\ComposePostTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Templates\LoginViewTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Templates\OverlayControlTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Templates\SelfActivityViewTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Templates\SubredditSmallViewTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Templates\VotableControlTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

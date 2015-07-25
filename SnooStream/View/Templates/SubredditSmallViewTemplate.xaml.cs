@@ -1,5 +1,4 @@
-﻿using SnooStream.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,20 +15,13 @@ using Windows.UI.Xaml.Navigation;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace SnooStream.Resources
+namespace SnooStream.View.Templates
 {
-    public sealed partial class CardLinkViewTemplate
+    public sealed partial class SubredditSmallViewTemplate
     {
-        public CardLinkViewTemplate()
+        public SubredditSmallViewTemplate()
         {
             this.InitializeComponent();
-        }
-
-        private void hqImageControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            var parent = ((FrameworkElement)sender).Parent as FrameworkElement;
-            if(parent != null)
-                ((Image)parent.FindName("imageControl")).Opacity = 0;
         }
     }
 }

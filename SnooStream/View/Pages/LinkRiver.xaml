@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream.View.Controls"
-    xmlns:resources="using:SnooStream.Resources"
+    xmlns:templates="using:SnooStream.View.Templates"
     xmlns:selectors="using:SnooStream.View.Selectors"
     xmlns:common="using:SnooStream.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -16,7 +16,7 @@
     <common:SnooApplicationPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <resources:CardLinkViewTemplate />
+                <templates:CardLinkViewTemplate />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </common:SnooApplicationPage.Resources>

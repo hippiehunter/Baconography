@@ -15,11 +15,11 @@ using Windows.UI.Xaml.Navigation;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace SnooStream.Resources
+namespace SnooStream.View.Templates
 {
-    public sealed partial class SubredditSmallViewTemplate
+    public sealed partial class CommentCountControlTemplate
     {
-        public SubredditSmallViewTemplate()
+        public CommentCountControlTemplate()
         {
             this.InitializeComponent();
         }

@@ -4,7 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:SnooStream.View.Controls"
-    xmlns:resources="using:SnooStream.Resources"
+    xmlns:templates="using:SnooStream.View.Templates"
     xmlns:snoodom="using:SnooDom"
     mc:Ignorable="d"
     d:DesignHeight="480" d:DesignWidth="480" DataContextChanged="UserControl_DataContextChanged">
@@ -12,8 +12,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <resources:VotableControlTemplate />
-                <resources:CommentCountControlTemplate />
+                <templates:VotableControlTemplate />
+                <templates:CommentCountControlTemplate />
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate x:Name="textTemplate">

@@ -6,7 +6,7 @@
     xmlns:localC="using:SnooStream.View.Controls"
     xmlns:vm="using:SnooStream.ViewModel"
     xmlns:selectors="using:SnooStream.View.Selectors"
-    xmlns:resources="using:SnooStream.Resources"
+    xmlns:templates="using:SnooStream.View.Templates"
     xmlns:common="using:SnooStream.Common"
     x:Class="SnooStream.View.Controls.SubredditRiver"
     mc:Ignorable="d"
@@ -15,7 +15,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <resources:SubredditSmallViewTemplate />
+                <templates:SubredditSmallViewTemplate />
             </ResourceDictionary.MergedDictionaries>
             <CollectionViewSource x:Name="subredditViewSource" ItemsPath="Collection" IsSourceGrouped="True" Source="{Binding SubredditCollection}"/>
         </ResourceDictionary>

@@ -3,13 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:SnooStream.View.Controls"
         xmlns:common="using:SnooStream.Common" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:snoodom="using:SnooDom"
-        xmlns:resources="using:SnooStream.Resources"
+        xmlns:templates="using:SnooStream.View.Templates"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
 
     <common:SnooApplicationPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <resources:CardLinkViewTemplate />
+                <templates:CardLinkViewTemplate />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </common:SnooApplicationPage.Resources>

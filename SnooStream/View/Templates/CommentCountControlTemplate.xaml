@@ -1,9 +1,8 @@
 ﻿<ResourceDictionary
-    x:Class="SnooStream.Resources.CommentCountControlTemplate"
+    x:Class="SnooStream.View.Templates.CommentCountControlTemplate"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:vm="using:SnooStream.ViewModel"
-    xmlns:local="using:SnooStream.Resources">
+    xmlns:vm="using:SnooStream.ViewModel">
 
     <DataTemplate x:Key="CommentCountControl" x:DataType="vm:LinkViewModel">
         <Grid>

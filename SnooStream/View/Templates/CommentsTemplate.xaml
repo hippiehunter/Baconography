@@ -1,0 +1,126 @@
+﻿<ResourceDictionary
+    x:Class="SnooStream.View.Templates.CommentsTemplate"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream.View.Templates"
+    xmlns:controls="using:SnooStream.View.Controls"
+    xmlns:vm="using:SnooStream.ViewModel"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ResourceDictionary.MergedDictionaries>
+        <local:VotableControlTemplate />
+        <local:CommentCountControlTemplate />
+    </ResourceDictionary.MergedDictionaries>
+    
+    <DataTemplate x:Key="LoadFullyTemplate">
+        <Button Command="{Binding Load}" Content="Load full context" BorderThickness="0" Margin="0"/>
+    </DataTemplate>
+
+    <DataTemplate x:Name="CardCommentView" x:DataType="vm:LinkViewModel">
+        <Border HorizontalAlignment="Stretch" Background="{ThemeResource ContentBackgroundBrush}">
+            <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Title block -->
+                <TextBlock Grid.Row="0"
+                   Style="{StaticResource TitleTextBlock}"
+                   Text="{x:Bind Title}"
+                   TextTrimming="WordEllipsis"
+                   MinHeight="50">
+                </TextBlock>
+
+                <!-- Link info, user / time / subreddit / domain -->
+                <ContentControl x:Name="linkMetadata" Grid.Row="1"
+                            Margin="0,5,0,-6" MinHeight="25"
+                            HorizontalAlignment="Stretch" Content="{x:Bind Converter={StaticResource linkMetadataConverter}}"/>
+
+                <!-- Non Editing Content block -->
+                <ContentControl Visibility="{x:Bind IsEditing, Converter={StaticResource invertedBooleanVisibilityConverter}}"  
+                            x:Name="contentSection" Grid.Row="2" Margin="0"
+                            BorderThickness="0"
+                            VerticalContentAlignment="Stretch" VerticalAlignment="Center"
+                            HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" />
+
+                <!-- Editing Content block -->
+                <Grid Grid.Row="2" Visibility="{x:Bind IsEditing, Converter={StaticResource booleanVisibilityConverter}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+
+                    <controls:MarkdownEditorControl DataContext="{x:Bind EditingVM}"
+                            x:Name="editSection" Margin="0" Grid.ColumnSpan="2" Grid.Row="0"
+                            VerticalContentAlignment="Stretch" VerticalAlignment="Center"
+                            HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" />
+
+                    <Button Background="Transparent" Grid.Column="0" Grid.Row="1" Content="Submit" Command="{x:Bind SubmitEdit}" />
+                    <Button Background="Transparent" Grid.Column="1" Grid.Row="1" Content="Cancel" Command="{x:Bind CancelEdit}" />
+                </Grid>
+
+                <!-- Action block, flyout menu / vote / comment count -->
+                <Grid x:Name="actionButtons" Grid.Row="3" Margin="0,0,0,0" HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"  Background="Transparent"
+                    HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
+                    BorderThickness="0" Padding="0" 
+                    Margin="0,-12,-12,0"
+                    FontFamily="Segoe UI Symbol">
+                        <Grid>
+                            <TextBlock Margin="0,0,0,0" FontSize="35" Text="&#xE10C;" />
+                        </Grid>
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="Share Link" Command="{x:Bind Share}"/>
+                                <MenuFlyoutItem Text="Report" Command="{x:Bind Report}"/>
+                                <MenuFlyoutItem Text="Save" Command="{x:Bind Save}"/>
+                                <MenuFlyoutItem Text="User Details" Command="{x:Bind GotoUserDetails}"/>
+                                <MenuFlyoutItem Text="Edit" Command="{x:Bind Edit}" Visibility="{x:Bind CanEdit, Converter={StaticResource booleanVisibilityConverter}}" />
+                                <MenuFlyoutItem Text="Delete" Command="{x:Bind Delete}" Visibility="{x:Bind CanDelete, Converter={StaticResource booleanVisibilityConverter}}" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+
+                    <ContentControl Grid.Column="1" ContentTemplate="{StaticResource VotableControl}" />
+
+                    <Button Grid.Column="2"
+                        HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
+                        Margin="0,-12,2,0"
+                        BorderThickness="0" Padding="0,0,0,0" 
+                        IsEnabled="False" ContentTemplate="{StaticResource CommentCountControl}">
+                    </Button>
+                </Grid>
+            </Grid>
+        </Border>
+    </DataTemplate>
+    
+    <DataTemplate x:Name="Comments">
+        <ListView x:Name="commentsList" x:FieldModifier="public" HeaderTemplate="{StaticResource HeaderTemplate}"
+                  ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                  ItemContainerStyle="{StaticResource FullWidthListViewContainer}"
+                  ItemTemplateSelector="{StaticResource CommentTemplateSelector}">
+            <ListView.ItemContainerTransitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition IsStaggeringEnabled="True"/>
+                    <AddDeleteThemeTransition/>
+                </TransitionCollection>
+            </ListView.ItemContainerTransitions>
+        </ListView>
+    </DataTemplate>
+</ResourceDictionary>

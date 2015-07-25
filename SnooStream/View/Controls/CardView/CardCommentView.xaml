@@ -3,9 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream.View.Controls"
-    xmlns:resource="using:SnooStream.Resources"
-    xmlns:i="using:Microsoft.Xaml.Interactivity"
-    xmlns:iCore="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:templates="using:SnooStream.View.Templates"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -15,8 +13,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <resource:VotableControlTemplate />
-                <resource:CommentCountControlTemplate />
+                <templates:VotableControlTemplate />
+                <templates:CommentCountControlTemplate />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
