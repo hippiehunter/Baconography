@@ -374,6 +374,7 @@ namespace SnooStream.ViewModel
                 things.Add(FirstActivity.GetThing());
             }
         }
+
         public void Tapped()
         {
             if (IsConversation)

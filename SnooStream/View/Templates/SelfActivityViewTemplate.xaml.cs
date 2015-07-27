@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SnooStream.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,6 +23,19 @@ namespace SnooStream.View.Templates
         public SelfActivityViewTemplate()
         {
             this.InitializeComponent();
+        }
+
+        private void ListView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var activityGroup = e.ClickedItem as ActivityGroupViewModel;
+            if (activityGroup != null)
+            {
+                activityGroup.Tapped();
+            }
+            else
+            {
+                (e.ClickedItem as ActivityViewModel)?.Tapped();
+            }
         }
     }
 }

@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream.View.Templates"
     xmlns:controls="using:SnooStream.View.Controls"
+    xmlns:selector="using:SnooStream.View.Selectors"
     xmlns:vm="using:SnooStream.ViewModel"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -13,6 +14,8 @@
         <local:VotableControlTemplate />
         <local:CommentCountControlTemplate />
     </ResourceDictionary.MergedDictionaries>
+
+    <selector:CommentTemplateSelector x:Key="commentTemplateSelector" />
     
     <DataTemplate x:Key="LoadFullyTemplate">
         <Button Command="{Binding Load}" Content="Load full context" BorderThickness="0" Margin="0"/>
@@ -110,14 +113,12 @@
     </DataTemplate>
     
     <DataTemplate x:Name="Comments">
-        <ListView x:Name="commentsList" x:FieldModifier="public" HeaderTemplate="{StaticResource HeaderTemplate}"
-                  ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging"
-                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+        <ListView HeaderTemplate="{StaticResource CardCommentView}"
+                  ItemsSource="{Binding FlatComments}"
                   ItemContainerStyle="{StaticResource FullWidthListViewContainer}"
-                  ItemTemplateSelector="{StaticResource CommentTemplateSelector}">
+                  ItemTemplateSelector="{StaticResource commentTemplateSelector}">
             <ListView.ItemContainerTransitions>
                 <TransitionCollection>
-                    <EntranceThemeTransition IsStaggeringEnabled="True"/>
                     <AddDeleteThemeTransition/>
                 </TransitionCollection>
             </ListView.ItemContainerTransitions>

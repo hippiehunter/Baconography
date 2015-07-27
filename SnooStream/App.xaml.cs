@@ -33,11 +33,6 @@ namespace SnooStream
     /// </summary>
     sealed partial class App : Application
     {
-        /// <summary>
-        /// Allows tracking page views, exceptions and other telemetry through the Microsoft Application Insights service.
-        /// </summary>
-        public static Microsoft.ApplicationInsights.TelemetryClient TelemetryClient;
-
         private TransitionCollection transitions;
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -45,8 +40,6 @@ namespace SnooStream
         /// </summary>
         public App()
         {
-            TelemetryClient = new Microsoft.ApplicationInsights.TelemetryClient();
-
             this.InitializeComponent();
             this.Suspending += OnSuspending;
         }
@@ -212,7 +205,7 @@ namespace SnooStream
         {
             if (string.IsNullOrWhiteSpace(launchArgs))
             {
-                if (!rootFrame.Navigate(typeof(SnooHubMark2), launchArgs))
+                if (!rootFrame.Navigate(typeof(AppShell), launchArgs))
                 {
                     throw new Exception("Failed to create initial page");
                 }
@@ -228,7 +221,7 @@ namespace SnooStream
                 }
                 catch (Exception)
                 {
-                    if (!rootFrame.Navigate(typeof(SnooHubMark2), launchArgs))
+                    if (!rootFrame.Navigate(typeof(AppShell), launchArgs))
                     {
                         throw new Exception("Failed to create initial page");
                     }

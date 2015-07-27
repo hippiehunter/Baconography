@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace SnooStream.Services
 {
-    [DataContract]
     public class UserCredential
     {
         [JsonProperty("oauth")]
