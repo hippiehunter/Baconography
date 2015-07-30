@@ -29,44 +29,8 @@ namespace SnooStream
     /// </summary>
     public sealed partial class AppShell : Page
     {
-        // Declare the top level nav items
-        private ObservableCollection<NavMenuItem> navlist = new ObservableCollection<NavMenuItem>(
-            new[]
-            {
-                new NavMenuItem()
-                {
-                    Symbol = Symbol.Contact,
-                    Label = SnooStreamViewModel.RedditUserState.Username,
-                    DestPage = typeof(SelfPage)
-                },
-                new NavMenuItem()
-                {
-                    Symbol = Symbol.Mail,
-                    Label = "Activity",
-                    DestPage = typeof(SelfActivityPage)
-                },
-                new NavMenuItem()
-                {
-                    Symbol = Symbol.Find,
-                    Label = "Search",
-                    DestPage = typeof(SearchPage)
-                },
-                new NavMenuItem()
-                {
-                    Symbol = Symbol.Setting,
-                    Label = "Settings",
-                    DestPage = typeof(SettingsPage)
-                },
-                new NavMenuItem()
-                {
-                    Symbol = Symbol.Home,
-                    Label = "Subreddits",
-                    DestPage = typeof(SubredditsPage)
-                }
-            });
-
         public static AppShell Current = null;
-
+        
         /// <summary>
         /// Initializes a new instance of the AppShell, sets the static 'Current' reference,
         /// adds callbacks for Back requests and changes in the SplitView's DisplayMode, and
@@ -85,13 +49,9 @@ namespace SnooStream
 
             SystemNavigationManager.GetForCurrentView().BackRequested += SystemNavigationManager_BackRequested;
 
-            // If on a phone device that has hardware buttons then we hide the app's back button.
-            if (ApiInformation.IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
-            {
-                this.BackButton.Visibility = Visibility.Collapsed;
-            }
-
-            NavMenuList.ItemsSource = navlist;
+            var navVM = ((SnooStreamViewModel)App.Current.Resources["SnooStream"]).NavMenu;
+            NavMenuList.ItemsSource = navVM.Items;
+            this.AppFrame.Navigate(MapVMToPageType(navVM.Subreddits.VM), null);
         }
 
         public Frame AppFrame { get { return this.frame; } }
@@ -154,13 +114,7 @@ namespace SnooStream
             e.Handled = handled;
         }
 
-        private void BackButton_Click(object sender, RoutedEventArgs e)
-        {
-            bool ignored = false;
-            this.BackRequested(ref ignored);
-        }
-
-        private void BackRequested(ref bool handled)
+        internal void BackRequested(ref bool handled)
         {
             // Get a hold of the current frame so that we can inspect the app back stack.
 
@@ -191,12 +145,32 @@ namespace SnooStream
 
             if (item != null)
             {
-                if (item.DestPage != null &&
-                    item.DestPage != this.AppFrame.CurrentSourcePageType)
+                if (item.VM != null &&
+                    item.VM != this.AppFrame.DataContext)
                 {
-                    this.AppFrame.Navigate(item.DestPage, item.Arguments);
+                    this.AppFrame.Navigate(MapVMToPageType(item.VM), null);
                 }
             }
+        }
+
+        Type MapVMToPageType(object vm)
+        {
+            if (vm is LoginViewModel)
+                return typeof(LoginPage);
+            else if (vm is SelfStreamViewModel)
+                return typeof(SelfActivityPage);
+            else if (vm is AboutUserViewModel)
+                return typeof(SelfPage);
+            else if (vm is LinkRiverViewModel)
+                return typeof(LinkRiver);
+            else if (vm is SettingsViewModel)
+                return typeof(SettingsPage);
+            else if (vm is SearchViewModel)
+                return typeof(SearchPage);
+            else if (vm is SubredditRiverViewModel)
+                return typeof(SubredditsPage);
+            else
+                return null;
         }
 
         /// <summary>
@@ -207,16 +181,17 @@ namespace SnooStream
         /// <param name="e"></param>
         private void OnNavigatingToPage(object sender, NavigatingCancelEventArgs e)
         {
+            var navVM = ((SnooStreamViewModel)App.Current.Resources["SnooStream"]).NavMenu;
             if (e.NavigationMode == NavigationMode.Back)
             {
-                var item = (from p in this.navlist where p.DestPage == e.SourcePageType select p).SingleOrDefault();
+                var item = (from p in navVM.Items where MapVMToPageType(p.VM) == e.SourcePageType select p).SingleOrDefault();
                 if (item == null && this.AppFrame.BackStackDepth > 0)
                 {
                     // In cases where a page drills into sub-pages then we'll highlight the most recent
                     // navigation menu item that appears in the BackStack
                     foreach (var entry in this.AppFrame.BackStack.Reverse())
                     {
-                        item = (from p in this.navlist where p.DestPage == entry.SourcePageType select p).SingleOrDefault();
+                        item = (from p in navVM.Items where MapVMToPageType(p.VM) == entry.SourcePageType select p).SingleOrDefault();
                         if (item != null)
                             break;
                     }

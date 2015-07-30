@@ -333,13 +333,15 @@ namespace SnooStream.ViewModel
             CreatedUTC = FirstActivity.CreatedUTC;
             PreviewBody = FirstActivity.PreviewBody;
             SubTitle = FirstActivity.SubTitle;
+            HasUnviewed = Activities.Values.Any(vm => vm.IsNew);
 
-			RaisePropertyChanged("CreatedUTC");
+            RaisePropertyChanged("CreatedUTC");
 			RaisePropertyChanged("PreviewBody");
 			RaisePropertyChanged("Title");
 			RaisePropertyChanged("SubTitle");
             RaisePropertyChanged("IsComment");
             RaisePropertyChanged("FirstActivity");
+            RaisePropertyChanged("HasUnviewed");
         }
         private bool IsMod { get; set; }
         public string Id { get; set; }
@@ -349,6 +351,7 @@ namespace SnooStream.ViewModel
 		public string PreviewBody { get; protected set; }
 		public string Status { get; protected set; }
         public bool IsComment { get; protected set; }
+        public bool HasUnviewed { get; set; }
         public ActivityViewModel FirstActivity { get; set; }
 
         private bool _isExpanded;

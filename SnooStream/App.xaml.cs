@@ -171,9 +171,16 @@ namespace SnooStream
         {
             var rootFrame = Window.Current.Content as Frame;
             var appPage = rootFrame.Content as SnooApplicationPage;
-            if (appPage.PopNavState())
+            if (appPage != null && appPage.PopNavState())
             {
                 return true;
+            }
+            else if(rootFrame.Content is AppShell)
+            {
+                var shell = rootFrame.Content as AppShell;
+                bool handled = false;
+                shell.BackRequested(ref handled);
+                return handled;
             }
             else if (rootFrame.CanGoBack)
             {

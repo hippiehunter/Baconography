@@ -64,14 +64,14 @@ namespace SnooStream.ViewModel
 			}
 		}
 
-		public ModStreamViewModel(SelfInit selfInit)
+		public ModStreamViewModel()
 		{
 			//load up the activities
 			Groups = new ObservableSortedUniqueCollection<string, ActivityGroupViewModel>(new ActivityGroupViewModel.ActivityAgeComparitor());
 			Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new ModActivityLoader(this), 100);
 			Subreddits = new List<SubredditMod>();
 			DisabledModeration = new List<string>();
-            if (selfInit != null && IsLoggedIn)
+            if (IsLoggedIn)
 			{
 				InitialLoad();
             }

@@ -50,7 +50,6 @@ namespace SnooStream.View.Controls
 #if WINDOWS_PHONE_APP
             ContinuumNavigationTransitionInfo.SetIsExitElement(sender as UIElement, true);
 #endif
-            SnooApplicationPage.Current.PopNavState();
             searchBox.Text = "";
             var linkRiver = ((Button)sender).DataContext as SubredditWrapper;
 			if(linkRiver != null)

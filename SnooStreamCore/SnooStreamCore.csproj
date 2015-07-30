@@ -10,7 +10,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SnooStream</RootNamespace>
     <AssemblyName>SnooStreamCore</AssemblyName>
-    <TargetFrameworkProfile></TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -53,8 +54,10 @@
     <Compile Include="Common\TaskSettings.cs" />
     <Compile Include="Common\ViewModelDumpUtility.cs" />
     <Compile Include="Messages\FocusChangedMessage.cs" />
+    <Compile Include="Messages\UnreadMessageCountChangedMessage.cs" />
     <Compile Include="Messages\SelectLinkMessage.cs" />
     <Compile Include="Messages\SettingsChangedMessage.cs" />
+    <Compile Include="Messages\SubredditSelectedMessage.cs" />
     <Compile Include="Messages\UserLoggedInMessage.cs" />
     <Compile Include="Model\InitializationBlob.cs" />
     <Compile Include="Common\CommandDispatcher.cs" />
@@ -93,6 +96,7 @@
     <Compile Include="ViewModel\MarkdownEditingVM.cs" />
     <Compile Include="ViewModel\ModStreamViewModel.cs" />
     <Compile Include="ViewModel\MoreViewModel.cs" />
+    <Compile Include="ViewModel\NavMenu.cs" />
     <Compile Include="ViewModel\OperationCancellationViewModel.cs" />
     <Compile Include="ViewModel\Popups\CommandViewModel.cs" />
     <Compile Include="ViewModel\Popups\InputViewModel.cs" />

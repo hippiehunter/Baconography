@@ -105,9 +105,11 @@ namespace SnooStream.Model
             LastUpdatedImages = init.DefaultGet("LastUpdatedImages", new DateTime());
             LastCleanedCache = init.DefaultGet("LastCleanedCache", new DateTime());
             HeavyPreview = init.DefaultGet("HeavyPreview", false);
+            LeftSideNav = init.DefaultGet("LeftSideNav", true);
         }
 
-		public int ContentTimeout { get; set; }
+        public bool LeftSideNav { get; set; }
+        public int ContentTimeout { get; set; }
         public bool AllowOver18 { get; set; }
         public bool AllowOver18Items { get; set; }
         public bool OpenLinksInBrowser { get; set; }
@@ -190,6 +192,7 @@ namespace SnooStream.Model
             result.Add("LastUpdatedImages", LastUpdatedImages.ToString());
             result.Add("LastCleanedCache", LastCleanedCache.ToString());
             result.Add("HeavyPreview", HeavyPreview.ToString());
+            result.Add("LeftSideNav", LeftSideNav.ToString());
             return result;
 
         }

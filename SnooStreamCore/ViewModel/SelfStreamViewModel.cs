@@ -63,12 +63,12 @@ namespace SnooStream.ViewModel
 			}
 		}
 
-		public SelfStreamViewModel(SelfInit selfInit)
+		public SelfStreamViewModel()
 		{
 			//load up the activities
 			Groups = new ObservableSortedUniqueCollection<string, ActivityGroupViewModel>(new ActivityGroupViewModel.ActivityAgeComparitor());
 			Activities = SnooStreamViewModel.SystemServices.MakeIncrementalLoadCollection(new SelfActivityLoader(this), 100);
-            if (selfInit != null && IsLoggedIn)
+            if (IsLoggedIn)
 			{
                 ProcessActivityManager();
                 RunActivityUpdater();
@@ -123,6 +123,8 @@ namespace SnooStream.ViewModel
 		public DateTime? LastRefresh { get; set; }
 		public ObservableSortedUniqueCollection<string, ActivityGroupViewModel> Groups { get; private set; }
 		public ObservableCollection<ViewModelBase> Activities { get; private set; }
+        public bool HasUnviewed { get; internal set; }
+
         public static Dictionary<string, ActivityViewModel> ActivityLookup = new Dictionary<string, ActivityViewModel>();
 		public async Task PullNew(bool userInitiated, bool appStart)
         {
@@ -168,6 +170,8 @@ namespace SnooStream.ViewModel
             OldestMessage = ActivityGroupViewModel.ProcessListing(Groups, resultTpl.Item1, OldestMessage);
             OldestSentMessage = ActivityGroupViewModel.ProcessListing(Groups, resultTpl.Item2, OldestSentMessage);
             OldestActivity = ActivityGroupViewModel.ProcessListing(Groups, resultTpl.Item3, OldestActivity);
+
+            HasUnviewed = Groups.Values.Any(group => group.HasUnviewed);
         }
 
         bool _runningActivityUpdater = false;
@@ -232,18 +236,6 @@ namespace SnooStream.ViewModel
             else
                 return oldest;
         }
-
-		internal SelfInit Dump()
-		{
-			return new SelfInit
-			{
-				LastRefresh = LastRefresh,
-				SelfThings = new List<Thing>(DumpThings(Groups)),
-				AfterSelfAction = OldestActivity,
-				AfterSelfMessage = OldestMessage,
-				AfterSelfSentMessage = OldestSentMessage
-			};
-		}
 
 		public async Task MaybeRefresh()
 		{

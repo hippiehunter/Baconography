@@ -12,11 +12,7 @@ namespace SnooStream.Common
         public Dictionary<string, string> Settings { get; set; }
         public Dictionary<string, bool> NSFWFilter { get; set; }
         public UserState DefaultUser { get; set; }
-        public SelfInit Self {get; set;}
         public SubredditRiverInit Subreddits {get; set;}
-        //original linkid, url, date first seen
-        public List<Tuple<string, string, DateTime>> LockscreenImages { get; set; }
-        public List<Tuple<string, string, DateTime>> LiveTileImages { get; set; }
 		public string NavigationBlob { get; set; }
     }
 

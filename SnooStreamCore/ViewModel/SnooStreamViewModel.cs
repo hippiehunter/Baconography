@@ -19,46 +19,47 @@ namespace SnooStream.ViewModel
     public abstract class SnooStreamViewModel : ViewModelBase
     {
         public static string CWD { get; set; }
-		protected void FinishInit()
-		{
+        protected void FinishInit()
+        {
             Current = this;
-			_listingFilter = new NSFWListingFilter();
-			if (IsInDesignMode)
-			{
-				_initializationBlob = new InitializationBlob { Settings = new Dictionary<string, string>(), NSFWFilter = new Dictionary<string, bool>() };
-			}
-			else
-			{
-				OfflineService = new OfflineService();
-				_initializationBlob = OfflineService.LoadInitializationBlob("");
-			}
-			Settings = new Model.Settings(_initializationBlob.Settings);
-			SettingsHub = new SettingsViewModel(Settings);
-			
-			RedditUserState = _initializationBlob.DefaultUser ?? new UserState();
+            _listingFilter = new NSFWListingFilter();
+            if (IsInDesignMode)
+            {
+                _initializationBlob = new InitializationBlob { Settings = new Dictionary<string, string>(), NSFWFilter = new Dictionary<string, bool>() };
+            }
+            else
+            {
+                OfflineService = new OfflineService();
+                _initializationBlob = OfflineService.LoadInitializationBlob("");
+            }
+            Settings = new Model.Settings(_initializationBlob.Settings);
+            SettingsHub = new SettingsViewModel(Settings);
+
+            RedditUserState = _initializationBlob.DefaultUser ?? new UserState();
 
             SnooStreamViewModel.ActivityManager.OAuth = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.OAuth != null ?
                     JsonConvert.SerializeObject(SnooStreamViewModel.RedditUserState) : "";
 
-			SnooStreamViewModel.ActivityManager.CanStore = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.IsDefault;
+            SnooStreamViewModel.ActivityManager.CanStore = SnooStreamViewModel.RedditUserState != null && SnooStreamViewModel.RedditUserState.IsDefault;
 
             NotificationService = new Common.NotificationService();
-			CaptchaProvider = new CaptchaService();
-			RedditService = new Reddit(_listingFilter, RedditUserState, OfflineService, CaptchaProvider, "3m9rQtBinOg_rA", null, "http://www.google.com");
-			Login = new LoginViewModel();
+            CaptchaProvider = new CaptchaService();
+            RedditService = new Reddit(_listingFilter, RedditUserState, OfflineService, CaptchaProvider, "3m9rQtBinOg_rA", null, "http://www.google.com");
+            Login = new LoginViewModel();
 
-			_listingFilter.Initialize(Settings, OfflineService, RedditService, _initializationBlob.NSFWFilter);
-			CommandDispatcher = new CommandDispatcher();
-			SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
-			SelfStream = new SelfStreamViewModel(_initializationBlob.Self);
-			ModStream = new ModStreamViewModel(_initializationBlob.Self);
-			MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
+            _listingFilter.Initialize(Settings, OfflineService, RedditService, _initializationBlob.NSFWFilter);
+            CommandDispatcher = new CommandDispatcher();
+            SubredditRiver = new SubredditRiverViewModel(_initializationBlob.Subreddits);
+            SelfStream = new SelfStreamViewModel();
+            ModStream = new ModStreamViewModel();
+            NavMenu = new NavMenu(Enumerable.Empty<LinkRiverViewModel>(), this);
+            MessengerInstance.Register<UserLoggedInMessage>(this, OnUserLoggedIn);
 
-			if (RedditUserState.Username != null)
-			{
-				SelfUser = new AboutUserViewModel(RedditUserState.Username);
-			}
-		}
+            if (RedditUserState.Username != null)
+            {
+                SelfUser = new AboutUserViewModel(RedditUserState.Username);
+            }
+        }
 
         private void OnUserLoggedIn(UserLoggedInMessage obj)
         {
@@ -67,9 +68,9 @@ namespace SnooStream.ViewModel
                 _initializationBlob.DefaultUser = RedditUserState;
             }
 
-			SelfUser = new AboutUserViewModel(obj.NewAccount, DateTime.UtcNow);
-			RaisePropertyChanged("SelfUser");
-			//_logger.Info("user logged in " + RedditUserState.Username);
+            SelfUser = new AboutUserViewModel(obj.NewAccount, DateTime.UtcNow);
+            RaisePropertyChanged("SelfUser");
+            //_logger.Info("user logged in " + RedditUserState.Username);
         }
 
         private InitializationBlob _initializationBlob;
@@ -87,13 +88,14 @@ namespace SnooStream.ViewModel
         public static ISystemServices SystemServices { get; set; }
         public static IActivityManager ActivityManager { get; set; }
 
-		public AboutUserViewModel SelfUser { get; private set; }
+        public AboutUserViewModel SelfUser { get; private set; }
         public SelfStreamViewModel SelfStream { get; private set; }
-		public ModStreamViewModel ModStream { get; private set; }
-		public LoginViewModel Login { get; private set; }
+        public ModStreamViewModel ModStream { get; private set; }
+        public LoginViewModel Login { get; private set; }
         public SettingsViewModel SettingsHub { get; private set; }
         public SubredditRiverViewModel SubredditRiver { get; private set; }
         public UploadViewModel UploadHub { get; private set; }
+        public NavMenu NavMenu { get; private set; }
         public string FeaturedImage { get; private set; }
 
 		public static SnooStream.Common.LoggingService Logging = new LoggingService();
@@ -119,7 +121,6 @@ namespace SnooStream.ViewModel
         {
 			//_logger.Info("dumping init blob");
             _initializationBlob.Settings = Settings.Dump();
-			_initializationBlob.Self = SelfStream.Dump();
 
 			if(RedditUserState.IsDefault)
 				_initializationBlob.DefaultUser = RedditUserState;
