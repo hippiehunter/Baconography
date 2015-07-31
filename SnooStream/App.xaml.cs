@@ -98,22 +98,23 @@ namespace SnooStream
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
-                    var navService = new NavigationService(rootFrame, snooStreamViewModel);
-                    SnooStreamViewModel.NavigationService = navService;
-                    navService.Finish(snooStreamViewModel.GetNavigationBlob());
-					// Removes the turnstile navigation for startup.
-					if (rootFrame.ContentTransitions != null)
-					{
-						this.transitions = new TransitionCollection();
-						foreach (var c in rootFrame.ContentTransitions)
-						{
-							this.transitions.Add(c);
-						}
-					}
+                    // Removes the turnstile navigation for startup.
+                    if (rootFrame.ContentTransitions != null)
+                    {
+                        this.transitions = new TransitionCollection();
+                        foreach (var c in rootFrame.ContentTransitions)
+                        {
+                            this.transitions.Add(c);
+                        }
+                    }
 
-					rootFrame.ContentTransitions = null;
-					rootFrame.Navigated += this.RootFrame_FirstNavigated;
+                    rootFrame.ContentTransitions = null;
+                    rootFrame.Navigated += this.RootFrame_FirstNavigated;
+                }
+                else
+                {
+                    var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
+                    snooStreamViewModel.ClearNavigationBlob();
                 }
 
                 // Place the frame in the current Window
@@ -134,9 +135,6 @@ namespace SnooStream
 
                 rootFrame.ContentTransitions = null;
                 rootFrame.Navigated += this.RootFrame_FirstNavigated;
-                var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
-                SnooStreamViewModel.NavigationService = new NavigationService(rootFrame, snooStreamViewModel);
-                ((NavigationService)SnooStreamViewModel.NavigationService).Finish(null);
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
@@ -206,6 +204,8 @@ namespace SnooStream
             var rootFrame = sender as Frame;
             rootFrame.ContentTransitions = this.transitions ?? new TransitionCollection() { new NavigationThemeTransition() };
             rootFrame.Navigated -= this.RootFrame_FirstNavigated;
+
+
         }
 
         void DispatchToInitialPage(Frame rootFrame, string launchArgs)

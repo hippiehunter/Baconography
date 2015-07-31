@@ -18,6 +18,7 @@ using SnooStream.ViewModel;
 using SnooStream.View.Controls;
 using System.Collections.ObjectModel;
 using SnooStream.View.Pages;
+using SnooStream.PlatformServices;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -181,6 +182,15 @@ namespace SnooStream
         /// <param name="e"></param>
         private void OnNavigatingToPage(object sender, NavigatingCancelEventArgs e)
         {
+            var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
+            if (SnooStreamViewModel.NavigationService == null)
+            {
+                var navService = new NavigationService(AppFrame, snooStreamViewModel);
+                SnooStreamViewModel.NavigationService = navService;
+                navService.Finish(snooStreamViewModel.GetNavigationBlob());
+            }
+
+
             var navVM = ((SnooStreamViewModel)App.Current.Resources["SnooStream"]).NavMenu;
             if (e.NavigationMode == NavigationMode.Back)
             {

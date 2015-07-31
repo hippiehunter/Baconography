@@ -133,7 +133,7 @@ namespace SnooStream.ViewModel
         }
 
 		public string GetNavigationBlob() {  return _initializationBlob.NavigationBlob; }
-
+        public void ClearNavigationBlob() { _initializationBlob.NavigationBlob = null; }
         public abstract void Suspend();
         public abstract void Resume();
         public abstract void SetFocusedViewModel(ViewModelBase viewModel);
