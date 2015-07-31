@@ -490,6 +490,11 @@ namespace SnooStream.ViewModel
 
         }
 
+        public void NavigateLink()
+        {
+            SnooStreamViewModel.NavigationService.NavigateToLinkRiver(LinkRiver);
+        }
+
         public override string ToString()
         {
             return "SubredditWrapper: " + Category;

@@ -22,7 +22,7 @@
         <ListView x:Name="commentsList" x:FieldModifier="public" HeaderTemplate="{StaticResource HeaderTemplate}"
                   ItemsSource="{Binding FlatComments}" ContainerContentChanging="commentsList_ContainerContentChanging"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
-                  ItemContainerStyle="{StaticResource NoTiltListViewItemContainerStyle}">
+                  ItemContainerStyle="{StaticResource FullWidthListViewContainer}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ContentControl Width="{Binding FullWidth, ElementName=root}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" MinHeight="25" />

@@ -16,6 +16,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <templates:SubredditSmallViewTemplate />
+                <templates:SubredditRiverTemplate />
             </ResourceDictionary.MergedDictionaries>
             <CollectionViewSource x:Name="subredditViewSource" ItemsPath="Collection" IsSourceGrouped="True" Source="{Binding SubredditCollection}"/>
         </ResourceDictionary>
@@ -50,32 +51,32 @@
                         Storyboard.TargetProperty="Margin">
                             <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="-62,0,-12,0" />
                         </ObjectAnimationUsingKeyFrames>
-                        
+
 
 
                     </Storyboard>
                 </VisualState>
             </VisualStateGroup>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1024" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SubredditRootView.ContentTemplate" Value="{StaticResource SubredditRiverLargeView}"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SubredditRootView.ContentTemplate" Value="{StaticResource SubredditRiverSmallView}"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Grid.Resources>
-			<DataTemplate x:Name="subredditGroupHeader">
-                <Border HorizontalAlignment="Stretch" Visibility="{Binding DataContext.IsShowingGroups, ElementName=root, Converter={StaticResource booleanVisibilityConverter}}"
-					BorderThickness="0,0,0,0" Margin="0,0,18,0">
-					<TextBlock Text="{Binding Name}" FontSize="24" FontWeight="Bold" Padding="6" Margin="12,0,12,0"
-						HorizontalAlignment="Left" VerticalAlignment="Center" />
-				</Border>
-			</DataTemplate>
-
-			<DataTemplate x:Name="stickyGroupHeader">
-				<Border HorizontalAlignment="Stretch"
-					BorderThickness="0,0,0,0" Margin="0,0,0,36"
-					Visibility="{Binding Converter={StaticResource blankVisibilityConverter}}"
-					Background="Black">
-					<TextBlock Text="{Binding}" Margin="12,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-				</Border>
-			</DataTemplate>
-		</Grid.Resources>
-		<Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions>
 			<ColumnDefinition Width="50"/>
 			<ColumnDefinition Width="*"/>
 		</Grid.ColumnDefinitions>
@@ -97,37 +98,7 @@
                 </TransitionCollection>
             </TextBox.Transitions>
         </TextBox>
-        <ListView Grid.Column="1" Grid.Row="1"
-			x:Name="listBox"
-			HorizontalAlignment="Stretch" SelectionMode="None"
-			HorizontalContentAlignment="Stretch"
-			Margin="-12,-1,-12,0" ItemsSource="{Binding Source={StaticResource subredditViewSource}}"
-                  ItemContainerStyle="{StaticResource FullWidthListViewContainer}">
-			<ListView.ItemTemplate>
-                <DataTemplate x:DataType="vm:SubredditWrapper">
-                    <Button Margin="0,0,0,0" Background="Transparent" BorderThickness="0" Tapped="listBox_ItemTap" Holding="Button_Holding"
-                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{x:Bind Thing.DisplayName}"
-                            ContentTemplate="{StaticResource SubredditSmallView}">
-                    </Button>
-                </DataTemplate>
-			</ListView.ItemTemplate>
-            <ListView.GroupStyle>
-                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource subredditGroupHeader}">
-                </GroupStyle>
-            </ListView.GroupStyle>
-            <ListView.Footer>
-                <Grid Height="12" />
-            </ListView.Footer>
-            <ListView.ItemContainerTransitions>
-                <TransitionCollection>
-                    <EntranceThemeTransition IsStaggeringEnabled="True"/>
-                </TransitionCollection>
-            </ListView.ItemContainerTransitions>
-            <ListView.Transitions>
-                <TransitionCollection>
-                    <RepositionThemeTransition/>
-                </TransitionCollection>
-            </ListView.Transitions>
-		</ListView>
+        <ContentControl x:Name="SubredditRootView" Content="{Binding}" Grid.Column="1" Grid.Row="1" 
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
 	</Grid>
 </UserControl>

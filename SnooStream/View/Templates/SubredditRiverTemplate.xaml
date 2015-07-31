@@ -1,0 +1,115 @@
+﻿<ResourceDictionary
+    x:Class="SnooStream.View.Templates.SubredditRiverTemplate"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream.View.Templates"
+    xmlns:templates="using:SnooStream.View.Templates"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converter="using:SnooStream.Converters"
+    mc:Ignorable="d"
+    xmlns:vm="using:SnooStream.ViewModel">
+
+    <ResourceDictionary.MergedDictionaries>
+        <templates:SubredditSmallViewTemplate />
+    </ResourceDictionary.MergedDictionaries>
+
+    <converter:ClearableImageConverter x:Key="clearableImageConverter"/>
+
+    <DataTemplate x:Name="subredditGroupHeader">
+        <Border HorizontalAlignment="Stretch" Visibility="{Binding DataContext.IsShowingGroups, ElementName=root, Converter={StaticResource booleanVisibilityConverter}}"
+					BorderThickness="0,0,0,0" Margin="0,0,18,0">
+            <TextBlock Text="{Binding Name}" FontSize="24" FontWeight="Bold" Padding="6" Margin="12,0,12,0"
+						HorizontalAlignment="Left" VerticalAlignment="Center" />
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Name="stickyGroupHeader">
+        <Border HorizontalAlignment="Stretch"
+					BorderThickness="0,0,0,0" Margin="0,0,0,36"
+					Visibility="{Binding Converter={StaticResource blankVisibilityConverter}}"
+					Background="Black">
+            <TextBlock Text="{Binding}" Margin="12,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="SubredditLargeView" x:DataType="vm:SubredditWrapper">
+        <Grid>
+            <Grid Width="360" Background="White" Tapped="{x:Bind NavigateLink}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="128" />
+                    <RowDefinition Height="32" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0">
+                    <Image Source="{x:Bind Thing.HeaderImage, Converter={StaticResource clearableImageConverter}}"
+                                MaxHeight="128" MaxWidth="360" Height="{x:Bind HeaderImageHeight}"
+                                Width="{x:Bind HeaderImageWidth}" Margin="0"
+                                HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                </Border>
+
+                <Border Grid.Row="1">
+                    <TextBlock Foreground="Black" VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                                                Margin="24,0,6,0" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}"/>
+                </Border>
+            </Grid>
+        </Grid>
+
+    </DataTemplate>
+
+    <DataTemplate x:Key="SubredditRiverLargeView" x:DataType="vm:SubredditRiverViewModel">
+        <Grid>
+            <Grid.Resources>
+                <CollectionViewSource x:Name="subredditViewSource" ItemsPath="Collection" IsSourceGrouped="True" Source="{x:Bind SubredditCollection}"/>
+            </Grid.Resources>
+
+            <GridView HorizontalAlignment="Stretch" SelectionMode="None" HorizontalContentAlignment="Stretch"
+                  Margin="-12,12,-12,0"
+                  ItemsSource="{Binding Source={StaticResource subredditViewSource}}"
+                  ItemTemplate="{StaticResource SubredditLargeView}">
+
+            </GridView>
+        </Grid>
+        
+   </DataTemplate>
+
+    <DataTemplate x:Key="SubredditRiverSmallView" x:DataType="vm:SubredditRiverViewModel">
+        <Grid>
+            <Grid.Resources>
+                <CollectionViewSource x:Name="subredditViewSource" ItemsPath="Collection" IsSourceGrouped="True" Source="{x:Bind SubredditCollection}"/>
+            </Grid.Resources>   
+        <ListView
+			HorizontalAlignment="Stretch" SelectionMode="None"
+			HorizontalContentAlignment="Stretch"
+			Margin="-12,-1,-12,0" ItemsSource="{Binding Source={StaticResource subredditViewSource}}"
+            ItemContainerStyle="{StaticResource FullWidthListViewContainer}"
+            ItemTemplate="{StaticResource SubredditSmallView}">
+            <!--<ListView.ItemTemplate>
+                <DataTemplate x:DataType="vm:SubredditWrapper">
+                    <Button Margin="0,0,0,0" Background="Transparent" BorderThickness="0" Tapped="listBox_ItemTap" Holding="Button_Holding"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{x:Bind Thing.DisplayName}"
+                            ContentTemplate="{StaticResource SubredditSmallView}">
+                    </Button>
+                </DataTemplate>
+            </ListView.ItemTemplate>-->
+            <ListView.GroupStyle>
+                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource subredditGroupHeader}">
+                </GroupStyle>
+            </ListView.GroupStyle>
+            <ListView.Footer>
+                <Grid Height="12" />
+            </ListView.Footer>
+            <ListView.ItemContainerTransitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition IsStaggeringEnabled="True"/>
+                </TransitionCollection>
+            </ListView.ItemContainerTransitions>
+            <ListView.Transitions>
+                <TransitionCollection>
+                    <RepositionThemeTransition/>
+                </TransitionCollection>
+            </ListView.Transitions>
+        </ListView>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

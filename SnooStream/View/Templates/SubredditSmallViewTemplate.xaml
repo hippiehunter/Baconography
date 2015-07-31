@@ -2,34 +2,44 @@
     x:Class="SnooStream.View.Templates.SubredditSmallViewTemplate"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="using:SnooStream.Converters"
     xmlns:vm="using:SnooStream.ViewModel">
-    <DataTemplate x:Key="SubredditSmallView"  x:DataType="vm:SubredditWrapper">
-        <Grid HorizontalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
 
-            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                BorderThickness="0" Padding="0" Margin="0"
+    <converter:ClearableImageConverter x:Key="clearableImageConverter"/>
+    <DataTemplate x:Key="SubredditSmallView"  x:DataType="vm:SubredditWrapper">
+        <Grid>
+            <Grid HorizontalAlignment="Stretch" Tapped="{x:Bind NavigateLink}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                BorderThickness="0" Padding="0" Margin="0,0,0,6"
                                 Background="White">
-                <Grid HorizontalAlignment="Stretch" Height="50">
-                    <Image Source="{x:Bind Thing.HeaderImage}"
-                            MaxHeight="50" MaxWidth="125" Height="{x:Bind HeaderImageHeight}"
+                    <Grid HorizontalAlignment="Stretch" Height="64">
+                        <Grid.ColumnDefinitions>
+
+                        </Grid.ColumnDefinitions>
+                        <Image
+                            Source="{x:Bind Thing.HeaderImage, Converter={StaticResource clearableImageConverter}}"
+                            MaxHeight="64" MaxWidth="128" Height="{x:Bind HeaderImageHeight}"
                             Width="{x:Bind HeaderImageWidth}" Margin="0"
                             HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <Border>
-                        <Border.Background>
-                            <SolidColorBrush Color="Black" Opacity="0.35" />
-                        </Border.Background>
+                        <Border HorizontalAlignment="Right">
+                            <Border.Background>
+                                <SolidColorBrush Color="White"/>
+                            </Border.Background>
 
-                        <TextBlock Foreground="White" VerticalAlignment="Bottom" HorizontalAlignment="Right"
-                                            Margin="24,0,6,0" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}"/>
-                    </Border>
-                </Grid>
-            </Border>
+                            <TextBlock Foreground="Black" VerticalAlignment="Bottom"
+                                            Margin="24,0,6,0" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}">
+                            </TextBlock>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

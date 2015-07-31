@@ -165,6 +165,9 @@
     <Compile Include="View\Templates\SelfActivityViewTemplate.xaml.cs">
       <DependentUpon>SelfActivityViewTemplate.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Templates\SubredditRiverTemplate.xaml.cs">
+      <DependentUpon>SubredditRiverTemplate.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Templates\SubredditSmallViewTemplate.xaml.cs">
       <DependentUpon>SubredditSmallViewTemplate.xaml</DependentUpon>
     </Compile>
@@ -387,6 +390,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Templates\SelfActivityViewTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Templates\SubredditRiverTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
