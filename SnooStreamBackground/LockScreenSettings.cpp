@@ -19,60 +19,60 @@ LockScreenSettings::LockScreenSettings()
 {
     wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
     localPath += L"\\bgtaskSettings.txt";
-	auto fileStr = readFileWithLock(localPath);
+    auto fileStr = readFileWithLock(localPath);
     if (fileStr->Length() > 0)
     {
-        auto parsedFileObject = JsonObject::Parse(fileStr);
-
-        RedditOAuth = parsedFileObject->GetNamedString("RedditOAuth", RedditOAuth);
-        LockScreenOverlayRoundedEdges = parsedFileObject->GetNamedBoolean("LockScreenOverlayRoundedEdges", LockScreenOverlayRoundedEdges);
-        LockScreenOverlayOpacity = (int)parsedFileObject->GetNamedNumber("LockScreenOverlayOpacity", LockScreenOverlayOpacity);
-        LockScreenOverlayItemsCount = (int)parsedFileObject->GetNamedNumber("LockScreenOverlayItemsCount", LockScreenOverlayItemsCount);
-        LockScreenOverlayItemsReddit = parsedFileObject->GetNamedString("LockScreenOverlayItemsReddit", LockScreenOverlayItemsReddit);
-        auto liveTileSettings = parsedFileObject->GetNamedArray("LiveTileSettings");
-        if (liveTileSettings != nullptr)
+        JsonObject^ parsedFileObject = nullptr;
+        if (JsonObject::TryParse(fileStr, &parsedFileObject))
         {
-            LiveTileSettings = ref new Platform::Collections::Vector<SnooStreamBackground::LiveTileSettings^>();
-            for each(auto&& liveTile in liveTileSettings)
+
+            RedditOAuth = parsedFileObject->GetNamedString("RedditOAuth", RedditOAuth);
+            LockScreenOverlayRoundedEdges = parsedFileObject->GetNamedBoolean("LockScreenOverlayRoundedEdges", LockScreenOverlayRoundedEdges);
+            LockScreenOverlayOpacity = (int)parsedFileObject->GetNamedNumber("LockScreenOverlayOpacity", LockScreenOverlayOpacity);
+            LockScreenOverlayItemsCount = (int)parsedFileObject->GetNamedNumber("LockScreenOverlayItemsCount", LockScreenOverlayItemsCount);
+            LockScreenOverlayItemsReddit = parsedFileObject->GetNamedString("LockScreenOverlayItemsReddit", LockScreenOverlayItemsReddit);
+            auto liveTileSettings = parsedFileObject->GetNamedArray("LiveTileSettings");
+            if (liveTileSettings != nullptr)
             {
-                auto liveTileObject = liveTile->GetObject();
-                auto liveTileStyle = liveTileObject->GetNamedString("LiveTileStyle");
-                auto liveTileReddit = liveTileObject->GetNamedString("LiveTileItemsReddit");
-                auto currentImages = liveTileObject->GetNamedArray("CurrentImages");
-
-                if (liveTileStyle == nullptr || liveTileReddit == nullptr)
+                LiveTileSettings = ref new Platform::Collections::Vector<SnooStreamBackground::LiveTileSettings^>();
+                for each(auto&& liveTile in liveTileSettings)
                 {
-                    continue;
-                }
-                else
-                {
-                    auto madeLiveTileSettings = ref new SnooStreamBackground::LiveTileSettings();
-                    if (liveTileStyle == L"Off")
-                        madeLiveTileSettings->LiveTileStyle = SnooStreamBackground::LiveTileStyle::Off;
-                    else if (liveTileStyle == L"ImageSet")
-                        madeLiveTileSettings->LiveTileStyle = SnooStreamBackground::LiveTileStyle::ImageSet;
-                    else if (liveTileStyle == L"Text")
-                        madeLiveTileSettings->LiveTileStyle = SnooStreamBackground::LiveTileStyle::Text;
-                    else if (liveTileStyle == L"TextImage")
-                        madeLiveTileSettings->LiveTileStyle = SnooStreamBackground::LiveTileStyle::TextImage;
-                    else
-                        madeLiveTileSettings->LiveTileStyle = SnooStreamBackground::LiveTileStyle::Image;
-
-                    madeLiveTileSettings->LiveTileItemsReddit = liveTileReddit;
-                    madeLiveTileSettings->CurrentImages = ref new Platform::Collections::Vector<String^>();
+                    auto liveTileObject = liveTile->GetObject();
+                    auto liveTileStyle = liveTileObject->GetNamedString("LiveTileStyle");
+                    auto liveTileReddit = liveTileObject->GetNamedString("LiveTileItemsReddit");
                     auto currentImages = liveTileObject->GetNamedArray("CurrentImages");
-                    for each(auto&& image in currentImages)
+
+                    if (liveTileStyle == nullptr || liveTileReddit == nullptr)
                     {
-                        madeLiveTileSettings->CurrentImages->Append(image->GetString());
+                        continue;
                     }
-                    LiveTileSettings->Append(madeLiveTileSettings);
+                    else
+                    {
+                        auto madeLiveTileSettings = ref new SnooStreamBackground::LiveTileSettings();
+                        if (liveTileStyle == L"Off")
+                            madeLiveTileSettings->LiveTileStyle = SnooStreamBackground::LiveTileStyle::Off;
+                        else if (liveTileStyle == L"ImageSet")
+                            madeLiveTileSettings->LiveTileStyle = SnooStreamBackground::LiveTileStyle::ImageSet;
+                        else if (liveTileStyle == L"Text")
+                            madeLiveTileSettings->LiveTileStyle = SnooStreamBackground::LiveTileStyle::Text;
+                        else if (liveTileStyle == L"TextImage")
+                            madeLiveTileSettings->LiveTileStyle = SnooStreamBackground::LiveTileStyle::TextImage;
+                        else
+                            madeLiveTileSettings->LiveTileStyle = SnooStreamBackground::LiveTileStyle::Image;
+
+                        madeLiveTileSettings->LiveTileItemsReddit = liveTileReddit;
+                        madeLiveTileSettings->CurrentImages = ref new Platform::Collections::Vector<String^>();
+                        auto currentImages = liveTileObject->GetNamedArray("CurrentImages");
+                        for each(auto&& image in currentImages)
+                        {
+                            madeLiveTileSettings->CurrentImages->Append(image->GetString());
+                        }
+                        LiveTileSettings->Append(madeLiveTileSettings);
+                    }
                 }
             }
-
         }
     }
-
-    //LockFileEx(existingMessagesFile)
 }
 
 

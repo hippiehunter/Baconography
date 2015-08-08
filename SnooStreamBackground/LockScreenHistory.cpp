@@ -27,11 +27,7 @@ LockScreenHistory::LockScreenHistory()
 	if (fileStr->Length() > 0)
     {
 		JsonObject^ parsedFileObject = nullptr;
-		try
-		{
-			parsedFileObject = JsonObject::Parse(fileStr);
-		}
-		catch(...)
+		if(!JsonObject::TryParse(fileStr, &parsedFileObject))
 		{
 			//bad file kill and start over
 			_wremove(localPath.c_str());

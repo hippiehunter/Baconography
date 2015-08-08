@@ -1,11 +1,14 @@
 #include "pch.h"
 #include "LiveTileUtilities.h"
 #include <chrono>
+#include <boost/format.hpp>
+
 using namespace SnooStreamBackground;
 using namespace Windows::UI::Notifications;
 using namespace Windows::Foundation::Collections;
 using namespace Windows::Foundation;
 using namespace std;
+using namespace boost;
 
 void LiveTileUtilities::MakeLiveTile(LockScreenHistory^ history, LiveTileSettings^ liveTile, IVector<ImageInfo^>^ options, Windows::UI::Notifications::TileUpdater^ updater)
 {
@@ -30,7 +33,7 @@ void LiveTileUtilities::MakeLiveTile(LockScreenHistory^ history, LiveTileSetting
 		int tagId = 0;
 		for (auto option : options)
 		{
-			Windows::Data::Xml::Dom::XmlDocument^ tileTemplate = nullptr;
+			Windows::Data::Xml::Dom::XmlDocument^ tileTemplate = ref new Windows::Data::Xml::Dom::XmlDocument();
 
 			switch (liveTile->LiveTileStyle)
 			{
@@ -40,43 +43,41 @@ void LiveTileUtilities::MakeLiveTile(LockScreenHistory^ history, LiveTileSetting
 				}
 				case LiveTileStyle::Image:
 				{
-					tileTemplate = Windows::UI::Notifications::TileUpdateManager::GetTemplateContent(Windows::UI::Notifications::TileTemplateType::TileWide310x150Image);
-					auto tileAttributes = tileTemplate->GetElementsByTagName("image");
-					tileAttributes->GetAt(0)->Attributes->GetNamedItem("src")->InnerText = "ms-appdata:///local/" + option->LocalWideUrl;
+          auto imageTileXml = str(wformat(
+            L"<tile>"
+              "<visual>"
+                "<binding template = \"TileMedium\" branding = \"name\">"
+                  "<image placement = \"background\" src = \"ms-appdata:///Local/%s\" />"
+                "</binding>"
+                "<binding template = \"TileWide\" branding = \"name\">"
+                  "<image placement = \"background\" src = \"ms-appdata:///Local/%s\" />"
+                "</binding>"
+              "</visual>"
+            "</tile>") % option->LocalSmallSquareUrl->Data() % option->LocalWideUrl->Data());
 
-					auto squareTemplate = Windows::UI::Notifications::TileUpdateManager::GetTemplateContent(Windows::UI::Notifications::TileTemplateType::TileSquare150x150Image);
-					auto squareAttributes = squareTemplate->GetElementsByTagName("image");
-					squareAttributes->GetAt(0)->Attributes->GetNamedItem("src")->InnerText = "ms-appdata:///local/" + option->LocalSmallSquareUrl;
-
-					auto node = tileTemplate->ImportNode(squareTemplate->GetElementsByTagName("binding")->Item(0), true);
-					tileTemplate->GetElementsByTagName("visual")->Item(0)->AppendChild(node);
+          tileTemplate->LoadXml(ref new Platform::String(imageTileXml.c_str(), imageTileXml.length()));
 					break;
 				}
 				case LiveTileStyle::Text:
 				{
-					tileTemplate = Windows::UI::Notifications::TileUpdateManager::GetTemplateContent(Windows::UI::Notifications::TileTemplateType::TileWide310x150Text04);
-					tileTemplate->GetElementsByTagName("text")->Item(0)->AppendChild(tileTemplate->CreateTextNode(option->Title));
-					auto squareTemplate = Windows::UI::Notifications::TileUpdateManager::GetTemplateContent(Windows::UI::Notifications::TileTemplateType::TileSquare150x150Text04);
-					squareTemplate->GetElementsByTagName("text")->Item(0)->AppendChild(squareTemplate->CreateTextNode(option->Title));
-
-					auto node = tileTemplate->ImportNode(squareTemplate->GetElementsByTagName("binding")->Item(0), true);
-					tileTemplate->GetElementsByTagName("visual")->Item(0)->AppendChild(node);
 					break;
 				}
 				case LiveTileStyle::TextImage:
 				{
-					tileTemplate = Windows::UI::Notifications::TileUpdateManager::GetTemplateContent(Windows::UI::Notifications::TileTemplateType::TileWide310x150PeekImageAndText01);
-					auto tileAttributes = tileTemplate->GetElementsByTagName("image");
-					tileTemplate->GetElementsByTagName("text")->Item(0)->AppendChild(tileTemplate->CreateTextNode(option->Title));
-					tileAttributes->GetAt(0)->Attributes->GetNamedItem("src")->InnerText = "ms-appdata:///local/" + option->LocalWideUrl;
-
-					auto squareTemplate = Windows::UI::Notifications::TileUpdateManager::GetTemplateContent(Windows::UI::Notifications::TileTemplateType::TileSquare150x150PeekImageAndText04);
-					auto squareAttributes = squareTemplate->GetElementsByTagName("image");
-					squareTemplate->GetElementsByTagName("text")->Item(0)->AppendChild(squareTemplate->CreateTextNode(option->Title));
-					squareAttributes->GetAt(0)->Attributes->GetNamedItem("src")->InnerText = "ms-appdata:///local/" + option->LocalSmallSquareUrl;
-
-					auto node = tileTemplate->ImportNode(squareTemplate->GetElementsByTagName("binding")->Item(0), true);
-					tileTemplate->GetElementsByTagName("visual")->Item(0)->AppendChild(node);
+          auto textImageTileXml = str(wformat(
+            L"<tile>"
+              "<visual>"
+                "<binding template = \"TileMedium\" branding = \"name\">"
+                  "<image placement = \"peek\" src = \"ms-appdata:///Local/%s\" />"
+                  "<text hint-style = \"captionsubtle\" hint-wrap = \"true\">%s</text>"
+                "</binding>"
+                "<binding template = \"TileWide\" branding = \"name\">"
+                  "<image placement = \"background\" src = \"ms-appdata:///Local/%s\" />"
+                  "<text hint-style = \"captionsubtle\" hint-wrap = \"true\">%s</text>"
+                "</binding>"
+              "</visual>"
+            "</tile>") % option->LocalSmallSquareUrl->Data() % option->Title->Data() %  option->LocalWideUrl->Data() % option->Title->Data());
+          tileTemplate->LoadXml(ref new Platform::String(textImageTileXml.c_str(), textImageTileXml.length()));
 					break;
 				}
 			}
@@ -95,7 +96,10 @@ void LiveTileUtilities::MakeLiveTile(LockScreenHistory^ history, LiveTileSetting
 			else
 			{
 				auto tile = ref new Windows::UI::Notifications::TileNotification(tileTemplate);
+                auto tagString = std::to_wstring(tagId);
+                tile->Tag = ref new Platform::String(tagString.c_str(), tagString.size());
 				updater->Update(tile);
+                auto setting = updater->Setting;
 			}
 		}
 	}

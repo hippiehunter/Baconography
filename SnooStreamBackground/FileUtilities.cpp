@@ -11,13 +11,13 @@ Platform::String^ readFileWithLock(std::wstring fileName)
     OVERLAPPED overlapped = {};
     if (LockFileEx(targetFile, LOCKFILE_EXCLUSIVE_LOCK, 0, fileSize.LowPart, fileSize.HighPart, &overlapped))
     {
-      std::vector<wchar_t> bytes(fileSize.QuadPart / 2);
+      std::vector<wchar_t> bytes(fileSize.QuadPart / sizeof(wchar_t) + 1, '\0');
       DWORD writtenSize;
       if (ReadFile(targetFile, &bytes[0], fileSize.QuadPart, &writtenSize, nullptr))
       {
         UnlockFileEx(targetFile, 0, fileSize.LowPart, fileSize.HighPart, &overlapped);
         CloseHandle(targetFile);
-        auto resultString = ref new Platform::String(&bytes[0], fileSize.QuadPart / 2);
+        auto resultString = ref new Platform::String(&bytes[0], fileSize.QuadPart / sizeof(wchar_t));
         return resultString;
       }
     }
