@@ -28,8 +28,6 @@ using std::make_tuple;
 using std::begin;
 using std::end;
 using std::wstring;
-using std::wifstream;
-using std::wofstream;
 using std::getline;
 using boost::wstring_ref;
 

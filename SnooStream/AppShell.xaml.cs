@@ -19,6 +19,7 @@ using SnooStream.View.Controls;
 using System.Collections.ObjectModel;
 using SnooStream.View.Pages;
 using SnooStream.PlatformServices;
+using System.Runtime.InteropServices;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -277,11 +278,11 @@ namespace SnooStream
                 this.TogglePaneButtonRect = new Rect();
             }
 
-            var handler = this.TogglePaneButtonRectChanged;
-            if (handler != null)
+            if (this.TogglePaneButtonRectChanged != null)
             {
-                handler(this, this.TogglePaneButtonRect);
+                this.TogglePaneButtonRectChanged.DynamicInvoke(this, this.TogglePaneButtonRect);
             }
+
         }
 
         /// <summary>

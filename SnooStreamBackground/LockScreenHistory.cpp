@@ -142,8 +142,5 @@ void LockScreenHistory::Store()
     auto serializedString = serializedObject->Stringify();
     wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
     localPath += L"\\bgtaskHistory.txt";
-    wofstream settingsFile(localPath, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc, _SH_DENYRW);
-    wstring settingsFileString(serializedString->Data(), serializedString->Length());
-    settingsFile << settingsFileString;
-    settingsFile.close();
+    writeFileWithLock(serializedString, localPath, true);
 }

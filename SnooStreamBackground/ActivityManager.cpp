@@ -46,8 +46,7 @@ void ActivityManager::ClearState()
 {
     wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
     localPath += L"\\bgtaskActivity.txt";
-    wofstream activityFile(localPath, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc, _SH_DENYRW);
-    activityFile.close();
+    writeFileWithLock(L"", localPath, true);
 }
 
 void ActivityManager::StoreState()
@@ -72,10 +71,7 @@ void ActivityManager::StoreState()
         auto serializedString = serializedObject->Stringify();
         wstring localPath(Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
         localPath += L"\\bgtaskActivity.txt";
-        wofstream activityFile(localPath, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc, _SH_DENYRW);
-        wstring activityFileString(serializedString->Data(), serializedString->Length());
-        activityFile << activityFileString;
-        activityFile.close();
+        writeFileWithLock(serializedString, localPath, true);
     }
 }
 
@@ -119,10 +115,7 @@ void ActivityManager::MakeToast(String^ id, String^ text, String^ context, Typed
     if (context != nullptr)
     {
         wstring localPath((Windows::Storage::ApplicationData::Current->TemporaryFolder->Path + L"\\activity_context" + id)->Data());
-        wofstream contextFile(localPath, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc, _SH_DENYRW);
-        wstring wContext(context->Data());
-        contextFile << wContext;
-        contextFile.close();
+        writeFileWithLock(context, localPath, true);
     }
     static_cast<Windows::Data::Xml::Dom::XmlElement^>(toastNode)->SetAttribute("launch", "{'activityid':'" + id + "'}");
     auto notification = ref new ToastNotification(toastXml);

@@ -4,7 +4,7 @@
     "uwp.10.0.app": {}
   },
   "dependencies": {
-    "KitaroDB": "2.3.0",
+    "KitaroDB": "2.3.1",
     "Microsoft.NETCore": "5.0.0",
     "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
     "MvvmLightLibs": "5.1.1",
