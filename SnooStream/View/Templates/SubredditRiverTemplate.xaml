@@ -64,10 +64,31 @@
             </Grid.Resources>
 
             <GridView HorizontalAlignment="Stretch" SelectionMode="None" HorizontalContentAlignment="Stretch"
-                  Margin="-12,12,-12,0"
+                  Margin="0,12,0,0"
                   ItemsSource="{Binding Source={StaticResource subredditViewSource}}"
                   ItemTemplate="{StaticResource SubredditLargeView}">
 
+                <GridView.GroupStyle>
+                    <GroupStyle HidesIfEmpty="True">
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0" HorizontalAlignment="Stretch">
+                                    <TextBlock Text='{Binding Name}' 
+                                               Foreground="Black" Margin="12"
+                                               Style="{StaticResource HeaderTextBlockStyle}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                        <GroupStyle.HeaderContainerStyle>
+                            <Style TargetType="GridViewHeaderItem">
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                <Setter Property="Background" Value="LightGray" />
+                                <Setter Property="Margin" Value="0,0,0,12" />
+                            </Style>
+                        </GroupStyle.HeaderContainerStyle>
+                    </GroupStyle>
+                </GridView.GroupStyle>
             </GridView>
         </Grid>
         
