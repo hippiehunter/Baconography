@@ -34,6 +34,11 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="102" />
+            </Grid.ColumnDefinitions>
+
             <!-- Title block -->
             <TextBlock Grid.Row="0"
                    Style="{StaticResource TitleTextBlock}"
@@ -42,20 +47,22 @@
                    MinHeight="50">
             </TextBlock>
 
+            <ContentControl Grid.Row="0" Grid.Column="1" DataContext="{Binding Votable}" ContentTemplate="{StaticResource VotableControl}" />
+
             <!-- Link info, user / time / subreddit / domain -->
-            <ContentControl x:Name="linkMetadata" Grid.Row="1"
+            <ContentControl x:Name="linkMetadata" Grid.Row="1" Grid.ColumnSpan="2"
                             Margin="0,5,0,-6" MinHeight="25"
                             HorizontalAlignment="Stretch" Content="{Binding Converter={StaticResource linkMetadataConverter}}"/>
 
             <!-- Non Editing Content block -->
             <ContentControl Visibility="{Binding IsEditing, Converter={StaticResource invertedBooleanVisibilityConverter}}"  
-                            x:Name="contentSection" Grid.Row="2" Margin="0"
-                            BorderThickness="0"
+                            x:Name="contentSection" Grid.Row="2" Grid.ColumnSpan="2"
+                            Margin="0" BorderThickness="0"
                             VerticalContentAlignment="Stretch" VerticalAlignment="Center"
                             HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" />
 
             <!-- Editing Content block -->
-            <Grid Grid.Row="2" Visibility="{Binding IsEditing, Converter={StaticResource booleanVisibilityConverter}}">
+            <Grid Grid.Row="2" Grid.ColumnSpan="2" Visibility="{Binding IsEditing, Converter={StaticResource booleanVisibilityConverter}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
@@ -75,7 +82,7 @@
             </Grid>
 
             <!-- Action block, flyout menu / vote / comment count -->
-            <Grid x:Name="actionButtons" Grid.Row="3" Margin="0,0,0,0" HorizontalAlignment="Stretch">
+            <Grid x:Name="actionButtons" Grid.Row="3" Grid.ColumnSpan="2" Margin="0,0,0,0" HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
@@ -100,8 +107,8 @@
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>
-                
-                <ContentControl Grid.Column="1" ContentTemplate="{StaticResource VotableControl}" />
+
+                <!--<ContentControl Grid.Column="1" ContentTemplate="{StaticResource VotableControl}" />-->
 
                 <Button Grid.Column="2"
                         HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"

@@ -24,10 +24,10 @@
             <DataTemplate x:DataType="common:PreviewImage">
                 <Grid>
                     <Image Margin="-12,0,-12,0" Source="{x:Bind HQThumbnailUrl, Mode=OneWay, Converter={StaticResource clearableImageConverter}}" HorizontalAlignment="Stretch" Stretch="UniformToFill"
-                                       VerticalAlignment="Center" Height="175" ImageOpened="hqImageControl_Loaded" />
+                                       VerticalAlignment="Center" MinHeight="175" MaxHeight="500" ImageOpened="hqImageControl_Loaded" />
 
                     <Image Margin="-12,0,-12,0" x:Name="imageControl" Source="{x:Bind ThumbnailUrl, Converter={StaticResource clearableImageConverter}}" HorizontalAlignment="Stretch" Stretch="UniformToFill"
-                                       VerticalAlignment="Center" Height="175" Opacity="{x:Bind HQThumbnailUrl, Converter={StaticResource nullToOpacityConverter}}"/>
+                                       VerticalAlignment="Center" MinHeight="175" MaxHeight="500" Opacity="{x:Bind HQThumbnailUrl, Converter={StaticResource nullToOpacityConverter}}"/>
 
                     <Border Padding="2" Margin="0,0,0,12" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                         <Border.Background>
@@ -72,29 +72,13 @@
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="60" />
                 </Grid.RowDefinitions>
 
-                <!-- Title block -->
-                <TextBlock Grid.Row="0"
-                   Style="{StaticResource TitleTextBlock}"
-                   Text="{x:Bind Title, Mode=OneTime}"
-                   TextTrimming="WordEllipsis"
-                   MaxLines="3">
-                    <TextBlock.Foreground>
-                        <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
-                    </TextBlock.Foreground>
-                </TextBlock>
-
-                <!-- Link info, user / time / subreddit / domain -->
-                <ContentControl x:Name="linkMetadata" Grid.Row="1"
-                            Margin="0,5,0,-6"
-                            HorizontalAlignment="Stretch" Content="{x:Bind Converter={StaticResource linkMetadataConverter}, Mode=OneWay}"/>
 
                 <!-- Content block -->
-                <Button x:Name="previewSection" Grid.Row="2" Margin="0,0,0,0" Height="175"
+                <Button x:Name="previewSection" Grid.Row="0" Grid.RowSpan="2" Margin="0,0,0,0" MinHeight="175" MaxHeight="500"
                     BorderThickness="0" Padding="0,0,0,0" Background="Transparent"
                     VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" Content="{x:Null}" DataContext="{x:Null}"
@@ -102,8 +86,46 @@
 
                 </Button>
 
+                <!-- Link Header -->
+                <Grid Grid.Row="0" Padding="24" Margin="-12,-12,-12,0">
+                    <Grid.Background>
+                        <SolidColorBrush Color="#FF1F1F1F" Opacity="0.75" />
+                    </Grid.Background>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" MinWidth="80" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Title block -->
+                    <TextBlock Grid.Row="0" Grid.Column="0"
+                        Style="{StaticResource TitleTextBlock}"
+                        Text="{x:Bind Title, Mode=OneTime}"
+                        TextTrimming="WordEllipsis"
+                        MaxLines="3">
+                        <TextBlock.Foreground>
+                            <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
+                        </TextBlock.Foreground>
+                    </TextBlock>
+
+                    <!-- Vote Content -->
+                    <ContentControl Grid.Column="1" DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" 
+                                    Margin="0,24,-12,0"/>
+
+                    <!-- Link info, user / time / subreddit / domain -->
+                    <ContentControl x:Name="linkMetadata"
+                        Grid.Row="1" Grid.ColumnSpan="2"
+                        Margin="0,5,0,-6"
+                        HorizontalAlignment="Stretch" Content="{x:Bind Converter={StaticResource linkMetadataConverter}, Mode=OneWay}"/>
+                </Grid>
+
                 <!-- Action block, flyout menu / vote / comment count -->
-                <Grid x:Name="actionButtons" Grid.Row="3" Margin="0,0,0,0" HorizontalAlignment="Stretch">
+                <Grid x:Name="actionButtons" Grid.Row="2" Margin="0,0,0,0" HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
                         <ColumnDefinition Width="1*" />
@@ -128,7 +150,7 @@
                         </Button.Flyout>
                     </Button>
 
-                    <ContentControl Grid.Column="1" DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" />
+                    <!--<ContentControl Grid.Column="1" DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" />-->
 
                     <Button Grid.Column="2" Background="Transparent"
                         HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
