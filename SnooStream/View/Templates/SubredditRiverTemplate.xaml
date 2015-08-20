@@ -29,6 +29,7 @@
         </Border>
     </DataTemplate>
 
+    <!-- Large form factor representation of a subreddit -->
     <DataTemplate x:Key="SubredditLargeView" x:DataType="vm:SubredditWrapper">
         <Grid>
             <Grid Width="310" Height="150" Background="White" Tapped="{x:Bind NavigateLink}">
@@ -46,12 +47,24 @@
 
                 <Border Grid.Row="1">
                     <TextBlock Foreground="Black" VerticalAlignment="Bottom" HorizontalAlignment="Right"
-                                                Margin="24,0,6,0" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}"/>
+                        Margin="24,0,12,6" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}"/>
                 </Border>
             </Grid>
         </Grid>
     </DataTemplate>
 
+    <Style x:Key="GroupHeaderTextBlock" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontWeight" Value="SemiLight" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="IsTextScaleFactorEnabled" Value="False"/>
+    </Style>
+    
+    <!-- Subreddit River for large form factor -->
     <DataTemplate x:Key="SubredditRiverLargeView" x:DataType="vm:SubredditRiverViewModel">
         <Grid>
             <Grid.Resources>
@@ -59,18 +72,22 @@
             </Grid.Resources>
 
             <GridView HorizontalAlignment="Stretch" SelectionMode="None" HorizontalContentAlignment="Stretch"
-                  Margin="0,12,0,0"
-                  ItemsSource="{Binding Source={StaticResource subredditViewSource}}"
-                  ItemTemplate="{StaticResource SubredditLargeView}">
+                Margin="0,12,0,0" 
+                ItemsSource="{Binding Source={StaticResource subredditViewSource}}"
+                ItemTemplate="{StaticResource SubredditLargeView}">
 
                 <GridView.GroupStyle>
                     <GroupStyle HidesIfEmpty="True">
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate>
-                                <Grid Margin="0" HorizontalAlignment="Stretch">
+                                <Grid
+                                    Margin="-12,0,0,0"
+                                    Padding="0"
+                                    HorizontalAlignment="Stretch">
                                     <TextBlock Text="{Binding Name}"
-                                               Margin="12"
-                                               Style="{StaticResource HeaderTextBlockStyle}"/>
+                                        Padding="0,12,12,12"
+                                        Margin="0,0,0,0"
+                                        Style="{StaticResource GroupHeaderTextBlock}"/>
                                 </Grid>
                             </DataTemplate>
                         </GroupStyle.HeaderTemplate>
@@ -79,6 +96,40 @@
                                 <Setter Property="HorizontalAlignment" Value="Left" />
                                 <Setter Property="HorizontalContentAlignment" Value="Left" />
                                 <Setter Property="Margin" Value="0,0,0,12" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="GridViewHeaderItem">
+                                            <Grid>
+                                                <Border Margin="0"
+                                                    Padding="0"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                                    <ContentPresenter Content="{TemplateBinding Content}"
+                                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                        Margin="{TemplateBinding Padding}"
+                                                        ContentTransitions="{TemplateBinding ContentTransitions}"
+                                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                                </Border>
+                                                <Rectangle x:Name="FocusVisualWhite"
+                                                    IsHitTestVisible="False"
+                                                    Stroke="{ThemeResource FocusVisualWhiteStrokeThemeBrush}"
+                                                    StrokeEndLineCap="Square"
+                                                    StrokeDashArray="1,1"
+                                                    Opacity="0"
+                                                    StrokeDashOffset="1.5" />
+                                                <Rectangle x:Name="FocusVisualBlack"
+                                                    IsHitTestVisible="False"
+                                                    Stroke="{ThemeResource FocusVisualBlackStrokeThemeBrush}"
+                                                    StrokeEndLineCap="Square"
+                                                    StrokeDashArray="1,1"
+                                                    Opacity="0"
+                                                    StrokeDashOffset="0.5" />
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
                             </Style>
                         </GroupStyle.HeaderContainerStyle>
                     </GroupStyle>
@@ -87,6 +138,7 @@
         </Grid>
     </DataTemplate>
     
+    <!-- Small form factor representation of a subreddit -->
     <DataTemplate x:Key="SubredditSmallView"  x:DataType="vm:SubredditWrapper">
         <Grid>
             <Grid HorizontalAlignment="Stretch" Tapped="{x:Bind NavigateLink}">
@@ -115,7 +167,7 @@
                             </Border.Background>
 
                             <TextBlock Foreground="Black" VerticalAlignment="Bottom"
-                                            Margin="24,0,6,0" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}">
+                                            Margin="24,0,12,6" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}">
                             </TextBlock>
                         </Border>
                     </Grid>
@@ -124,6 +176,7 @@
         </Grid>
     </DataTemplate>
 
+    <!-- Subreddit River for small form factor -->
     <DataTemplate x:Key="SubredditRiverSmallView" x:DataType="vm:SubredditRiverViewModel">
         <Grid>
             <Grid.Resources>

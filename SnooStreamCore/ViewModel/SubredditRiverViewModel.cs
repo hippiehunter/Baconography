@@ -347,7 +347,9 @@ namespace SnooStream.ViewModel
 
         private void EnsureFrontPage()
         {
-            AddToLocalSubreddits(new SubredditWrapper(this, "/", new Subreddit("/"), "hot", IsLoggedIn ? "subscribed" : "popular"), true);
+            AddToLocalSubreddits(new SubredditWrapper(this, "/", new Subreddit("/"), "hot", ""), true);
+            AddToLocalSubreddits(new SubredditWrapper(this, "/r/all", new Subreddit("/r/all"), "hot", ""), true);
+            AddToLocalSubreddits(new SubredditWrapper(this, "/r/random", new Subreddit("/r/random"), "hot", ""), true);
         }
 
         private bool IsLoggedIn

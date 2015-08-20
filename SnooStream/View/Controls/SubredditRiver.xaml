@@ -21,13 +21,13 @@
         </ResourceDictionary>
     </UserControl.Resources>
     
-    <Grid x:Name="LayoutRoot" Padding="24,24,0,0">
+    <Grid x:Name="LayoutRoot" Padding="24,24,24,0">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState x:Name="Normal"/>
                 <VisualState x:Name="ShowSearch">
                     <Storyboard>
-                        <ObjectAnimationUsingKeyFrames
+                        <!--<ObjectAnimationUsingKeyFrames
                         Storyboard.TargetName="search"
                         Storyboard.TargetProperty="Visibility">
                             <DiscreteObjectKeyFrame KeyTime="0:0:0.5" Value="Collapsed" />
@@ -49,10 +49,7 @@
                         Storyboard.TargetName="listBox"
                         Storyboard.TargetProperty="Margin">
                             <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="-62,0,-12,0" />
-                        </ObjectAnimationUsingKeyFrames>
-
-
-
+                        </ObjectAnimationUsingKeyFrames>-->
                     </Storyboard>
                 </VisualState>
             </VisualStateGroup>
@@ -63,6 +60,10 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="SubredditRootView.ContentTemplate" Value="{StaticResource SubredditRiverLargeView}"/>
+                        <!--<Setter Target="searchBox.(Grid.Column)" Value="2"/>-->
+                        <!--<Setter Target="searchBox.(Grid.Row)" Value="0"/>-->
+                        <Setter Target="headerRight.Width" Value="2*"/>
+                        <Setter Target="headerLeft.Width" Value="0"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -71,6 +72,10 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="SubredditRootView.ContentTemplate" Value="{StaticResource SubredditRiverSmallView}"/>
+                        <!--<Setter Target="searchBox.(Grid.Column)" Value="1"/>-->
+                        <!--<Setter Target="searchBox.(Grid.Row)" Value="1"/>-->
+                        <Setter Target="headerRight.Width" Value="2*"/>
+                        <Setter Target="headerLeft.Width" Value="40"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -84,16 +89,23 @@
         <!-- Page header -->
         <Grid Grid.Row="0" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="40" x:Name="headerLeft" />
                 <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" x:Name="headerRight" />
             </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             
-            <TextBlock Grid.Column="0" Text="SNOO STREAM"
+            <TextBlock Grid.Column="1" Text="SNOO STREAM"
                        Style="{StaticResource PageHeaderTextBlock}"/>
             
             <TextBox x:Name="searchBox"
-                     Margin="0,0,24,0"
-                     Grid.Column="1"
+                     Margin="0,0,0,0"
+                     Grid.Column="2"
+                     Grid.Row="0"
                      PlaceholderText="Search for subreddit"
                      KeyDown="manualBox_KeyDown" TextChanged="searchBox_TextChanged"
                      Text="{Binding Path=SearchString, Mode=TwoWay}"
