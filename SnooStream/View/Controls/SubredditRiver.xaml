@@ -91,10 +91,7 @@
             
             <TextBlock Grid.Column="0" Text="SNOO STREAM"
                        Style="{StaticResource PageHeaderTextBlock}"/>
-            <!--<Button x:Name="search" Grid.RowSpan="2" Padding="0" Background="Transparent" Margin="-24,0,0,0" BorderThickness="0" VerticalAlignment="Top" HorizontalAlignment="Left"
-                Width="50" Click="search_Click">
-                <SymbolIcon Symbol="Find"/>
-            </Button>-->
+            
             <TextBox x:Name="searchBox"
                      Margin="0,0,24,0"
                      Grid.Column="1"
@@ -105,14 +102,6 @@
                      HorizontalAlignment="Stretch"
                      VerticalAlignment="Top"
                      />
-            <!--<TextBox PlaceholderText="Search for subreddit"
-                     Margin="-3,-150,-3,0" x:Name="searchBox" KeyDown="manualBox_KeyDown" TextChanged="searchBox_TextChanged" Text="{Binding Path=SearchString, Mode=TwoWay}" Opacity="0">
-                <TextBox.Transitions>
-                    <TransitionCollection>
-                        <RepositionThemeTransition/>
-                    </TransitionCollection>
-                </TextBox.Transitions>
-            </TextBox>-->
         </Grid>
 
         <ContentControl x:Name="SubredditRootView" Content="{Binding}" Grid.Column="0" Grid.Row="1" 

@@ -35,17 +35,17 @@
 
     <DataTemplate x:Key="SubredditLargeView" x:DataType="vm:SubredditWrapper">
         <Grid>
-            <Grid Width="360" Background="White" Tapped="{x:Bind NavigateLink}">
+            <Grid Width="310" Height="150" Background="White" Tapped="{x:Bind NavigateLink}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="128" />
+                    <RowDefinition Height="118" />
                     <RowDefinition Height="32" />
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0">
                     <Image Source="{x:Bind Thing.HeaderImage, Converter={StaticResource clearableImageConverter}}"
-                                MaxHeight="128" MaxWidth="360" Height="{x:Bind HeaderImageHeight}"
+                                MaxHeight="118" MaxWidth="310" Height="{x:Bind HeaderImageHeight}"
                                 Width="{x:Bind HeaderImageWidth}" Margin="0"
-                                HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
 
                 <Border Grid.Row="1">
@@ -73,17 +73,16 @@
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate>
                                 <Grid Margin="0" HorizontalAlignment="Stretch">
-                                    <TextBlock Text='{Binding Name}' 
-                                               Foreground="Black" Margin="12"
+                                    <TextBlock Text="{Binding Name}"
+                                               Margin="12"
                                                Style="{StaticResource HeaderTextBlockStyle}"/>
                                 </Grid>
                             </DataTemplate>
                         </GroupStyle.HeaderTemplate>
                         <GroupStyle.HeaderContainerStyle>
                             <Style TargetType="GridViewHeaderItem">
-                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter Property="HorizontalAlignment" Value="Left" />
                                 <Setter Property="HorizontalContentAlignment" Value="Left" />
-                                <Setter Property="Background" Value="LightGray" />
                                 <Setter Property="Margin" Value="0,0,0,12" />
                             </Style>
                         </GroupStyle.HeaderContainerStyle>

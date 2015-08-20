@@ -22,14 +22,16 @@
     <selector:PreviewTemplateSelector x:Key="previewTemplateSelector">
         <selector:PreviewTemplateSelector.ImagePreview>
             <DataTemplate x:DataType="common:PreviewImage">
-                <Grid>
-                    <Image Margin="-12,0,-12,0" Source="{x:Bind HQThumbnailUrl, Mode=OneWay, Converter={StaticResource clearableImageConverter}}" HorizontalAlignment="Stretch" Stretch="UniformToFill"
-                                       VerticalAlignment="Center" MinHeight="175" MaxHeight="500" ImageOpened="hqImageControl_Loaded" />
+                <Grid MinHeight="175" MaxHeight="500">
+                    <Image Margin="-12,0,-12,0" Source="{x:Bind HQThumbnailUrl, Mode=OneWay, Converter={StaticResource clearableImageConverter}}"
+                           HorizontalAlignment="Center" Stretch="UniformToFill"
+                           VerticalAlignment="Center" ImageOpened="hqImageControl_Loaded" />
 
-                    <Image Margin="-12,0,-12,0" x:Name="imageControl" Source="{x:Bind ThumbnailUrl, Converter={StaticResource clearableImageConverter}}" HorizontalAlignment="Stretch" Stretch="UniformToFill"
-                                       VerticalAlignment="Center" MinHeight="175" MaxHeight="500" Opacity="{x:Bind HQThumbnailUrl, Converter={StaticResource nullToOpacityConverter}}"/>
+                    <Image Margin="-12,0,-12,0" x:Name="imageControl" Source="{x:Bind ThumbnailUrl, Converter={StaticResource clearableImageConverter}}"
+                           HorizontalAlignment="Center" Stretch="UniformToFill"
+                           VerticalAlignment="Center" Opacity="{x:Bind HQThumbnailUrl, Converter={StaticResource nullToOpacityConverter}}"/>
 
-                    <Border Padding="2" Margin="0,0,0,12" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <Border Padding="2" Margin="0,0,24,84" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                         <Border.Background>
                             <SolidColorBrush Color="Black" Opacity="0.3" />
                         </Border.Background>
@@ -50,7 +52,7 @@
                                            TextTrimming="WordEllipsis" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
                     </Border>
 
-                    <Border Padding="2" Margin="0,0,12,12" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <Border Padding="2" Margin="0,0,24,84" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                         <Border.Background>
                             <SolidColorBrush Color="Black" Opacity="0.3" />
                         </Border.Background>
@@ -62,7 +64,7 @@
     </selector:PreviewTemplateSelector>
 
     <DataTemplate x:Key="CardLinkView" x:DataType="vm:LinkViewModel">
-        <Border HorizontalAlignment="Stretch" Background="{ThemeResource ContentBackgroundBrush}" Margin="0,0,0,24" MinHeight="350">
+        <Border HorizontalAlignment="Stretch" Background="{ThemeResource ContentBackgroundBrush}" Margin="0,12,0,12" MinHeight="350">
             <Border.Transitions>
                 <TransitionCollection>
                     <EntranceThemeTransition FromHorizontalOffset="400" />
@@ -73,12 +75,12 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="60" />
                 </Grid.RowDefinitions>
 
-
                 <!-- Content block -->
-                <Button x:Name="previewSection" Grid.Row="0" Grid.RowSpan="2" Margin="0,0,0,0" MinHeight="175" MaxHeight="500"
+                <Button x:Name="previewSection"
+                    Grid.Row="0" Grid.RowSpan="3"
+                    Margin="0,0,0,0" MinHeight="175" MaxHeight="500"
                     BorderThickness="0" Padding="0,0,0,0" Background="Transparent"
                     VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
                     HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" Content="{x:Null}" DataContext="{x:Null}"
@@ -87,13 +89,14 @@
                 </Button>
 
                 <!-- Link Header -->
-                <Grid Grid.Row="0" Padding="24" Margin="-12,-12,-12,0">
+                <Grid Grid.Row="0" Padding="24,24,24,24" Margin="-12,0,-12,0" MaxHeight="400">
                     <Grid.Background>
                         <SolidColorBrush Color="#FF1F1F1F" Opacity="0.75" />
                     </Grid.Background>
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="12" />
                         <ColumnDefinition Width="Auto" MinWidth="80" />
                     </Grid.ColumnDefinitions>
 
@@ -114,8 +117,8 @@
                     </TextBlock>
 
                     <!-- Vote Content -->
-                    <ContentControl Grid.Column="1" DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" 
-                                    Margin="0,24,-12,0"/>
+                    <ContentControl Grid.Column="2" DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" 
+                                    Margin="0,24,-24,0"/>
 
                     <!-- Link info, user / time / subreddit / domain -->
                     <ContentControl x:Name="linkMetadata"
@@ -125,17 +128,24 @@
                 </Grid>
 
                 <!-- Action block, flyout menu / vote / comment count -->
-                <Grid x:Name="actionButtons" Grid.Row="2" Margin="0,0,0,0" HorizontalAlignment="Stretch">
+                <Grid x:Name="actionButtons"
+                      Grid.Row="1" Margin="-12,0,-12,0"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Bottom"
+                      Height="60">
+                    <Grid.Background>
+                        <SolidColorBrush Color="#FF1F1F1F" Opacity="0.75" />
+                    </Grid.Background>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
                         <ColumnDefinition Width="1*" />
                         <ColumnDefinition Width="1*" />
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" Background="Transparent"
-                    HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
-                    BorderThickness="0" Padding="0"
-                    Margin="0,-12,-12,0"
-                    FontFamily="Segoe UI Symbol">
+                        HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
+                        BorderThickness="0" Padding="0"
+                        Margin="24,0,0,0"
+                        FontFamily="Segoe UI Symbol">
                         <Grid>
                             <TextBlock Margin="0,0,0,0" FontSize="35" Text="&#xE10C;" />
                         </Grid>
@@ -154,7 +164,7 @@
 
                     <Button Grid.Column="2" Background="Transparent"
                         HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
-                        Margin="0,-12,2,0"
+                        Margin="0,-12,36,0"
                         BorderThickness="0" Padding="0,0,0,0" 
                         Command="{x:Bind GotoComments}" ContentTemplate="{StaticResource CommentCountControl}" />
                 </Grid>
