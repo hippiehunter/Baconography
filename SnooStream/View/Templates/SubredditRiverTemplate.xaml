@@ -10,10 +10,6 @@
     mc:Ignorable="d"
     xmlns:vm="using:SnooStream.ViewModel">
 
-    <ResourceDictionary.MergedDictionaries>
-        <templates:SubredditSmallViewTemplate />
-    </ResourceDictionary.MergedDictionaries>
-
     <converter:ClearableImageConverter x:Key="clearableImageConverter"/>
 
     <DataTemplate x:Name="subredditGroupHeader">
@@ -54,7 +50,6 @@
                 </Border>
             </Grid>
         </Grid>
-
     </DataTemplate>
 
     <DataTemplate x:Key="SubredditRiverLargeView" x:DataType="vm:SubredditRiverViewModel">
@@ -90,8 +85,44 @@
                 </GridView.GroupStyle>
             </GridView>
         </Grid>
-        
-   </DataTemplate>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="SubredditSmallView"  x:DataType="vm:SubredditWrapper">
+        <Grid>
+            <Grid HorizontalAlignment="Stretch" Tapped="{x:Bind NavigateLink}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                BorderThickness="0" Padding="0" Margin="0,0,0,6"
+                                Background="White">
+                    <Grid HorizontalAlignment="Stretch" Height="64">
+                        <Grid.ColumnDefinitions>
+
+                        </Grid.ColumnDefinitions>
+                        <Image
+                            Source="{x:Bind Thing.HeaderImage, Converter={StaticResource clearableImageConverter}}"
+                            MaxHeight="64" MaxWidth="128" Height="{x:Bind HeaderImageHeight}"
+                            Width="{x:Bind HeaderImageWidth}" Margin="0"
+                            HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <Border HorizontalAlignment="Right">
+                            <Border.Background>
+                                <SolidColorBrush Color="White"/>
+                            </Border.Background>
+
+                            <TextBlock Foreground="Black" VerticalAlignment="Bottom"
+                                            Margin="24,0,6,0" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}">
+                            </TextBlock>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </DataTemplate>
 
     <DataTemplate x:Key="SubredditRiverSmallView" x:DataType="vm:SubredditRiverViewModel">
         <Grid>

@@ -168,9 +168,6 @@
     <Compile Include="View\Templates\SubredditRiverTemplate.xaml.cs">
       <DependentUpon>SubredditRiverTemplate.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Templates\SubredditSmallViewTemplate.xaml.cs">
-      <DependentUpon>SubredditSmallViewTemplate.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\Templates\VotableControlTemplate.xaml.cs">
       <DependentUpon>VotableControlTemplate.xaml</DependentUpon>
     </Compile>
@@ -394,10 +391,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Templates\SubredditRiverTemplate.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\Templates\SubredditSmallViewTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

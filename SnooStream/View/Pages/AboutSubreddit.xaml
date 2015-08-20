@@ -15,7 +15,7 @@
     <common:SnooApplicationPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <templates:SubredditSmallViewTemplate />
+                <templates:SubredditRiverTemplate />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </common:SnooApplicationPage.Resources>

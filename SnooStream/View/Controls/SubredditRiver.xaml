@@ -15,7 +15,6 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <templates:SubredditSmallViewTemplate />
                 <templates:SubredditRiverTemplate />
             </ResourceDictionary.MergedDictionaries>
             <CollectionViewSource x:Name="subredditViewSource" ItemsPath="Collection" IsSourceGrouped="True" Source="{Binding SubredditCollection}"/>
