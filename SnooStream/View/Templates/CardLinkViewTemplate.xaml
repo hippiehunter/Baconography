@@ -31,12 +31,12 @@
                            HorizontalAlignment="Center" Stretch="UniformToFill"
                            VerticalAlignment="Center" Opacity="{x:Bind HQThumbnailUrl, Converter={StaticResource nullToOpacityConverter}}"/>
 
-                    <Border Padding="2" Margin="0,0,24,84" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <!--<Border Padding="2" Margin="0,0,24,84" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                         <Border.Background>
                             <SolidColorBrush Color="Black" Opacity="0.3" />
                         </Border.Background>
                         <TextBlock FontFamily="Segoe UI Symbol" FontSize="36" Foreground="White" Text="{x:Bind Converter={StaticResource linkGlyphConverter}}" />
-                    </Border>
+                    </Border>-->
                 </Grid>
             </DataTemplate>
         </selector:PreviewTemplateSelector.ImagePreview>
@@ -52,12 +52,12 @@
                                            TextTrimming="WordEllipsis" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
                     </Border>
 
-                    <Border Padding="2" Margin="0,0,24,84" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <!--<Border Padding="2" Margin="0,0,24,84" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                         <Border.Background>
                             <SolidColorBrush Color="Black" Opacity="0.3" />
                         </Border.Background>
                         <TextBlock FontFamily="Segoe UI Symbol" FontSize="36" Foreground="White" Text="{x:Bind Converter={StaticResource linkGlyphConverter}}" />
-                    </Border>
+                    </Border>-->
                 </Grid>
             </DataTemplate>
         </selector:PreviewTemplateSelector.TextPreview>
@@ -89,7 +89,7 @@
                 </Button>
 
                 <!-- Link Header -->
-                <Grid Grid.Row="0" Padding="24,24,24,24" Margin="-12,0,-12,0" MaxHeight="400">
+                <Grid Grid.Row="0" Padding="24,24,12,24" Margin="-12,0,-12,0" MaxHeight="400">
                     <Grid.Background>
                         <SolidColorBrush Color="#FF1F1F1F" Opacity="0.75" />
                     </Grid.Background>
@@ -117,8 +117,11 @@
                     </TextBlock>
 
                     <!-- Vote Content -->
-                    <ContentControl Grid.Column="2" DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" 
-                                    Margin="0,24,-24,0" FontSize="16" FontWeight="SemiBold" />
+                    <ContentControl Grid.Column="2"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" 
+                                    Margin="0,0,0,0" />
 
                     <!-- Link info, user / time / subreddit / domain -->
                     <ContentControl x:Name="linkMetadata"
@@ -141,13 +144,17 @@
                         <ColumnDefinition Width="1*" />
                         <ColumnDefinition Width="1*" />
                     </Grid.ColumnDefinitions>
+                    
+                    <!-- More button -->
                     <Button Grid.Column="0" Background="Transparent"
-                        HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
-                        BorderThickness="0" Padding="0"
-                        Margin="24,0,0,0"
+                        HorizontalContentAlignment="Left" HorizontalAlignment="Left"
+                        VerticalAlignment="Stretch"
+                        BorderThickness="0"
+                        Padding="24,6,24,6"
+                        Margin="12,0,0,0"
                         FontFamily="Segoe UI Symbol">
                         <Grid>
-                            <TextBlock Margin="0,0,0,0" FontSize="35" Text="&#xE10C;" />
+                            <TextBlock Margin="0,-6,0,0" FontSize="35" Text="&#xE10C;" />
                         </Grid>
                         <Button.Flyout>
                             <MenuFlyout>
@@ -160,13 +167,25 @@
                         </Button.Flyout>
                     </Button>
 
-                    <!--<ContentControl Grid.Column="1" DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" />-->
+                    <!-- Content type button -->
+                    <Button Grid.Column="1"
+                        Margin="0,0,0,0"
+                        BorderThickness="0" Padding="24,6,24,6" Background="Transparent"
+                        VerticalContentAlignment="Center" VerticalAlignment="Stretch"
+                        HorizontalContentAlignment="Center" HorizontalAlignment="Center"
+                        Command="{x:Bind GotoLink}">
+                        <TextBlock FontFamily="Segoe UI Symbol" FontSize="36"
+                                   Foreground="White" Text="{x:Bind Converter={StaticResource linkGlyphConverter}}" />
+                    </Button>
 
+                    <!-- Comments button -->
                     <Button Grid.Column="2" Background="Transparent"
-                        HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
-                        Margin="0,-12,36,0"
-                        BorderThickness="0" Padding="0,0,0,0" 
-                        Command="{x:Bind GotoComments}" ContentTemplate="{StaticResource CommentCountControl}" />
+                        HorizontalContentAlignment="Right" HorizontalAlignment="Right"
+                        Margin="0,0,12,0"
+                        BorderThickness="0" Padding="24,6,24,6" 
+                        Command="{x:Bind GotoComments}">
+                        <ContentControl Margin="0,-6,0,0" ContentTemplate="{StaticResource CommentCountControl}" />
+                    </Button>
                 </Grid>
             </Grid>
         </Border>
