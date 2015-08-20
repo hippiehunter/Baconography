@@ -118,7 +118,7 @@
 
                     <!-- Vote Content -->
                     <ContentControl Grid.Column="2" DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" 
-                                    Margin="0,24,-24,0"/>
+                                    Margin="0,24,-24,0" FontSize="16" FontWeight="SemiBold" />
 
                     <!-- Link info, user / time / subreddit / domain -->
                     <ContentControl x:Name="linkMetadata"

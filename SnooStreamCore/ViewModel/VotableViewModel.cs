@@ -28,6 +28,7 @@ namespace SnooStream.ViewModel
             RaisePropertyChanged("Dislike");
             RaisePropertyChanged("TotalVotes");
             RaisePropertyChanged("LikeStatus");
+            RaisePropertyChanged("SelfRef");
         }
 
         public RelayCommand ToggleUpvote { get { return new RelayCommand(ToggleVoteImpl); } }
@@ -35,12 +36,20 @@ namespace SnooStream.ViewModel
         public RelayCommand ToggleVote { get { return new RelayCommand(ToggleVoteImpl); } }
         private int originalVoteModifier = 0;
 
+        // HACK: Needed a way to get the object for x:Bind
+        public VotableViewModel SelfRef
+        {
+            get
+            {
+                return this;
+            }
+        }
 
         public int TotalVotes
         {
             get
             {
-                var currentVoteModifier = (Like ? 1 : 0) + (Dislike ? -1 : 0);
+                var currentVoteModifier = LikeStatus;
                 if (originalVoteModifier == currentVoteModifier)
                     return (_votableThing.Ups - _votableThing.Downs);
                 else
@@ -81,6 +90,7 @@ namespace SnooStream.ViewModel
                     RaisePropertyChanged("Dislike");
                     RaisePropertyChanged("TotalVotes");
                     RaisePropertyChanged("LikeStatus");
+                    RaisePropertyChanged("SelfRef");
                 }
             }
         }
@@ -105,6 +115,7 @@ namespace SnooStream.ViewModel
                     RaisePropertyChanged("Dislike");
                     RaisePropertyChanged("TotalVotes");
                     RaisePropertyChanged("LikeStatus");
+                    RaisePropertyChanged("SelfRef");
                 }
             }
         }
@@ -146,6 +157,11 @@ namespace SnooStream.ViewModel
 
             SnooStreamViewModel.RedditService.AddVote(_votableThing.Name, voteDirection);
             _propertyChanged();
+            RaisePropertyChanged("Like");
+            RaisePropertyChanged("Dislike");
+            RaisePropertyChanged("TotalVotes");
+            RaisePropertyChanged("LikeStatus");
+            RaisePropertyChanged("SelfRef");
         }
 
         private void ToggleDownvoteImpl()
@@ -162,6 +178,11 @@ namespace SnooStream.ViewModel
 
             SnooStreamViewModel.RedditService.AddVote(_votableThing.Name, voteDirection);
             _propertyChanged();
+            RaisePropertyChanged("Like");
+            RaisePropertyChanged("Dislike");
+            RaisePropertyChanged("TotalVotes");
+            RaisePropertyChanged("LikeStatus");
+            RaisePropertyChanged("SelfRef");
         }
     }
 }
