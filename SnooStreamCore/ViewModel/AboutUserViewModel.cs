@@ -89,6 +89,15 @@ namespace SnooStream.ViewModel
             var loadTask = LoadAccount(username);
         }
 
+        private ObservableCollection<KarmaData> _karmaCollection;
+        public ObservableCollection<KarmaData> KarmaCollection
+        {
+            get
+            {
+                return _karmaCollection;
+            }
+        }
+
         public AboutUserViewModel(Account thing, DateTime? lastRefresh)
         {
 			LastRefresh = lastRefresh;
@@ -105,8 +114,13 @@ namespace SnooStream.ViewModel
                 RaisePropertyChanged("Loading");
 				await SnooStreamViewModel.NotificationService.Report("Loading user details", async () => Thing = (await SnooStreamViewModel.RedditService.GetUserInfo(username, "about", null)).Data as Account);
                 LastRefresh = DateTime.UtcNow;
+                _karmaCollection = new ObservableCollection<KarmaData> {
+                    new KarmaData { Name = "Comments", Value = Thing.CommentKarma },
+                    new KarmaData { Name = "Links", Value = Thing.LinkKarma }
+                };
                 RaisePropertyChanged("Thing");
                 RaisePropertyChanged("Cakeday");
+                RaisePropertyChanged("KarmaCollection");
             }
             finally
             {
@@ -205,6 +219,21 @@ namespace SnooStream.ViewModel
             get
             {
                 return new RelayCommand(() => SnooStreamViewModel.NavigationService.NavigateToAboutUser(this));
+            }
+        }
+
+        public class KarmaData
+        {
+            public string Name
+            {
+                get;
+                set;
+            }
+
+            public int Value
+            {
+                get;
+                set;
             }
         }
     }

@@ -5,32 +5,89 @@
     xmlns:local="using:SnooStream.View.Pages"
     xmlns:controls="using:SnooStream.View.Controls"
     xmlns:common="using:SnooStream.Common"
+    xmlns:charting="using:WinRTXamlToolkit.Controls.DataVisualization.Charting"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Pivot Title="SNOO STREAM > ABOUT USER" x:Name="pivot">
+        <Pivot Title="{Binding Thing.Name}" x:Name="pivot" HorizontalAlignment="Stretch">
+            <Pivot.Background>
+                <ImageBrush ImageSource="/Assets/test.png" Stretch="UniformToFill" />
+            </Pivot.Background>
             <PivotItem Header="overview">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     
                     <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
+                        <RowDefinition Height="*" MaxHeight="300" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
+
+                    <charting:Chart Grid.Row="0"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <charting:Chart.Background>
+                            <SolidColorBrush Color="#FF1F1F1F" Opacity="0.75" />
+                        </charting:Chart.Background>
+                        
+                        <charting:PieSeries ItemsSource="{Binding KarmaCollection}"
+                                            Margin="0"
+                                            IndependentValuePath="Name" DependentValuePath="Value"
+                                            IsSelectionEnabled="False"/>
+                    </charting:Chart>
+
+                    <Grid Grid.Row="1" Margin="0,12,0,0" Padding="24,12,24,12">
+                        <Grid.Background>
+                            <SolidColorBrush Color="#FF1F1F1F" Opacity="0.75" />
+                        </Grid.Background>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <Image Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                            Source="/Assets/cake.png" />
+                        
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="cakeday"
+                                   Style="{StaticResource AboutUserPageTextBlock}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CakeDay, Mode=OneWay}"
+                                   Style="{StaticResource AboutUserPageTextBlock}"/>
+                    </Grid>
                     
-                    <TextBlock Grid.Row="0" Grid.ColumnSpan="3" FontSize="24" Text="{Binding Thing.Name}"/>
+                    <Grid Grid.Row="2" Margin="0,12,0,0" Padding="24,12,24,12">
+                        <Grid.Background>
+                            <SolidColorBrush Color="#FF1F1F1F" Opacity="0.75" />
+                        </Grid.Background>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <Image Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                            Source="/Assets/cake.png" />
+                        
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="friendship"
+                                   Style="{StaticResource AboutUserPageTextBlock}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="ain't your pal friend"
+                                   Style="{StaticResource AboutUserPageTextBlock}"/>
+                    </Grid>
+                    
+                    <!--<TextBlock Grid.Row="0" Grid.ColumnSpan="3" FontSize="24" Text="{Binding Thing.Name}"/>
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Link Karma: "/>
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Thing.LinkKarma}"/>
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Comment Karma: "/>
@@ -45,7 +102,7 @@
                     <Button Grid.Row="5" Grid.Column="2" Content="Friend" Command="{Binding ToggleFriend}"/>
                     <TextBlock Grid.Row="6" Grid.Column="0" Text="Cakeday: "/>
                     <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding CakeDay}"/>
-                    <Button Grid.Row="7" Grid.Column="0" Content="Message" Command="{Binding GotoMessage}"/>
+                    <Button Grid.Row="7" Grid.Column="0" Content="Message" Command="{Binding GotoMessage}"/>-->
                 </Grid>
             </PivotItem>
 
