@@ -29,7 +29,7 @@ namespace SnooStream.Controls
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            DataContext = e.Parameter;
+            HubBinder.SetDataSource(hub, e.Parameter);
         }
     }
 }

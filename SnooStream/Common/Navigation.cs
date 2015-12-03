@@ -225,7 +225,7 @@ namespace SnooStream.Common
         public DataTemplate ContentRiverTemplate { get; set; }
         public DataTemplate CommentTemplate { get; set; }
         public DataTemplate SubredditRiverTemplate { get; set; }
-
+        public List<ResourceDictionary> ResourceDictionaryHandles { get; set; } = new List<ResourceDictionary>();
         public IEnumerable<object> ViewModelStack
         {
             get
@@ -239,11 +239,14 @@ namespace SnooStream.Common
 
         public NavigationContext(AdaptiveHubNav hubNav)
         {
-            SubredditRiverTemplate = new SubredditRiverTemplate()["SubredditRiverView"] as DataTemplate;
-            LinkRiverTemplate = new LinkRiverTemplate()["LinkRiverView"] as DataTemplate;
+            var subredditRiverRD = new SubredditRiverTemplate();
+            var linkRiverRD = new LinkRiverTemplate();
+            ResourceDictionaryHandles.Add(subredditRiverRD);
+            ResourceDictionaryHandles.Add(linkRiverRD);
+            SubredditRiverTemplate = subredditRiverRD["SubredditRiverView"] as DataTemplate;
+            LinkRiverTemplate = linkRiverRD["LinkRiverView"] as DataTemplate;
 
             HubNav = hubNav;
-            hubNav.DataContext = new List<HubNavItem>();
             RoamingState = new RoamingState();
             var settingsContext = new SettingsContext { Settings = RoamingState.Settings ?? new Dictionary<string, string>() };
             SettingsViewModel = new SettingsViewModel(settingsContext);
@@ -320,14 +323,14 @@ namespace SnooStream.Common
             //    return typeof(SelfActivityPage);
             //else if (vm is AboutUserViewModel)
             //    return typeof(SelfPage);
-            //else if (vm is LinkRiverViewModel)
-            //    return typeof(LinkRiver);
+            if (vm is LinkRiverViewModel)
+                return LinkRiverTemplate;
             //else if (vm is SettingsViewModel)
             //    return typeof(SettingsPage);
             //else if (vm is SearchViewModel)
             //    return typeof(SearchPage);
-            //else if (vm is SubredditRiverViewModel)
-            //    return typeof(SubredditsPage);
+            else if (vm is SubredditRiverViewModel)
+                return SubredditRiverTemplate;
             //else
             return null;
         }

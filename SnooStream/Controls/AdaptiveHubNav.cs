@@ -40,15 +40,15 @@ namespace SnooStream.Controls
 
         private static void DataSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var data = e.NewValue as ObservableCollection<HubNavItem>;
+            var data = e.NewValue as HubNavGroup;
             var hub = d as Hub;
             if (data == null || hub == null) return;
-            foreach (var hubItem in data)
+            foreach (var hubItem in data.Sections)
             {
                 hub.Sections.Add(new HubSection { DataContext = hubItem.Content, ContentTemplate = hubItem.ContentTemplate, Header = hubItem.HeaderText, IsHeaderInteractive = false });
             }
 
-            data.CollectionChanged += (obj, arg) =>
+            data.Sections.CollectionChanged += (obj, arg) =>
             {
                 switch (arg.Action)
                 {
@@ -103,7 +103,6 @@ namespace SnooStream.Controls
             Content = _mainFrame;
             UpdateSize(Window.Current.Bounds.Width);
             Window.Current.SizeChanged += Current_SizeChanged;
-            DataContextChanged += AdaptiveHubNav_DataContextChanged;
 
 
             if (ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1, 0))
@@ -123,21 +122,21 @@ namespace SnooStream.Controls
             }
         }
 
-        private void AdaptiveHubNav_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-        {
-            if (_navStack != args.NewValue)
-            {
-                _navStack = args.NewValue as List<HubNavItem>;
-                if (_navStack != null)
-                {
-                    foreach (var item in _navStack)
-                        item.Container = this;
-                }
+        //private void AdaptiveHubNav_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        //{
+        //    if (_navStack != args.NewValue)
+        //    {
+        //        _navStack = args.NewValue as List<HubNavItem>;
+        //        if (_navStack != null)
+        //        {
+        //            foreach (var item in _navStack)
+        //                item.Container = this;
+        //        }
 
-                _isLarge = null;
-                UpdateSize(Window.Current.Bounds.Width);
-            }
-        }
+        //        _isLarge = null;
+        //        UpdateSize(Window.Current.Bounds.Width);
+        //    }
+        //}
 
         public void Remove(HubNavItem item)
         {
@@ -254,7 +253,6 @@ namespace SnooStream.Controls
         {
             if (_isLarge.Value)
             {
-                var hubSection = new HubSection { DataContext = hubNav.Content, ContentTemplate = hubNav.ContentTemplate, HeaderTemplate = HubItemHeaderTemplate, IsHeaderInteractive = false, Header = hubNav.HeaderText, };
                 if (hubNav.IsRoot || !(((Page)_mainFrame.Content)?.DataContext is HubNavGroup))
                 {
                     var hubSections = new HubNavGroup { Sections = new ObservableCollection<HubNavItem> { hubNav } };
