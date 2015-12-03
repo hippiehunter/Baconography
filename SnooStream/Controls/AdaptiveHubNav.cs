@@ -27,7 +27,7 @@ namespace SnooStream.Controls
 
     public class HubNavGroup
     {
-        public ObservableCollection<HubSection> Sections { get; set; }
+        public ObservableCollection<HubNavItem> Sections { get; set; }
     }
 
     public class HubBinder : DependencyObject
@@ -40,12 +40,12 @@ namespace SnooStream.Controls
 
         private static void DataSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var data = e.NewValue as ObservableCollection<HubSection>;
+            var data = e.NewValue as ObservableCollection<HubNavItem>;
             var hub = d as Hub;
             if (data == null || hub == null) return;
-            foreach (var section in data)
+            foreach (var hubItem in data)
             {
-                hub.Sections.Add(section);
+                hub.Sections.Add(new HubSection { DataContext = hubItem.Content, ContentTemplate = hubItem.ContentTemplate, Header = hubItem.HeaderText, IsHeaderInteractive = false });
             }
 
             data.CollectionChanged += (obj, arg) =>
@@ -53,13 +53,19 @@ namespace SnooStream.Controls
                 switch (arg.Action)
                 {
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                        hub.Sections.Add(arg.NewItems[0] as HubSection);
-                        break;
+                        {
+                            var hubItem = arg.NewItems[0] as HubNavItem;
+                            hub.Sections.Add(new HubSection { DataContext = hubItem.Content, ContentTemplate = hubItem.ContentTemplate, Header = hubItem.HeaderText, IsHeaderInteractive = false } );
+                            break;
+                        }
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
                         break;
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                        hub.Sections.Remove(arg.OldItems[0] as HubSection);
-                        break;
+                        {
+                            var hubItem = arg.OldItems[0] as HubNavItem;
+                            hub.Sections.Remove(hub.Sections.FirstOrDefault(section => section.DataContext == hubItem.Content));
+                            break;
+                        }
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
                         break;
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
@@ -149,7 +155,7 @@ namespace SnooStream.Controls
                         var foundNavGroup = pse.Parameter as HubNavGroup;
                         return foundNavGroup.Sections.Any(section =>
                         {
-                            return section.DataContext == item;
+                            return section.Content == item;
                         });
                     }
                     else if (pse.Parameter == item)
@@ -164,7 +170,7 @@ namespace SnooStream.Controls
 
                 if (navGroup != null)
                 {
-                    var foundSection = navGroup.Sections.FirstOrDefault(section => section.DataContext == item);
+                    var foundSection = navGroup.Sections.FirstOrDefault(section => section.Content == item);
                     if (foundSection != null)
                     {
                         navGroup.Sections.Remove(foundSection);
@@ -177,7 +183,7 @@ namespace SnooStream.Controls
                     }
                     else
                     {
-                        ((HubNavItem)navGroup.Sections.FirstOrDefault().DataContext).IsRoot = true;
+                        ((HubNavItem)navGroup.Sections.FirstOrDefault().Content).IsRoot = true;
                     }
                 }
                 else
@@ -251,7 +257,7 @@ namespace SnooStream.Controls
                 var hubSection = new HubSection { DataContext = hubNav.Content, ContentTemplate = hubNav.ContentTemplate, HeaderTemplate = HubItemHeaderTemplate, IsHeaderInteractive = false, Header = hubNav.HeaderText, };
                 if (hubNav.IsRoot || !(((Page)_mainFrame.Content)?.DataContext is HubNavGroup))
                 {
-                    var hubSections = new HubNavGroup { Sections = new ObservableCollection<HubSection> { hubSection } };
+                    var hubSections = new HubNavGroup { Sections = new ObservableCollection<HubNavItem> { hubNav } };
                     if (doNavigate)
                     {
                         _mainFrame.Navigate(typeof(MultiPageHubView), hubSections);
@@ -264,7 +270,7 @@ namespace SnooStream.Controls
                 else
                 {
                     var hubGroup = insertCurrent ? _mainFrame.BackStack.Last().Parameter as HubNavGroup : ((Page)_mainFrame.Content).DataContext as HubNavGroup;
-                    hubGroup.Sections.Add(hubSection);
+                    hubGroup.Sections.Add(hubNav);
                 }
             }
             else
