@@ -25,7 +25,7 @@ namespace SnooStreamBackground
             bool get();
         }
         property int UpdateCountSinceActivity;
-        Windows::Foundation::IAsyncAction^ Refresh(Platform::String^ oAuthBlob, Windows::Foundation::TypedEventHandler<Windows::UI::Notifications::ToastNotification^, Object^>^ activatedHandler, bool canStore);
+        Windows::Foundation::IAsyncActionWithProgress<float>^ Refresh(Platform::String^ oAuthBlob, Windows::Foundation::TypedEventHandler<Windows::UI::Notifications::ToastNotification^, Object^>^ activatedHandler, bool canStore);
         void StoreState();
         Platform::String^ ContextForId(Platform::String^ id);
         void ClearState();

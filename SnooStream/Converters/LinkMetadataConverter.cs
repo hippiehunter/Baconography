@@ -11,11 +11,13 @@ using Windows.UI;
 using Windows.UI.Xaml.Media;
 using SnooSharp;
 using Windows.UI.Xaml;
+using SnooStream.Common;
 
 namespace SnooStream.Converters
 {
 	public class LinkMetadataConverter : IValueConverter
 	{
+        public INavigationContext NavigationContext { get; set; }
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{
             if (value == null)
@@ -32,21 +34,21 @@ namespace SnooStream.Converters
 			rtb.FontWeight = FontWeights.SemiBold;
 			List<Inline> inlinesCollection = new List<Inline>();
 			
-			var subredditLink = new Run { Text = linkViewModel.Link.Subreddit };
-			var authorLink = new Run { Text = linkViewModel.Author };
+			var subredditLink = new Run { Text = linkViewModel.Thing.Subreddit };
+			var authorLink = new Run { Text = linkViewModel.Thing.Author };
 
-			if (linkViewModel.Link.Over18)
+			if (linkViewModel.Thing.Over18)
 				inlinesCollection.Add(new Run { Text = "NSFW", Foreground = new SolidColorBrush(Colors.Red)});
 
-			if (!string.IsNullOrWhiteSpace(linkViewModel.Link.LinkFlairText))
-				inlinesCollection.Add(new Run { Text = linkViewModel.Link.LinkFlairText });
+			if (!string.IsNullOrWhiteSpace(linkViewModel.Thing.LinkFlairText))
+				inlinesCollection.Add(new Run { Text = linkViewModel.Thing.LinkFlairText });
 
 			if (linkViewModel.FromMultiReddit)
 				inlinesCollection.Add(subredditLink);
 
 			inlinesCollection.Add(authorLink);
-			inlinesCollection.Add(new Run { Text = TimeRelationConverter.GetRelationString(linkViewModel.CreatedUTC) });
-			inlinesCollection.Add(new Run { Text = DomainConverter.GetDomain(linkViewModel.Url) });
+			inlinesCollection.Add(new Run { Text = TimeRelationConverter.GetRelationString(linkViewModel.Thing.CreatedUTC) });
+			inlinesCollection.Add(new Run { Text = DomainConverter.GetDomain(linkViewModel.Thing.Url) });
 
 			for (int i = 0; i < inlinesCollection.Count; i++)
 			{
@@ -80,10 +82,10 @@ namespace SnooStream.Converters
 				if (element == null) return;
 
 				var run = element as Run;
-				if (run == subredditLink)
-					linkViewModel.GotoSubreddit.Execute(null);
-				else if (run == authorLink)
-					linkViewModel.GotoUserDetails.Execute(null);
+                if (run == subredditLink)
+                    Navigation.GotoSubreddit(linkViewModel.Thing.Subreddit, NavigationContext);
+                else if (run == authorLink)
+                    Navigation.GotoUserDetails(linkViewModel.Thing.Author, NavigationContext);
 				
 			};
 
@@ -99,15 +101,21 @@ namespace SnooStream.Converters
 
     public class ActivityMetadataConverter : IValueConverter
     {
+        public IActivityBuilderContext ActivityContext { get; set; }
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            var activityViewModel = value as ActivityGroupViewModel;
-            var thing = activityViewModel.FirstActivity.GetThing();
+            var activityViewModel = value as ActivityHeaderViewModel;
             var rtb = new RichTextBlock();
+            ActivityGroup activityGroup;
+            if (!ActivityContext.TryGetGroup(activityViewModel.GroupId, out activityGroup))
+            {
+                return rtb;
+            }
+            var thing = activityGroup.Children.First().Thing;
             var pp = new Paragraph();
             rtb.IsTextSelectionEnabled = false;
             rtb.Blocks.Add(pp);
-            rtb.Style = App.Current.Resources["SubtextButtonSubtextTextBlock"] as Style;
+            rtb.Style = Application.Current.Resources["SubtextButtonSubtextTextBlock"] as Style;
             List<Inline> inlinesCollection = new List<Inline>();
 
             if (thing.Data is Link)

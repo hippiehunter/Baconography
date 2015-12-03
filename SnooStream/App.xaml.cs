@@ -1,9 +1,4 @@
-﻿using Newtonsoft.Json;
-using SnooStream.Common;
-using SnooStream.PlatformServices;
-using SnooStream.View.Pages;
-using SnooStream.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,19 +7,13 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-using Windows.Foundation.Metadata;
-using Windows.System.UserProfile;
-using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
-
-// The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=402347&clcid=0x409
 
 namespace SnooStream
 {
@@ -33,41 +22,17 @@ namespace SnooStream
     /// </summary>
     sealed partial class App : Application
     {
-        private TransitionCollection transitions;
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
         public App()
         {
+            Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(
+                Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
+                Microsoft.ApplicationInsights.WindowsCollectors.Session);
             this.InitializeComponent();
             this.Suspending += OnSuspending;
-        }
-
-        protected override void OnActivated(IActivatedEventArgs args)
-        {
-            base.OnActivated(args);
-			if (args.Kind == ActivationKind.WebAuthenticationBrokerContinuation)
-			{
-				var wab = args as WebAuthenticationBrokerContinuationEventArgs;
-				if (wab.WebAuthenticationResult.ResponseStatus == Windows.Security.Authentication.Web.WebAuthenticationStatus.Success)
-				{
-					var resultData = wab.WebAuthenticationResult.ResponseData;
-					var decoder = new WwwFormUrlDecoder(new Uri(resultData).Query);
-					var code = decoder.GetFirstValueByName("code");
-					var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
-					snooStreamViewModel.Login.FinishOAuth(code);
-				}
-				else
-				{
-					var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
-					snooStreamViewModel.Login.FailOAuth(wab.WebAuthenticationResult.ResponseStatus.ToString(), wab.WebAuthenticationResult.ResponseData);
-				}
-			}
-            else if (args.Kind == ActivationKind.Launch)
-            {
-
-            }
         }
 
         /// <summary>
@@ -98,23 +63,7 @@ namespace SnooStream
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    // Removes the turnstile navigation for startup.
-                    if (rootFrame.ContentTransitions != null)
-                    {
-                        this.transitions = new TransitionCollection();
-                        foreach (var c in rootFrame.ContentTransitions)
-                        {
-                            this.transitions.Add(c);
-                        }
-                    }
-
-                    rootFrame.ContentTransitions = null;
-                    rootFrame.Navigated += this.RootFrame_FirstNavigated;
-                }
-                else
-                {
-                    var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
-                    snooStreamViewModel.ClearNavigationBlob();
+                    //TODO: Load state from previously suspended application
                 }
 
                 // Place the frame in the current Window
@@ -123,118 +72,13 @@ namespace SnooStream
 
             if (rootFrame.Content == null)
             {
-                // Removes the turnstile navigation for startup.
-                if (rootFrame.ContentTransitions != null)
-                {
-                    this.transitions = new TransitionCollection();
-                    foreach (var c in rootFrame.ContentTransitions)
-                    {
-                        this.transitions.Add(c);
-                    }
-                }
-
-                rootFrame.ContentTransitions = null;
-                rootFrame.Navigated += this.RootFrame_FirstNavigated;
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                DispatchToInitialPage(rootFrame, e.Arguments);
+                rootFrame.Navigate(typeof(MainPage), e.Arguments);
             }
-            else if (!string.IsNullOrWhiteSpace(e.Arguments))
-            {
-                DispatchToInitialPage(rootFrame, e.Arguments);
-            }
-
-            if (ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1, 0))
-            {
-                Windows.Phone.UI.Input.HardwareButtons.BackPressed += (s, a) =>
-                {
-                    a.Handled = HandleBackPressed(true);
-                };
-            }
-            else
-            {
-                Windows.UI.Core.SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
-                Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += (s, a) =>
-                {
-                    a.Handled = HandleBackPressed(false);
-                };
-            }
-
             // Ensure the current window is active
             Window.Current.Activate();
-        }
-
-        private bool HandleBackPressed(bool isHardware)
-        {
-            var rootFrame = Window.Current.Content as Frame;
-            var appPage = rootFrame.Content as SnooApplicationPage;
-            if (appPage != null && appPage.PopNavState())
-            {
-                return true;
-            }
-            else if(rootFrame.Content is AppShell)
-            {
-                var shell = rootFrame.Content as AppShell;
-                bool handled = false;
-                shell.BackRequested(ref handled);
-                return handled;
-            }
-            else if (rootFrame.CanGoBack)
-            {
-                rootFrame.GoBack();
-                //Indicate the back button press is handled so the app does not exit		
-                return true;
-            }
-            else if(isHardware)
-            {
-                var snooStreamViewModel = Application.Current.Resources["SnooStream"] as SnooStreamViewModel;
-                snooStreamViewModel.DumpInitBlob(); 
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Restores the content transitions after the app has launched.
-        /// </summary>
-        /// <param name="sender">The object where the handler is attached.</param>
-        /// <param name="e">Details about the navigation event.</param>
-        private void RootFrame_FirstNavigated(object sender, NavigationEventArgs e)
-        {
-            var rootFrame = sender as Frame;
-            rootFrame.ContentTransitions = this.transitions ?? new TransitionCollection() { new NavigationThemeTransition() };
-            rootFrame.Navigated -= this.RootFrame_FirstNavigated;
-
-
-        }
-
-        void DispatchToInitialPage(Frame rootFrame, string launchArgs)
-        {
-            if (string.IsNullOrWhiteSpace(launchArgs))
-            {
-                if (!rootFrame.Navigate(typeof(AppShell), launchArgs))
-                {
-                    throw new Exception("Failed to create initial page");
-                }
-            }
-            else
-            {
-                try
-                {
-                    var activityParams = JsonConvert.DeserializeAnonymousType(launchArgs, new { activityid = "" });
-                    var targetActivity = SelfStreamViewModel.ActivityLookup.ContainsKey(activityParams.activityid) ? SelfStreamViewModel.ActivityLookup[activityParams.activityid] : null;
-                    if (targetActivity != null)
-                        targetActivity.Tapped();
-                }
-                catch (Exception)
-                {
-                    if (!rootFrame.Navigate(typeof(AppShell), launchArgs))
-                    {
-                        throw new Exception("Failed to create initial page");
-                    }
-                }
-            }
-
         }
 
         /// <summary>
@@ -257,7 +101,10 @@ namespace SnooStream
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            //TODO: Save application state and stop any background activity
+            if (MainPage.Current != null)
+            {
+                MainPage.Current.NavContext.SaveNavigationState();
+            }
             deferral.Complete();
         }
     }

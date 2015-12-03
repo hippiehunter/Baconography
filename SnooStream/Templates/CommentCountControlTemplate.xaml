@@ -1,0 +1,14 @@
+﻿<ResourceDictionary
+    x:Class="SnooStream.Templates.CommentCountControlTemplate"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:SnooStream.ViewModel">
+
+    <DataTemplate x:Key="CommentCountControl" x:DataType="vm:LinkViewModel">
+        <Grid>
+            <TextBlock Margin="0,0,0,0" FontSize="36" Text="&#xE200;" FontFamily="Segoe UI Symbol" />
+            <TextBlock Margin="1,11,0,0" Text="{x:Bind Path=CommentCount}" Foreground="{ThemeResource InvertThemeForegroundBrush}" HorizontalAlignment="Center"/>
+        </Grid>
+    </DataTemplate>
+    
+</ResourceDictionary>

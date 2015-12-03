@@ -170,3 +170,6 @@ pip-log.txt
 SnooStream.sln.ide/edb.chk
 *.chm
 SnooStream/SnooStream.WindowsPhone/BundleArtifacts/arm.txt
+/Nuget/GifRenderer/lib/win10.0/ZoomableImageControl.xbf
+/Nuget/GifRenderer/lib/win10.0/GifRenderer.winmd
+/Nuget/GifRenderer/lib/win10.0/GifRenderer.pri

@@ -128,17 +128,18 @@ void ActivityManager::MakeToast(String^ id, String^ text, String^ context, Typed
     notifier->Show(notification);
 }
 
-IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHandler<ToastNotification^, Object^>^ activatedHandler, bool canStore)
+IAsyncActionWithProgress<float>^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHandler<ToastNotification^, Object^>^ activatedHandler, bool canStore)
 {
     _canStore = canStore;
     std::shared_ptr<SimpleRedditService> redditService = make_shared<SimpleRedditService>(RedditOAuth::Deserialize(oAuthBlob));
     UpdateCountSinceActivity = UpdateCountSinceActivity + 1;
     //grab new data
-    return concurrency::create_async([=]()
+    return concurrency::create_async([=](concurrency::progress_reporter<float> progress, concurrency::cancellation_token token)
     {
         return redditService->GetActivity()
             .then([=](concurrency::task<Activities> result)
         {
+            progress.report(0.33f);
             try
             {
                 auto resultActivities = result.get();
@@ -155,9 +156,10 @@ IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHa
 			catch (...) {}
 			return concurrency::task_from_result(Activities::MakeFaulted());
 
-        })
+        }, token)
             .then([=](concurrency::task<Activities> result)
         {
+            progress.report(0.66f);
             try
             {
                 auto resultActivities = result.get();
@@ -174,11 +176,12 @@ IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHa
             }
 			catch (...) {}
 			return concurrency::task_from_result(Activities::MakeFaulted());
-        })
+        }, token)
             .then([=](concurrency::task<Activities> result)
         {
             try
             {
+                progress.report(0.99f);
                 std::unordered_set<Platform::String^> toastedLookup(_alreadyToasted.begin(), _alreadyToasted.end());
                 auto resultActivities = result.get();
 				if (!resultActivities.Faulted)
@@ -205,7 +208,7 @@ IAsyncAction^ ActivityManager::Refresh(Platform::String^ oAuthBlob, TypedEventHa
             catch (...)
             {
             }
-        });
+        }, token);
     });
 }
 

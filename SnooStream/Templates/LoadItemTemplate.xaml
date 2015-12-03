@@ -1,0 +1,31 @@
+﻿<ResourceDictionary
+    x:Class="SnooStream.Templates.LoadItemTemplate"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream.Templates"
+    xmlns:converters="using:SnooStream.Converters"
+    xmlns:vm="using:SnooStream.ViewModel"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <converters:NotLoadStateVisibilityConverter x:Key="notLoadedConverter" TargetState="Loaded" />
+    <converters:LoadStateVisibilityConverter x:Key="loadedConverter" TargetState="Loaded" />
+    <converters:LoadStateVisibilityConverter x:Key="noStateConverter" TargetState="None" />
+    <converters:LoadStateVisibilityConverter x:Key="loadingConverter" TargetState="Loading" />
+    <converters:LoadStateVisibilityConverter x:Key="cancelledConverter" TargetState="Cancelled" />
+    <converters:LoadStateVisibilityConverter x:Key="noItemsConverter" TargetState="NoItems" />
+    <converters:LoadStateVisibilityConverter x:Key="notFoundConverter" TargetState="NotFound" />
+    <converters:LoadStateVisibilityConverter x:Key="disallowedConverter" TargetState="Disallowed" />
+    <converters:LoadStateVisibilityConverter x:Key="networkFailureConverter" TargetState="NetworkFailure" />
+    <converters:LoadStateVisibilityConverter x:Key="networkCapturedConverter" TargetState="NetworkCaptured" />
+    <converters:LoadStateVisibilityConverter x:Key="failureConverter" TargetState="Failure" />
+    <converters:LoadStateVisibilityConverter x:Key="notAuthorized" TargetState="NotAuthorized" />
+
+    <DataTemplate x:Key="LoadItemView" x:DataType="vm:LoadViewModel">
+        <Grid DataContextChanged="Grid_DataContextChanged">
+            <ProgressBar Value="{x:Bind LoadPercent, Mode=OneWay}" Visibility="{x:Bind State, Converter={StaticResource loadingConverter}, Mode=OneWay}"/>
+        </Grid>
+    </DataTemplate>
+
+</ResourceDictionary>

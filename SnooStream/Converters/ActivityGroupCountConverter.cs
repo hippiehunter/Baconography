@@ -1,4 +1,5 @@
-﻿using SnooStream.ViewModel;
+﻿using SnooSharp;
+using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,18 +13,11 @@ namespace SnooStream.Converters
     {
         private string MessageGroupText(ActivityViewModel viewModel)
         {
-            if (viewModel is MessageActivityViewModel || viewModel is ModeratorMessageActivityViewModel)
+            if (viewModel.Thing.Data is Message)
             {
                 return "messages";
             }
-            else if (viewModel is ModeratorActivityViewModel)
-            {
-                return "activities";
-            }
-            else if (viewModel is ReportActivityViewModel)
-                return "reports";
-            else if (viewModel is PostedLinkActivityViewModel || viewModel is PostedCommentActivityViewModel ||
-                viewModel is RecivedCommentReplyActivityViewModel || viewModel is MentionActivityViewModel)
+            else if (viewModel.Thing.Data is Link)
             {
                 return "replies";
             }
@@ -33,16 +27,11 @@ namespace SnooStream.Converters
 
         private string NewnessGroupText(ActivityViewModel viewModel)
         {
-            if (viewModel is MessageActivityViewModel || viewModel is ModeratorMessageActivityViewModel)
+            if (viewModel.Thing.Data is Message)
             {
                 return "unread";
             }
-            else if (viewModel is ModeratorActivityViewModel || viewModel is ReportActivityViewModel)
-            {
-                return "unreviewed";
-            }
-            else if (viewModel is PostedLinkActivityViewModel || viewModel is PostedCommentActivityViewModel ||
-                viewModel is RecivedCommentReplyActivityViewModel || viewModel is MentionActivityViewModel)
+            else if (viewModel.Thing.Data is Link)
             {
                 return "unviewed";
             }
@@ -52,17 +41,8 @@ namespace SnooStream.Converters
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            int readCount = 0;
-
-            var group = value as ActivityGroupViewModel;
-
-            foreach (var activity in group.Activities)
-            {
-                readCount = activity.IsNew ? readCount : readCount + 1;
-            }
-
-            var adjustedCount = group.FirstActivity is PostedLinkActivityViewModel ? group.Activities.Count - 1 : group.Activities.Count;
-            return string.Format("{0} {1}, {2} {3}", adjustedCount, MessageGroupText(group.FirstActivity), adjustedCount - readCount, NewnessGroupText(group.FirstActivity));
+            var group = value as ActivityHeaderViewModel;
+            return string.Format("{0} {1}, {2} {3}", group.UnreadCount + group.ReadCount, "messages", group.ReadCount, "unread");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

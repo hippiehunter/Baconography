@@ -72,11 +72,7 @@ namespace SnooStream.Converters
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-#if WINDOWS_APP
-			bool multiColor = true;
-#else
-			bool multiColor = SnooStreamViewModel.Settings.MultiColorCommentMargins;
-#endif
+            bool multiColor = true;
 
 			if (multiColor)
             {

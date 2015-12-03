@@ -1,0 +1,143 @@
+﻿<ResourceDictionary
+    x:Class="SnooStream.Templates.CardLinkViewTemplate"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:SnooStream.ViewModel"
+    xmlns:selector="using:SnooStream.Selectors"
+    xmlns:converter="using:SnooStream.Converters"
+    xmlns:local="using:SnooStream.Templates">
+
+    <ResourceDictionary.MergedDictionaries>
+        <local:VotableControlTemplate />
+        <local:CommentCountControlTemplate />
+    </ResourceDictionary.MergedDictionaries>
+
+    <converter:LinkGlyphConverter x:Key="linkGlyphConverter" />
+    <converter:NullToOpacityConverter x:Key="nullToOpacityConverter" />
+    <converter:ClearableImageConverter x:Key="clearableImageConverter"/>
+    <converter:NullToEmptyConverter x:Key="nullToEmptyConverter" />
+    <converter:LinkMetadataConverter x:Key="linkMetadataConverter" />
+    
+    <selector:PreviewTemplateSelector x:Key="previewTemplateSelector">
+        <selector:PreviewTemplateSelector.ImagePreview>
+            <DataTemplate x:DataType="vm:ImageContentViewModel">
+                <Grid>
+                    <Image Margin="-12,0,-12,0" Source="{x:Bind HQThumbnailUrl, Mode=OneWay, Converter={StaticResource clearableImageConverter}}" HorizontalAlignment="Stretch" Stretch="UniformToFill"
+                                       VerticalAlignment="Center" Height="175" ImageOpened="hqImageControl_Loaded" />
+
+                    <Image Margin="-12,0,-12,0" x:Name="imageControl" Source="{x:Bind ThumbnailUrl, Converter={StaticResource clearableImageConverter}}" HorizontalAlignment="Stretch" Stretch="UniformToFill"
+                                       VerticalAlignment="Center" Height="175" Opacity="{x:Bind HQThumbnailUrl, Converter={StaticResource nullToOpacityConverter}}"/>
+
+                    <Border Padding="2" Margin="0,0,0,12" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                        <Border.Background>
+                            <SolidColorBrush Color="Black" Opacity="0.3" />
+                        </Border.Background>
+                        <TextBlock FontFamily="Segoe UI Symbol" FontSize="36" Foreground="White" Text="{x:Bind Converter={StaticResource linkGlyphConverter}}" />
+                    </Border>
+                </Grid>
+            </DataTemplate>
+        </selector:PreviewTemplateSelector.ImagePreview>
+        <selector:PreviewTemplateSelector.TextPreview>
+            <DataTemplate x:DataType="vm:TextContentViewModel">
+                <Grid Margin="-12,0,-12,0">
+                    <Grid.Background>
+                        <ImageBrush ImageSource="{x:Bind ThumbnailUrl, Converter={StaticResource clearableImageConverter}}" Opacity="0.2" Stretch="UniformToFill" />
+                    </Grid.Background>
+
+                    <Border Padding="12,12,12,12">
+                        <TextBlock Margin="0,0,0,0" Text="{x:Bind Synopsis, Mode=OneWay, Converter={StaticResource nullToEmptyConverter}}" Style="{StaticResource MarkdownTextBlockStyle}" 
+                                           TextTrimming="WordEllipsis" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                    </Border>
+
+                    <Border Padding="2" Margin="0,0,12,12" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                        <Border.Background>
+                            <SolidColorBrush Color="Black" Opacity="0.3" />
+                        </Border.Background>
+                        <TextBlock FontFamily="Segoe UI Symbol" FontSize="36" Foreground="White" Text="{x:Bind Converter={StaticResource linkGlyphConverter}}" />
+                    </Border>
+                </Grid>
+            </DataTemplate>
+        </selector:PreviewTemplateSelector.TextPreview>
+    </selector:PreviewTemplateSelector>
+
+    <DataTemplate x:Key="CardLinkView" x:DataType="vm:LinkViewModel">
+        <Border HorizontalAlignment="Stretch" Background="{ThemeResource ContentBackgroundBrush}" Margin="0,0,0,24" MinHeight="350">
+            <Border.Transitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition FromHorizontalOffset="400" />
+                </TransitionCollection>
+            </Border.Transitions>
+            <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0" x:Name="rootGrid">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Title block -->
+                <TextBlock Grid.Row="0"
+                   Style="{StaticResource TitleTextBlock}"
+                   Text="{x:Bind Thing.Title, Mode=OneTime}"
+                   TextTrimming="WordEllipsis"
+                   MaxLines="3">
+                    <TextBlock.Foreground>
+                        <Binding Converter="{StaticResource visitedMainLinkConverter}"/>
+                    </TextBlock.Foreground>
+                </TextBlock>
+
+                <!-- Link info, user / time / subreddit / domain -->
+                <ContentControl x:Name="linkMetadata" Grid.Row="1"
+                            Margin="0,5,0,-6"
+                            HorizontalAlignment="Stretch" Content="{x:Bind Converter={StaticResource linkMetadataConverter}, Mode=OneWay}"/>
+
+                <!-- Content block -->
+                <Button x:Name="previewSection" Grid.Row="2" Margin="0,0,0,0" Height="175"
+                    BorderThickness="0" Padding="0,0,0,0" Background="Transparent"
+                    VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" Content="{x:Null}" DataContext="{x:Null}"
+                    Command="{x:Bind GotoLink}" ContentTemplateSelector="{StaticResource previewTemplateSelector}">
+
+                </Button>
+
+                <!-- Action block, flyout menu / vote / comment count -->
+                <Grid x:Name="actionButtons" Grid.Row="3" Margin="0,0,0,0" HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Background="Transparent"
+                    HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
+                    BorderThickness="0" Padding="0"
+                    Margin="0,-12,-12,0"
+                    FontFamily="Segoe UI Symbol">
+                        <Grid>
+                            <TextBlock Margin="0,0,0,0" FontSize="35" Text="&#xE10C;" />
+                        </Grid>
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="Share Link" Command="{x:Bind Share}"/>
+                                <MenuFlyoutItem Text="Report" Command="{x:Bind Report}"/>
+                                <MenuFlyoutItem Text="Save" Command="{x:Bind Save}"/>
+                                <MenuFlyoutItem Text="User Details" Command="{x:Bind GotoUserDetails}"/>
+                                <MenuFlyoutItem Text="Hide" Command="{x:Bind Hide}"/>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+
+                    <ContentControl Grid.Column="1" DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" />
+
+                    <Button Grid.Column="2" Background="Transparent"
+                        HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
+                        Margin="0,-12,2,0"
+                        BorderThickness="0" Padding="0,0,0,0" 
+                        Command="{x:Bind GotoComments}" ContentTemplate="{StaticResource CommentCountControl}" />
+                </Grid>
+            </Grid>
+        </Border>
+    </DataTemplate>
+
+
+</ResourceDictionary>

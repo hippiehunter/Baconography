@@ -18,8 +18,6 @@ namespace SnooStream.Converters
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-			if (value is Preview)
-				return ((Preview)value).Glyph;
 			return LinkGlyphUtility.GetLinkGlyph(value);
         }
 
