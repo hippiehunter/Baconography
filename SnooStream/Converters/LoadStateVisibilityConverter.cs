@@ -36,4 +36,25 @@ namespace SnooStream.Converters
             throw new NotImplementedException();
         }
     }
+
+    public class LoadedConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is SubredditRiverViewModel)
+            {
+                if (((SubredditRiverViewModel)value).LoadState.State == LoadState.Loaded)
+                    return value;
+                else
+                    return ((SubredditRiverViewModel)value).LoadState;
+            }
+            else
+                return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

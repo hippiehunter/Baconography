@@ -123,6 +123,11 @@ namespace SnooStream.ViewModel
         }
     }
 
+    public interface ILinkContext
+    {
+        string CurrentUser { get; }
+    }
+
     public interface ILinkBuilderContext
     {
         void UpdateVotable(string name, int direction);
@@ -132,13 +137,14 @@ namespace SnooStream.ViewModel
         Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache);
         Task<Listing> LoadAdditional(IProgress<float> progress, CancellationToken token);
         bool IsMultiReddit { get; }
+        ILinkContext LinkContext { get; }
     }
 
     public static class LinkBuilder
     {
         public static IEnumerable<LinkViewModel> MakeLinkViewModels(IEnumerable<Thing> things, ILinkBuilderContext builderContext)
         {
-            var madeViewModels = things.Select(thing => new LinkViewModel { Thing = thing.Data as Link, Votable = new VotableViewModel(thing.Data as Link, builderContext.UpdateVotable), CommentCount = ((Link)thing.Data).CommentCount, FromMultiReddit = builderContext.IsMultiReddit }).ToList();
+            var madeViewModels = things.Select(thing => new LinkViewModel { Context = builderContext.LinkContext, Thing = thing.Data as Link, Votable = new VotableViewModel(thing.Data as Link, builderContext.UpdateVotable), CommentCount = ((Link)thing.Data).CommentCount, FromMultiReddit = builderContext.IsMultiReddit }).ToList();
             UpdateLinkMetadata(things, builderContext, madeViewModels);
             return madeViewModels;
         }
@@ -231,13 +237,17 @@ namespace SnooStream.ViewModel
 
     public class LinkViewModel : ObservableObject
     {
+        public ILinkContext Context { get; set; }
         public Link Thing { get; set; }
         public VotableViewModel Votable { get; set; }
         public LinkMeta Metadata { get; set; }
+        public MarkdownEditingViewModel Editing { get; set; }
         public int CommentCount { get; set; }
         public int ReadCommentCount { get; set; }
         public bool FromMultiReddit { get; set; }
-
+        public bool IsEditing { get; set; }
+        public bool CanEdit { get { return string.Compare(Thing.Author, Context.CurrentUser, true) == 0; } }
+        public bool CanDelete { get { return string.Compare(Thing.Author, Context.CurrentUser, true) == 0; } }
         public void UpdateThing(Link thing)
         {
             if (thing.CommentCount != CommentCount)
@@ -286,6 +296,26 @@ namespace SnooStream.ViewModel
 
         }
 
+        public void Edit()
+        {
+
+        }
+
+        public void SubmitEdit()
+        {
+
+        }
+
+        public void CancelEdit()
+        {
+
+        }
+
+        public void Delete()
+        {
+
+        }
+
         public void GotoUserDetails()
         {
 
@@ -294,12 +324,13 @@ namespace SnooStream.ViewModel
 
     class LinkBuilderContext : ILinkBuilderContext
     {
+        public ILinkContext LinkContext { get; set; }
         public string Subreddit { get; set; }
         public string Sort { get; set; }
         public SnooSharp.Reddit Reddit { get; set; }
         public OfflineService Offline { get; set; }
         private string _after;
-        private bool _hasCollectionLoadViewModel = false;
+        private bool _hasLoaded = false;
 
         public bool IsMultiReddit
         {
@@ -313,7 +344,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return !string.IsNullOrWhiteSpace(_after) && !_hasCollectionLoadViewModel;
+                return !_hasLoaded || !string.IsNullOrWhiteSpace(_after);
             }
         }
 
@@ -321,7 +352,7 @@ namespace SnooStream.ViewModel
         {
             return Task.Run(async () =>
             {
-                return (await Offline.GetLinkMetadata(linkNames)).ToDictionary(lm => ((ThingData)lm.Data).Name);
+                return (await Offline.GetLinkMetadata(linkNames)).Where(lm => lm != null).ToDictionary(lm => ((ThingData)lm.Data).Name);
             });
         }
 
@@ -333,6 +364,7 @@ namespace SnooStream.ViewModel
 
         public async Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache)
         {
+            _hasLoaded = true;
             var listing = await Reddit.GetPostsBySubreddit(Subreddit, token, progress, ignoreCache, Sort, null);
             _after = listing.Data.After;
             return listing;

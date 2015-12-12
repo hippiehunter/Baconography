@@ -23,7 +23,7 @@ namespace SnooStream.ViewModel
         void ChangeMulti(string url, string multi, bool subscribe);
     }
 
-    public class SubredditRiverViewModel
+    public class SubredditRiverViewModel : ObservableObject, IHasLoadableState
     {
         private ISubredditGroupBuilderContext subredditContext;
 

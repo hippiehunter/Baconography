@@ -91,6 +91,7 @@ namespace SnooStream.ViewModel
         public int Depth { get; set; }
         public VotableViewModel Votable { get; set; }
         public bool IsEditing { get; set; }
+        public MarkdownEditingViewModel Editing { get; set; }
         internal bool _collapsed;
         public bool Collapsed
         {

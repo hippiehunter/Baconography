@@ -36,6 +36,11 @@ namespace SnooStream.ViewModel
         Item
     }
 
+    public interface IHasLoadableState
+    {
+        LoadViewModel LoadState { get; }
+    }
+
     public class LoadViewModel : ObservableObject
     {
         public static CoreDispatcher UIDispatcher { get; set; }

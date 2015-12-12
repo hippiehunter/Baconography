@@ -1,0 +1,48 @@
+﻿<UserControl
+    x:Class="SnooStream.Controls.MarkdownEditorControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream.Controls"
+    xmlns:snoodom="using:SnooDom"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    x:Name="root"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+    <Grid Margin="0,12,0,12" HorizontalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <ListView Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapGrid Orientation="Horizontal" ItemWidth="50"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListViewItem DataContext="{Binding Path=InsertBold}" Tapped="Button_Tapped">
+                <TextBlock FontSize="22" FontWeight="Bold" Text="B"/>
+            </ListViewItem>
+            <ListViewItem DataContext="{Binding Path=InsertItalic}" Tapped="Button_Tapped">
+                <TextBlock FontSize="22" FontStyle="Italic" Text="i"/>
+            </ListViewItem>
+            <ListViewItem DataContext="{Binding Path=InsertLink}" Content="&#xE167;" FontFamily="Segoe UI Symbol" FontSize="22" Tapped="Button_Tapped"/>
+            <ListViewItem DataContext="{Binding Path=InsertQuote}" Content="&#x201D;" FontSize="22" Tapped="Button_Tapped"/>
+            <ListViewItem DataContext="{Binding Path=InsertBullet}" Content="&#x2022;" FontSize="22" Tapped="Button_Tapped"/>
+            <ListViewItem DataContext="{Binding Path=InsertList}" Content="&#xE14C;" FontFamily="Segoe UI Symbol" FontSize="22"  Tapped="Button_Tapped"/>
+            <ListViewItem DataContext="{Binding Path=InsertDisapproval}" Content="&#x0CA0;_&#x0CA0;" FontSize="22"  Tapped="Button_Tapped"/>
+        </ListView>
+
+        <TextBox x:Name="textBox" KeyUp="TextBox_KeyUp" AcceptsReturn="True" IsSpellCheckEnabled="True" TextChanged="TextBox_TextChanged" InputScope="Chat" 
+                 Text="{Binding Path=Text, Mode=TwoWay}" HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Row="1" 
+                 SelectionStart="{Binding SelectionStart, Mode=TwoWay}" SelectionLength="{Binding SelectionLength, Mode=TwoWay}"/>
+
+        <snoodom:MarkdownControl Markdown="{Binding Path=Markdown}" Grid.Row="2"
+                StyleProvider="{StaticResource markdownHelpers}"
+                CommandFactory="{StaticResource markdownHelpers}"
+                HorizontalAlignment="Stretch" />
+    </Grid>
+</UserControl>

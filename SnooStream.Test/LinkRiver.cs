@@ -37,6 +37,14 @@ namespace SnooStream.Test
                 }
             }
 
+            public ILinkContext LinkContext
+            {
+                get
+                {
+                    return null;
+                }
+            }
+
             public Task<Dictionary<string, LinkMeta>> GenerateLinkMeta(IEnumerable<string> linkNames)
             {
                 var result = new Dictionary<string, LinkMeta>();
