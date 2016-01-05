@@ -3,27 +3,36 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream.Templates"
+    xmlns:selector="using:SnooStream.Selectors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:SnooStream.ViewModel"
     mc:Ignorable="d">
 
     <ResourceDictionary.MergedDictionaries>
         <local:CardLinkViewTemplate />
     </ResourceDictionary.MergedDictionaries>
 
-    <DataTemplate x:Key="LinkRiverView">
+    <selector:LoadableItemTemplateSelector x:Key="loadableItemTemplateSelector" Default="{StaticResource CardLinkView}">
+        <selector:LoadableItemTemplateSelector.LoadItem>
+            <DataTemplate>
+                <TextBlock Text="Loading..." />
+            </DataTemplate>
+        </selector:LoadableItemTemplateSelector.LoadItem>
+    </selector:LoadableItemTemplateSelector>
+
+    <DataTemplate x:Key="LinkRiverView" x:DataType="vm:LinkRiverViewModel">
         <Grid>
             <ListView Grid.Column="0"  Margin="0,0,0,0"
                       SelectionMode="None"
-                      ItemsSource="{Binding Links}"
+                      ItemsSource="{x:Bind LinkViewSource.View}"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                      ContainerContentChanging="linksListView_ContainerContentChanging"
                       ShowsScrollingPlaceholders="False"
                       IsItemClickEnabled="False"
                       IncrementalLoadingTrigger="Edge"
                       IncrementalLoadingThreshold="10" 
                       VirtualizingStackPanel.VirtualizationMode="Recycling"
-                      ItemTemplate="{StaticResource CardLinkView}" 
+                      ItemTemplateSelector="{StaticResource loadableItemTemplateSelector}"
                       ItemContainerStyle="{StaticResource FullWidthListViewContainer}">
                 <ListView.ItemContainerTransitions>
                     <TransitionCollection>

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.UI.Xaml.Data;
 
 namespace SnooStream.ViewModel
 {
@@ -44,9 +45,12 @@ namespace SnooStream.ViewModel
                 },
                 IsCritical = true
             };
+
+            CollectionView = new CollectionViewSource { Source = SubredditGroups, ItemsPath = new Windows.UI.Xaml.PropertyPath("Collection"), IsSourceGrouped = true };
         }
 
         public ObservableCollection<object> SubredditGroups { get; set; } = new ObservableCollection<object>();
+        public CollectionViewSource CollectionView { get; set; }
         public DateTime? LastRefresh { get; private set; }
         public LoadViewModel LoadState { get; private set; }
     }

@@ -19,6 +19,14 @@ namespace SnooStreamCore.Test
 
         class TestSubredditBuilderContext : ISubredditGroupBuilderContext
         {
+            public bool IsLoggedIn
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
             public void ChangeMulti(string url, string multi, bool subscribe)
             {
                 throw new NotImplementedException();

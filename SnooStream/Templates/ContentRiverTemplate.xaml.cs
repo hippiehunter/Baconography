@@ -17,21 +17,11 @@ using Windows.UI.Xaml.Navigation;
 
 namespace SnooStream.Templates
 {
-    public sealed partial class LinkRiverTemplate : ResourceDictionary
+    public sealed partial class ContentRiverTemplate : ResourceDictionary
     {
-        public LinkRiverTemplate()
+        public ContentRiverTemplate()
         {
             this.InitializeComponent();
-        }
-
-        private void ListView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-        {
-
-        }
-
-        private void Grid_Loaded(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

@@ -11,8 +11,8 @@
     <AssemblyName>SnooStream</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.10240.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.10586.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
@@ -131,6 +131,7 @@
     <Compile Include="Converters\LoadStateVisibilityConverter.cs" />
     <Compile Include="Converters\NullToEmptyConverter.cs" />
     <Compile Include="Converters\NullToOpacityConverter.cs" />
+    <Compile Include="Converters\NumericToBooleanConverter.cs" />
     <Compile Include="Converters\StringCaseConverter.cs" />
     <Compile Include="Converters\TimeRelationConverter.cs" />
     <Compile Include="Converters\UnixTimeConverter.cs" />
@@ -147,6 +148,7 @@
     <Compile Include="Model\SnooSharpNetworkLayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Selectors\CommentTemplateSelector.cs" />
+    <Compile Include="Selectors\ContentTemplateSelector.cs" />
     <Compile Include="Selectors\LoadableItemTemplateSelector.cs" />
     <Compile Include="Selectors\PreviewTemplateSelector.cs" />
     <Compile Include="Templates\CardLinkViewTemplate.xaml.cs">
@@ -157,6 +159,9 @@
     </Compile>
     <Compile Include="Templates\CommentsTemplate.xaml.cs">
       <DependentUpon>CommentsTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\ContentRiverTemplate.xaml.cs">
+      <DependentUpon>ContentRiverTemplate.xaml</DependentUpon>
     </Compile>
     <Compile Include="Templates\LinkRiverTemplate.xaml.cs">
       <DependentUpon>LinkRiverTemplate.xaml</DependentUpon>
@@ -238,6 +243,10 @@
     <Page Include="Templates\CommentsTemplate.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Templates\ContentRiverTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Templates\LinkRiverTemplate.xaml">
       <SubType>Designer</SubType>

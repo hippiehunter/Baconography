@@ -34,57 +34,166 @@
         </Border>
     </DataTemplate>
 
+    <!-- Large form factor representation of a subreddit -->
     <DataTemplate x:Key="SubredditLargeView" x:DataType="vm:SubredditWrapper">
         <Grid>
-            <Grid Width="360" Background="White" Tapped="{x:Bind Navigate}">
+            <Grid Width="310" Height="150" Background="White" Tapped="{x:Bind Navigate}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="128" />
+                    <RowDefinition Height="118" />
                     <RowDefinition Height="32" />
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0">
                     <Image Source="{x:Bind Thing.HeaderImage, Converter={StaticResource clearableImageConverter}}"
-                                MaxHeight="128" MaxWidth="360" Height="{x:Bind HeaderImageHeight}"
+                                MaxHeight="118" MaxWidth="310" Height="{x:Bind HeaderImageHeight}"
                                 Width="{x:Bind HeaderImageWidth}" Margin="0"
-                                HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
 
                 <Border Grid.Row="1">
                     <TextBlock Foreground="Black" VerticalAlignment="Bottom" HorizontalAlignment="Right"
-                                                Margin="24,0,6,0" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}"/>
+                        Margin="24,0,12,6" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}"/>
                 </Border>
             </Grid>
         </Grid>
-
     </DataTemplate>
 
+    <Style x:Key="GroupHeaderTextBlock" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontWeight" Value="SemiLight" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="IsTextScaleFactorEnabled" Value="False"/>
+    </Style>
+
+    <!-- Subreddit River for large form factor -->
     <DataTemplate x:Key="SubredditRiverLargeView" x:DataType="vm:SubredditRiverViewModel">
         <Grid>
-            <Grid.Resources>
-                <CollectionViewSource x:Name="subredditViewSource" ItemsPath="Collection" IsSourceGrouped="True" Source="{x:Bind SubredditGroups}"/>
-            </Grid.Resources>
-
             <GridView HorizontalAlignment="Stretch" SelectionMode="None" HorizontalContentAlignment="Stretch"
-                  Margin="-12,12,-12,0"
-                  ItemsSource="{Binding Source={StaticResource subredditViewSource}}"
-                  ItemTemplate="{StaticResource SubredditLargeView}">
+                Margin="0,12,0,0" 
+                ItemsSource="{x:Bind CollectionView.View}"
+                ItemTemplate="{StaticResource SubredditLargeView}">
 
+                <GridView.GroupStyle>
+                    <GroupStyle HidesIfEmpty="True">
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid
+                                    Margin="-12,0,0,0"
+                                    Padding="0"
+                                    HorizontalAlignment="Stretch">
+                                    <TextBlock Text="{Binding Name}"
+                                        Padding="0,12,12,12"
+                                        Margin="0,0,0,0"
+                                        Style="{StaticResource GroupHeaderTextBlock}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                        <GroupStyle.HeaderContainerStyle>
+                            <Style TargetType="GridViewHeaderItem">
+                                <Setter Property="HorizontalAlignment" Value="Left" />
+                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                <Setter Property="Margin" Value="0,0,0,12" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="GridViewHeaderItem">
+                                            <Grid>
+                                                <Border Margin="0"
+                                                    Padding="0"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                                    <ContentPresenter Content="{TemplateBinding Content}"
+                                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                        Margin="{TemplateBinding Padding}"
+                                                        ContentTransitions="{TemplateBinding ContentTransitions}"
+                                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                                </Border>
+                                                <Rectangle x:Name="FocusVisualWhite"
+                                                    IsHitTestVisible="False"
+                                                    Stroke="{ThemeResource FocusVisualWhiteStrokeThemeBrush}"
+                                                    StrokeEndLineCap="Square"
+                                                    StrokeDashArray="1,1"
+                                                    Opacity="0"
+                                                    StrokeDashOffset="1.5" />
+                                                <Rectangle x:Name="FocusVisualBlack"
+                                                    IsHitTestVisible="False"
+                                                    Stroke="{ThemeResource FocusVisualBlackStrokeThemeBrush}"
+                                                    StrokeEndLineCap="Square"
+                                                    StrokeDashArray="1,1"
+                                                    Opacity="0"
+                                                    StrokeDashOffset="0.5" />
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.HeaderContainerStyle>
+                    </GroupStyle>
+                </GridView.GroupStyle>
             </GridView>
         </Grid>
-
     </DataTemplate>
 
+    <!-- Small form factor representation of a subreddit -->
+    <DataTemplate x:Key="SubredditSmallView"  x:DataType="vm:SubredditWrapper">
+        <Grid>
+            <Grid HorizontalAlignment="Stretch" Tapped="{x:Bind Navigate}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                BorderThickness="0" Padding="0" Margin="0,0,0,6"
+                                Background="White">
+                    <Grid HorizontalAlignment="Stretch" Height="64">
+                        <Grid.ColumnDefinitions>
+
+                        </Grid.ColumnDefinitions>
+                        <Image
+                            Source="{x:Bind Thing.HeaderImage, Converter={StaticResource clearableImageConverter}}"
+                            MaxHeight="64" MaxWidth="128" Height="{x:Bind HeaderImageHeight}"
+                            Width="{x:Bind HeaderImageWidth}" Margin="0"
+                            HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <Border HorizontalAlignment="Right">
+                            <Border.Background>
+                                <SolidColorBrush Color="White"/>
+                            </Border.Background>
+
+                            <TextBlock Foreground="Black" VerticalAlignment="Bottom"
+                                            Margin="24,0,12,6" Style="{StaticResource SubtextButtonTitleTextBlock}" Text="{x:Bind Thing.DisplayName}">
+                            </TextBlock>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+
+    <!-- Subreddit River for small form factor -->
     <DataTemplate x:Key="SubredditRiverSmallView" x:DataType="vm:SubredditRiverViewModel">
         <Grid>
-            <Grid.Resources>
-                <CollectionViewSource x:Name="subredditViewSource" ItemsPath="Collection" IsSourceGrouped="True" Source="{x:Bind SubredditGroups}"/>
-            </Grid.Resources>
             <ListView
 			HorizontalAlignment="Stretch" SelectionMode="None"
 			HorizontalContentAlignment="Stretch"
-			Margin="-12,-1,-12,0" ItemsSource="{Binding Source={StaticResource subredditViewSource}}"
+			Margin="-12,-1,-12,0" ItemsSource="{x:Bind CollectionView.View}"
             ItemContainerStyle="{StaticResource FullWidthListViewContainer}"
             ItemTemplate="{StaticResource SubredditSmallView}">
+                <!--<ListView.ItemTemplate>
+                <DataTemplate x:DataType="vm:SubredditWrapper">
+                    <Button Margin="0,0,0,0" Background="Transparent" BorderThickness="0" Tapped="listBox_ItemTap" Holding="Button_Holding"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{x:Bind Thing.DisplayName}"
+                            ContentTemplate="{StaticResource SubredditSmallView}">
+                    </Button>
+                </DataTemplate>
+            </ListView.ItemTemplate>-->
                 <ListView.GroupStyle>
                     <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource subredditGroupHeader}">
                     </GroupStyle>
@@ -108,7 +217,29 @@
 
     <DataTemplate x:Key="SubredditRiverView" x:DataType="vm:SubredditRiverViewModel">
         <UserControl>
-            <controls:LoadableControl LoadedContentTemplate="{StaticResource SubredditRiverLargeView}" LoadingContentTemplate="{StaticResource LoadItemView}" FailureContentTemplate="{StaticResource LoadItemView}" />
+            <Grid>
+                <!--<VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup>
+                        <VisualState>
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="720" />
+                            </VisualState.StateTriggers>
+                            <VisualState.Setters>
+                                <Setter Target="loadable.LoadedContentTemplate" Value="{StaticResource SubredditRiverLargeView}"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState>
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="0" />
+                            </VisualState.StateTriggers>
+                            <VisualState.Setters>
+                                <Setter Target="loadable.LoadedContentTemplate" Value="{StaticResource SubredditRiverSmallView}"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>-->
+                <controls:LoadableControl x:Name="loadable" LoadedContentTemplate="{StaticResource SubredditRiverLargeView}" LoadingContentTemplate="{StaticResource LoadItemView}" FailureContentTemplate="{StaticResource LoadItemView}" />
+            </Grid>
         </UserControl>
     </DataTemplate>
 </ResourceDictionary>

@@ -13,17 +13,20 @@ using CommonResourceAcquisition.VideoAcquisition;
 using CommonResourceAcquisition.ImageAcquisition;
 using NBoilerpipePortable.Extractors;
 using NBoilerpipePortable.Util;
+using Windows.UI.Xaml;
+using SnooStream.Common;
 
 namespace SnooStream.ViewModel
 {
     public interface IContentRiverContext
     {
         bool HasAdditional { get; }
+        IEnumerable<object> LoadInitial();
         Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token);
         void NavigateToWeb(string url);
         void NavigateToComments(string contextUrl);
         bool MakeCollectionViewSource { get; }
-        Task<ICommentBuilderContext> MakeCommentContext(string commentUrl);
+        Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token);
         void SetCurrent(int index);
     }
 
@@ -39,7 +42,7 @@ namespace SnooStream.ViewModel
         {
             Context = context;
             var contentCollection = new ContentCollection { Context = context };
-            ViewSource = new CollectionViewSource { Source = ContentItems };
+            ViewSource = new CollectionViewSource { Source = contentCollection };
             ViewSource.View.CurrentChanged += View_CurrentChanged;
             contentCollection.CollectionView = ViewSource.View;
             ContentItems = contentCollection;
@@ -61,7 +64,7 @@ namespace SnooStream.ViewModel
         //if we know what the content is make its view model
         //if we need to call an API first, make it a LoadViewModel
         public static object MakeContentViewModel(string url, string title, VotableViewModel votable, 
-            LinkViewModel linkViewModel, IContentRiverContext context, ICollectionView contentView, INetworkLayer networkLayer)
+            LinkViewModel linkViewModel, IContentRiverContext context, ICollectionView contentView, INetworkLayer networkLayer, ObservableCollection<object> collection)
         {
             object result = null;
             string targetHost = null;
@@ -79,7 +82,11 @@ namespace SnooStream.ViewModel
             if (linkViewModel != null && ((LinkViewModel)linkViewModel).Thing.IsSelf)
             {
                 //make comments view model from the link viewmodel
-                throw new NotImplementedException();
+                result = MakeSelfReplacingLoadViewModel(async (progress, token) =>
+                {
+                    var commentContext = await context.MakeCommentContext(url, progress, token);
+                    return commentContext.Comments;
+                }, contentView, collection);
             }
             //needs to return a CommentsViewModel for a comment/commentspage
             //AboutSubreddit for a subreddit
@@ -90,9 +97,9 @@ namespace SnooStream.ViewModel
             {
                 result = MakeSelfReplacingLoadViewModel(async (progress, token) =>
                 {
-                    var commentContext = await context.MakeCommentContext(url);
+                    var commentContext = await context.MakeCommentContext(url, progress, token);
                     return commentContext.Comments;
-                }, contentView);
+                }, contentView, collection);
             }
             else if (LinkGlyphUtility.IsSubreddit(url) || LinkGlyphUtility.IsUserMultiReddit(url))
             {
@@ -136,9 +143,9 @@ namespace SnooStream.ViewModel
                             PreviewUrl = await videoResult.PreviewUrl(networkLayer as IResourceNetworkLayer, progress, token),
                             PlayableStreams = await videoResult.PlayableStreams(networkLayer as IResourceNetworkLayer, progress, token)
                         };
-                    }, contentView);
+                    }, contentView, collection);
                 else
-                    result = ContentBuilder.MakeWebContent(url, title, contentView, networkLayer, context, linkViewModel, votable);
+                    result = ContentBuilder.MakeWebContent(url, title, contentView, networkLayer, context, linkViewModel, votable, collection);
 
             }
             else
@@ -153,7 +160,7 @@ namespace SnooStream.ViewModel
                         if (imageResult.Count() > 1)
                         {
                             var itemContentViewSource = context.MakeCollectionViewSource ? new CollectionViewSource() : null;
-                            var contentItems = new ObservableCollection<object>(imageResult.Select(tpl => MakeContentViewModel(tpl.Item2, tpl.Item1, null, null, context, itemContentViewSource?.View, networkLayer)));
+                            var contentItems = new ObservableCollection<object>(imageResult.Select(tpl => MakeContentViewModel(tpl.Item2, tpl.Item1, null, null, context, itemContentViewSource?.View, networkLayer, collection)));
                             return new ContentContainerViewModel
                             {
                                 Url = url,
@@ -169,7 +176,7 @@ namespace SnooStream.ViewModel
                         {
                             return new ImageContentViewModel { Url = imageResult.First().Item2, Title = title, HasComments = linkViewModel != null, Context = context, Votable = votable };
                         }
-                    }, contentView);
+                    }, contentView, collection);
                 }
                 else if (imageAPIType == ImageAPIType.Simple)
                 {
@@ -179,35 +186,41 @@ namespace SnooStream.ViewModel
                 {
                     //create LoadViewModel until we have at least the first part of the web data returned
                     //then replace it with a ContentCollectionViewModel comprised of TextContentViewModel and ImageContentViewModels
-                    result = ContentBuilder.MakeWebContent(url, title, contentView, networkLayer, context, linkViewModel, votable);
+                    result = ContentBuilder.MakeWebContent(url, title, contentView, networkLayer, context, linkViewModel, votable, collection);
                 }
             }
             return result;
         }
 
-        public static LoadViewModel MakeSelfReplacingLoadViewModel(Func<IProgress<float>, CancellationToken, Task<object>> viewModelMaker, ICollectionView collectionView)
+        public static LoadViewModel MakeSelfReplacingLoadViewModel(Func<IProgress<float>, CancellationToken, Task<object>> viewModelMaker, ICollectionView collectionView, ObservableCollection<object> collection)
         {
+            if (collectionView == null)
+                throw new ArgumentNullException();
+
             LoadViewModel loadViewModel = null;
             loadViewModel = new LoadViewModel
             {
                 LoadAction = async (progress, token) =>
                 {
                     var replacementViewModel = await viewModelMaker(progress, token);
-                    var itemIndex = collectionView.IndexOf(loadViewModel);
-                    collectionView[itemIndex] = replacementViewModel;
+                    Window.Current.Dispatcher.CurrentPriority = Windows.UI.Core.CoreDispatcherPriority.Idle;
+                    await Task.Yield();
+
+                    var itemIndex = collection.IndexOf(loadViewModel);
+                    await ((ContentCollection)collection).BlockingReplace(itemIndex, replacementViewModel);
                     SetCurrentContentItem(collectionView.CurrentPosition, collectionView, itemIndex);
                 }
             };
             return loadViewModel;
         }
 
-        public static LoadViewModel MakeWebContent(string url, string title, ICollectionView collectionView, INetworkLayer networkLayer, IContentRiverContext context, LinkViewModel linkViewModel, VotableViewModel votable)
+        public static LoadViewModel MakeWebContent(string url, string title, ICollectionView collectionView, INetworkLayer networkLayer, IContentRiverContext context, LinkViewModel linkViewModel, VotableViewModel votable, ObservableCollection<object> collection)
         {
             return MakeSelfReplacingLoadViewModel(async (progress, token) =>
             {
-                var itemContentViewSource = context.MakeCollectionViewSource ? new CollectionViewSource() : null;
                 var webContent = await LoadWebContent(networkLayer, url, progress, token, context);
                 var contentItems = new WebContentCollection(webContent.Item3, webContent.Item2, url, networkLayer, context);
+                var itemContentViewSource = context.MakeCollectionViewSource ? new CollectionViewSource { Source = contentItems } : null;
                 return new ContentContainerViewModel
                 {
                     Url = url,
@@ -218,7 +231,7 @@ namespace SnooStream.ViewModel
                     ContentItems = contentItems,
                     ViewSource = itemContentViewSource
                 };
-            }, collectionView);
+            }, collectionView, collection);
         }
 
         public static async Task<Tuple<string, string, IEnumerable<object>>> LoadWebContent(INetworkLayer networkLayer, string url, IProgress<float> progress, CancellationToken token, IContentRiverContext context)
@@ -464,6 +477,27 @@ namespace SnooStream.ViewModel
 
             return _loadTask.AsAsyncOperation();
         }
+
+        public async Task BlockingReplace(int index, object value)
+        {
+            bool notFinished = true;
+            while (notFinished)
+            {
+                try
+                {
+                    using (BlockReentrancy())
+                    {
+                        SetItem(index, value);
+                        notFinished = false;
+                    }
+                }
+                catch
+                {
+
+                }
+                await Task.Yield();
+            }
+        }
     }
 
     public class ContentViewModel : ObservableObject
@@ -499,21 +533,27 @@ namespace SnooStream.ViewModel
 
     public class VideoContentViewModel : ContentViewModel
     {
+        public bool IsPlaying { get; set; }
+        public double PlayPosition { get; set; }
+        public bool IsLooping { get; set; }
         public string PreviewUrl { get; set; }
         public IEnumerable<Tuple<string, string>> PlayableStreams { get; set; }
     }
 
     public class ContentContainerViewModel : ContentViewModel
     {
+        public bool SingleViewItem { get; set; }
         public ObservableCollection<object> ContentItems { get; set; }
         public CollectionViewSource ViewSource { get; set; }
     }
 
     public class LinkContentRiverContext : IContentRiverContext
     {
+        public INavigationContext NavigationContext { get; set; }
         public INetworkLayer NetworkLayer { get; set; }
         public LinkRiverViewModel LinkRiverContext { get; set; }
         public ICollectionView ContentView { get; set; }
+        public ObservableCollection<object> Collection { get; set; }
         public bool HasAdditional
         {
             get
@@ -534,7 +574,7 @@ namespace SnooStream.ViewModel
         public async Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token)
         {
             var additionalListing = await LinkRiverContext.LoadAdditionalAsync(progress, token);
-            return additionalListing.Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, link.Thing.Title, link.Votable, link, this, ContentView, NetworkLayer));
+            return additionalListing.Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, link.Thing.Title, link.Votable, link, this, ContentView, NetworkLayer, Collection));
         }
 
         public void NavigateToComments(string contextUrl)
@@ -547,14 +587,21 @@ namespace SnooStream.ViewModel
             throw new NotImplementedException();
         }
 
-        public Task<ICommentBuilderContext> MakeCommentContext(string commentUrl)
+        public async Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
         {
-            throw new NotImplementedException();
+            var comments = NavigationContext.MakeCommentContext(commentUrl, null, null, null);
+            await comments.LoadAsync(progress, token);
+            return comments.Context;
         }
 
         public void SetCurrent(int index)
         {
             LinkRiverContext.LinkViewSource.View.MoveCurrentToPosition(index);
+        }
+
+        public IEnumerable<object> LoadInitial()
+        {
+            return LinkRiverContext.Links.OfType<LinkViewModel>().Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, link.Thing.Title, link.Votable, link, this, ContentView, NetworkLayer, Collection));
         }
     }
 
@@ -572,6 +619,7 @@ namespace SnooStream.ViewModel
         public CommentsViewModel Comments { get; set; }
         public INetworkLayer NetworkLayer { get; set; }
         public ICollectionView CollectionView { get; set; }
+        public ObservableCollection<object> Collection { get; set; }
 
         public bool MakeCollectionViewSource
         {
@@ -590,10 +638,14 @@ namespace SnooStream.ViewModel
                 var comment = commentObj as CommentViewModel;
                 if (comment != null)
                 {
-                    var bodyMD = await comment.BodyMDTask;
-                    foreach (var link in bodyMD.GetLinks())
+                    await comment.BodyMDTask;
+                    var bodyMD = comment.Body as SnooDom.SnooDom;
+                    if (bodyMD != null)
                     {
-                        result.Add(ContentBuilder.MakeContentViewModel(link.Key, link.Value, comment.Votable, null, this, CollectionView, NetworkLayer));
+                        foreach (var link in bodyMD.GetLinks())
+                        {
+                            result.Add(ContentBuilder.MakeContentViewModel(link.Key, link.Value, comment.Votable, null, this, CollectionView, NetworkLayer, Collection));
+                        }
                     }
                 }
             }
@@ -610,7 +662,7 @@ namespace SnooStream.ViewModel
             //goto reddit url
         }
 
-        public Task<ICommentBuilderContext> MakeCommentContext(string commentUrl)
+        public Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
         {
             throw new NotImplementedException();
         }
@@ -618,6 +670,11 @@ namespace SnooStream.ViewModel
         public void SetCurrent(int index)
         {
             //set the focused item from the comment context we came from
+        }
+
+        public IEnumerable<object> LoadInitial()
+        {
+            return Enumerable.Empty<object>();
         }
     }
 }

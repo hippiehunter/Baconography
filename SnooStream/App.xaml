@@ -7,69 +7,87 @@
     xmlns:converters="using:SnooStream.Converters"
     RequestedTheme="Light">
     <Application.Resources>
-        <converters:NullToEmptyConverter x:Key="nullToEmptyConverter" />
-        <converters:NullToOpacityConverter x:Key="nullToOpacityConverter" />
-        <converters:ClearableImageConverter x:Key="clearableImageConverter"/>
-        <converters:ActivityMetadataConverter x:Key="activityMetadataConverter" />
-        <converters:LinkMetadataConverter x:Key="linkMetadataConverter" />
-        <converters:VoteIndicatorConverter x:Key="voteIndicatorConverter" />
-        <converters:VoteSymbolConverter x:Key="voteSymbolConverter" />
-        <converters:VoteUriConverter x:Key="voteUriConverter" />
-        <converters:BooleanVisibilityConverter x:Key="booleanVisibilityConverter" />
-        <converters:InvertedBooleanVisibilityConverter x:Key="invertedBooleanVisibilityConverter" />
-        <converters:LinkGlyphConverter x:Key="linkGlyphConverter" />
-        <converters:TimeRelationConverter x:Key="timeRelationConverter" />
-        <converters:ShortTimeRelationConverter x:Key="shortTimeRelationConverter" />
-        <converters:DomainConverter x:Key="domainConverter" />
-        <converters:VisitedLinkConverter x:Key="visitedLinkConverter" />
-        <converters:VisitedMainLinkConverter x:Key="visitedMainLinkConverter" />
-        <converters:VoteColorConverter x:Key="voteColorConverter" />
-        <converters:CommentDepthColorConverter x:Key="commentDepthColorConverter" />
-        <converters:CommentDepthMarginConverter x:Key="commentDepthMarginConverter" />
-        <converters:InvertedBooleanConverter x:Key="invertedBooleanConverter" />
-        <converters:BoolToAccentBrushConverter x:Key="boolToAccentBrushConverter" />
-        <converters:UnixTimeConverter x:Key="unixTimeConverter" />
-        <common:LinkViewLayoutManager x:Key="linkViewLayoutManager" />
-        <common:MarkdownHelpers x:Key="markdownHelpers" />
-        <converters:AuthorFlairKindConverter x:Key="authorFlairKindConverter" />
-        <converters:ForegroundAuthorFlairKindConverter x:Key="fgAuthorFlairKindConverter" />
-        <converters:BlankVisibilityConverter x:Key="blankVisibilityConverter" />
-        <converters:StringToUpperConverter x:Key="stringToUpperConverter" />
-        <converters:StringToLowerConverter x:Key="stringToLowerConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FFDCDCDC" />
+                    <SolidColorBrush x:Key="InvertThemeForegroundBrush" Color="White" />
+                    <SolidColorBrush x:Key="ThemeForegroundBrush" Color="Black" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Default">
+                    <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FF1F1F1F" />
+                    <SolidColorBrush x:Key="InvertThemeForegroundBrush" Color="Black" />
+                    <SolidColorBrush x:Key="ThemeForegroundBrush" Color="White" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+            <converters:NullToEmptyConverter x:Key="nullToEmptyConverter" />
+            <converters:NullToOpacityConverter x:Key="nullToOpacityConverter" />
+            <converters:ClearableImageConverter x:Key="clearableImageConverter"/>
+            <converters:ActivityMetadataConverter x:Key="activityMetadataConverter" />
+            <converters:LinkMetadataConverter x:Key="linkMetadataConverter" />
+            <converters:VoteIndicatorConverter x:Key="voteIndicatorConverter" />
+            <converters:VoteSymbolConverter x:Key="voteSymbolConverter" />
+            <converters:VoteUriConverter x:Key="voteUriConverter" />
+            <converters:BooleanVisibilityConverter x:Key="booleanVisibilityConverter" />
+            <converters:InvertedBooleanVisibilityConverter x:Key="invertedBooleanVisibilityConverter" />
+            <converters:LinkGlyphConverter x:Key="linkGlyphConverter" />
+            <converters:TimeRelationConverter x:Key="timeRelationConverter" />
+            <converters:ShortTimeRelationConverter x:Key="shortTimeRelationConverter" />
+            <converters:DomainConverter x:Key="domainConverter" />
+            <converters:VisitedLinkConverter x:Key="visitedLinkConverter" />
+            <converters:VisitedMainLinkConverter x:Key="visitedMainLinkConverter" />
+            <converters:VoteColorConverter x:Key="voteColorConverter" />
+            <converters:CommentDepthColorConverter x:Key="commentDepthColorConverter" />
+            <converters:CommentDepthMarginConverter x:Key="commentDepthMarginConverter" />
+            <converters:InvertedBooleanConverter x:Key="invertedBooleanConverter" />
+            <converters:BoolToAccentBrushConverter x:Key="boolToAccentBrushConverter" />
+            <converters:UnixTimeConverter x:Key="unixTimeConverter" />
+            <common:LinkViewLayoutManager x:Key="linkViewLayoutManager" />
+            <common:MarkdownHelpers x:Key="markdownHelpers" />
+            <converters:AuthorFlairKindConverter x:Key="authorFlairKindConverter" />
+            <converters:ForegroundAuthorFlairKindConverter x:Key="fgAuthorFlairKindConverter" />
+            <converters:BlankVisibilityConverter x:Key="blankVisibilityConverter" />
+            <converters:StringToUpperConverter x:Key="stringToUpperConverter" />
+            <converters:StringToLowerConverter x:Key="stringToLowerConverter" />
+            <converters:InvertedFloatToBooleanConverter x:Key="invertedFloatToBooleanConverter" />
 
-        <FontFamily x:Key="ContentControlThemeFontFamily">Segoe WP</FontFamily>
-        <x:Double x:Key="ControlContentThemeFontSize">12</x:Double>
-        <Thickness x:Key="ListViewItemMargin">0</Thickness>
-        <SolidColorBrush x:Key="CheckBoxBackgroundThemeBrush" Color="Transparent"/>
-        <x:Double x:Key="CheckBoxBorderThemeThickness">2.5</x:Double>
-        <x:Double x:Key="ListViewItemContentOffsetX">-40.5</x:Double>
-        <Thickness x:Key="ListViewItemMultiselectCheckBoxMargin">0,9.5,0,0</Thickness>
-        <Thickness x:Key="GridViewItemMultiselectBorderThickness">2.5</Thickness>
-        <x:Double x:Key="ListViewItemDisabledThemeOpacity">0.55</x:Double>
-        <x:Double x:Key="ListViewItemContentTranslateX">40.5</x:Double>
-        <x:Double x:Key="ListViewItemReorderHintThemeOffset">32</x:Double>
+            <FontFamily x:Key="ContentControlThemeFontFamily">Segoe WP</FontFamily>
+            <x:Double x:Key="ControlContentThemeFontSize">12</x:Double>
+            <Thickness x:Key="ListViewItemMargin">0</Thickness>
+            <SolidColorBrush x:Key="CheckBoxBackgroundThemeBrush" Color="Transparent"/>
+            <x:Double x:Key="CheckBoxBorderThemeThickness">2.5</x:Double>
+            <x:Double x:Key="ListViewItemContentOffsetX">-40.5</x:Double>
+            <Thickness x:Key="ListViewItemMultiselectCheckBoxMargin">0,9.5,0,0</Thickness>
+            <Thickness x:Key="GridViewItemMultiselectBorderThickness">2.5</Thickness>
+            <x:Double x:Key="ListViewItemDisabledThemeOpacity">0.55</x:Double>
+            <x:Double x:Key="ListViewItemContentTranslateX">40.5</x:Double>
+            <x:Double x:Key="ListViewItemReorderHintThemeOffset">32</x:Double>
 
-        <Style x:Key="RoundButtonStyle" TargetType="Button">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid Background="Transparent">
-                            <Ellipse x:Name="Circle" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" StrokeThickness="2"/>
-                            <ContentControl x:Name="Content" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" />
+            <Style x:Key="RoundButtonStyle" TargetType="Button">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid Background="Transparent">
+                                <Ellipse x:Name="Circle" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" StrokeThickness="2"/>
+                                <ContentControl x:Name="Content" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" />
 
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
 
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <Style x:Key="MessageTextBox" TargetType="TextBox">
-            <!--Setter Property="AcceptsReturn" Value="True" />
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource ThemeForegroundBrush}" />
+            </Style>
+            
+            <Style x:Key="MessageTextBox" TargetType="TextBox">
+                <!--Setter Property="AcceptsReturn" Value="True" />
         <Setter Property="Padding" Value="2" />
         <Setter Property="Template">
             <Setter.Value>
@@ -160,10 +178,10 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter-->
-        </Style>
+            </Style>
 
-        <Style x:Key="MessageButtonStyle" TargetType="Button">
-            <!--Setter Property="Template">
+            <Style x:Key="MessageButtonStyle" TargetType="Button">
+                <!--Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Grid Background="Transparent">
@@ -207,110 +225,110 @@
                 </ControlTemplate>
             </Setter.Value>
         </-->
-        </Style>
+            </Style>
 
-        <Style x:Key="SubtextButtonTitleTextBlock" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Segoe UI" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="FontSize" Value="22" />
-        </Style>
+            <Style x:Key="SubtextButtonTitleTextBlock" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="FontSize" Value="22" />
+            </Style>
 
-        <Style x:Key="SubtextButtonSubtextTextBlock" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Segoe UI" />
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Foreground" Value="#99FFFFFF" />
-        </Style>
+            <Style x:Key="SubtextButtonSubtextTextBlock" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="#99FFFFFF" />
+            </Style>
 
-        <Style x:Key="SubtextButtonBodyTextBlock" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Segoe UI" />
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="FontWeight" Value="Normal" />
-            <Setter Property="Foreground" Value="#99FFFFFF" />
-        </Style>
+            <Style x:Key="SubtextButtonBodyTextBlock" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontWeight" Value="Normal" />
+                <Setter Property="Foreground" Value="#99FFFFFF" />
+            </Style>
 
-        <Style x:Key="SubtextButton" TargetType="Button">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="Padding" Value="0,0,0,0" />
-            <Setter Property="Margin" Value="0,0,0,0" />
-        </Style>
+            <Style x:Key="SubtextButton" TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="Padding" Value="0,0,0,0" />
+                <Setter Property="Margin" Value="0,0,0,0" />
+            </Style>
 
-        <Style x:Key="MarkdownTextBlockStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="TextWrapping" Value="WrapWholeWords" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="FontWeight" Value="Normal" />
-            <Setter Property="FontFamily" Value="Calibri" />
-        </Style>
+            <Style x:Key="MarkdownTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="TextWrapping" Value="WrapWholeWords" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="FontWeight" Value="Normal" />
+                <Setter Property="FontFamily" Value="Calibri" />
+            </Style>
 
-        <Style x:Key="MarkdownRichTextBlockStyle" TargetType="RichTextBlock">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="TextWrapping" Value="WrapWholeWords" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="FontWeight" Value="Normal" />
-            <Setter Property="FontStyle" Value="Normal" />
-            <Setter Property="FontFamily" Value="Calibri" />
-        </Style>
+            <Style x:Key="MarkdownRichTextBlockStyle" TargetType="RichTextBlock">
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="TextWrapping" Value="WrapWholeWords" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="FontWeight" Value="Normal" />
+                <Setter Property="FontStyle" Value="Normal" />
+                <Setter Property="FontFamily" Value="Calibri" />
+            </Style>
 
-        <Style x:Key="PlainButtonTextBlock" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="FontFamily" Value="Segoe UI" />
-        </Style>
+            <Style x:Key="PlainButtonTextBlock" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="FontFamily" Value="Segoe UI" />
+            </Style>
 
-        <Style x:Key="VoteArrowTextBlock" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="18" />
-            <Setter Property="Text" Value="&#xE110;" />
-            <Setter Property="IsTextScaleFactorEnabled" Value="False"/>
-            <Setter Property="FontFamily" Value="Segoe UI Symbol" />
-        </Style>
+            <Style x:Key="VoteArrowTextBlock" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="Text" Value="&#xE110;" />
+                <Setter Property="IsTextScaleFactorEnabled" Value="False"/>
+                <Setter Property="FontFamily" Value="Segoe UI Symbol" />
+            </Style>
 
-        <Style x:Key="ReadabilityTextBlock" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="FontFamily" Value="Calibri" />
-        </Style>
+            <Style x:Key="ReadabilityTextBlock" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="FontFamily" Value="Calibri" />
+            </Style>
 
-        <Style x:Key="TitleTextBlock" TargetType="TextBlock" BasedOn="{StaticResource SubheaderTextBlockStyle}">
-            <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="FontFamily" Value="Calibri" />
-        </Style>
+            <Style x:Key="TitleTextBlock" TargetType="TextBlock" BasedOn="{StaticResource SubheaderTextBlockStyle}">
+                <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="FontFamily" Value="Calibri" />
+            </Style>
 
-        <Style x:Key="MarkdownRunStyle" TargetType="Run">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="FontWeight" Value="Normal" />
-            <Setter Property="FontStyle" Value="Normal" />
-            <Setter Property="FontFamily" Value="Calibri" />
-        </Style>
+            <Style x:Key="MarkdownRunStyle" TargetType="Run">
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontWeight" Value="Normal" />
+                <Setter Property="FontStyle" Value="Normal" />
+                <Setter Property="FontFamily" Value="Calibri" />
+            </Style>
 
-        <Style x:Key="MarkdownBorderStyle" TargetType="Border">
-            <Setter Property="Margin" Value="0" />
-        </Style>
+            <Style x:Key="MarkdownBorderStyle" TargetType="Border">
+                <Setter Property="Margin" Value="0" />
+            </Style>
 
-        <DataTemplate x:Key="ToggleContent">
-            <Grid>
-                <TextBlock Margin="0,0,0,0" Text="{Binding Converter={StaticResource stringToUpperConverter}}"/>
-            </Grid>
-        </DataTemplate>
-        <Style x:Key="FullWidthListViewContainer" TargetType="ListViewItem">
-            <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
-            <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
-            <Setter Property="TabNavigation" Value="Local"/>
-            <Setter Property="IsHoldingEnabled" Value="True"/>
-            <Setter Property="Padding" Value="12,0,12,0"/>
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="MinWidth" Value="{ThemeResource ListViewItemMinWidth}"/>
-            <Setter Property="MinHeight" Value="{ThemeResource ListViewItemMinHeight}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListViewItem">
-                        <ListViewItemPresenter CheckBrush="{ThemeResource SystemControlForegroundBaseMediumHighBrush}" 
+            <DataTemplate x:Key="ToggleContent">
+                <Grid>
+                    <TextBlock Margin="0,0,0,0" Text="{Binding Converter={StaticResource stringToUpperConverter}}"/>
+                </Grid>
+            </DataTemplate>
+            <Style x:Key="FullWidthListViewContainer" TargetType="ListViewItem">
+                <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
+                <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
+                <Setter Property="TabNavigation" Value="Local"/>
+                <Setter Property="IsHoldingEnabled" Value="True"/>
+                <Setter Property="Padding" Value="12,0,12,0"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="MinWidth" Value="{ThemeResource ListViewItemMinWidth}"/>
+                <Setter Property="MinHeight" Value="{ThemeResource ListViewItemMinHeight}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListViewItem">
+                            <ListViewItemPresenter CheckBrush="{ThemeResource SystemControlForegroundBaseMediumHighBrush}" 
                                            ContentMargin="{TemplateBinding Padding}" 
                                            CheckMode="Inline" 
                                            ContentTransitions="{TemplateBinding ContentTransitions}" 
@@ -333,29 +351,31 @@
                                            SelectedPointerOverBackground="{ThemeResource SystemControlHighlightListAccentMediumBrush}" 
                                            SelectedBackground= "Transparent" 
                                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <ItemsPanelTemplate x:Key="HorizontalItemsPanel">
-            <VirtualizingStackPanel AreScrollSnapPointsRegular="True" Orientation="Horizontal" />
-        </ItemsPanelTemplate>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <ItemsPanelTemplate x:Key="HorizontalItemsPanel">
+                <VirtualizingStackPanel AreScrollSnapPointsRegular="True" Orientation="Horizontal" />
+            </ItemsPanelTemplate>
 
-        <ItemsPanelTemplate x:Key="VerticalItemsPanel">
-            <VirtualizingStackPanel AreScrollSnapPointsRegular="True" Orientation="Vertical" />
-        </ItemsPanelTemplate>
+            <ItemsPanelTemplate x:Key="VerticalItemsPanel">
+                <VirtualizingStackPanel AreScrollSnapPointsRegular="True" Orientation="Vertical" />
+            </ItemsPanelTemplate>
 
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="Transparent" />
-        </Style>
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
 
-        <Style x:Key="PageTitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="TextWrapping" Value="NoWrap"/>
-            <Setter Property="CharacterSpacing" Value="75"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="Margin" Value="12, 14, 12, 4"/>
-        </Style>
+            <Style x:Key="PageTitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="TextWrapping" Value="NoWrap"/>
+                <Setter Property="CharacterSpacing" Value="75"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="Margin" Value="12, 14, 12, 4"/>
+            </Style>
+            
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

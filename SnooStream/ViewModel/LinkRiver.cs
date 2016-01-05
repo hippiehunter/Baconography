@@ -11,11 +11,14 @@ using Windows.Foundation;
 using System.Threading;
 using SnooStream.Common;
 using System.Diagnostics;
+using Windows.ApplicationModel.DataTransfer;
+using SnooStream.Controls;
 
 namespace SnooStream.ViewModel
 {
-    public class LinkRiverViewModel
+    public class LinkRiverViewModel : IHasTitle
     {
+        public string Title { get { return Context.Title; } }
         public ILinkBuilderContext Context { get; set; }
         public Subreddit Thing { get; set; }
         public string Sort { get; set; }
@@ -113,6 +116,12 @@ namespace SnooStream.ViewModel
             }
         }
 
+        private void AddRange(IEnumerable<LinkViewModel> collection)
+        {
+            foreach (var item in collection)
+                Add(item);
+        }
+
         private async Task<LoadMoreItemsResult> LoadItem(LoadViewModel loadItem)
         {
             var itemCount = Count - 1;
@@ -125,11 +134,24 @@ namespace SnooStream.ViewModel
 
     public interface ILinkContext
     {
+        bool IsHighBandwidth { get; }
         string CurrentUser { get; }
+        void GotoComments(LinkViewModel linkViewModel);
+        Task<Thing> GetThing(string url);
+        void UpdateVotable(string name, int direction);
+        void GotoLink(string url);
+        void Share(LinkViewModel linkViewModel);
+        void Hide(LinkViewModel linkViewModel);
+        void Report(string id);
+        void Save(string id);
+        void Delete(LinkViewModel linkViewModel);
+        void SubmitEdit(MarkdownEditingViewModel editing);
+        void GotoUserDetails(string author);
     }
 
     public interface ILinkBuilderContext
     {
+        string Title { get; }
         void UpdateVotable(string name, int direction);
         Task<Dictionary<string, LinkMeta>> GenerateLinkMeta(IEnumerable<string> linkNames);
         void HandleError(Exception ex);
@@ -142,6 +164,13 @@ namespace SnooStream.ViewModel
 
     public static class LinkBuilder
     {
+        public static async Task<LinkViewModel> MakeLinkViewModel(string url, ILinkContext context)
+        {
+            var madeThing = await context.GetThing(url);
+            var linkViewModel = new LinkViewModel { Context = context, Thing = madeThing.Data as Link, Votable = new VotableViewModel(madeThing.Data as Link, context.UpdateVotable), CommentCount = ((Link)madeThing.Data).CommentCount, FromMultiReddit = false };
+            return linkViewModel;
+        }
+
         public static IEnumerable<LinkViewModel> MakeLinkViewModels(IEnumerable<Thing> things, ILinkBuilderContext builderContext)
         {
             var madeViewModels = things.Select(thing => new LinkViewModel { Context = builderContext.LinkContext, Thing = thing.Data as Link, Votable = new VotableViewModel(thing.Data as Link, builderContext.UpdateVotable), CommentCount = ((Link)thing.Data).CommentCount, FromMultiReddit = builderContext.IsMultiReddit }).ToList();
@@ -261,6 +290,41 @@ namespace SnooStream.ViewModel
             
         }
 
+        private PreviewImage Preview
+        {
+            get
+            {
+                if (Thing.Preview?.images != null)
+                {
+                    var previewImages = Thing.Preview.images.OrderBy(thing => thing.source.height * thing.source.width);
+                    if (Context.IsHighBandwidth)
+                        return previewImages.FirstOrDefault();
+                    else
+                        return previewImages.LastOrDefault();
+                }
+                else
+                    return null;
+            }
+        }
+
+        public bool HasPreview { get { return Preview != null; } }
+
+        public string PreviewSource
+        {
+            get
+            {
+                return Preview?.source.url;
+            }
+        }
+
+        public double PreviewHeight
+        {
+            get
+            {
+                return Preview?.source.height ?? 0.0;
+            }
+        }
+
         public void UpdateMetadata(LinkMeta linkMeta)
         {
             Metadata = linkMeta;
@@ -271,59 +335,165 @@ namespace SnooStream.ViewModel
             }
         }
 
+        public void GotoLink()
+        {
+            Context.GotoLink(Thing.Url);
+        }
+
         public void GotoComments()
         {
-
+            Context.GotoComments(this);
         }
 
         public void Share()
         {
-
+            Context.Share(this);
         }
 
         public void Hide()
         {
-
+            Context.Hide(this);
         }
 
         public void Report()
         {
-
+            Context.Report(Thing.Id);
         }
 
         public void Save()
         {
-
+            Context.Save(Thing.Id);
         }
 
         public void Edit()
         {
-
+            
         }
 
         public void SubmitEdit()
         {
-
+            IsEditing = false;
+            RaisePropertyChanged("IsEditing");
+            Context.SubmitEdit(Editing);
         }
 
         public void CancelEdit()
         {
-
+            Editing = null;
+            IsEditing = false;
+            RaisePropertyChanged("Editing");
+            RaisePropertyChanged("IsEditing");
         }
 
         public void Delete()
         {
-
+            Context.Delete(this);
         }
 
         public void GotoUserDetails()
         {
+            Context.GotoUserDetails(Thing.Author);
+        }
+    }
 
+    class LinkContext : ILinkContext
+    {
+        public LinkRiverViewModel LinkRiver { get; set; }
+        public INavigationContext NavigationContext { get; set; }
+        public Reddit Reddit { get; set; }
+        public string CurrentUser { get { return Reddit.CurrentUserName; } }
+
+        public bool IsHighBandwidth
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public void GotoComments(LinkViewModel link)
+        {
+            Navigation.GotoComments(link.Thing.Permalink, NavigationContext, link);
+        }
+
+        public Task<Thing> GetThing(string url)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async void UpdateVotable(string name, int direction)
+        {
+            try
+            {
+                await Reddit.AddVote(name, direction);
+            }
+            catch { }
+        }
+
+        public void GotoLink(string url)
+        {
+            Navigation.GotoLink(LinkRiver, url, NavigationContext);
+        }
+
+        public void Share(LinkViewModel linkViewModel)
+        {
+            DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
+            dataTransferManager.DataRequested += new TypedEventHandler<DataTransferManager,
+                DataRequestedEventArgs>((sender, e) =>
+                {
+                    DataRequest request = e.Request;
+                    request.Data.Properties.Title = linkViewModel.Thing.Title;
+                    request.Data.Properties.Description = linkViewModel.Thing.Permalink;
+                    request.Data.SetWebLink(new Uri(linkViewModel.Thing.Url));
+                });
+
+            Windows.ApplicationModel.DataTransfer.DataTransferManager.ShowShareUI();
+        }
+
+        public void Hide(LinkViewModel linkViewModel)
+        {
+            LinkRiver.Links.Remove(linkViewModel);
+            Reddit.HideThing(linkViewModel.Thing.Id);
+        }
+
+        public void Report(string id)
+        {
+            Reddit.AddReportOnThing(id);
+        }
+
+        public void Save(string id)
+        {
+            Reddit.AddSavedThing(id);
+        }
+
+        public async void Delete(LinkViewModel linkViewModel)
+        {
+            LinkRiver.Links.Remove(linkViewModel);
+            try
+            {
+                await Reddit.DeleteLinkOrComment(linkViewModel.Thing.Id);
+            }
+            catch { }
+        }
+
+        public async void SubmitEdit(MarkdownEditingViewModel editing)
+        {
+            try
+            {
+                await Reddit.EditPost(editing.Text, editing.Context.TargetName);
+            }
+            catch { }
+        }
+
+        public void GotoUserDetails(string author)
+        {
+            Navigation.GotoUserDetails(author, NavigationContext);
         }
     }
 
     class LinkBuilderContext : ILinkBuilderContext
     {
+        public string Title { get { return Subreddit; } }
         public ILinkContext LinkContext { get; set; }
         public string Subreddit { get; set; }
         public string Sort { get; set; }

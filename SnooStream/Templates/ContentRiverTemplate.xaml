@@ -1,0 +1,148 @@
+﻿<ResourceDictionary
+    x:Class="SnooStream.Templates.ContentRiverTemplate"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:SnooStream.ViewModel"
+    xmlns:local="using:SnooStream.Templates"
+    xmlns:gif="using:GifRenderer"
+    xmlns:selector="using:SnooStream.Selectors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ResourceDictionary.MergedDictionaries>
+        <local:CommentsTemplate />
+    </ResourceDictionary.MergedDictionaries>
+
+    <Storyboard x:Name="fadeInOverlay">
+        <DoubleAnimation
+                    Storyboard.TargetName="overlay"
+                    Storyboard.TargetProperty="Opacity"
+                    Duration="0:0:0.25"
+                    From="0" To="1"/>
+    </Storyboard>
+    <Storyboard x:Name="fadeOutOverlay">
+        <DoubleAnimation
+                    Storyboard.TargetName="overlay"
+                    Storyboard.TargetProperty="Opacity"
+                    Duration="0:0:0.25"
+                    From="1" To="0"/>
+    </Storyboard>
+
+    <DataTemplate x:Key="textContentTemplate" x:DataType="vm:TextContentViewModel">
+        <TextBlock HorizontalAlignment="Left" FontSize="14" FontWeight="SemiBold" FontFamily="Calibri" Padding="0" Margin="20,0,20,0" Text="{x:Bind Text}" TextWrapping="Wrap"/>
+    </DataTemplate>
+
+    <DataTemplate x:Key="imageContentTemplate" x:DataType="vm:ContentViewModel">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption"/>
+            </Grid>
+            <gif:ZoomableImageControl Grid.Row="1" DataContext="{x:Bind Url}" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="albumContentTemplate" x:DataType="vm:ContentContainerViewModel">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption"/>
+            </Grid>
+            <FlipView Grid.Row="1" x:Name="albumSlideView" ItemsSource="{x:Bind ViewSource.View}" HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.IsVerticalRailEnabled="True" 
+                      ItemsPanel="{StaticResource VerticalItemsPanel}">
+                <FlipView.ItemContainerStyle>
+                    <Style TargetType="FlipViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                    </Style>
+                </FlipView.ItemContainerStyle>
+                <FlipView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ContentViewModel">
+                        <gif:ZoomableImageControl DataContext="{x:Bind Url}"/>
+                    </DataTemplate>
+                </FlipView.ItemTemplate>
+            </FlipView>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="videoContentTemplate" x:DataType="vm:VideoContentViewModel">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" Height="80" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption"/>
+            </Grid>
+            <MediaElement AudioCategory="Media" AreTransportControlsEnabled="True" Grid.Row="1" Source="{x:Bind Url}" IsLooping="{x:Bind IsLooping}"/>
+        </Grid>
+    </DataTemplate>
+
+    <selector:ContentTemplateSelector x:Name="webContentSelector" 
+                                    PlainTextTemplate="{StaticResource textContentTemplate}"
+                                    ImageContainerTemplate="{StaticResource imageContentTemplate}"
+                                    AlbumViewTemplate="{StaticResource albumContentTemplate}"
+                                    VideoTemplate="{StaticResource videoContentTemplate}"/>
+
+    <DataTemplate x:Key="plainWebContentTemplate" x:DataType="vm:ContentContainerViewModel">
+        <Grid x:Name="controlRoot">
+            <ListView ItemsSource="{x:Bind ViewSource.View}"
+                Margin="0" Padding="0"
+                BorderThickness="0" VerticalAlignment="Stretch" 
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                IsItemClickEnabled="False"
+                IsTapEnabled="False"
+                SelectionMode="None"
+                IsSwipeEnabled="False"
+                HorizontalContentAlignment="Stretch"
+                ItemTemplateSelector="{StaticResource webContentSelector}">
+                <ListView.Header>
+                    <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" MaxHeight="400" Padding="0,0,0,6" 
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption"/>
+                    </Grid>
+                </ListView.Header>
+            </ListView>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Name="loadingTemplate" x:DataType="vm:LoadViewModel" >
+        <ProgressBar HorizontalAlignment="Stretch" IsIndeterminate="{x:Bind LoadPercent, Converter={StaticResource invertedFloatToBooleanConverter}, Mode=OneWay}" Value="{x:Bind LoadPercent, Mode=OneWay}" />
+    </DataTemplate>
+
+    <selector:ContentTemplateSelector x:Name="contentSelector" 
+                                          PlainTextTemplate="{StaticResource textContentTemplate}"
+                                          ImageContainerTemplate="{StaticResource imageContentTemplate}"
+                                          AlbumViewTemplate="{StaticResource albumContentTemplate}"
+                                          VideoTemplate="{StaticResource videoContentTemplate}"
+                                          PlainWebTemplate="{StaticResource plainWebContentTemplate}"
+                                          CommentsViewTemplate="{StaticResource CommentsView}"
+                                          LoadingTemplate="{StaticResource loadingTemplate}"/>
+
+
+    <DataTemplate x:Key="ContentRiverView" x:DataType="vm:ContentRiverViewModel">
+        <Grid Background="White">
+            <FlipView x:Name="flipView"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                  ItemsSource="{x:Bind ViewSource.View}"
+                  ItemTemplateSelector="{StaticResource contentSelector}">
+                <FlipView.ItemContainerStyle>
+                    <Style TargetType="FlipViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                    </Style>
+                </FlipView.ItemContainerStyle>
+            </FlipView>
+        </Grid>
+    </DataTemplate>
+
+</ResourceDictionary>

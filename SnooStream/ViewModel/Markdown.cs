@@ -10,6 +10,7 @@ namespace SnooStream.ViewModel
     public interface IMarkdownEditingContext
     {
         string CurrentUser { get; }
+        string TargetName { get; }
         void UpdateMarkdown(string source, Action<SnooDom.SnooDom> updator);
     }
 

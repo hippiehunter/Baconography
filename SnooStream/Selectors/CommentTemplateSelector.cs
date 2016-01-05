@@ -13,11 +13,17 @@ namespace SnooStream.Selectors
     {
         public DataTemplate CommentTemplate { get; set; }
         public DataTemplate MoreTemplate { get; set; }
+        public DataTemplate LoadFullyTemplate { get; set; }
+        public DataTemplate LoadingTemplate { get; set; }
 
         protected override DataTemplate SelectTemplateCore(object item)
         {
             if (item is MoreViewModel)
                 return MoreTemplate;
+            else if (item is LoadViewModel)
+                return LoadingTemplate;
+            else if (item is LoadFullCommentsViewModel)
+                return LoadFullyTemplate;
             else
                 return CommentTemplate;
         }

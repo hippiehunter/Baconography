@@ -18,11 +18,49 @@ namespace SnooStream.Controls
         public bool IsRoot { get; set; }
         public DataTemplate ContentTemplate { get; set; }
         public object Content { get; set; }
-        public string HeaderText { get; } = "Header";
+        public string HeaderText
+        {
+            get
+            {
+                if (Content is IHasTitle)
+                    return ((IHasTitle)Content).Title;
+                else
+                    return "";
+            }
+        }
         public void Close()
         {
             Container.Remove(this);
         }
+        public IEnumerable<IHubNavCommand> Commands
+        {
+            get
+            {
+                if (Content is IHasHubNavCommands)
+                    return ((IHasHubNavCommands)Content).Commands;
+                else
+                    return Enumerable.Empty<IHubNavCommand>();
+            }
+        }
+    }
+
+    public interface IHasTitle
+    {
+        string Title { get; }
+    }
+
+    public interface IHasHubNavCommands
+    {
+        IEnumerable<IHubNavCommand> Commands { get; }
+    }
+
+    public interface IHubNavCommand
+    {
+        bool IsInput { get; }
+        string Text { get; }
+        string Glyph { get; }
+        bool IsEnabled { get; }
+        void Tapped();
     }
 
     public class HubNavGroup
@@ -92,10 +130,10 @@ namespace SnooStream.Controls
     {
         bool? _isLarge;
         Frame _mainFrame;
-        List<HubNavItem> _navStack;
+        public List<HubNavItem> NavStack;
         public AdaptiveHubNav()
         {
-            _navStack = new List<HubNavItem>();
+            NavStack = new List<HubNavItem>();
             _mainFrame = new Frame();
             Content = _mainFrame;
             UpdateSize(Window.Current.Bounds.Width);
@@ -137,13 +175,13 @@ namespace SnooStream.Controls
 
         public void Remove(HubNavItem item)
         {
-            if (_navStack[_navStack.Count - 1] == item)
+            if (NavStack[NavStack.Count - 1] == item)
             {
                 Back();
             }
             else
             {
-                _navStack.Remove(item);
+                NavStack.Remove(item);
                 var foundStackItem = _mainFrame.BackStack.FirstOrDefault(pse =>
                 {
                     if (pse.Parameter is HubNavGroup)
@@ -192,7 +230,7 @@ namespace SnooStream.Controls
 
         public bool CanGoBack()
         {
-            return _navStack.Count > 1;
+            return NavStack.Count > 1;
         }
 
         public bool Back()
@@ -205,7 +243,7 @@ namespace SnooStream.Controls
                 {
                     if (_isLarge.Value)
                     {
-                        var currentItem = _navStack[_navStack.Count - 1];
+                        var currentItem = NavStack[NavStack.Count - 1];
                         if (currentItem.IsRoot)
                         {
                             _mainFrame.GoBack();
@@ -215,13 +253,13 @@ namespace SnooStream.Controls
                             var navGroup = ((Page)_mainFrame.Content).DataContext as HubNavGroup;
                             navGroup.Sections.RemoveAt(navGroup.Sections.Count - 1);
                         }
-                        _navStack.Remove(currentItem);
+                        NavStack.Remove(currentItem);
                         return true;
                     }
                     else
                     {
                         _mainFrame.GoBack();
-                        _navStack.RemoveAt(_navStack.Count - 1);
+                        NavStack.RemoveAt(NavStack.Count - 1);
                         return true;
                     }
                 }
@@ -234,14 +272,14 @@ namespace SnooStream.Controls
 
         public void Navigate(object viewModel, DataTemplate template, bool makeRoot)
         {
-            if (_navStack.Count > 0 && _navStack.Last().Content == viewModel && _navStack.Last().ContentTemplate == template)
+            if (NavStack.Count > 0 && NavStack.Last().Content == viewModel && NavStack.Last().ContentTemplate == template)
             {
                 //Do nothing, we dont need to navigate to ourself
             }
             else
             {
                 var hubNav = new HubNavItem { Content = viewModel, IsRoot = makeRoot, ContentTemplate = template, Container = this };
-                _navStack.Add(hubNav);
+                NavStack.Add(hubNav);
                 NavToHubItem(true, false, hubNav);
             }
         }
@@ -288,7 +326,7 @@ namespace SnooStream.Controls
 
         private void UpdateSize(double width)
         {
-            if (_navStack == null)
+            if (NavStack == null)
                 return;
 
             if (width > 500)
@@ -311,8 +349,8 @@ namespace SnooStream.Controls
 
         private void SetNavStack()
         {
-            var lastNavItem = _isLarge.Value ? _navStack.LastOrDefault(item => item.IsRoot) : _navStack.LastOrDefault();
-            var afterLastRoot = _navStack.Skip(_navStack.IndexOf(lastNavItem) + 1).ToArray();
+            var lastNavItem = _isLarge.Value ? NavStack.LastOrDefault(item => item.IsRoot) : NavStack.LastOrDefault();
+            var afterLastRoot = NavStack.Skip(NavStack.IndexOf(lastNavItem) + 1).ToArray();
             if (lastNavItem != null)
             {
                 NavToHubItem(true, false, lastNavItem);
@@ -320,7 +358,7 @@ namespace SnooStream.Controls
                 {
                     NavToHubItem(false, false, item);
                 }
-                foreach (var hubItem in _navStack)
+                foreach (var hubItem in NavStack)
                 {
                     if (lastNavItem == hubItem)
                         break;

@@ -24,7 +24,7 @@
 
     <DataTemplate x:Key="LoadItemView" x:DataType="vm:LoadViewModel">
         <Grid DataContextChanged="Grid_DataContextChanged">
-            <ProgressBar Value="{x:Bind LoadPercent, Mode=OneWay}" Visibility="{x:Bind State, Converter={StaticResource loadingConverter}, Mode=OneWay}"/>
+            <ProgressBar HorizontalAlignment="Stretch" IsIndeterminate="{x:Bind LoadPercent, Converter={StaticResource invertedFloatToBooleanConverter}, Mode=OneWay}" Value="{x:Bind LoadPercent, Mode=OneWay}"  Visibility="{x:Bind State, Converter={StaticResource loadingConverter}, Mode=OneWay}"/>
         </Grid>
     </DataTemplate>
 

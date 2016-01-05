@@ -24,7 +24,7 @@ namespace SnooStream.Common
         void Navigate(object viewModel);
         void SaveNavigationState();
         ContentRiverViewModel MakeContentRiverContext(object context, string url);
-        CommentsViewModel MakeCommentContext(string url, string focusId, string sort);
+        CommentsViewModel MakeCommentContext(string url, string focusId, string sort, LinkViewModel linkViewModel);
         LinkRiverViewModel MakeLinkRiverContext(string subreddit, string focusId, string sort);
 
         LoginViewModel LoginViewModel { get; }
@@ -46,6 +46,7 @@ namespace SnooStream.Common
         Dictionary<string, object> MakePageState(CommentsViewModel comments);
         Dictionary<string, object> MakePageState(LinkRiverViewModel links);
         Dictionary<string, object> MakePageState(ContentRiverViewModel contentRiver);
+        ILinkContext MakeLinkContext(string url);
     }
 
     public class Navigation
@@ -68,11 +69,16 @@ namespace SnooStream.Common
         //User:
         public static Regex UserRegex = new Regex("(?:^|\\s|reddit.com)/u(?:ser)*/[a-zA-Z0-9_/-]+/?$");
 
-        public static CommentsViewModel GotoComments(string url, INavigationContext context)
+        public static async void GotoComments(string url, INavigationContext context, LinkViewModel linkViewModel)
         {
-            var commentsViewModel = context.MakeCommentContext(url, null, null);
+            if (linkViewModel == null)
+            {
+                var linkContext = context.MakeLinkContext(url);
+                linkViewModel = await LinkBuilder.MakeLinkViewModel(url, linkContext);
+
+            }
+            var commentsViewModel = context.MakeCommentContext(url, null, null, linkViewModel);
             context.HubNav.Navigate(commentsViewModel, context.CommentTemplate, false);
-            return commentsViewModel;
         }
 
         public static void GotoUserDetails(string username, INavigationContext context)
@@ -92,7 +98,7 @@ namespace SnooStream.Common
                 CommentsPageRegex.IsMatch(url) ||
                 ShortCommentsPageRegex.IsMatch(url))
             {
-                GotoComments(url, context);
+                GotoComments(url, context, contextObj as LinkViewModel);
             }
             else if (SubredditRegex.IsMatch(url))
             {
@@ -179,7 +185,7 @@ namespace SnooStream.Common
                     GotoContentRiver(context.ViewModelStack.LastOrDefault(vm => vm is LinkRiverViewModel || vm is CommentsViewModel), pageState["url"] as string, context);
                     break;
                 case "comments":
-                    context.HubNav.Navigate(context.MakeCommentContext(pageState["url"] as string, pageState["focusId"] as string, pageState["sort"] as string), context.CommentTemplate, false);
+                    context.HubNav.Navigate(context.MakeCommentContext(pageState["url"] as string, pageState["focusId"] as string, pageState["sort"] as string, null), context.CommentTemplate, false);
                     break;
                 case "user":
                     GotoUserDetails(pageState["username"] as string, context);
@@ -241,10 +247,16 @@ namespace SnooStream.Common
         {
             var subredditRiverRD = new SubredditRiverTemplate();
             var linkRiverRD = new LinkRiverTemplate();
+            var commentsRD = new CommentsTemplate();
+            var contentRiverRD = new ContentRiverTemplate();
+            ResourceDictionaryHandles.Add(commentsRD);
             ResourceDictionaryHandles.Add(subredditRiverRD);
             ResourceDictionaryHandles.Add(linkRiverRD);
+            ResourceDictionaryHandles.Add(contentRiverRD);
             SubredditRiverTemplate = subredditRiverRD["SubredditRiverView"] as DataTemplate;
             LinkRiverTemplate = linkRiverRD["LinkRiverView"] as DataTemplate;
+            CommentTemplate = commentsRD["CommentsView"] as DataTemplate;
+            ContentRiverTemplate = contentRiverRD["ContentRiverView"] as DataTemplate;
 
             HubNav = hubNav;
             RoamingState = new RoamingState();
@@ -335,10 +347,11 @@ namespace SnooStream.Common
             return null;
         }
 
-        public CommentsViewModel MakeCommentContext(string url, string focusId, string sort)
+        public CommentsViewModel MakeCommentContext(string url, string focusId, string sort, LinkViewModel linkViewModel)
         {
-            var madeContext = new CommentBuilderContext { Reddit = Reddit };
+            var madeContext = new CommentBuilderContext { Reddit = Reddit, Url = url, Sort = sort ?? "best", ContextTarget = focusId, Link = linkViewModel, NavigationContext = this };
             var madeComments = new CommentsViewModel(madeContext);
+            madeContext.Comments = madeComments;
             return madeComments;
         }
 
@@ -346,15 +359,23 @@ namespace SnooStream.Common
         {
             if (context is LinkRiverViewModel)
             {
-                var madeContext = new LinkContentRiverContext { LinkRiverContext = context as LinkRiverViewModel, NetworkLayer = NetworkLayer };
+                var madeContext = new LinkContentRiverContext { LinkRiverContext = context as LinkRiverViewModel, NetworkLayer = NetworkLayer, NavigationContext = this };
                 var madeContentRiver = new ContentRiverViewModel(madeContext);
+                madeContext.Collection = madeContentRiver.ContentItems;
                 madeContext.ContentView = madeContentRiver.ViewSource.View;
+
+                foreach (var item in madeContext.LoadInitial())
+                {
+                    madeContentRiver.ContentItems.Add(item);
+                }
+
                 return madeContentRiver;
             }
             else if (context is CommentsViewModel)
             {
                 var madeContext = new CommentContentRiverContext { Comments = context as CommentsViewModel, NetworkLayer = NetworkLayer };
                 var madeContentRiver = new ContentRiverViewModel(madeContext);
+                madeContext.Collection = madeContentRiver.ContentItems;
                 madeContext.CollectionView = madeContentRiver.ViewSource.View;
                 return madeContentRiver;
             }
@@ -365,13 +386,16 @@ namespace SnooStream.Common
 
         public LinkRiverViewModel MakeLinkRiverContext(string subreddit, string focusId, string sort)
         {
-            var madeContext = new LinkBuilderContext { Offline = Offline, Reddit = Reddit, Subreddit = subreddit };
-            return new LinkRiverViewModel(madeContext);
+            var linkContext = new LinkContext { NavigationContext = this, Reddit = Reddit };
+            var madeContext = new LinkBuilderContext { Offline = Offline, Reddit = Reddit, Subreddit = subreddit, LinkContext = linkContext };
+            var madeViewModel = new LinkRiverViewModel(madeContext);
+            linkContext.LinkRiver = madeViewModel;
+            return madeViewModel;
         }
 
         public void SaveNavigationState()
         {
-            var hubNavItems = this.HubNav.DataContext as List<HubNavItem>;
+            var hubNavItems = this.HubNav.NavStack;
             RoamingState.NavStack = hubNavItems.Select(hubNavItem => Navigation.MakeStatePage(hubNavItem.Content, this)).ToList();
         }
 
@@ -456,6 +480,11 @@ namespace SnooStream.Common
             }
             else
                 return null;
+        }
+
+        public ILinkContext MakeLinkContext(string url)
+        {
+            return new LinkContext { NavigationContext = this, Reddit = Reddit };
         }
     }
 }

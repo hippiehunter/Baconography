@@ -10,6 +10,12 @@ using Windows.UI.Xaml.Data;
 using SnooDom;
 using System.Threading;
 using SnooStream.Common;
+using System.Collections.Concurrent;
+using Windows.System.Threading;
+using Windows.UI.Core;
+using NBoilerpipePortable.Util;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Foundation;
 
 namespace SnooStream.ViewModel
 {
@@ -17,6 +23,7 @@ namespace SnooStream.ViewModel
     {
         public LoadViewModel LoadState { get; set; }
         public VotableViewModel Votable { get; set; }
+        public LinkViewModel Link { get { return Context.Link; } }
         public ICommentBuilderContext Context { get; set; }
         public Link Thing { get; set; }
         public string Sort
@@ -69,6 +76,7 @@ namespace SnooStream.ViewModel
         public void Load()
         {
             LoadState = LoadViewModel.ReplaceLoadViewModel(LoadState, new LoadViewModel { LoadAction = (progress, token) => LoadAsync(progress, token), IsCritical = true });
+            LoadState.Load();
             RaisePropertyChanged("LoadState");
         }
 
@@ -86,12 +94,34 @@ namespace SnooStream.ViewModel
     {
         public ICommentBuilderContext Context { get; set; }
         public Comment Thing { get; set; }
-        public SnooDom.SnooDom BodyMD { get; set; }
-        public Task<SnooDom.SnooDom> BodyMDTask { get; set; }
+        private object _body;
+        public object Body
+        {
+            get
+            {
+                return _body;
+            }
+            set
+            {
+                Set("Body", ref _body, value);
+            }
+        }
+        public Task BodyMDTask { get; set; }
         public int Depth { get; set; }
         public VotableViewModel Votable { get; set; }
         public bool IsEditing { get; set; }
         public MarkdownEditingViewModel Editing { get; set; }
+        public string AuthorFlairText { get; set; }
+        public AuthorFlairKind AuthorFlair { get; set; }
+        public bool HasAuthorFlair { get { return !string.IsNullOrWhiteSpace(AuthorFlairText); } }
+        public bool CanEdit { get { return string.Compare(Context.CurrentUserName, Thing.Author, true) == 0; } }
+        public bool CanDelete { get { return string.Compare(Context.CurrentUserName, Thing.Author, true) == 0; } }
+
+        public void Minimize()
+        {
+            Collapsed = true;
+        }
+
         internal bool _collapsed;
         public bool Collapsed
         {
@@ -124,6 +154,40 @@ namespace SnooStream.ViewModel
             await Context.SubmitComment(this);
             IsEditing = false;
             RaisePropertyChanged("IsEditing");
+        }
+
+        public void Report()
+        {
+            Context.Report(Thing.Id);
+        }
+
+        public async void Save()
+        {
+            Context.Save(Thing.Id);
+        }
+
+        public async void Share()
+        {
+            Context.Share(this);
+        }
+
+        public void GotoUserDetails()
+        {
+            Context.GotoUserDetails(Thing.Author);
+        }
+
+        public void GotoReply()
+        {
+        }
+
+        public void Edit()
+        {
+            IsEditing = true;
+        }
+
+        public void Delete()
+        {
+            Context.Delete(this);
         }
     }
 
@@ -195,6 +259,7 @@ namespace SnooStream.ViewModel
     public interface ICommentBuilderContext
     {
         CommentsViewModel Comments { get; }
+        LinkViewModel Link { get; }
         string FirstChildName { get; set; }
         int InsertionWaveIndex { get; }
         CommentOriginType InsertionWaveType { get; }
@@ -221,8 +286,15 @@ namespace SnooStream.ViewModel
         void PopOrigin();
         void RemoveShell(string id);
         void ClearState();
-        SnooDom.SnooDom MakeMarkdown(string body);
+        Task QueueMarkdown(CommentViewModel comment);
+        Task FinishMarkdownQueue();
         Task<Link> GetLink(IProgress<float> progress, CancellationToken token);
+        AuthorFlairKind GetUsernameModifiers(string author);
+        void Report(string id);
+        void Save(string id);
+        void Share(CommentViewModel comment);
+        void GotoUserDetails(string author);
+        void Delete(CommentViewModel comment);
     }
 
     public class CommentBuilder
@@ -394,9 +466,21 @@ namespace SnooStream.ViewModel
 
         private static CommentShell MakeCommentShell(Comment comment, int depth, CommentShell priorSibling, ICommentBuilderContext context)
         {
+            var commentViewModel = new CommentViewModel
+            {
+                Depth = depth,
+                Thing = comment,
+                Votable = new VotableViewModel(comment, context.ChangeVote),
+                Context = context,
+                _collapsed = false,
+                Body = HttpUtility.HtmlDecode(comment.Body),
+                AuthorFlair = context.GetUsernameModifiers(comment.Author),
+                AuthorFlairText = HttpUtility.HtmlDecode(comment.AuthorFlairText)
+            };
+            commentViewModel.BodyMDTask = context.QueueMarkdown(commentViewModel);
             var result = new CommentShell
             {
-                Comment = new CommentViewModel { Depth = depth, Thing = comment, Votable = new VotableViewModel(comment, context.ChangeVote), Context = context, _collapsed = false },
+                Comment = commentViewModel,
                 Id = comment.Id,
                 Parent = comment.ParentId.StartsWith("t1_") ? comment.ParentId.Substring("t1_".Length) : null,
                 PriorSibling = priorSibling != null ? priorSibling.Id : null,
@@ -716,6 +800,9 @@ namespace SnooStream.ViewModel
 
     public abstract class BasicCommentBuilderContext : ICommentBuilderContext
     {
+        public CoreDispatcher Dispatcher { get; set; }
+
+        public LinkViewModel Link { get; set; }
         public abstract void ChangeVote(string id, int direction);
         public abstract Task<IEnumerable<Thing>> GetMore(IEnumerable<string> ids, IProgress<float> progress, CancellationToken token);
         public abstract Task<IEnumerable<Thing>> LoadAll(bool ignoreCache, IProgress<float> progress, CancellationToken token);
@@ -723,7 +810,42 @@ namespace SnooStream.ViewModel
         public abstract Task SubmitComment(CommentViewModel viewModel);
         public abstract string CurrentUserName { get; }
         public abstract Task<Link> GetLink(IProgress<float> progress, CancellationToken token);
+        public abstract void Report(string id);
+        public abstract void Save(string id);
+        public abstract void Share(CommentViewModel comment);
+        public abstract void GotoUserDetails(string author);
+        public abstract void Delete(CommentViewModel comment);
 
+        private Task _bodyChangedTask;
+        private ConcurrentQueue<Tuple<CommentViewModel, SnooDom.SnooDom>> _bodyChangedQueue = new ConcurrentQueue<Tuple<CommentViewModel, SnooDom.SnooDom>>();
+
+        public void QueueBodyChanged(CommentViewModel viewModel, SnooDom.SnooDom dom)
+        {
+            if (Dispatcher != null)
+            {
+                if (_bodyChangedTask == null || (_bodyChangedTask?.IsCompleted ?? true))
+                {
+                    _bodyChangedTask = Dispatcher.RunIdleAsync((o) =>
+                    {
+                        Tuple<CommentViewModel, SnooDom.SnooDom> result;
+                        while (_bodyChangedQueue.TryDequeue(out result))
+                        {
+                            result.Item1.Body = result.Item2;
+                        }
+                        _bodyChangedTask = null;
+
+                        //flush out any leftovers we might end up with
+                        while (_bodyChangedQueue.TryDequeue(out result))
+                        {
+                            result.Item1.Body = result.Item2;
+                        }
+
+                    }).AsTask();
+                }
+            }
+            else
+                viewModel.Body = dom;
+        }
         private SnooDom.SimpleSessionMemoryPool _markdownMemoryPool;
 
         private string _sort;
@@ -832,20 +954,69 @@ namespace SnooStream.ViewModel
             _comments.Remove(id);
         }
 
+        Task _activeMarkdownBuilder;
+        CancellationTokenSource _markdownBuilderCancelSource = new CancellationTokenSource();
+        BlockingCollection<CommentViewModel> _workQueue = new BlockingCollection<CommentViewModel>();
+        public Task QueueMarkdown(CommentViewModel viewModel)
+        {
+            _workQueue.Add(viewModel);
+            if (_activeMarkdownBuilder == null || _activeMarkdownBuilder.IsCompleted)
+            {
+                var cancelToken = _markdownBuilderCancelSource.Token;
+                _activeMarkdownBuilder = Windows.System.Threading.ThreadPool.RunAsync((o) =>
+                {
+                    try
+                    {
+                        CommentViewModel result;
+                        while (_workQueue.TryTake(out result, Timeout.Infinite, cancelToken))
+                        {
+                            QueueBodyChanged(result, MakeMarkdown(result.Thing.Body));
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        var remainingWork = _workQueue;
+                        _workQueue = new BlockingCollection<CommentViewModel>();
+                        if (remainingWork.Count > 0)
+                        {
+                            foreach (var item in remainingWork)
+                            { 
+                                QueueBodyChanged(item, MakeMarkdown(item.Thing.Body));
+                            }
+                        }
+                    }
+                }, WorkItemPriority.Low, WorkItemOptions.TimeSliced).AsTask();
+            }
+            return _activeMarkdownBuilder;
+        }
+
+        public Task FinishMarkdownQueue()
+        {
+            _markdownBuilderCancelSource.Cancel();
+            return _activeMarkdownBuilder ?? Task.CompletedTask;
+        }
+
         public SnooDom.SnooDom MakeMarkdown(string body)
         {
             return SnooDom.SnooDom.MarkdownToDOM(body, _markdownMemoryPool);
+        }
+
+        public AuthorFlairKind GetUsernameModifiers(string author)
+        {
+            return String.Compare(Comments.Thing.Author, author, true) == 0 ? AuthorFlairKind.OriginalPoster : AuthorFlairKind.None;
         }
     }
 
     class CommentBuilderContext : BasicCommentBuilderContext
     {
         public Reddit Reddit { get; set; }
+        public INavigationContext NavigationContext { get; set; }
         public string Url { get; set; }
         public string LinkName { get; set; }
         public string PermaLink { get; set; }
         public string Subreddit { get; set; }
         public string ContextTarget { get; set; }
+
         public override string CurrentUserName
         {
             get
@@ -911,6 +1082,46 @@ namespace SnooStream.ViewModel
             {
                 throw new InvalidOperationException("failed to convert url to a usable Thing<Link>");
             }
+        }
+
+        public override void Report(string id)
+        {
+            Reddit.AddReportOnThing(id);
+        }
+
+        public override void Save(string id)
+        {
+            Reddit.AddSavedThing(id);
+        }
+
+        public override void Share(CommentViewModel comment)
+        {
+            DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
+            dataTransferManager.DataRequested += new TypedEventHandler<DataTransferManager,
+                DataRequestedEventArgs>((sender, e) =>
+                {
+                    DataRequest request = e.Request;
+                    request.Data.Properties.Title = "Comment from " + comment.Thing.LinkTitle;
+                    request.Data.Properties.Description = comment.Thing.Body;
+                    request.Data.SetWebLink(new Uri(comment.Thing.Context));
+                });
+
+            Windows.ApplicationModel.DataTransfer.DataTransferManager.ShowShareUI();
+        }
+
+        public override void GotoUserDetails(string author)
+        {
+            Navigation.GotoUserDetails(author, NavigationContext);
+        }
+
+        public override async void Delete(CommentViewModel comment)
+        {
+            CommentBuilder.RemoveComment(comment, this.Comments.Comments, this);
+            try
+            {
+                await Reddit.DeleteLinkOrComment(comment.Thing.Id);
+            }
+            catch { }
         }
     }
 }

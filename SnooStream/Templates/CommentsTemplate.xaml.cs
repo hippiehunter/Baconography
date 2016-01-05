@@ -23,5 +23,10 @@ namespace SnooStream.Templates
         {
             this.InitializeComponent();
         }
+
+        private void Button_Holding(object sender, Windows.UI.Xaml.Input.HoldingRoutedEventArgs e)
+        {
+            FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
+        }
     }
 }

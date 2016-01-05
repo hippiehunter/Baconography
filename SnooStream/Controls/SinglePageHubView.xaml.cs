@@ -30,6 +30,29 @@ namespace SnooStream.Controls
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             DataContext = e.Parameter;
+            if (e.Parameter is IHasHubNavCommands)
+            {
+                var symbol = new FontFamily("Segoe UI Symbol");
+                var commandBar = new CommandBar();
+                var commands = ((IHasHubNavCommands)e.Parameter).Commands;
+                foreach (var command in commands)
+                {
+
+                    var madeCommand = new AppBarButton
+                    {
+                        Icon = new FontIcon { FontFamily = symbol, Glyph = command.Glyph },
+                        Label = command.Text,
+                        IsEnabled = command.IsEnabled
+                    };
+
+                    madeCommand.Command = new GalaSoft.MvvmLight.Command.RelayCommand(command.Tapped);
+                    var isEnabledBinding = new Binding { Path = new PropertyPath("IsEnabled"), Mode = BindingMode.OneWay, Source = command };
+                    madeCommand.SetBinding(AppBarButton.IsEnabledProperty, isEnabledBinding);
+                    commandBar.PrimaryCommands.Add(madeCommand);
+
+                }
+                BottomAppBar = commandBar;
+            }
         }
     }
 }
