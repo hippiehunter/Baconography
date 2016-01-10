@@ -251,7 +251,10 @@ namespace SnooStream.Controls
                         else
                         {
                             var navGroup = ((Page)_mainFrame.Content).DataContext as HubNavGroup;
-                            navGroup.Sections.RemoveAt(navGroup.Sections.Count - 1);
+                            if (navGroup == null)
+                                _mainFrame.GoBack();
+                            else
+                                navGroup.Sections.RemoveAt(navGroup.Sections.Count - 1);
                         }
                         NavStack.Remove(currentItem);
                         return true;

@@ -176,7 +176,7 @@ namespace SnooStream.Common
                     context.HubNav.Navigate(context.SubredditRiver, context.SubredditRiverTemplate, true);
                     break;
                 case "subreddit":
-                    context.HubNav.Navigate(context.MakeLinkRiverContext(pageState["subreddit"] as string, pageState["focusId"] as string, pageState["sort"] as string), context.LinkRiverTemplate, true);
+                    context.HubNav.Navigate(context.MakeLinkRiverContext(pageState["url"] as string, pageState["focusId"] as string, pageState["sort"] as string), context.LinkRiverTemplate, true);
                     break;
                 case "login":
                     GotoLogin(context);
@@ -362,12 +362,13 @@ namespace SnooStream.Common
                 var madeContext = new LinkContentRiverContext { LinkRiverContext = context as LinkRiverViewModel, NetworkLayer = NetworkLayer, NavigationContext = this };
                 var madeContentRiver = new ContentRiverViewModel(madeContext);
                 madeContext.Collection = madeContentRiver.ContentItems;
-                madeContext.ContentView = madeContentRiver.ViewSource.View;
+                madeContext.ContentView = madeContentRiver.ContentItems;
 
                 foreach (var item in madeContext.LoadInitial())
                 {
                     madeContentRiver.ContentItems.Add(item);
                 }
+                madeContentRiver.ContentItems.CurrentPosition = madeContext.Current;
 
                 return madeContentRiver;
             }
@@ -376,7 +377,7 @@ namespace SnooStream.Common
                 var madeContext = new CommentContentRiverContext { Comments = context as CommentsViewModel, NetworkLayer = NetworkLayer };
                 var madeContentRiver = new ContentRiverViewModel(madeContext);
                 madeContext.Collection = madeContentRiver.ContentItems;
-                madeContext.CollectionView = madeContentRiver.ViewSource.View;
+                madeContext.CollectionView = madeContentRiver.ContentItems;
                 return madeContentRiver;
             }
             else
@@ -438,7 +439,7 @@ namespace SnooStream.Common
             {
                 { "kind", "subreddit" },
                 { "url", typedContext.Subreddit },
-                { "focusId", GetIdFromLinkItem(linkRiver.LinkViewSource.View.CurrentItem, linkRiver.LastLinkId) },
+                { "focusId", GetIdFromLinkItem(linkRiver.Links.CurrentItem, linkRiver.LastLinkId) },
                 { "sort", typedContext.Sort }
             };
         }
@@ -464,7 +465,7 @@ namespace SnooStream.Common
             return new Dictionary<string, object>
             {
                 { "kind", "content" },
-                { "url", GetUrlFromContentItem(contentRiver.ViewSource.View.CurrentItem, contentRiver.ViewSource.View.LastOrDefault()) },
+                { "url", GetUrlFromContentItem(contentRiver.ContentItems.CurrentItem, contentRiver.ContentItems.LastOrDefault()) },
             };
         }
 

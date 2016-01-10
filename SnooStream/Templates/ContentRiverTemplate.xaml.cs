@@ -23,5 +23,10 @@ namespace SnooStream.Templates
         {
             this.InitializeComponent();
         }
+
+        private void flipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

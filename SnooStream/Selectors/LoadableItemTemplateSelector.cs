@@ -21,5 +21,10 @@ namespace SnooStream.Selectors
             else
                 return Default;
         }
+
+        protected override DataTemplate SelectTemplateCore(object item)
+        {
+            return SelectTemplateCore(item, null);
+        }
     }
 }

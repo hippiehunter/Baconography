@@ -44,7 +44,7 @@ namespace SnooStream.Selectors
             else if (item is TextContentViewModel)
                 return PlainTextTemplate;
             else
-                throw new NotImplementedException();
+                return null;
         }
     }
 }

@@ -27,24 +27,21 @@ namespace SnooStream.ViewModel
         void NavigateToComments(string contextUrl);
         bool MakeCollectionViewSource { get; }
         Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token);
-        void SetCurrent(int index);
+        int Current { get; set; }
     }
 
     public class ContentRiverViewModel
     {
         public IContentRiverContext Context { get; set; }
-        public ObservableCollection<object> ContentItems { get; set; }
-        public CollectionViewSource ViewSource { get; set; }
+        public RangedCollectionBase ContentItems { get; set; }
 
         public ContentRiverViewModel() { }
 
         public ContentRiverViewModel(IContentRiverContext context)
         {
             Context = context;
-            var contentCollection = new ContentCollection { Context = context };
-            ViewSource = new CollectionViewSource { Source = contentCollection };
-            ViewSource.View.CurrentChanged += View_CurrentChanged;
-            contentCollection.CollectionView = ViewSource.View;
+            var contentCollection = new ContentCollection(context);
+            contentCollection.CurrentChanged += View_CurrentChanged;
             ContentItems = contentCollection;
         }
 
@@ -52,7 +49,7 @@ namespace SnooStream.ViewModel
         {
             var collectionView = sender as ICollectionView;
             await ContentBuilder.SetCurrentContent(collectionView.CurrentPosition, collectionView, Context);
-            Context.SetCurrent(collectionView?.CurrentPosition ?? -1);
+            Context.Current = collectionView?.CurrentPosition ?? -1;
         }
     }
 
@@ -159,8 +156,12 @@ namespace SnooStream.ViewModel
                         var imageResult = await ImageAcquisition.GetImagesFromUrl(title, url, networkLayer as IResourceNetworkLayer, progress, token);
                         if (imageResult.Count() > 1)
                         {
-                            var itemContentViewSource = context.MakeCollectionViewSource ? new CollectionViewSource() : null;
-                            var contentItems = new ObservableCollection<object>(imageResult.Select(tpl => MakeContentViewModel(tpl.Item2, tpl.Item1, null, null, context, itemContentViewSource?.View, networkLayer, collection)));
+                            var contentItems = new RangeCollection();
+                            foreach (var vm in imageResult.Select(tpl => MakeContentViewModel(tpl.Item2, tpl.Item1, null, null, context, contentItems, networkLayer, collection)))
+                            {
+                                contentItems.Add(vm);
+                            }
+
                             return new ContentContainerViewModel
                             {
                                 Url = url,
@@ -168,8 +169,7 @@ namespace SnooStream.ViewModel
                                 Context = context,
                                 HasComments = linkViewModel != null,
                                 Votable = votable,
-                                ContentItems = contentItems,
-                                ViewSource = itemContentViewSource
+                                ContentItems = contentItems
                             };
                         }
                         else
@@ -228,8 +228,7 @@ namespace SnooStream.ViewModel
                     Context = context,
                     HasComments = linkViewModel != null,
                     Votable = votable,
-                    ContentItems = contentItems,
-                    ViewSource = itemContentViewSource
+                    ContentItems = contentItems
                 };
             }, collectionView, collection);
         }
@@ -329,7 +328,7 @@ namespace SnooStream.ViewModel
         }
     }
 
-    class WebContentCollection : ObservableCollection<object>, ISupportIncrementalLoading
+    class WebContentCollection : RangedCollectionBase
     {
         INetworkLayer _networkLayer;
         IContentRiverContext _context;
@@ -344,7 +343,7 @@ namespace SnooStream.ViewModel
             _originalUrl = originalUrl;
         }
 
-        public bool HasMoreItems
+        public override bool HasMoreItems
         {
             get
             {
@@ -394,7 +393,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
         {
             if (_loadTask == null)
             {
@@ -411,11 +410,16 @@ namespace SnooStream.ViewModel
         }
     }
 
-    class ContentCollection : ObservableCollection<object>, ISupportIncrementalLoading
+    class ContentCollection : RangedCollectionBase
     {
         public IContentRiverContext Context { get; set; }
-        public ICollectionView CollectionView { get; set; }
-        public bool HasMoreItems
+
+        public ContentCollection(IContentRiverContext context)
+        {
+            Context = context;
+        }
+
+        public override bool HasMoreItems
         {
             get
             {
@@ -438,7 +442,7 @@ namespace SnooStream.ViewModel
                     {
                         var loadedContent = await Context.LoadMore(progress, token);
                         var first = loadedContent.FirstOrDefault() as ContentViewModel;
-                        bool replacingCurrent = CollectionView.CurrentPosition == Count - 1;
+                        bool replacingCurrent = CurrentPosition == Count - 1;
                         this[Count - 1] = first;
 
                         if (replacingCurrent && first != null)
@@ -462,7 +466,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
         {
             if (_loadTask == null)
             {
@@ -543,8 +547,7 @@ namespace SnooStream.ViewModel
     public class ContentContainerViewModel : ContentViewModel
     {
         public bool SingleViewItem { get; set; }
-        public ObservableCollection<object> ContentItems { get; set; }
-        public CollectionViewSource ViewSource { get; set; }
+        public RangedCollectionBase ContentItems { get; set; }
     }
 
     public class LinkContentRiverContext : IContentRiverContext
@@ -594,9 +597,16 @@ namespace SnooStream.ViewModel
             return comments.Context;
         }
 
-        public void SetCurrent(int index)
+        public int Current
         {
-            LinkRiverContext.LinkViewSource.View.MoveCurrentToPosition(index);
+            get
+            {
+                return LinkRiverContext.Links.CurrentPosition;
+            }
+            set
+            {
+                LinkRiverContext.Links.MoveCurrentToPosition(value);
+            }
         }
 
         public IEnumerable<object> LoadInitial()
@@ -667,8 +677,16 @@ namespace SnooStream.ViewModel
             throw new NotImplementedException();
         }
 
-        public void SetCurrent(int index)
+        public int Current
         {
+            get
+            {
+                return -1;
+            }
+            set
+            {
+
+            }
             //set the focused item from the comment context we came from
         }
 

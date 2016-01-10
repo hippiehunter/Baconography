@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:SnooStream.ViewModel"
     xmlns:local="using:SnooStream.Templates"
+    xmlns:common="using:SnooStream.Common"
     xmlns:gif="using:GifRenderer"
     xmlns:selector="using:SnooStream.Selectors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -55,9 +56,10 @@
             <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption"/>
             </Grid>
-            <FlipView Grid.Row="1" x:Name="albumSlideView" ItemsSource="{x:Bind ViewSource.View}" HorizontalAlignment="Stretch"
+            <FlipView Grid.Row="1" x:Name="albumSlideView" ItemsSource="{x:Bind ContentItems}" HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.IsVerticalRailEnabled="True" 
-                      ItemsPanel="{StaticResource VerticalItemsPanel}">
+                      ItemsPanel="{StaticResource VerticalItemsPanel}"
+                      IsSynchronizedWithCurrentItem="False">
                 <FlipView.ItemContainerStyle>
                     <Style TargetType="FlipViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -94,7 +96,8 @@
 
     <DataTemplate x:Key="plainWebContentTemplate" x:DataType="vm:ContentContainerViewModel">
         <Grid x:Name="controlRoot">
-            <ListView ItemsSource="{x:Bind ViewSource.View}"
+            <ListView ItemsSource="{x:Bind ContentItems}"
+                      IsSynchronizedWithCurrentItem="False"
                 Margin="0" Padding="0"
                 BorderThickness="0" VerticalAlignment="Stretch" 
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -133,7 +136,7 @@
         <Grid Background="White">
             <FlipView x:Name="flipView"
                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
-                  ItemsSource="{x:Bind ViewSource.View}"
+                  common:RangedCollectionDataSource.DataSource ="{x:Bind ContentItems}"
                   ItemTemplateSelector="{StaticResource contentSelector}">
                 <FlipView.ItemContainerStyle>
                     <Style TargetType="FlipViewItem">

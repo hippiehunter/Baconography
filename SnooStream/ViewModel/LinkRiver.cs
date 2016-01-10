@@ -23,8 +23,7 @@ namespace SnooStream.ViewModel
         public Subreddit Thing { get; set; }
         public string Sort { get; set; }
         public DateTime? LastRefresh { get; set; }
-        public CollectionViewSource LinkViewSource { get; set; }
-        public ObservableCollection<object> Links {get; set;}
+        public RangedCollectionBase Links {get; set;}
         public string LastLinkId { get; set; }
 
         public LinkRiverViewModel()
@@ -35,9 +34,7 @@ namespace SnooStream.ViewModel
         public LinkRiverViewModel(ILinkBuilderContext context)
         {
             Context = context;
-            LinkViewSource = new CollectionViewSource();
             Links = new LinkCollection { Context = context, LinkRiver = this };
-            LinkViewSource.Source = Links;
         }
 
         public bool IsUserMultiReddit
@@ -87,11 +84,11 @@ namespace SnooStream.ViewModel
         }
     }
 
-    public class LinkCollection : ObservableCollection<object>, ISupportIncrementalLoading
+    public class LinkCollection : RangedCollectionBase
     {
         public ILinkBuilderContext Context { get; set; }
         public LinkRiverViewModel LinkRiver { get; set; }
-        public bool HasMoreItems
+        public override bool HasMoreItems
         {
             get
             {
@@ -99,7 +96,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
         {
             //Load Additional
             if (Count > 0)
@@ -139,14 +136,14 @@ namespace SnooStream.ViewModel
         void GotoComments(LinkViewModel linkViewModel);
         Task<Thing> GetThing(string url);
         void UpdateVotable(string name, int direction);
-        void GotoLink(string url);
+        void GotoLink(LinkViewModel linkViewModel);
         void Share(LinkViewModel linkViewModel);
         void Hide(LinkViewModel linkViewModel);
         void Report(string id);
         void Save(string id);
         void Delete(LinkViewModel linkViewModel);
         void SubmitEdit(MarkdownEditingViewModel editing);
-        void GotoUserDetails(string author);
+        void GotoUserDetails(LinkViewModel linkViewModel);
     }
 
     public interface ILinkBuilderContext
@@ -337,7 +334,7 @@ namespace SnooStream.ViewModel
 
         public void GotoLink()
         {
-            Context.GotoLink(Thing.Url);
+            Context.GotoLink(this);
         }
 
         public void GotoComments()
@@ -392,7 +389,7 @@ namespace SnooStream.ViewModel
 
         public void GotoUserDetails()
         {
-            Context.GotoUserDetails(Thing.Author);
+            Context.GotoUserDetails(this);
         }
     }
 
@@ -413,6 +410,7 @@ namespace SnooStream.ViewModel
 
         public void GotoComments(LinkViewModel link)
         {
+            LinkRiver.Links.CurrentItem = link;
             Navigation.GotoComments(link.Thing.Permalink, NavigationContext, link);
         }
 
@@ -430,9 +428,10 @@ namespace SnooStream.ViewModel
             catch { }
         }
 
-        public void GotoLink(string url)
+        public void GotoLink(LinkViewModel vm)
         {
-            Navigation.GotoLink(LinkRiver, url, NavigationContext);
+            LinkRiver.Links.CurrentItem = vm;
+            Navigation.GotoLink(LinkRiver, vm.Thing.Url, NavigationContext);
         }
 
         public void Share(LinkViewModel linkViewModel)
@@ -485,9 +484,10 @@ namespace SnooStream.ViewModel
             catch { }
         }
 
-        public void GotoUserDetails(string author)
+        public void GotoUserDetails(LinkViewModel vm)
         {
-            Navigation.GotoUserDetails(author, NavigationContext);
+            LinkRiver.Links.CurrentItem = vm;
+            Navigation.GotoUserDetails(vm.Thing.Author, NavigationContext);
         }
     }
 

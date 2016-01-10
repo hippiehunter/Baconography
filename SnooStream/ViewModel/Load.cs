@@ -189,7 +189,7 @@ namespace SnooStream.ViewModel
                     case WebErrorStatus.Unknown:
                     default:
                         State = LoadState.Failure;
-                        throw new Exception(WebError.GetStatus(ex.HResult).ToString());
+                        break;
                 }
             }
             finally
