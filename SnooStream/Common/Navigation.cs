@@ -407,7 +407,7 @@ namespace SnooStream.Common
             {
                 { "kind", "comments" },
                 { "url", typedContext.Url },
-                { "focusId", GetIdFromCommentItem(comment.CommentsViewSource.View.CurrentItem) },
+                { "focusId", GetIdFromCommentItem(comment.Comments.CurrentItem) },
                 { "sort", typedContext.Sort }
             };
         }

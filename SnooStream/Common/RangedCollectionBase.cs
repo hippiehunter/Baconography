@@ -11,6 +11,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace SnooStream.Common
 {
@@ -238,7 +239,7 @@ namespace SnooStream.Common
             typeof(RangedCollectionDataSource), new PropertyMetadata(null, DataSourceChanged)
             );
 
-        private static void DataSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static async void DataSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var target = d as Selector;
             var rcb = e.NewValue as RangedCollectionBase;
@@ -250,8 +251,24 @@ namespace SnooStream.Common
                 target.ItemsSource = rcb;
 
                 var targetItem = rcb.CurrentItem;
-                if(target is ListViewBase && targetItem != null)
-                    d.Dispatcher.RunIdleAsync((arg) => ((ListViewBase)target).ScrollIntoView(targetItem, ScrollIntoViewAlignment.Leading));
+                if (target is ListViewBase && targetItem != null)
+                {
+                    ((ListViewBase)target).Opacity = 0.0;
+                    await d.Dispatcher.RunIdleAsync((arg) =>
+                    {
+                        var sb = new Storyboard();
+                        var animation = new DoubleAnimation { Duration = new Duration(TimeSpan.FromMilliseconds(500)), From = 0.0, To = 1.0 };
+                        sb.Children.Add(animation);
+                        ((ListViewBase)target).ScrollIntoView(targetItem, ScrollIntoViewAlignment.Leading);
+                        Storyboard.SetTarget(animation, target);
+                        Storyboard.SetTargetProperty(animation, "Opacity");
+                        sb.Begin();
+                    });
+                }
+            }
+            catch
+            {
+
             }
             finally
             {

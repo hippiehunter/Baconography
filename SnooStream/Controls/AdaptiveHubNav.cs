@@ -134,7 +134,7 @@ namespace SnooStream.Controls
         public AdaptiveHubNav()
         {
             NavStack = new List<HubNavItem>();
-            _mainFrame = new Frame();
+            _mainFrame = new Frame { CacheSize = 3 };
             Content = _mainFrame;
             UpdateSize(Window.Current.Bounds.Width);
             Window.Current.SizeChanged += Current_SizeChanged;

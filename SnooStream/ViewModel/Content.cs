@@ -220,7 +220,6 @@ namespace SnooStream.ViewModel
             {
                 var webContent = await LoadWebContent(networkLayer, url, progress, token, context);
                 var contentItems = new WebContentCollection(webContent.Item3, webContent.Item2, url, networkLayer, context);
-                var itemContentViewSource = context.MakeCollectionViewSource ? new CollectionViewSource { Source = contentItems } : null;
                 return new ContentContainerViewModel
                 {
                     Url = url,

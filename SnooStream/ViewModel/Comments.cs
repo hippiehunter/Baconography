@@ -39,8 +39,7 @@ namespace SnooStream.ViewModel
         }
 
         public DateTime? LastRefresh { get; set; }
-        public CollectionViewSource CommentsViewSource { get; set; }
-        public ObservableCollection<object> Comments { get; set; }
+        public RangeCollection Comments { get; set; }
 
         public CommentsViewModel()
         {
@@ -50,8 +49,7 @@ namespace SnooStream.ViewModel
         public CommentsViewModel(ICommentBuilderContext context)
         {
             Context = context;
-            Comments = new ObservableCollection<object>();
-            CommentsViewSource = new CollectionViewSource { Source = Comments };
+            Comments = new RangeCollection();
             Thing = new Link();
             Votable = new VotableViewModel(Thing, Context.ChangeVote);
             Load();
@@ -198,7 +196,7 @@ namespace SnooStream.ViewModel
         public List<string> Ids { get; set; }
         public int Count { get; set; }
         public int Depth { get; set; }
-
+        public string Text { get { return string.Format("Load {0} more comment{1}", Ids.Count, Ids.Count > 1 ? "s" : ""); } }
         public void LoadMore()
         {
             LoadState = LoadViewModel.ReplaceLoadViewModel(LoadState, new LoadViewModel { LoadAction = (progress, token) => LoadMoreAsync(progress, token), IsCritical = false });
@@ -232,6 +230,7 @@ namespace SnooStream.ViewModel
             Context.Comments.Comments.Clear();
             CommentBuilder.FillFlatList(Context.Comments.Comments, comments.ToList(), Context);
         }
+        public string Text { get; set; } = "Load all comments";
     }
 
     public enum CommentOriginType

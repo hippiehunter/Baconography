@@ -16,8 +16,10 @@
         <local:CommentCountControlTemplate />
     </ResourceDictionary.MergedDictionaries>
 
-    <DataTemplate x:Key="LoadFullyTemplate">
-        <Button Command="{Binding Load}" Content="Load full context" BorderThickness="0" Margin="0"/>
+    <DataTemplate x:Key="LoadFullyTemplate" x:DataType="vm:LoadFullCommentsViewModel">
+        <Grid>
+            <Button Tapped="{x:Bind LoadFully}" Content="{x:Bind Text}" BorderThickness="0" Margin="0"/>
+        </Grid>
     </DataTemplate>
 
     <DataTemplate x:Key="CardCommentView" x:DataType="vm:CommentsViewModel">
@@ -98,7 +100,7 @@
                         </Button.Flyout>
                     </Button>
 
-                    <ContentControl Grid.Column="1" Content="{x:Bind Link.Votable}" ContentTemplate="{StaticResource VotableControl}" />
+                    <ContentControl Grid.Column="1" DataContext="{x:Bind Link.Votable}" ContentTemplate="{StaticResource VotableControl}" />
 
                     <Button Grid.Column="2"
                         HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
@@ -175,7 +177,7 @@
                     </Button>
 
                     <!-- Votable Section -->
-                    <ContentControl Grid.Column="1" Content="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" />
+                    <ContentControl Grid.Column="1" DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" />
                 </Grid>
                 <snoodom:MarkdownControl
                         Grid.ColumnSpan="2"
@@ -209,14 +211,19 @@
             </Grid>
         </Grid>
     </DataTemplate>
-    
+
+    <DataTemplate x:Name="MoreItemTemplate" x:DataType="vm:MoreViewModel">
+        <Grid>
+            <Button Content="{x:Bind Text}" Tapped="{x:Bind LoadMore}"/>
+        </Grid>
+    </DataTemplate>
     
     <selector:CommentTemplateSelector x:Key="commentTemplateSelector"  CommentTemplate="{StaticResource CommentTemplate}" LoadFullyTemplate="{StaticResource LoadFullyTemplate}"
-                                      LoadingTemplate="{StaticResource LoadingTemplate}"/>
+                                      LoadingTemplate="{StaticResource LoadingTemplate}" MoreTemplate="{StaticResource MoreItemTemplate}"/>
 
     <DataTemplate x:Key="CommentsView" x:DataType="vm:CommentsViewModel">
         <ListView HeaderTemplate="{StaticResource CardCommentView}"
-                  ItemsSource="{x:Bind CommentsViewSource.View}"
+                  ItemsSource="{x:Bind Comments}"
                   ItemContainerStyle="{StaticResource FullWidthListViewContainer}"
                   ItemTemplateSelector="{StaticResource commentTemplateSelector}">
             <ListView.ItemContainerTransitions>

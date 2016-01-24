@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Data;
 using Windows.Foundation;
 using SnooStreamBackground;
 using Newtonsoft.Json;
+using SnooStream.Common;
 
 namespace SnooStream.ViewModel
 {
@@ -20,8 +21,7 @@ namespace SnooStream.ViewModel
         public LoadViewModel LoadState { get; set; }
         public IActivityBuilderContext Context { get; set; }
         public DateTime? LastRefresh { get; set; }
-        public CollectionViewSource ActivityViewSource { get; set; }
-        public ObservableCollection<object> Activities { get; set; }
+        public ActivityCollection Activities { get; set; }
 
         public ActivitiesViewModel()
         {
@@ -30,9 +30,7 @@ namespace SnooStream.ViewModel
         public ActivitiesViewModel(IActivityBuilderContext activityContext)
         {
             Context = activityContext;
-            ActivityViewSource = new CollectionViewSource();
             Activities = new ActivityCollection { Context = Context };
-            ActivityViewSource.Source = Activities;
             LoadState = new LoadViewModel { IsCritical = false, State = ViewModel.LoadState.None };
         }
 
@@ -56,11 +54,11 @@ namespace SnooStream.ViewModel
         }
     }
 
-    public class ActivityCollection : ObservableCollection<object>, ISupportIncrementalLoading
+    public class ActivityCollection : RangedCollectionBase
     {
         public IActivityBuilderContext Context { get; set; }
         public ActivitiesViewModel Activities { get; set; }
-        public bool HasMoreItems
+        public override bool HasMoreItems
         {
             get
             {
@@ -68,7 +66,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
         {
             //Load Additional
             if (Count > 0)
