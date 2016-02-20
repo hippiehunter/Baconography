@@ -162,6 +162,16 @@ namespace SnooStream.Model
             if (!string.IsNullOrWhiteSpace(realErrorString))
                 throw new RedditException(realErrorString);
 
+#if DEBUG
+            try
+            {
+                JsonConvert.DeserializeObject(response);
+            }
+            catch (Exception ex)
+            {
+                throw new RedditException(ex.ToString());
+            }
+#endif
             return response;
         }
 
@@ -185,6 +195,17 @@ namespace SnooStream.Model
             }
             if (!string.IsNullOrWhiteSpace(realErrorString))
                 throw new RedditException(realErrorString);
+
+#if DEBUG
+            try
+            {
+                JsonConvert.DeserializeObject(response);
+            }
+            catch (Exception ex)
+            {
+                throw new RedditException(ex.ToString());
+            }
+#endif
         }
 
         private async Task EnsureRedditCookie(CancellationToken token)
