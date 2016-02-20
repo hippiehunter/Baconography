@@ -4,8 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream"
     xmlns:common="using:SnooStream.Common"
-    xmlns:converters="using:SnooStream.Converters"
-    RequestedTheme="Light">
+    xmlns:converters="using:SnooStream.Converters">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.ThemeDictionaries>
@@ -13,11 +12,13 @@
                     <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FFDCDCDC" />
                     <SolidColorBrush x:Key="InvertThemeForegroundBrush" Color="White" />
                     <SolidColorBrush x:Key="ThemeForegroundBrush" Color="Black" />
+                    <SolidColorBrush x:Key="ThemeForegroundOffsetBrush" Color="#99FFFFFF" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Default">
                     <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FF1F1F1F" />
                     <SolidColorBrush x:Key="InvertThemeForegroundBrush" Color="Black" />
                     <SolidColorBrush x:Key="ThemeForegroundBrush" Color="White" />
+                    <SolidColorBrush x:Key="ThemeForegroundOffsetBrush" Color="#99000000" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
             <converters:NullToEmptyConverter x:Key="nullToEmptyConverter" />
@@ -83,7 +84,7 @@
             </Style>
 
             <Style TargetType="TextBlock">
-                <Setter Property="Foreground" Value="{StaticResource ThemeForegroundBrush}" />
+                <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundBrush}" />
             </Style>
             
             <Style x:Key="MessageTextBox" TargetType="TextBox">
@@ -231,20 +232,21 @@
                 <Setter Property="FontFamily" Value="Segoe UI" />
                 <Setter Property="FontWeight" Value="Bold" />
                 <Setter Property="FontSize" Value="22" />
+                <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundBrush}" />
             </Style>
 
             <Style x:Key="SubtextButtonSubtextTextBlock" TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="Segoe UI" />
                 <Setter Property="FontSize" Value="16" />
                 <Setter Property="FontWeight" Value="SemiBold" />
-                <Setter Property="Foreground" Value="#99FFFFFF" />
+                <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundOffsetBrush}" />
             </Style>
 
             <Style x:Key="SubtextButtonBodyTextBlock" TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="Segoe UI" />
                 <Setter Property="FontSize" Value="16" />
                 <Setter Property="FontWeight" Value="Normal" />
-                <Setter Property="Foreground" Value="#99FFFFFF" />
+                <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundOffsetBrush}" />
             </Style>
 
             <Style x:Key="SubtextButton" TargetType="Button">
@@ -261,6 +263,7 @@
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="FontWeight" Value="Normal" />
                 <Setter Property="FontFamily" Value="Calibri" />
+                <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundBrush}" />
             </Style>
 
             <Style x:Key="MarkdownRichTextBlockStyle" TargetType="RichTextBlock">
@@ -270,12 +273,14 @@
                 <Setter Property="FontWeight" Value="Normal" />
                 <Setter Property="FontStyle" Value="Normal" />
                 <Setter Property="FontFamily" Value="Calibri" />
+                <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundBrush}" />
             </Style>
 
             <Style x:Key="PlainButtonTextBlock" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="16" />
                 <Setter Property="FontWeight" Value="SemiBold" />
                 <Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundBrush}" />
             </Style>
 
             <Style x:Key="VoteArrowTextBlock" TargetType="TextBlock">
@@ -283,12 +288,14 @@
                 <Setter Property="Text" Value="&#xE110;" />
                 <Setter Property="IsTextScaleFactorEnabled" Value="False"/>
                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
+                <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundBrush}" />
             </Style>
 
             <Style x:Key="ReadabilityTextBlock" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="16" />
                 <Setter Property="FontWeight" Value="SemiBold" />
                 <Setter Property="FontFamily" Value="Calibri" />
+                <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundBrush}" />
             </Style>
 
             <Style x:Key="TitleTextBlock" TargetType="TextBlock" BasedOn="{StaticResource SubheaderTextBlockStyle}">
@@ -302,6 +309,7 @@
                 <Setter Property="FontWeight" Value="Normal" />
                 <Setter Property="FontStyle" Value="Normal" />
                 <Setter Property="FontFamily" Value="Calibri" />
+                <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundBrush}" />
             </Style>
 
             <Style x:Key="MarkdownBorderStyle" TargetType="Border">
@@ -374,6 +382,7 @@
                 <Setter Property="HorizontalAlignment" Value="Left"/>
                 <Setter Property="VerticalAlignment" Value="Top"/>
                 <Setter Property="Margin" Value="12, 14, 12, 4"/>
+                <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundBrush}" />
             </Style>
             
         </ResourceDictionary>
