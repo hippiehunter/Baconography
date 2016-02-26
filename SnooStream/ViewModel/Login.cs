@@ -13,7 +13,7 @@ using Windows.Security.Authentication.Web;
 
 namespace SnooStream.ViewModel
 {
-    public class LoginViewModel : ObservableObject
+    public class LoginViewModel : SnooObservableObject
     {
         private ILoginContext _context;
 

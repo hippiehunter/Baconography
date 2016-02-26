@@ -6,7 +6,7 @@ using Windows.UI.Xaml;
 
 namespace SnooStream.Common
 {
-    public class LinkViewLayoutManager : ObservableObject
+    public class LinkViewLayoutManager : SnooObservableObject
     {
         const int PictureColumnWidth = 100;
         public ISettingsContext Settings { get; set; }

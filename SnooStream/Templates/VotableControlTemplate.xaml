@@ -8,7 +8,7 @@
     <converter:VoteColorConverter x:Key="voteColorConverter" />
 
     <DataTemplate x:Key="VotableControl"  x:DataType="vm:VotableViewModel">
-        <UserControl>
+        <UserControl Loaded="UserControl_Loaded">
             <Button HorizontalContentAlignment="Center" HorizontalAlignment="Stretch"
                 BorderThickness="0" Margin="0,-12,0,0" Padding="0" Background="Transparent"
                 Tapped="{x:Bind ToggleVote}">

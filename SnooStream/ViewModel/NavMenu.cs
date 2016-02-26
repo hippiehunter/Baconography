@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using SnooSharp;
+using SnooStream.Common;
 using SnooStream.ViewModel.Messages;
 using SnooStreamBackground;
 using System;
@@ -22,7 +23,7 @@ namespace SnooStream.ViewModel
         ObservableCollection<Subreddit> MRUSubreddits { get; }
     }
 
-    public class NavMenu : ObservableObject
+    public class NavMenu : SnooObservableObject
     {
         INavMenuContext _context;
         public NavMenu(INavMenuContext context, LoginViewModel loginViewModel, SelfViewModel selfViewModel, 

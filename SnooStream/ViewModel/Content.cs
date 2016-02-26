@@ -15,6 +15,7 @@ using NBoilerpipePortable.Extractors;
 using NBoilerpipePortable.Util;
 using Windows.UI.Xaml;
 using SnooStream.Common;
+using System.Net;
 
 namespace SnooStream.ViewModel
 {
@@ -503,7 +504,7 @@ namespace SnooStream.ViewModel
         }
     }
 
-    public class ContentViewModel : ObservableObject
+    public class ContentViewModel : SnooObservableObject
     {
         public IContentRiverContext Context { get; set; }
         public string Url { get; set; }
@@ -576,7 +577,7 @@ namespace SnooStream.ViewModel
         public async Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token)
         {
             var additionalListing = await LinkRiverContext.LoadAdditionalAsync(progress, token);
-            return additionalListing.Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, link.Thing.Title, link.Votable, link, this, ContentView, NetworkLayer, Collection));
+            return additionalListing.Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
         }
 
         public void NavigateToComments(string contextUrl)
@@ -610,7 +611,7 @@ namespace SnooStream.ViewModel
 
         public IEnumerable<object> LoadInitial()
         {
-            return LinkRiverContext.Links.OfType<LinkViewModel>().Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, link.Thing.Title, link.Votable, link, this, ContentView, NetworkLayer, Collection));
+            return LinkRiverContext.Links.OfType<LinkViewModel>().Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
         }
     }
 

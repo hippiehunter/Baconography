@@ -13,6 +13,7 @@ using SnooStream.Common;
 using System.Diagnostics;
 using Windows.ApplicationModel.DataTransfer;
 using SnooStream.Controls;
+using System.Net;
 
 namespace SnooStream.ViewModel
 {
@@ -261,10 +262,11 @@ namespace SnooStream.ViewModel
         }
     }
 
-    public class LinkViewModel : ObservableObject
+    public class LinkViewModel : SnooObservableObject
     {
         public ILinkContext Context { get; set; }
         public Link Thing { get; set; }
+        public string LinkTitle { get { return WebUtility.HtmlDecode(Thing.Title); } }
         public VotableViewModel Votable { get; set; }
         public LinkMeta Metadata { get; set; }
         public MarkdownEditingViewModel Editing { get; set; }

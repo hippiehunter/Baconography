@@ -24,7 +24,7 @@ namespace SnooStream.ViewModel
         void ChangeMulti(string url, string multi, bool subscribe);
     }
 
-    public class SubredditRiverViewModel : ObservableObject, IHasLoadableState
+    public class SubredditRiverViewModel : SnooObservableObject, IHasLoadableState
     {
         private ISubredditGroupBuilderContext subredditContext;
 
@@ -214,7 +214,7 @@ namespace SnooStream.ViewModel
             }
         }
     }
-    public class SubredditWrapper : ObservableObject
+    public class SubredditWrapper : SnooObservableObject
     {
         public ISubredditGroupBuilderContext Context { get; set; }
 

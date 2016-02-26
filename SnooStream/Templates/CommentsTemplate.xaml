@@ -36,7 +36,7 @@
                 <!-- Title block -->
                 <TextBlock Grid.Row="0"
                    Style="{StaticResource TitleTextBlock}"
-                   Text="{x:Bind Thing.Title}"
+                   Text="{x:Bind LinkTitle}"
                    TextTrimming="WordEllipsis"
                    MinHeight="50">
                 </TextBlock>
@@ -100,13 +100,13 @@
                         </Button.Flyout>
                     </Button>
 
-                    <ContentControl Grid.Column="1" DataContext="{x:Bind Link.Votable}" ContentTemplate="{StaticResource VotableControl}" />
+                    <ContentControl Grid.Column="1" DataContext="{Binding Link.Votable, Mode=OneTime}" ContentTemplate="{StaticResource VotableControl}" />
 
                     <Button Grid.Column="2"
                         HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
                         Margin="0,-12,2,0"
                         BorderThickness="0" Padding="0,0,0,0" 
-                        IsEnabled="False" Content="{x:Bind Link}" ContentTemplate="{StaticResource CommentCountControl}">
+                        IsEnabled="False" DataContext="{x:Bind Link}" ContentTemplate="{StaticResource CommentCountControl}">
                     </Button>
                 </Grid>
             </Grid>
@@ -177,7 +177,7 @@
                     </Button>
 
                     <!-- Votable Section -->
-                    <ContentControl Grid.Column="1" DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" />
+                    <ContentControl Grid.Column="1" DataContext="{Binding Votable, Mode=OneTime}" ContentTemplate="{StaticResource VotableControl}" />
                 </Grid>
                 <snoodom:MarkdownControl
                         Grid.ColumnSpan="2"

@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using SnooSharp;
+using SnooStream.Common;
 using SnooStream.Model;
 using System;
 using System.Collections.Generic;
@@ -41,7 +42,7 @@ namespace SnooStream.ViewModel
         LoadViewModel LoadState { get; }
     }
 
-    public class LoadViewModel : ObservableObject
+    public class LoadViewModel : SnooObservableObject
     {
         public static CoreDispatcher UIDispatcher { get; set; }
         public LoadKind Kind { get; set; } = LoadKind.Item;

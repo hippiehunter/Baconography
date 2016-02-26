@@ -16,16 +16,18 @@ using Windows.UI.Core;
 using NBoilerpipePortable.Util;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
+using System.Net;
 
 namespace SnooStream.ViewModel
 {
-    public class CommentsViewModel : ObservableObject
+    public class CommentsViewModel : SnooObservableObject
     {
         public LoadViewModel LoadState { get; set; }
         public VotableViewModel Votable { get; set; }
         public LinkViewModel Link { get { return Context.Link; } }
         public ICommentBuilderContext Context { get; set; }
         public Link Thing { get; set; }
+        public string LinkTitle { get { return WebUtility.HtmlDecode(Thing.Title); } }
         public string Sort
         {
             get
@@ -88,7 +90,7 @@ namespace SnooStream.ViewModel
         }
     }
 
-    public class CommentViewModel : ObservableObject
+    public class CommentViewModel : SnooObservableObject
     {
         public ICommentBuilderContext Context { get; set; }
         public Comment Thing { get; set; }
@@ -189,7 +191,7 @@ namespace SnooStream.ViewModel
         }
     }
 
-    public class MoreViewModel : ObservableObject
+    public class MoreViewModel : SnooObservableObject
     {
         public ICommentBuilderContext Context { get; set; }
         public LoadViewModel LoadState { get; set; }
@@ -213,7 +215,7 @@ namespace SnooStream.ViewModel
         }
     }
 
-    public class LoadFullCommentsViewModel : ObservableObject
+    public class LoadFullCommentsViewModel : SnooObservableObject
     {
         public ICommentBuilderContext Context { get; set; }
         public LoadViewModel LoadState { get; set; }
@@ -472,9 +474,9 @@ namespace SnooStream.ViewModel
                 Votable = new VotableViewModel(comment, context.ChangeVote),
                 Context = context,
                 _collapsed = false,
-                Body = HttpUtility.HtmlDecode(comment.Body),
+                Body = WebUtility.HtmlDecode(comment.Body),
                 AuthorFlair = context.GetUsernameModifiers(comment.Author),
-                AuthorFlairText = HttpUtility.HtmlDecode(comment.AuthorFlairText)
+                AuthorFlairText = WebUtility.HtmlDecode(comment.AuthorFlairText)
             };
             commentViewModel.BodyMDTask = context.QueueMarkdown(commentViewModel);
             var result = new CommentShell
@@ -564,7 +566,7 @@ namespace SnooStream.ViewModel
             {
                 Author = context.CurrentUserName,
                 CreatedUTC = DateTime.UtcNow,
-                LinkTitle = context.Comments.Thing.Title,
+                LinkTitle = WebUtility.HtmlDecode(context.Comments.Thing.Title),
                 LinkId = context.Comments.Thing.Name,
                 Body = "",
                 Name = "t1_" + newCommentId,
@@ -969,7 +971,7 @@ namespace SnooStream.ViewModel
                         CommentViewModel result;
                         while (_workQueue.TryTake(out result, Timeout.Infinite, cancelToken))
                         {
-                            QueueBodyChanged(result, MakeMarkdown(result.Thing.Body));
+                            QueueBodyChanged(result, MakeMarkdown(WebUtility.HtmlDecode(result.Thing.Body)));
                         }
                     }
                     catch (OperationCanceledException)
@@ -980,7 +982,7 @@ namespace SnooStream.ViewModel
                         {
                             foreach (var item in remainingWork)
                             { 
-                                QueueBodyChanged(item, MakeMarkdown(item.Thing.Body));
+                                QueueBodyChanged(item, MakeMarkdown(WebUtility.HtmlDecode(item.Thing.Body)));
                             }
                         }
                     }

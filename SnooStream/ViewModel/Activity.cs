@@ -13,10 +13,11 @@ using Windows.Foundation;
 using SnooStreamBackground;
 using Newtonsoft.Json;
 using SnooStream.Common;
+using System.Net;
 
 namespace SnooStream.ViewModel
 {
-    public class ActivitiesViewModel : ObservableObject
+    public class ActivitiesViewModel : SnooObservableObject
     {
         public LoadViewModel LoadState { get; set; }
         public IActivityBuilderContext Context { get; set; }
@@ -111,7 +112,7 @@ namespace SnooStream.ViewModel
         public string Symbol { get; set; }
     }
 
-    public class ActivityHeaderViewModel : ObservableObject
+    public class ActivityHeaderViewModel : SnooObservableObject
     {
         public DateTime CreatedUTC { get; set; }
         public string GroupId { get; set; }
@@ -373,7 +374,7 @@ namespace SnooStream.ViewModel
 
             if (thing.Data is Link)
             {
-                var body = HttpUtility.HtmlDecode(((Link)thing.Data).Selftext);
+                var body = WebUtility.HtmlDecode(((Link)thing.Data).Selftext);
                 result = new ActivityViewModel
                 {
                     Thing = thing,
@@ -389,7 +390,7 @@ namespace SnooStream.ViewModel
             }
             else if (thing.Data is Comment)
             {
-                var body = HttpUtility.HtmlDecode(((Comment)thing.Data).Body);
+                var body = WebUtility.HtmlDecode(((Comment)thing.Data).Body);
                 result = new ActivityViewModel
                 {
                     Thing = thing,
@@ -419,7 +420,7 @@ namespace SnooStream.ViewModel
                     isMod = true;
                 }
 
-                var body = HttpUtility.HtmlDecode(((Message)thing.Data).Body);
+                var body = WebUtility.HtmlDecode(((Message)thing.Data).Body);
                 result = new ActivityViewModel
                 {
                     Thing = thing,

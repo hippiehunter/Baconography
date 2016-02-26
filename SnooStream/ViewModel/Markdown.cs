@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using SnooStream.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace SnooStream.ViewModel
         void UpdateMarkdown(string source, Action<SnooDom.SnooDom> updator);
     }
 
-    public class MarkdownEditingViewModel : ObservableObject
+    public class MarkdownEditingViewModel : SnooObservableObject
     {
         public IMarkdownEditingContext Context { get; set; }
         Action<string> _textChanged;

@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using SnooSharp;
+using SnooStream.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SnooStream.ViewModel
 {
-    public class VotableViewModel : ObservableObject
+    public class VotableViewModel : SnooObservableObject
     {
         IVotable _votableThing;
         Action<string, int> _propertyChanged;

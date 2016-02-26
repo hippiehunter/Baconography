@@ -23,5 +23,10 @@ namespace SnooStream.Templates
         {
             this.InitializeComponent();
         }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

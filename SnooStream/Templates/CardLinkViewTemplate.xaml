@@ -57,7 +57,7 @@
                     <!-- Title block -->
                     <TextBlock Grid.Row="0" Grid.Column="0"
                         Style="{StaticResource TitleTextBlock}"
-                        Text="{x:Bind Thing.Title, Mode=OneTime}"
+                        Text="{x:Bind LinkTitle, Mode=OneTime}"
                         TextTrimming="WordEllipsis"
                         MaxLines="3">
                         <TextBlock.Foreground>
@@ -69,7 +69,7 @@
                     <ContentControl Grid.Column="2"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
-                                    DataContext="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" 
+                                    Content="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" 
                                     Margin="0,0,0,0" />
 
                     <!-- Link info, user / time / subreddit / domain -->
