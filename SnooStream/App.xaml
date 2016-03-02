@@ -339,6 +339,7 @@
                             <ListViewItemPresenter CheckBrush="{ThemeResource SystemControlForegroundBaseMediumHighBrush}" 
                                            ContentMargin="{TemplateBinding Padding}" 
                                            CheckMode="Inline" 
+                                           HorizontalAlignment="Stretch"
                                            ContentTransitions="{TemplateBinding ContentTransitions}" 
                                            CheckBoxBrush="{ThemeResource SystemControlForegroundBaseMediumHighBrush}" 
                                            DragForeground="{ThemeResource ListViewItemDragForegroundThemeBrush}" 

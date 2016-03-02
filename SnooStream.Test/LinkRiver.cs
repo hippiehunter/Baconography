@@ -45,6 +45,14 @@ namespace SnooStream.Test
                 }
             }
 
+            public string Title
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
             public Task<Dictionary<string, LinkMeta>> GenerateLinkMeta(IEnumerable<string> linkNames)
             {
                 var result = new Dictionary<string, LinkMeta>();

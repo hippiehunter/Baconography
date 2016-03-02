@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using System.Threading;
 using Windows.UI.Xaml;
+using SnooStream.Common;
 
 namespace SnooStream.Test
 {
@@ -149,7 +150,7 @@ namespace SnooStream.Test
             _moreThings = moreThings;
             _allThings = allThings;
             _requestedThings = requestedThings;
-            var commentsCollection = new ObservableCollection<object>();
+            var commentsCollection = new RangeCollection();
             Comments = new CommentsViewModel { Thing = thing, Sort = "best", Context = this, Comments = commentsCollection };
         }
 
@@ -186,6 +187,31 @@ namespace SnooStream.Test
         }
 
         public override Task<Link> GetLink(IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Report(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Save(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Share(CommentViewModel comment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void GotoUserDetails(string author)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Delete(CommentViewModel comment)
         {
             throw new NotImplementedException();
         }

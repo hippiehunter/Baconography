@@ -16,6 +16,6 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding HeaderText}" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource HeaderTextBlockStyle}" Margin="0,0,12,0" />
-        <ContentControl Grid.ColumnSpan="2" Grid.Row="1" Content="{Binding Content}" ContentTemplate="{Binding ContentTemplate}"/>
+        <ContentControl Grid.ColumnSpan="2" Grid.Row="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Content="{Binding Content}" ContentTemplate="{Binding ContentTemplate}"/>
     </Grid>
 </Page>

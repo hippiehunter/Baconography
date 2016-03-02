@@ -15,6 +15,8 @@ using SnooSharp;
 using CommonResourceAcquisition.ImageAcquisition;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
+using SnooStream.Common;
+using System.Collections.ObjectModel;
 
 namespace SnooStream.Test
 {
@@ -28,7 +30,7 @@ namespace SnooStream.Test
             var riverContext = new TestContentRiverContext();
             var collectionView = new TestCollectionView();
             var networkLayer = new TestNetworkLayer();
-            var content = ContentBuilder.MakeContentViewModel("http://www.example.com/test.jpg", "no title", null, null, riverContext, collectionView, networkLayer);
+            var content = ContentBuilder.MakeContentViewModel("http://www.example.com/test.jpg", "no title", null, null, riverContext, collectionView, networkLayer, collectionView);
             Assert.IsNotNull(content);
 
             var sampleListing = JsonConvert.DeserializeObject<Listing>(sampleListingString);
@@ -39,7 +41,7 @@ namespace SnooStream.Test
                     if (((Link)thing.Data).Url.EndsWith(".pdf"))
                         continue;
 
-                    collectionView.Add(ContentBuilder.MakeContentViewModel(((Link)thing.Data).Url, ((Link)thing.Data).Title, null, null, riverContext, collectionView, networkLayer));
+                    collectionView.Add(ContentBuilder.MakeContentViewModel(((Link)thing.Data).Url, ((Link)thing.Data).Title, null, null, riverContext, collectionView, networkLayer, collectionView));
                 }
             }
 
@@ -158,7 +160,7 @@ namespace SnooStream.Test
         }
     }
 
-    class TestCollectionView : List<object>, ICollectionView
+    class TestCollectionView : ObservableCollection<object>, ICollectionView
     {
         public IObservableVector<object> CollectionGroups
         {
@@ -244,6 +246,8 @@ namespace SnooStream.Test
 
     class TestContentRiverContext : IContentRiverContext
     {
+        public int Current { get; set; }
+
         public bool HasAdditional
         {
             get
@@ -260,6 +264,11 @@ namespace SnooStream.Test
             }
         }
 
+        public IEnumerable<object> LoadInitial()
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token)
         {
             throw new NotImplementedException();
@@ -268,6 +277,11 @@ namespace SnooStream.Test
         public Task<ICommentBuilderContext> MakeCommentContext(string commentUrl)
         {
             return Task.FromResult<ICommentBuilderContext>(new TestCommentBuilderContext());
+        }
+
+        public Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
         }
 
         public void NavigateToComments(string contextUrl)

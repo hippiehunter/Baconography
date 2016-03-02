@@ -35,7 +35,7 @@
                 <!-- Content block -->
                 <Image Tapped="{x:Bind GotoLink}" HorizontalAlignment="Stretch" Visibility="{x:Bind HasPreview, Converter={StaticResource booleanVisibilityConverter}}"
                        Source="{x:Bind PreviewSource, Converter={StaticResource clearableImageConverter}}" MaxHeight="{x:Bind PreviewHeight}"
-                       Grid.Row="0" Grid.RowSpan="3"/>
+                       Grid.Row="1" />
 
                 <!-- Link Header -->
                 <Grid Grid.Row="0" Padding="24,24,12,24" Margin="-12,0,-12,0" MaxHeight="400">
@@ -69,13 +69,14 @@
                     <ContentControl Grid.Column="2"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
+                                    DataContext="{x:Null}"
                                     Content="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" 
                                     Margin="0,0,0,0" />
 
                     <!-- Link info, user / time / subreddit / domain -->
                     <ContentControl x:Name="linkMetadata"
                         Grid.Row="1" Grid.ColumnSpan="2"
-                        Margin="0,5,0,-6"
+                        Margin="0,5,0,-6" DataContext="{x:Null}"
                         HorizontalAlignment="Stretch" Content="{x:Bind Converter={StaticResource linkMetadataConverter}, Mode=OneWay}"/>
                 </Grid>
 

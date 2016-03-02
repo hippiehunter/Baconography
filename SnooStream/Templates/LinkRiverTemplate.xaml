@@ -32,6 +32,8 @@
                       IsItemClickEnabled="False"
                       IncrementalLoadingTrigger="Edge"
                       IncrementalLoadingThreshold="10" 
+                      HorizontalContentAlignment="Stretch"
+                      HorizontalAlignment="Stretch"
                       VirtualizingStackPanel.VirtualizationMode="Recycling"
                       ItemTemplateSelector="{StaticResource loadableItemTemplateSelector}"
                       ItemContainerStyle="{StaticResource FullWidthListViewContainer}">
