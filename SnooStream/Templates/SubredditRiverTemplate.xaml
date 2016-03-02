@@ -230,7 +230,7 @@
                         </VisualState>
                     </VisualStateGroup>
                 </VisualStateManager.VisualStateGroups>
-                <controls:LoadableControl x:Name="loadable" LoadedContentTemplate="{StaticResource SubredditRiverSmallView}" LoadingContentTemplate="{StaticResource LoadItemView}" FailureContentTemplate="{StaticResource LoadItemView}" />
+                <controls:LoadableControl x:Name="loadable" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" LoadedContentTemplate="{StaticResource SubredditRiverSmallView}" LoadingContentTemplate="{StaticResource LoadItemView}" FailureContentTemplate="{StaticResource LoadItemView}" />
             </Grid>
         </UserControl>
     </DataTemplate>

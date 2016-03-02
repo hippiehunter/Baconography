@@ -78,8 +78,8 @@ namespace SnooStream.Controls
         public LoadableControl()
         {
             DataContextChanged += LoadableControl_DataContextChanged;
-            _loadControl = new ContentControl { Visibility = Visibility.Collapsed };
-            _realContent = new ContentControl { Visibility = Visibility.Collapsed };
+            _loadControl = new ContentControl { Visibility = Visibility.Collapsed, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
+            _realContent = new ContentControl { Visibility = Visibility.Collapsed, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
             Content = _containerGrid = new Grid();
             _containerGrid.Children.Add(_loadControl);
             _containerGrid.Children.Add(_realContent);

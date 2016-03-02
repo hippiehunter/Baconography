@@ -46,6 +46,9 @@ namespace SnooStream.Common
         Dictionary<string, object> MakePageState(CommentsViewModel comments);
         Dictionary<string, object> MakePageState(LinkRiverViewModel links);
         Dictionary<string, object> MakePageState(ContentRiverViewModel contentRiver);
+        Dictionary<string, object> MakePageState(SearchViewModel search);
+        Dictionary<string, object> MakePageState(LoginViewModel login);
+        Dictionary<string, object> MakePageState(SelfViewModel self);
         ILinkContext MakeLinkContext(string url);
     }
 
