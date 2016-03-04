@@ -195,6 +195,7 @@
     <Compile Include="ViewModel\Self.cs" />
     <Compile Include="ViewModel\Settings.cs" />
     <Compile Include="ViewModel\SubredditRiver.cs" />
+    <Compile Include="ViewModel\User.cs" />
     <Compile Include="ViewModel\Votable.cs" />
   </ItemGroup>
   <ItemGroup>

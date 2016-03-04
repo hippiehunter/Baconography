@@ -18,6 +18,8 @@ namespace SnooStream.ViewModel
         {
             this.selfContext = selfContext;
         }
+
+        public string Username { get; set; }
     }
 
     class SelfContext : ISelfContext

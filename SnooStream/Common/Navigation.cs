@@ -26,6 +26,8 @@ namespace SnooStream.Common
         ContentRiverViewModel MakeContentRiverContext(object context, string url);
         CommentsViewModel MakeCommentContext(string url, string focusId, string sort, LinkViewModel linkViewModel);
         LinkRiverViewModel MakeLinkRiverContext(string subreddit, string focusId, string sort);
+        SearchViewModel MakeSearchContext(string query, string restrictedToSubreddit, bool subredditsOnly);
+        UserViewModel MakeUserDetailsContext(string username);
 
         LoginViewModel LoginViewModel { get; }
         ActivitiesViewModel ActivitiesViewModel { get; }
@@ -40,6 +42,9 @@ namespace SnooStream.Common
         DataTemplate ContentRiverTemplate { get; }
         DataTemplate CommentTemplate { get; }
         DataTemplate SubredditRiverTemplate { get; }
+        DataTemplate SearchTemplate { get; }
+        DataTemplate SelfTemplate { get; }
+        DataTemplate UserDetailsTemplate { get; }
 
         IEnumerable<object> ViewModelStack { get; }
 
@@ -87,7 +92,15 @@ namespace SnooStream.Common
         public static void GotoUserDetails(string username, INavigationContext context)
         {
             //check if we're looking at our self so we dont go to a generic about user page
-            //SnooStreamViewModel.NavigationService.NavigateToAboutUser(new AboutUserViewModel(username));
+            if (string.Compare(context.SelfViewModel.Username, username, false) == 0)
+            {
+                GotoSelf(context);
+            }
+            else
+            {
+                var userContext = context.MakeUserDetailsContext(username);
+                context.HubNav.Navigate(userContext, context.UserDetailsTemplate, false);
+            }
         }
 
         public static void GotoLink(object contextObj, string url, INavigationContext context)
@@ -157,6 +170,19 @@ namespace SnooStream.Common
             return contentContext;
         }
 
+        public static LoginViewModel GotoSearch(string query, string restrictedToSubreddit, bool subredditsOnly, INavigationContext context)
+        {
+            var result = context.MakeSearchContext(query, restrictedToSubreddit, subredditsOnly);
+            context.HubNav.Navigate(result, context.SearchTemplate, true);
+            return context.LoginViewModel;
+        }
+
+        public static LoginViewModel GotoSelf(INavigationContext context)
+        {
+            context.HubNav.Navigate(context.SelfViewModel, context.SelfTemplate, true);
+            return context.LoginViewModel;
+        }
+
         public static LoginViewModel GotoLogin(INavigationContext context)
         {
             context.HubNav.Navigate(context.LoginViewModel, context.LoginTemplate, true);
@@ -180,6 +206,12 @@ namespace SnooStream.Common
                     break;
                 case "subreddit":
                     context.HubNav.Navigate(context.MakeLinkRiverContext(pageState["url"] as string, pageState["focusId"] as string, pageState["sort"] as string), context.LinkRiverTemplate, true);
+                    break;
+                case "search":
+                    GotoSearch(pageState["query"] as string, pageState["restrictedToSubreddit"] as string, (bool)pageState["subredditsOnly"], context);
+                    break;
+                case "self":
+                    GotoSelf(context);
                     break;
                 case "login":
                     GotoLogin(context);
@@ -234,6 +266,10 @@ namespace SnooStream.Common
         public DataTemplate ContentRiverTemplate { get; set; }
         public DataTemplate CommentTemplate { get; set; }
         public DataTemplate SubredditRiverTemplate { get; set; }
+        public DataTemplate SearchTemplate { get; set; }
+        public DataTemplate SelfTemplate { get; set; }
+        public DataTemplate UserDetailsTemplate { get; set; }
+
         public List<ResourceDictionary> ResourceDictionaryHandles { get; set; } = new List<ResourceDictionary>();
         public IEnumerable<object> ViewModelStack
         {
@@ -245,6 +281,8 @@ namespace SnooStream.Common
                     return Enumerable.Empty<object>();
             }
         }
+
+        
 
         public NavigationContext(AdaptiveHubNav hubNav)
         {
@@ -290,7 +328,7 @@ namespace SnooStream.Common
             SubredditRiver = new SubredditRiverViewModel(new SubredditRiverContext { Reddit = Reddit, NavigationContext = this });
             NavMenu = new NavMenu(new NavMenuContext { Reddit = Reddit, ActivityManager = ActivityManager },
                 LoginViewModel, SelfViewModel, ActivitiesViewModel, 
-                SettingsViewModel, new SearchViewModel(new SearchContext()), SubredditRiver);
+                SettingsViewModel, new SearchViewModel(new SearchContext("", "", false)), SubredditRiver);
 
             ((VisitedLinkConverter)Application.Current.Resources["visitedLinkConverter"]).Offline = Offline;
             ((VisitedMainLinkConverter)Application.Current.Resources["visitedMainLinkConverter"]).Offline = Offline;
@@ -397,6 +435,20 @@ namespace SnooStream.Common
             return madeViewModel;
         }
 
+        public SearchViewModel MakeSearchContext(string query, string restrictedToSubreddit, bool subredditsOnly)
+        {
+            var searchContext = new SearchContext(query, restrictedToSubreddit, subredditsOnly);
+            var madeViewModel = new SearchViewModel(searchContext);
+            return madeViewModel;
+        }
+
+        public UserViewModel MakeUserDetailsContext(string username)
+        {
+            var userContext = new UserContext(username);
+            var madeViewModel = new UserViewModel(userContext);
+            return madeViewModel;
+        }
+
         public void SaveNavigationState()
         {
             var hubNavItems = this.HubNav.NavStack;
@@ -490,5 +542,34 @@ namespace SnooStream.Common
         {
             return new LinkContext { NavigationContext = this, Reddit = Reddit };
         }
+
+        public Dictionary<string, object> MakePageState(SearchViewModel search)
+        {
+            return new Dictionary<string, object>
+            {
+                { "kind", "search" },
+                { "query", search.Query },
+                { "subredditsOnly", search.SubredditsOnly },
+                { "restrictedToSubreddit", search.RestrictedToSubreddit }
+            };
+        }
+
+        public Dictionary<string, object> MakePageState(LoginViewModel login)
+        {
+            return new Dictionary<string, object>
+            {
+                { "kind", "login" }
+            };
+        }
+
+        public Dictionary<string, object> MakePageState(SelfViewModel self)
+        {
+            return new Dictionary<string, object>
+            {
+                { "kind", "self" },
+            };
+        }
+
+        
     }
 }
