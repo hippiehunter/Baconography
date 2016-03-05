@@ -100,6 +100,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Common\CaptchaService.cs" />
+    <Compile Include="Common\DispatchTimer.cs" />
     <Compile Include="Common\LinkViewLayoutManager.cs" />
     <Compile Include="Common\MarkdownHelpers.cs" />
     <Compile Include="Common\Navigation.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="Selectors\ContentTemplateSelector.cs" />
     <Compile Include="Selectors\LoadableItemTemplateSelector.cs" />
     <Compile Include="Selectors\PreviewTemplateSelector.cs" />
+    <Compile Include="Selectors\SearchResultTemplateSelector.cs" />
     <Compile Include="Templates\CardLinkViewTemplate.xaml.cs">
       <DependentUpon>CardLinkViewTemplate.xaml</DependentUpon>
     </Compile>
@@ -170,6 +172,9 @@
     </Compile>
     <Compile Include="Templates\LoadItemTemplate.xaml.cs">
       <DependentUpon>LoadItemTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\SearchViewTemplate.xaml.cs">
+      <DependentUpon>SearchViewTemplate.xaml</DependentUpon>
     </Compile>
     <Compile Include="Templates\SubredditRiverTemplate.xaml.cs">
       <DependentUpon>SubredditRiverTemplate.xaml</DependentUpon>
@@ -205,6 +210,9 @@
     <None Include="SnooStream_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\BadgeLogo.scale-200.png" />
+    <Content Include="Assets\SplashScreen.scale-100.png" />
+    <Content Include="Assets\Square71x71Logo.scale-200.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -256,6 +264,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Templates\LoadItemTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Templates\SearchViewTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

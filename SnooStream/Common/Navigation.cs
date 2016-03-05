@@ -7,12 +7,14 @@ using SnooStream.ViewModel;
 using SnooStreamBackground;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.System;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -247,6 +249,7 @@ namespace SnooStream.Common
 
     class NavigationContext : INavigationContext
     {
+        CoreDispatcher _coreDispatcher;
         public Reddit Reddit { get; set; }
         public OfflineService Offline { get; set; }
         public PlainNetworkLayer NetworkLayer { get; set; }
@@ -286,18 +289,26 @@ namespace SnooStream.Common
 
         public NavigationContext(AdaptiveHubNav hubNav)
         {
+            Debug.Assert(Window.Current != null && Window.Current.Dispatcher != null, "CoreDispatcher was null for current window");
+            _coreDispatcher = Window.Current.Dispatcher;
+           
             var subredditRiverRD = new SubredditRiverTemplate();
             var linkRiverRD = new LinkRiverTemplate();
             var commentsRD = new CommentsTemplate();
             var contentRiverRD = new ContentRiverTemplate();
+            var searchRD = new SearchViewTemplate();
+
             ResourceDictionaryHandles.Add(commentsRD);
             ResourceDictionaryHandles.Add(subredditRiverRD);
             ResourceDictionaryHandles.Add(linkRiverRD);
             ResourceDictionaryHandles.Add(contentRiverRD);
+            ResourceDictionaryHandles.Add(searchRD);
+
             SubredditRiverTemplate = subredditRiverRD["SubredditRiverView"] as DataTemplate;
             LinkRiverTemplate = linkRiverRD["LinkRiverView"] as DataTemplate;
             CommentTemplate = commentsRD["CommentsView"] as DataTemplate;
             ContentRiverTemplate = contentRiverRD["ContentRiverView"] as DataTemplate;
+            SearchTemplate = searchRD["SearchView"] as DataTemplate;
 
             HubNav = hubNav;
             RoamingState = new RoamingState();
@@ -328,7 +339,7 @@ namespace SnooStream.Common
             SubredditRiver = new SubredditRiverViewModel(new SubredditRiverContext { Reddit = Reddit, NavigationContext = this });
             NavMenu = new NavMenu(new NavMenuContext { Reddit = Reddit, ActivityManager = ActivityManager },
                 LoginViewModel, SelfViewModel, ActivitiesViewModel, 
-                SettingsViewModel, new SearchViewModel(new SearchContext("", "", false)), SubredditRiver);
+                SettingsViewModel, MakeSearchContext("", "", false), SubredditRiver);
 
             ((VisitedLinkConverter)Application.Current.Resources["visitedLinkConverter"]).Offline = Offline;
             ((VisitedMainLinkConverter)Application.Current.Resources["visitedMainLinkConverter"]).Offline = Offline;
@@ -380,8 +391,8 @@ namespace SnooStream.Common
                 return LinkRiverTemplate;
             //else if (vm is SettingsViewModel)
             //    return typeof(SettingsPage);
-            //else if (vm is SearchViewModel)
-            //    return typeof(SearchPage);
+            else if (vm is SearchViewModel)
+                return SearchTemplate;
             else if (vm is SubredditRiverViewModel)
                 return SubredditRiverTemplate;
             //else
@@ -437,8 +448,10 @@ namespace SnooStream.Common
 
         public SearchViewModel MakeSearchContext(string query, string restrictedToSubreddit, bool subredditsOnly)
         {
-            var searchContext = new SearchContext(query, restrictedToSubreddit, subredditsOnly);
+            var linkContext = new SearchLinkContext { NavigationContext = this, Reddit = Reddit };
+            var searchContext = new SearchContext(query, restrictedToSubreddit, subredditsOnly, Reddit, this, Offline, linkContext, _coreDispatcher);
             var madeViewModel = new SearchViewModel(searchContext);
+            linkContext.SearchViewModel = madeViewModel;
             return madeViewModel;
         }
 

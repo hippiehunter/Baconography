@@ -171,14 +171,16 @@ namespace SnooStream.ViewModel
 
         public static IEnumerable<LinkViewModel> MakeLinkViewModels(IEnumerable<Thing> things, ILinkBuilderContext builderContext)
         {
-            var madeViewModels = things.Select(thing => new LinkViewModel { Context = builderContext.LinkContext, Thing = thing.Data as Link, Votable = new VotableViewModel(thing.Data as Link, builderContext.UpdateVotable), CommentCount = ((Link)thing.Data).CommentCount, FromMultiReddit = builderContext.IsMultiReddit }).ToList();
+            var madeViewModels = things
+                .Where(thing => thing.Data is Link)
+                .Select(thing => new LinkViewModel { Context = builderContext.LinkContext, Thing = thing.Data as Link, Votable = new VotableViewModel(thing.Data as Link, builderContext.UpdateVotable), CommentCount = ((Link)thing.Data).CommentCount, FromMultiReddit = builderContext.IsMultiReddit }).ToList();
             UpdateLinkMetadata(things, builderContext, madeViewModels);
             return madeViewModels;
         }
 
         private static void UpdateLinkMetadata(IEnumerable<Thing> things, ILinkBuilderContext builderContext, IEnumerable<LinkViewModel> madeViewModels)
         {
-            var metadataTask = builderContext.GenerateLinkMeta(things.Select(thing => ((Link)thing.Data).Name));
+            var metadataTask = builderContext.GenerateLinkMeta(things.Where(thing => thing.Data is Link).Select(thing => ((Link)thing.Data).Name));
             Action<Task<Dictionary<string, LinkMeta>>> attachMeta = tsk =>
             {
                 //might need to build better infrestructure here around catching exceptions and reporting them in the correct context
@@ -209,7 +211,10 @@ namespace SnooStream.ViewModel
             for (int i = possibleReplaceCount; i < existing.Count; i++)
                 existing.RemoveAt(i);
 
-            var madeViewModels = things.Select(thing => new LinkViewModel { Thing = thing.Data as Link, Votable = new VotableViewModel(thing.Data as Link, builderContext.UpdateVotable), CommentCount = ((Link)thing.Data).CommentCount }).ToList();
+            var madeViewModels = things
+                .Where(thing => thing.Data is Link)
+                .Select(thing => new LinkViewModel { Thing = thing.Data as Link, Votable = new VotableViewModel(thing.Data as Link, builderContext.UpdateVotable), CommentCount = ((Link)thing.Data).CommentCount }).ToList();
+
             var oldLinkLookup = existing.ToDictionary(link => link.Thing.Name);
             var matched = new List<LinkViewModel>();
             var toBeAdded = new List<LinkViewModel>();
@@ -395,9 +400,8 @@ namespace SnooStream.ViewModel
         }
     }
 
-    class LinkContext : ILinkContext
+    abstract class BaseLinkContext : ILinkContext
     {
-        public LinkRiverViewModel LinkRiver { get; set; }
         public INavigationContext NavigationContext { get; set; }
         public Reddit Reddit { get; set; }
         public string CurrentUser { get { return Reddit.CurrentUserName; } }
@@ -410,9 +414,8 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public void GotoComments(LinkViewModel link)
+        public virtual void GotoComments(LinkViewModel link)
         {
-            LinkRiver.Links.CurrentItem = link;
             Navigation.GotoComments(link.Thing.Permalink, NavigationContext, link);
         }
 
@@ -430,13 +433,9 @@ namespace SnooStream.ViewModel
             catch { }
         }
 
-        public void GotoLink(LinkViewModel vm)
-        {
-            LinkRiver.Links.CurrentItem = vm;
-            Navigation.GotoLink(LinkRiver, vm.Thing.Url, NavigationContext);
-        }
+        public abstract void GotoLink(LinkViewModel vm);
 
-        public void Share(LinkViewModel linkViewModel)
+        public virtual void Share(LinkViewModel linkViewModel)
         {
             DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
             dataTransferManager.DataRequested += new TypedEventHandler<DataTransferManager,
@@ -451,25 +450,23 @@ namespace SnooStream.ViewModel
             Windows.ApplicationModel.DataTransfer.DataTransferManager.ShowShareUI();
         }
 
-        public void Hide(LinkViewModel linkViewModel)
+        public virtual void Hide(LinkViewModel linkViewModel)
         {
-            LinkRiver.Links.Remove(linkViewModel);
             Reddit.HideThing(linkViewModel.Thing.Id);
         }
 
-        public void Report(string id)
+        public virtual void Report(string id)
         {
             Reddit.AddReportOnThing(id);
         }
 
-        public void Save(string id)
+        public virtual void Save(string id)
         {
             Reddit.AddSavedThing(id);
         }
 
-        public async void Delete(LinkViewModel linkViewModel)
+        public async virtual void Delete(LinkViewModel linkViewModel)
         {
-            LinkRiver.Links.Remove(linkViewModel);
             try
             {
                 await Reddit.DeleteLinkOrComment(linkViewModel.Thing.Id);
@@ -477,7 +474,7 @@ namespace SnooStream.ViewModel
             catch { }
         }
 
-        public async void SubmitEdit(MarkdownEditingViewModel editing)
+        public async virtual void SubmitEdit(MarkdownEditingViewModel editing)
         {
             try
             {
@@ -486,10 +483,44 @@ namespace SnooStream.ViewModel
             catch { }
         }
 
-        public void GotoUserDetails(LinkViewModel vm)
+        public virtual void GotoUserDetails(LinkViewModel vm)
+        {
+            Navigation.GotoUserDetails(vm.Thing.Author, NavigationContext);
+        }
+    }
+
+    class LinkContext : BaseLinkContext
+    {
+        public LinkRiverViewModel LinkRiver { get; set; }
+
+        public override void GotoComments(LinkViewModel link)
+        {
+            LinkRiver.Links.CurrentItem = link;
+            base.GotoComments(link);
+        }
+
+        public override void GotoLink(LinkViewModel vm)
         {
             LinkRiver.Links.CurrentItem = vm;
-            Navigation.GotoUserDetails(vm.Thing.Author, NavigationContext);
+            Navigation.GotoLink(LinkRiver, vm.Thing.Url, NavigationContext);
+        }
+
+        public override void GotoUserDetails(LinkViewModel vm)
+        {
+            LinkRiver.Links.CurrentItem = vm;
+            base.GotoUserDetails(vm);
+        }
+
+        public override void Hide(LinkViewModel linkViewModel)
+        {
+            LinkRiver.Links.Remove(linkViewModel);
+            base.Hide(linkViewModel);
+        }
+
+        public override void Delete(LinkViewModel linkViewModel)
+        {
+            LinkRiver.Links.Remove(linkViewModel);
+            base.Delete(linkViewModel);
         }
     }
 
@@ -508,7 +539,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return Subreddit.Contains("/m/") || Subreddit.Contains("+");
+                return string.IsNullOrWhiteSpace(Subreddit) || Subreddit.Contains("/m/") || Subreddit.Contains("+") || Subreddit == "/";
             }
         }
 
@@ -536,6 +567,7 @@ namespace SnooStream.ViewModel
 
         public async Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache)
         {
+            Debug.Assert(!string.IsNullOrWhiteSpace(Subreddit), "subreddit was null while loading links from LinkBuilderContext");
             _hasLoaded = true;
             var listing = await Reddit.GetPostsBySubreddit(Subreddit, token, progress, ignoreCache, Sort, null);
             _after = listing.Data.After;
@@ -544,6 +576,7 @@ namespace SnooStream.ViewModel
 
         public async Task<Listing> LoadAdditional(IProgress<float> progress, CancellationToken token)
         {
+            Debug.Assert(!string.IsNullOrWhiteSpace(Subreddit), "subreddit was null while loading additional links from LinkBuilderContext");
             var listing = await Reddit.GetAdditionalFromListing(Subreddit + ".json?sort=" + Sort, _after, token, progress, true, null);
             _after = listing.Data.After;
             return listing;
