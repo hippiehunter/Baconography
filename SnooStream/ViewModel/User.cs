@@ -1,13 +1,31 @@
-﻿using System;
+﻿using SnooSharp;
+using SnooStream.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Foundation;
+using Windows.UI.Xaml.Data;
 
 namespace SnooStream.ViewModel
 {
     public interface IUserContext
     {
+        string TargetUser { get; }
+        bool HasAdditional { get; }
+        Task<Listing> LoadMultiReddits(IProgress<float> progress, CancellationToken token, bool ignoreCache);
+        Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache);
+        Task<Listing> LoadAdditional(IProgress<float> progress, CancellationToken token);
+        void GotoComment(string url);
+        void GotoMultiReddit(string url);
+        void CopyMultiReddit(string from, string to, string displayName);
+        //this is so we can take advantage of LinkBuilder in the search results
+        ILinkBuilderContext LinkBuilderContext { get; }
+        ICommentBuilderContext CommentBuilderContext { get; }
     }
 
     public class UserViewModel
@@ -18,13 +36,330 @@ namespace SnooStream.ViewModel
         {
             this.userContext = userContext;
         }
+
+        public UserActivityCollection Activity { get; set; }
+        public UserMultiRedditCollection MultiReddits { get; set; }
     }
 
     class UserContext : IUserContext
     {
-        public UserContext(string username)
+        public UserContext(string username, Reddit reddit)
         {
+            _reddit = reddit;
+            TargetUser = username;
+        }
 
+        Reddit _reddit;
+        public ICommentBuilderContext CommentBuilderContext { get; set; }
+        public ILinkBuilderContext LinkBuilderContext { get; set; }
+
+        public bool HasAdditional
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string TargetUser { get; set; }
+
+        public async void CopyMultiReddit(string from, string to, string displayName)
+        {
+            await _reddit.CopyMulti(from, from, displayName);
+        }
+
+        public void GotoComment(string url)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GotoMultiReddit(string url)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Listing> LoadMultiReddits(IProgress<float> progress, CancellationToken token, bool ignoreCache)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Listing> LoadAdditional(IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    static class UserViewModelBuilder
+    {
+        public static IEnumerable<object> MakeMultiReddits(IEnumerable<Thing> things, IUserContext builderContext)
+        {
+            List<object> result = new List<object>();
+            foreach (var thing in things)
+            {
+                if (thing.Data is LabeledMulti)
+                {
+                    result.Add(new UserMultiRedditViewModel { Context = builderContext, Thing = thing.Data as LabeledMulti, Name = ((LabeledMulti)thing.Data).Name });
+                }
+            }
+            return result;
+        }
+
+        public static IEnumerable<object> MakeViewModels(IEnumerable<Thing> things, IUserContext builderContext)
+        {
+            List<object> result = new List<object>();
+            foreach (var thing in things)
+            {
+                if (thing.Data is Link)
+                {
+                    result.Add(new LinkViewModel { Context = builderContext.LinkBuilderContext.LinkContext, Thing = thing.Data as Link, Votable = new VotableViewModel(thing.Data as Link, builderContext.LinkBuilderContext.UpdateVotable), CommentCount = ((Link)thing.Data).CommentCount, FromMultiReddit = builderContext.LinkBuilderContext.IsMultiReddit });
+                }
+                else if (thing.Data is Comment)
+                {
+                    var comment = thing.Data as Comment;
+                    var commentViewModel = new CommentViewModel
+                    {
+                        Depth = 0,
+                        Thing = comment,
+                        Votable = new VotableViewModel(thing.Data as Comment, builderContext.CommentBuilderContext.ChangeVote),
+                        Context = builderContext.CommentBuilderContext,
+                        _collapsed = false,
+                        Body = WebUtility.HtmlDecode(comment.Body),
+                        AuthorFlair = builderContext.CommentBuilderContext.GetUsernameModifiers(comment.Author),
+                        AuthorFlairText = WebUtility.HtmlDecode(comment.AuthorFlairText)
+                    };
+                    commentViewModel.BodyMDTask = builderContext.CommentBuilderContext.QueueMarkdown(commentViewModel);
+                    result.Add(commentViewModel);
+                }
+            }
+            return result;
+        }
+    }
+
+    class UserCommentBuilderContext : BasicCommentBuilderContext
+    {
+        public UserActivityCollection ActivityCollection { get; set; }
+        public Reddit Reddit { get; set; }
+        public INavigationContext NavigationContext { get; set; }
+
+        public override string CurrentUserName
+        {
+            get
+            {
+                return Reddit.CurrentUserName;
+            }
+        }
+
+        public override async void ChangeVote(string id, int direction)
+        {
+            await Reddit.AddVote(id, direction);
+        }
+
+        public override void Report(string id)
+        {
+            Reddit.AddReportOnThing(id);
+        }
+
+        public override void Save(string id)
+        {
+            Reddit.AddSavedThing(id);
+        }
+
+        public override void Share(CommentViewModel comment)
+        {
+            DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
+            dataTransferManager.DataRequested += new TypedEventHandler<DataTransferManager,
+                DataRequestedEventArgs>((sender, e) =>
+                {
+                    DataRequest request = e.Request;
+                    request.Data.Properties.Title = "Comment from user " + comment.Thing.Author;
+                    request.Data.Properties.Description = comment.Thing.Body;
+                    request.Data.SetWebLink(new Uri(comment.Thing.Context));
+                });
+
+            Windows.ApplicationModel.DataTransfer.DataTransferManager.ShowShareUI();
+        }
+
+        public override void GotoUserDetails(string author)
+        {
+            if (string.Compare(author, CurrentUserName, true) != 0)
+                Navigation.GotoUserDetails(author, NavigationContext);
+        }
+
+        public override async void Delete(CommentViewModel comment)
+        {
+            ActivityCollection.Remove(comment);
+            try
+            {
+                await Reddit.DeleteLinkOrComment(comment.Thing.Id);
+            }
+            catch { }
+        }
+
+        public override Task<Link> GetLink(IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IEnumerable<Thing>> GetMore(IEnumerable<string> ids, IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IEnumerable<Thing>> LoadAll(bool ignoreCache, IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IEnumerable<Thing>> LoadRequested(bool ignoreCache, IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task SubmitComment(CommentViewModel viewModel)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    public class UserMultiRedditCollection : RangedCollectionBase
+    {
+        public IUserContext Context { get; set; }
+
+        public UserMultiRedditCollection(IUserContext context)
+        {
+            Context = context;
+        }
+
+
+        public override bool HasMoreItems
+        {
+            get
+            {
+                return Context.HasAdditional;
+            }
+        }
+
+        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        {
+            //Load Additional
+            if (Count > 0)
+            {
+                var loadItem = new LoadViewModel
+                {
+                    LoadAction = async (progress, token) =>
+                    {
+                        var loadedListing = await Context.LoadAdditional(progress, token);
+                        AddRange(UserViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
+                    },
+                    IsCritical = false
+                };
+                Add(loadItem);
+                return LoadItem(loadItem).AsAsyncOperation();
+            }
+            else //Load fresh
+            {
+                var loadItem = new LoadViewModel
+                {
+                    LoadAction = async (progress, token) =>
+                    {
+                        var loadedListing = await Context.Load(progress, token, false);
+                        AddRange(UserViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
+                    },
+                    IsCritical = true
+                };
+                Add(loadItem);
+                return LoadItem(loadItem).AsAsyncOperation();
+            }
+        }
+
+        private void AddRange(IEnumerable<object> collection)
+        {
+            foreach (var item in collection)
+                Add(item);
+        }
+
+        private async Task<LoadMoreItemsResult> LoadItem(LoadViewModel loadItem)
+        {
+            var itemCount = Count - 1;
+            await loadItem.LoadAsync();
+            //now that the load is finished the load item should be removed from the list
+            Remove(loadItem);
+            return new LoadMoreItemsResult { Count = (uint)(Count - itemCount) };
+        }
+    }
+
+
+    public class UserActivityCollection : RangedCollectionBase
+    {
+        public IUserContext Context { get; set; }
+        bool _hasLoaded = false;
+        public UserActivityCollection(IUserContext context)
+        {
+            Context = context;
+        }
+
+
+        public override bool HasMoreItems
+        {
+            get
+            {
+                return !_hasLoaded;
+            }
+        }
+
+        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        {
+            _hasLoaded = true;
+            var loadItem = new LoadViewModel
+            {
+                LoadAction = async (progress, token) =>
+                {
+                    var loadedListing = await Context.Load(progress, token, false);
+                    AddRange(UserViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
+                },
+                IsCritical = true
+            };
+            Add(loadItem);
+            return LoadItem(loadItem).AsAsyncOperation();
+        }
+
+
+        private void AddRange(IEnumerable<object> collection)
+        {
+            foreach (var item in collection)
+                Add(item);
+        }
+
+        private async Task<LoadMoreItemsResult> LoadItem(LoadViewModel loadItem)
+        {
+            var itemCount = Count - 1;
+            await loadItem.LoadAsync();
+            //now that the load is finished the load item should be removed from the list
+            Remove(loadItem);
+            return new LoadMoreItemsResult { Count = (uint)(Count - itemCount) };
+        }
+    }
+
+    public class UserMultiRedditViewModel
+    {
+        public IUserContext Context { get; set; }
+        public LabeledMulti Thing { get; set; }
+        public string Name { get; set; }
+
+        public void Clone()
+        {
+            Context.CopyMultiReddit(string.Format("/user/{0}/m/{1}", Context.TargetUser, Thing.Path), "/me/m/" + Thing.Path, Thing.Name);
+        }
+
+        public void Navigate()
+        {
+            Context.GotoMultiReddit(Thing.Path);
         }
     }
 }
