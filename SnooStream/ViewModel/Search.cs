@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.UI.Core;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 
@@ -25,9 +26,11 @@ namespace SnooStream.ViewModel
         //this is so we can take advantage of LinkBuilder in the search results
         ILinkBuilderContext LinkBuilderContext { get; }
         event Action ResultsInvalidated;
+        bool IsValid { get; }
+        void TriggerSearch();
     }
 
-    public class SearchViewModel
+    public class SearchViewModel : SnooObservableObject
     {
         private ISearchContext _context;
 
@@ -39,19 +42,43 @@ namespace SnooStream.ViewModel
 
         public string Query { get { return _context.Query; } set { _context.Query = value; } }
         public string RestrictedToSubreddit { get { return _context.RestrictedToSubreddit; } set { _context.RestrictedToSubreddit = value; } }
-        public bool? SubredditsOnly { get { return _context.SubredditsOnly; } set { _context.SubredditsOnly = value ?? false; } }
+        public bool? SubredditsOnly { get { return _context.SubredditsOnly; } set { _context.SubredditsOnly = value ?? false; RaisePropertyChanged("SubredditsOnly"); } }
         public SearchCollection Result { get; set; }
 
         public void KeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
             {
-                //force the search
+                var textBox = sender as Windows.UI.Xaml.Controls.TextBox;
+                textBox.Focus(Windows.UI.Xaml.FocusState.Programmatic);
+                var searchText = textBox.Text;
+                textBox.Text = "";
+                //TODO this might not be quite the right behavior
+                _context.GotoSubreddit(searchText);
             }
+            else
+            {
+                BindingExpression bindingExpression = ((Windows.UI.Xaml.Controls.TextBox)sender).GetBindingExpression(TextBox.TextProperty);
+                if (bindingExpression != null)
+                {
+                    bindingExpression.UpdateSource();
+                }
+            }
+        }
+
+        public void KeyDown2(object sender, KeyRoutedEventArgs e)
+        {
+            BindingExpression bindingExpression = ((Windows.UI.Xaml.Controls.TextBox)sender).GetBindingExpression(TextBox.TextProperty);
+            if (bindingExpression != null)
+            {
+                bindingExpression.UpdateSource();
+            }
+            ForceSearch();
         }
 
         public void ForceSearch()
         {
+            _context.TriggerSearch();
         }
 
         public void TextChanged()
@@ -117,37 +144,59 @@ namespace SnooStream.ViewModel
 
         private async void Context_ResultsInvalidated()
         {
+            //cancel any existing load
+            var activeLoad = _activeLoad;
+            if (activeLoad != null)
+            {
+                activeLoad.Cancel();
+            }
+            _activeLoad = null;
             Clear();
-            await this.LoadMoreItemsAsync(40);
+
+            if(Context.IsValid)
+                await LoadMoreItemsAsync(100);
         }
 
         public override bool HasMoreItems
         {
             get
             {
-                return Context.HasAdditional;
+                return Context.HasAdditional && !this.OfType<LoadViewModel>().Any() && Context.IsValid;
             }
         }
 
+        LoadViewModel _activeLoad;
+
         public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
         {
+            //cancel any existing load
+            var activeLoad = _activeLoad;
+            if (activeLoad != null)
+            {
+                activeLoad.Cancel();
+            }
+            _activeLoad = null;
+
+            LoadViewModel loadItem = null;
             //Load Additional
             if (Count > 0)
             {
-                var loadItem = new LoadViewModel { LoadAction = async (progress, token) =>
+                loadItem =_activeLoad = new LoadViewModel { LoadAction = async (progress, token) =>
                 {
                     var loadedListing = await Context.LoadAdditional(progress, token);
                     AddRange(SearchViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
+                    _activeLoad = null;
                 }, IsCritical = false };
                 Add(loadItem);
                 return LoadItem(loadItem).AsAsyncOperation();
             }
             else //Load fresh
             {
-                var loadItem = new LoadViewModel { LoadAction = async (progress, token) =>
+                loadItem = _activeLoad = new LoadViewModel { LoadAction = async (progress, token) =>
                 {
                     var loadedListing = await Context.Load(progress, token, false);
                     AddRange(SearchViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
+                    _activeLoad = null;
                 }, IsCritical = true };
                 Add(loadItem);
                 return LoadItem(loadItem).AsAsyncOperation();
@@ -191,6 +240,14 @@ namespace SnooStream.ViewModel
             _helper = new SearchHelper(() => { if (ResultsInvalidated != null) ResultsInvalidated(); }, triggeredQuery => { _searchUri = _after = null; _hasLoaded = false; if (ResultsInvalidated != null) ResultsInvalidated();  }, dispatcher, 3, "/", 1);
         }
 
+        public bool IsValid
+        {
+            get
+            {
+                return _helper.IsValid;
+            }
+        }
+
         public bool HasAdditional
         {
             get
@@ -221,6 +278,11 @@ namespace SnooStream.ViewModel
         {
             Navigation.GotoSubreddit(url, NavigationContext);
         }
+
+        public void TriggerSearch()
+        {
+            _helper.queryTimer_Tick(null, null);
+        }
     }
 
     public class SearchHelper
@@ -239,6 +301,14 @@ namespace SnooStream.ViewModel
             _alwaysSearchIfContains = alwaysSearchIfContains;
             _secondsBeforeSearch = secondsBeforeSearch;
             _dispatcher = new DispatchTimer(dispatcher);
+        }
+
+        public bool IsValid
+        {
+            get
+            {
+                return _query != null && (_query.Length > _minimumCharCount || _query.Contains(_alwaysSearchIfContains));
+            }
         }
 
         private string _query;
@@ -331,7 +401,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        void queryTimer_Tick(object sender, object timer)
+        internal void queryTimer_Tick(object sender, object timer)
         {
             // Stop the timer so it doesn't fire again unless rescheduled
             RevokeQueryTimer();

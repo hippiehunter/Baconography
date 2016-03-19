@@ -68,12 +68,12 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <TextBox Grid.Column="0" Grid.Row="0" PlaceholderText="Search reddit" KeyDown="{x:Bind KeyDown}" TextChanged="{x:Bind TextChanged}" Text="{x:Bind Path=Query, Mode=TwoWay}"/>
-            <TextBox Grid.Column="0" Grid.Row="1" PlaceholderText="Restrict search to subreddit" IsEnabled="{x:Bind SubredditsOnly, Converter={StaticResource invertedBooleanConverter}, Mode=OneWay}" KeyDown="{x:Bind KeyDown}" TextChanged="{x:Bind TextChanged}" Text="{x:Bind Path=RestrictedToSubreddit, Mode=TwoWay}"/>
+            <TextBox Grid.Column="0" Grid.Row="0" PlaceholderText="Search reddit" KeyDown="{x:Bind KeyDown}" TextChanged="{x:Bind TextChanged}" Text="{Binding Path=Query, Mode=TwoWay}"/>
+            <TextBox Grid.Column="0" Grid.Row="1" PlaceholderText="Restrict search to subreddit" IsEnabled="{x:Bind SubredditsOnly, Converter={StaticResource invertedBooleanConverter}, Mode=OneWay}" KeyDown="{x:Bind KeyDown2}" TextChanged="{x:Bind TextChanged}" Text="{Binding Path=RestrictedToSubreddit, Mode=TwoWay}"/>
             <CheckBox Grid.Column="1" Grid.Row="1" Content="Search subreddits only" IsChecked="{x:Bind Path=SubredditsOnly, Mode=TwoWay}"/>
             <Button Grid.Column="1" Grid.Row="0" Padding="0" Margin="-24,0,0,0" BorderThickness="0" VerticalAlignment="Top" HorizontalAlignment="Left"
                 Width="50" Click="{x:Bind ForceSearch}">

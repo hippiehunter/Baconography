@@ -440,7 +440,7 @@ namespace SnooStream.Common
         public LinkRiverViewModel MakeLinkRiverContext(string subreddit, string focusId, string sort)
         {
             var linkContext = new LinkContext { NavigationContext = this, Reddit = Reddit };
-            var madeContext = new LinkBuilderContext { Offline = Offline, Reddit = Reddit, Subreddit = subreddit, LinkContext = linkContext };
+            var madeContext = new LinkBuilderContext { Offline = Offline, Reddit = Reddit, Subreddit = Utility.CleanRedditLink(subreddit, this.Reddit.CurrentUserName), LinkContext = linkContext };
             var madeViewModel = new LinkRiverViewModel(madeContext);
             linkContext.LinkRiver = madeViewModel;
             return madeViewModel;
@@ -457,7 +457,7 @@ namespace SnooStream.Common
 
         public UserViewModel MakeUserDetailsContext(string username)
         {
-            var userContext = new UserContext(username);
+            var userContext = new UserContext(username, Reddit);
             var madeViewModel = new UserViewModel(userContext);
             return madeViewModel;
         }
