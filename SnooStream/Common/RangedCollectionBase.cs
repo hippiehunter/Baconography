@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SnooStream.ViewModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -27,7 +28,7 @@ namespace SnooStream.Common
             CollectionChanged += RangedCollectionBase_CollectionChanged;
         }
 
-        public IObservableVector<object> CollectionGroups
+        public virtual IObservableVector<object> CollectionGroups
         {
             get
             {
@@ -146,11 +147,11 @@ namespace SnooStream.Common
 
         public void RangesChanged(ItemIndexRange visibleRange, IReadOnlyList<ItemIndexRange> trackedItems)
         {
-            if(RangeMovable && Movable)
+            if (RangeMovable && Movable)
                 _currentPosition = visibleRange.FirstIndex;
         }
-        
-        private sealed class VectorChangedEventArgs : IVectorChangedEventArgs
+
+        internal sealed class VectorChangedEventArgs : IVectorChangedEventArgs
         {
             public VectorChangedEventArgs(NotifyCollectionChangedAction action, object item, int index)
             {
@@ -230,6 +231,61 @@ namespace SnooStream.Common
             throw new NotImplementedException();
         }
     }
+
+    //this  almost works but not quite
+    public class RangedSegmentedCollection : RangedCollectionBase
+    {
+        public List<Tuple<object, RangedCollectionBase>> SingleLoadCollections { get; set; }
+        public RangedCollectionBase LoadMoreCollection { get; set; }
+        object LoadMoreHeader;
+        RangeCollection _collectionGroups;
+
+        public RangedSegmentedCollection(IEnumerable<Tuple<object, RangedCollectionBase>> items, RangedCollectionBase loadMoreItem, object loadMoreItemHeader)
+        {
+            SingleLoadCollections = items.ToList();
+            LoadMoreCollection = loadMoreItem;
+            foreach (var item in CollectionGroups)
+                Add(item);
+        }
+
+        public override IObservableVector<object> CollectionGroups
+        {
+            get
+            {
+                if (_collectionGroups == null)
+                {
+                    _collectionGroups = new RangeCollection(SingleLoadCollections.Select(col => new SegmentedCollectionViewGroup { GroupItems = col.Item2, Group = col.Item1 }));
+                    _collectionGroups.Add(new SegmentedCollectionViewGroup { GroupItems = LoadMoreCollection, Group = LoadMoreHeader });
+                }
+                return _collectionGroups;
+            }
+        }
+
+        public override bool HasMoreItems
+        {
+            get
+            {
+                return LoadMoreCollection.HasMoreItems || SingleLoadCollections.Any(collection => collection.Item2.HasMoreItems);
+            }
+        }
+
+        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        {
+            var firstSingleCollection = SingleLoadCollections.FirstOrDefault(collection => collection.Item2.HasMoreItems);
+            if(firstSingleCollection != null)
+                return firstSingleCollection.Item2.LoadMoreItemsAsync(count);
+            else
+                return LoadMoreCollection.LoadMoreItemsAsync(count);
+        }
+
+        class SegmentedCollectionViewGroup : ICollectionViewGroup
+        {
+            public object Group { get; set; }
+            public IObservableVector<object> GroupItems { get; set; }
+        }
+    }
+
+    
 
     public class RangedCollectionDataSource : DependencyObject
     {

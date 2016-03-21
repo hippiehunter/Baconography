@@ -134,9 +134,9 @@ namespace SnooStream.ViewModel
                 if (Set(ref _collapsed, value, "Collapsed"))
                 {
                     if (value)
-                        CommentBuilder.HideDecendents(Thing.Id, Context.Comments.Comments, Context);
+                        CommentBuilder.HideDecendents(Thing.Id, Context.Comments?.Comments, Context);
                     else
-                        CommentBuilder.ShowDecendents(this, Context.Comments.Comments, Context);
+                        CommentBuilder.ShowDecendents(this, Context.Comments?.Comments, Context);
                 }
             }
         }
@@ -730,18 +730,24 @@ namespace SnooStream.ViewModel
 
         public static void HideDecendents(string id, IList<object> targetList, ICommentBuilderContext context)
         {
-            foreach (var vmb in Decendents(id, context))
+            if (targetList != null)
             {
-                targetList.Remove(vmb);
+                foreach (var vmb in Decendents(id, context))
+                {
+                    targetList.Remove(vmb);
+                }
             }
         }
 
         public static void ShowDecendents(CommentViewModel parent, IList<object> targetList, ICommentBuilderContext context)
         {
-            var insertionPoint = targetList.IndexOf(parent) + 1;
-            foreach (var vmb in Decendents(parent.Thing.Id, context).Reverse())
+            if (targetList != null)
             {
-                targetList.Insert(insertionPoint, vmb);
+                var insertionPoint = targetList.IndexOf(parent) + 1;
+                foreach (var vmb in Decendents(parent.Thing.Id, context).Reverse())
+                {
+                    targetList.Insert(insertionPoint, vmb);
+                }
             }
         }
 
@@ -847,7 +853,7 @@ namespace SnooStream.ViewModel
             else
                 viewModel.Body = dom;
         }
-        private SnooDom.SimpleSessionMemoryPool _markdownMemoryPool;
+        private SnooDom.SimpleSessionMemoryPool _markdownMemoryPool = new SnooDom.SimpleSessionMemoryPool();
 
         private string _sort;
         public string Sort
@@ -1004,7 +1010,11 @@ namespace SnooStream.ViewModel
 
         public AuthorFlairKind GetUsernameModifiers(string author)
         {
-            return String.Compare(Comments.Thing.Author, author, true) == 0 ? AuthorFlairKind.OriginalPoster : AuthorFlairKind.None;
+            var commentsAuthor = Comments?.Thing?.Author;
+            if (string.IsNullOrWhiteSpace(commentsAuthor))
+                return AuthorFlairKind.None;
+            else
+                return String.Compare(Comments.Thing.Author, author, true) == 0 ? AuthorFlairKind.OriginalPoster : AuthorFlairKind.None;
         }
     }
 

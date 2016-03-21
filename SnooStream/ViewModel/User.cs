@@ -2,6 +2,7 @@
 using SnooStream.Common;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -17,8 +18,9 @@ namespace SnooStream.ViewModel
     {
         string TargetUser { get; }
         bool HasAdditional { get; }
-        Task<Listing> LoadMultiReddits(IProgress<float> progress, CancellationToken token, bool ignoreCache);
+        Task<TypedThing<LabeledMulti>[]> LoadMultiReddits(IProgress<float> progress, CancellationToken token, bool ignoreCache);
         Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache);
+        Task<Thing> LoadUserInfo(IProgress<float> progress, CancellationToken token, bool ignoreCache);
         Task<Listing> LoadAdditional(IProgress<float> progress, CancellationToken token);
         void GotoComment(string url);
         void GotoMultiReddit(string url);
@@ -26,38 +28,86 @@ namespace SnooStream.ViewModel
         //this is so we can take advantage of LinkBuilder in the search results
         ILinkBuilderContext LinkBuilderContext { get; }
         ICommentBuilderContext CommentBuilderContext { get; }
+
     }
 
-    public class UserViewModel
+    public class UserViewModel : IHasLoadableState
     {
-        private IUserContext userContext;
+        public IUserContext Context;
 
         public UserViewModel(IUserContext userContext)
         {
-            this.userContext = userContext;
+            TargetUser = userContext.TargetUser;
+            Context = userContext;
+            KarmaCollection = new ObservableCollection<KarmaData>();
+            Activity = new UserActivityCollection(userContext);
+            MultiReddits = new UserMultiRedditCollection(userContext);
+            LoadState = new LoadViewModel
+            {
+                LoadAction = async (progress, token) =>
+                {
+                    Thing = (await Context.LoadUserInfo(progress, token, false)).Data as Account;
+                    KarmaCollection.Clear();
+                    KarmaCollection.Add(new KarmaData { Name = "Comment", Value = Thing.CommentKarma });
+                    KarmaCollection.Add(new KarmaData { Name = "Link", Value = Thing.LinkKarma });
+                },
+                IsCritical = true
+            };
         }
 
+        public string CakeDay
+        {
+            get
+            {
+                return (Thing != null ? Thing.CreatedUTC : new DateTime()).ToString("MMMM d");
+            }
+        }
+
+        public string TargetUser { get; set; }
+        public Account Thing { get; set; }
         public UserActivityCollection Activity { get; set; }
         public UserMultiRedditCollection MultiReddits { get; set; }
+        public ObservableCollection<KarmaData> KarmaCollection { get; set; }
+        public LoadViewModel LoadState { get; private set; }
+    }
+
+    public class KarmaData
+    {
+        public string Name
+        {
+            get;
+            set;
+        }
+
+        public int Value
+        {
+            get;
+            set;
+        }
     }
 
     class UserContext : IUserContext
     {
-        public UserContext(string username, Reddit reddit)
+        public UserContext(string username, Reddit reddit, INavigationContext navigationContext, OfflineService offline, ILinkContext linkContext)
         {
             _reddit = reddit;
+            _navigationContext = navigationContext;
             TargetUser = username;
+            CommentBuilderContext = new UserCommentBuilderContext { NavigationContext = navigationContext, Reddit = reddit,  };
+            LinkBuilderContext = new LinkBuilderContext { LinkContext = linkContext, Offline = offline, Reddit = reddit, Subreddit = null };
         }
 
+        INavigationContext _navigationContext;
         Reddit _reddit;
         public ICommentBuilderContext CommentBuilderContext { get; set; }
         public ILinkBuilderContext LinkBuilderContext { get; set; }
-
+        string _after;
+        bool _hasLoaded = false;
         public bool HasAdditional
         {
             get
             {
-                throw new NotImplementedException();
+                return !_hasLoaded || !string.IsNullOrWhiteSpace(_after);
             }
         }
 
@@ -78,19 +128,27 @@ namespace SnooStream.ViewModel
             throw new NotImplementedException();
         }
 
-        public Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache)
+        public async Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache)
         {
-            throw new NotImplementedException();
+            _hasLoaded = true;
+            var listing = await _reddit.GetPostsByUser(TargetUser, null, token, progress, ignoreCache);
+            _after = listing.Data.After;
+            return listing;
         }
 
-        public Task<Listing> LoadMultiReddits(IProgress<float> progress, CancellationToken token, bool ignoreCache)
+        public Task<TypedThing<LabeledMulti>[]> LoadMultiReddits(IProgress<float> progress, CancellationToken token, bool ignoreCache)
         {
-            throw new NotImplementedException();
+            return _reddit.GetUserMultis(TargetUser, token, progress, ignoreCache);
         }
 
         public Task<Listing> LoadAdditional(IProgress<float> progress, CancellationToken token)
         {
-            throw new NotImplementedException();
+            return _reddit.GetAdditionalFromListing(Reddit.PostByUserBaseFormat, _after, token, progress, true, null);
+        }
+
+        public async Task<Thing> LoadUserInfo(IProgress<float> progress, CancellationToken token, bool ignoreCache)
+        {
+            return await _reddit.GetAccountInfo(TargetUser, token, progress, ignoreCache);
         }
     }
 
@@ -105,6 +163,16 @@ namespace SnooStream.ViewModel
                 {
                     result.Add(new UserMultiRedditViewModel { Context = builderContext, Thing = thing.Data as LabeledMulti, Name = ((LabeledMulti)thing.Data).Name });
                 }
+            }
+            return result;
+        }
+
+        public static IEnumerable<object> MakeViewModels(IEnumerable<LabeledMulti> things, IUserContext builderContext)
+        {
+            List<object> result = new List<object>();
+            foreach (var thing in things)
+            {
+                result.Add(new UserMultiRedditViewModel { Context = builderContext, Name = thing.Name, Thing = thing });
             }
             return result;
         }
@@ -230,8 +298,59 @@ namespace SnooStream.ViewModel
     public class UserMultiRedditCollection : RangedCollectionBase
     {
         public IUserContext Context { get; set; }
-
+        bool _hasLoaded = false;
         public UserMultiRedditCollection(IUserContext context)
+        {
+            Context = context;
+        }
+
+
+        public override bool HasMoreItems
+        {
+            get
+            {
+                return !_hasLoaded;
+            }
+        }
+
+        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        {
+            _hasLoaded = true;
+            var loadItem = new LoadViewModel
+            {
+                LoadAction = async (progress, token) =>
+                {
+                    var loadedListing = await Context.LoadMultiReddits(progress, token, false);
+                    AddRange(UserViewModelBuilder.MakeViewModels(loadedListing, Context));
+                },
+                IsCritical = false
+            };
+            Add(loadItem);
+            return LoadItem(loadItem).AsAsyncOperation();
+        }
+
+        private void AddRange(IEnumerable<object> collection)
+        {
+            foreach (var item in collection)
+                Add(item);
+        }
+
+        private async Task<LoadMoreItemsResult> LoadItem(LoadViewModel loadItem)
+        {
+            var itemCount = Count - 1;
+            await loadItem.LoadAsync();
+            //now that the load is finished the load item should be removed from the list
+            Remove(loadItem);
+            return new LoadMoreItemsResult { Count = (uint)(Count - itemCount) };
+        }
+    }
+
+
+    public class UserActivityCollection : RangedCollectionBase
+    {
+        public IUserContext Context { get; set; }
+        
+        public UserActivityCollection(IUserContext context)
         {
             Context = context;
         }
@@ -278,57 +397,6 @@ namespace SnooStream.ViewModel
             }
         }
 
-        private void AddRange(IEnumerable<object> collection)
-        {
-            foreach (var item in collection)
-                Add(item);
-        }
-
-        private async Task<LoadMoreItemsResult> LoadItem(LoadViewModel loadItem)
-        {
-            var itemCount = Count - 1;
-            await loadItem.LoadAsync();
-            //now that the load is finished the load item should be removed from the list
-            Remove(loadItem);
-            return new LoadMoreItemsResult { Count = (uint)(Count - itemCount) };
-        }
-    }
-
-
-    public class UserActivityCollection : RangedCollectionBase
-    {
-        public IUserContext Context { get; set; }
-        bool _hasLoaded = false;
-        public UserActivityCollection(IUserContext context)
-        {
-            Context = context;
-        }
-
-
-        public override bool HasMoreItems
-        {
-            get
-            {
-                return !_hasLoaded;
-            }
-        }
-
-        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
-        {
-            _hasLoaded = true;
-            var loadItem = new LoadViewModel
-            {
-                LoadAction = async (progress, token) =>
-                {
-                    var loadedListing = await Context.Load(progress, token, false);
-                    AddRange(UserViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
-                },
-                IsCritical = true
-            };
-            Add(loadItem);
-            return LoadItem(loadItem).AsAsyncOperation();
-        }
-
 
         private void AddRange(IEnumerable<object> collection)
         {
@@ -360,6 +428,15 @@ namespace SnooStream.ViewModel
         public void Navigate()
         {
             Context.GotoMultiReddit(Thing.Path);
+        }
+    }
+
+    class UserLinkContext : BaseLinkContext
+    {
+        public UserViewModel UserViewModel { get; set; }
+        public override void GotoLink(LinkViewModel vm)
+        {
+            Navigation.GotoLink(UserViewModel, vm.Thing.Url, NavigationContext);
         }
     }
 }

@@ -286,7 +286,7 @@ namespace SnooStream.ViewModel
             }
             else
             {
-                return Reddit.GetUserMultis(token, progress);
+                return Reddit.GetUserMultis(token, progress, false);
             }
         }
 

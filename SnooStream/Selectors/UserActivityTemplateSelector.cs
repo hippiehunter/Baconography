@@ -14,12 +14,15 @@ namespace SnooStream.Selectors
     {
         public DataTemplate Link { get; set; }
         public DataTemplate Comment { get; set; }
+        public DataTemplate MultiReddit { get; set; }
         public DataTemplate LoadItem { get; set; }
 
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
             if (item is LoadViewModel)
                 return LoadItem;
+            else if (item is UserMultiRedditViewModel)
+                return MultiReddit;
             else if (item is LinkViewModel)
                 return Link;
             else if (item is CommentViewModel)

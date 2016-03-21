@@ -47,9 +47,11 @@ namespace SnooStream.Common
         DataTemplate SearchTemplate { get; }
         DataTemplate SelfTemplate { get; }
         DataTemplate UserDetailsTemplate { get; }
+        DataTemplate SettingsTemplate { get; }
 
         IEnumerable<object> ViewModelStack { get; }
 
+        Dictionary<string, object> MakePageState(UserViewModel user);
         Dictionary<string, object> MakePageState(CommentsViewModel comments);
         Dictionary<string, object> MakePageState(LinkRiverViewModel links);
         Dictionary<string, object> MakePageState(ContentRiverViewModel contentRiver);
@@ -238,6 +240,10 @@ namespace SnooStream.Common
                 return context.MakePageState(((ContentRiverViewModel)viewModel));
             else if (viewModel is CommentsViewModel)
                 return context.MakePageState(((CommentsViewModel)viewModel));
+            else if (viewModel is SearchViewModel)
+                return context.MakePageState((SearchViewModel)viewModel);
+            else if (viewModel is UserViewModel)
+                return context.MakePageState((UserViewModel)viewModel);
             else if (viewModel is LoginViewModel)
                 return new Dictionary<string, object> { { "kind", "login" } };
             else if (viewModel is SubredditRiverViewModel)
@@ -272,6 +278,7 @@ namespace SnooStream.Common
         public DataTemplate SearchTemplate { get; set; }
         public DataTemplate SelfTemplate { get; set; }
         public DataTemplate UserDetailsTemplate { get; set; }
+        public DataTemplate SettingsTemplate { get; set; }
 
         public List<ResourceDictionary> ResourceDictionaryHandles { get; set; } = new List<ResourceDictionary>();
         public IEnumerable<object> ViewModelStack
@@ -297,18 +304,21 @@ namespace SnooStream.Common
             var commentsRD = new CommentsTemplate();
             var contentRiverRD = new ContentRiverTemplate();
             var searchRD = new SearchViewTemplate();
+            var userRD = new UserDetailsTemplate();
 
             ResourceDictionaryHandles.Add(commentsRD);
             ResourceDictionaryHandles.Add(subredditRiverRD);
             ResourceDictionaryHandles.Add(linkRiverRD);
             ResourceDictionaryHandles.Add(contentRiverRD);
             ResourceDictionaryHandles.Add(searchRD);
+            ResourceDictionaryHandles.Add(userRD);
 
             SubredditRiverTemplate = subredditRiverRD["SubredditRiverView"] as DataTemplate;
             LinkRiverTemplate = linkRiverRD["LinkRiverView"] as DataTemplate;
             CommentTemplate = commentsRD["CommentsView"] as DataTemplate;
             ContentRiverTemplate = contentRiverRD["ContentRiverView"] as DataTemplate;
             SearchTemplate = searchRD["SearchView"] as DataTemplate;
+            UserDetailsTemplate = userRD["UserDetails"] as DataTemplate;
 
             HubNav = hubNav;
             RoamingState = new RoamingState();
@@ -381,16 +391,16 @@ namespace SnooStream.Common
 
         DataTemplate MapVMToPageType(object vm)
         {
-            //if (vm is LoginViewModel)
-            //    return typeof(LoginPage);
+            if (vm is LoginViewModel)
+                return LoginTemplate;
             //else if (vm is SelfStreamViewModel)
             //    return typeof(SelfActivityPage);
-            //else if (vm is AboutUserViewModel)
-            //    return typeof(SelfPage);
-            if (vm is LinkRiverViewModel)
+            else if (vm is UserViewModel)
+                return UserDetailsTemplate;
+            else if (vm is LinkRiverViewModel)
                 return LinkRiverTemplate;
-            //else if (vm is SettingsViewModel)
-            //    return typeof(SettingsPage);
+            else if (vm is SettingsViewModel)
+                return SettingsTemplate;
             else if (vm is SearchViewModel)
                 return SearchTemplate;
             else if (vm is SubredditRiverViewModel)
@@ -457,7 +467,8 @@ namespace SnooStream.Common
 
         public UserViewModel MakeUserDetailsContext(string username)
         {
-            var userContext = new UserContext(username, Reddit);
+            var linkContext = new UserLinkContext { NavigationContext = this, Reddit = Reddit };
+            var userContext = new UserContext(username, Reddit, this, Offline, linkContext);
             var madeViewModel = new UserViewModel(userContext);
             return madeViewModel;
         }
@@ -477,6 +488,16 @@ namespace SnooStream.Common
                 { "url", typedContext.Url },
                 { "focusId", GetIdFromCommentItem(comment.Comments.CurrentItem) },
                 { "sort", typedContext.Sort }
+            };
+        }
+
+        public Dictionary<string, object> MakePageState(UserViewModel user)
+        {
+            var typedContext = user.Context as UserContext;
+            return new Dictionary<string, object>
+            {
+                { "kind", "user" },
+                { "username", typedContext.TargetUser }
             };
         }
 
