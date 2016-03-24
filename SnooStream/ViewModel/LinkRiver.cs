@@ -17,7 +17,7 @@ using System.Net;
 
 namespace SnooStream.ViewModel
 {
-    public class LinkRiverViewModel : IHasTitle
+    public class LinkRiverViewModel : IHasTitle, IHasHubNavCommands, IRefreshable
     {
         public string Title { get { return Context.Title; } }
         public ILinkBuilderContext Context { get; set; }
@@ -26,6 +26,7 @@ namespace SnooStream.ViewModel
         public DateTime? LastRefresh { get; set; }
         public RangedCollectionBase Links {get; set;}
         public string LastLinkId { get; set; }
+        public IEnumerable<IHubNavCommand> Commands { get; set; }
 
         public LinkRiverViewModel()
         {
@@ -36,6 +37,7 @@ namespace SnooStream.ViewModel
         {
             Context = context;
             Links = new LinkCollection { Context = context, LinkRiver = this };
+            Commands = context.MakeHubNavCommands(this);
         }
 
         public bool IsUserMultiReddit
@@ -83,6 +85,17 @@ namespace SnooStream.ViewModel
             var activityListing = await Context.LoadAdditional(progress, token);
             return LinkBuilder.AppendLinkViewModels(Links, activityListing.Data.Children, Context);
         }
+
+        public async Task<IEnumerable<LinkViewModel>> LoadCleanAsync(IProgress<float> progress, CancellationToken token)
+        {
+            var activityListing = await Context.Refresh(progress, token);
+            return LinkBuilder.AppendLinkViewModels(Links, activityListing.Data.Children, Context);
+        }
+
+        public void Refresh()
+        {
+            Links.Refresh();
+        }
     }
 
     public class LinkCollection : RangedCollectionBase
@@ -93,8 +106,15 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return Context.HasAdditional;
+                return Context.HasAdditional && !BlockLoading;
             }
+        }
+
+        protected override async void RefreshImpl()
+        {
+            var loadItem = new LoadViewModel { LoadAction = (progress, token) => LinkRiver.LoadCleanAsync(progress, token), IsCritical = true };
+            Add(loadItem);
+            await LoadItem(loadItem);
         }
 
         public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
@@ -156,8 +176,10 @@ namespace SnooStream.ViewModel
         bool HasAdditional { get; }
         Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache);
         Task<Listing> LoadAdditional(IProgress<float> progress, CancellationToken token);
+        Task<Listing> Refresh(IProgress<float> progress, CancellationToken token);
         bool IsMultiReddit { get; }
         ILinkContext LinkContext { get; }
+        IEnumerable<IHubNavCommand> MakeHubNavCommands(IRefreshable refreshTarget);
     }
 
     public static class LinkBuilder
@@ -526,6 +548,7 @@ namespace SnooStream.ViewModel
 
     class LinkBuilderContext : ILinkBuilderContext
     {
+        public INavigationContext NavigationContext { get; set; }
         public string Title { get { return Subreddit; } }
         public ILinkContext LinkContext { get; set; }
         public string Subreddit { get; set; }
@@ -534,6 +557,16 @@ namespace SnooStream.ViewModel
         public OfflineService Offline { get; set; }
         private string _after;
         private bool _hasLoaded = false;
+        public IEnumerable<IHubNavCommand> MakeHubNavCommands(IRefreshable refreshTarget)
+        {
+            return new List<IHubNavCommand>
+            {
+                new PostNavCommand { NavigationContext = NavigationContext },
+                new RefreshNavCommand { NavigationContext = NavigationContext, Target = refreshTarget },
+                new SearchNavCommand { NavigationContext = NavigationContext, TargetSubreddit = Subreddit },
+                new AboutSubredditNavCommand { NavigationContext = NavigationContext, TargetSubreddit = Subreddit }
+            };
+        }
 
         public bool IsMultiReddit
         {
@@ -563,6 +596,12 @@ namespace SnooStream.ViewModel
         {
             //TODO proper error noticiation here
             Debug.WriteLine(ex);
+        }
+
+        public Task<Listing> Refresh(IProgress<float> progress, CancellationToken token)
+        {
+            _after = null;
+            return Load(progress, token, true);
         }
 
         public async Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache)

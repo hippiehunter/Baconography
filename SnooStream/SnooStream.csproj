@@ -189,6 +189,7 @@
     <Compile Include="ViewModel\Activity.cs" />
     <Compile Include="ViewModel\Comments.cs" />
     <Compile Include="ViewModel\Content.cs" />
+    <Compile Include="ViewModel\HubNavCommands.cs" />
     <Compile Include="ViewModel\LinkRiver.cs" />
     <Compile Include="ViewModel\Load.cs" />
     <Compile Include="ViewModel\Login.cs" />

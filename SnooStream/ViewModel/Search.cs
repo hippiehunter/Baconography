@@ -236,7 +236,7 @@ namespace SnooStream.ViewModel
         {
             NavigationContext = navigationContext;
             _reddit = reddit;
-            LinkBuilderContext = new LinkBuilderContext { LinkContext = linkContext, Offline = offline, Reddit = _reddit, Subreddit = restrictedToSubreddit };
+            LinkBuilderContext = new LinkBuilderContext { LinkContext = linkContext, Offline = offline, Reddit = _reddit, Subreddit = restrictedToSubreddit, NavigationContext = navigationContext };
             _helper = new SearchHelper(() => { if (ResultsInvalidated != null) ResultsInvalidated(); }, triggeredQuery => { _searchUri = _after = null; _hasLoaded = false; if (ResultsInvalidated != null) ResultsInvalidated();  }, dispatcher, 3, "/", 1);
         }
 

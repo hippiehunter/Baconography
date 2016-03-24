@@ -541,6 +541,13 @@ namespace SnooStream.ViewModel
         public double PlayPosition { get; set; }
         public bool IsLooping { get; set; }
         public string PreviewUrl { get; set; }
+        public string PlayableUrl
+        {
+            get
+            {
+                return PlayableStreams.FirstOrDefault()?.Item1;
+            }
+        }
         public IEnumerable<Tuple<string, string>> PlayableStreams { get; set; }
     }
 

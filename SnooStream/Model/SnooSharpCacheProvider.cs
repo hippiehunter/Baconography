@@ -55,7 +55,9 @@ namespace SnooStream.Model
             if (_listingLookup.ContainsKey(lowerUrl))
             {
                 _listingLookup[lowerUrl] = listing;
-                _listingTimeoutLookup.RemoveAt(_listingTimeoutLookup.IndexOfValue(lowerUrl));
+                var timeoutIndex = _listingTimeoutLookup.IndexOfValue(lowerUrl);
+                if (timeoutIndex > -1)
+                    _listingTimeoutLookup.RemoveAt(timeoutIndex);
             }
             else
             {
@@ -72,7 +74,7 @@ namespace SnooStream.Model
                     _listingTimeoutLookup[timeAdded] = new List<string> { timeoutBlob as string, lowerUrl };
             }
             else
-                _thingTimeoutLookup.Add(timeAdded, lowerUrl);
+                _listingTimeoutLookup.Add(timeAdded, lowerUrl);
 
             ProcessListingForSingles(listing);
 

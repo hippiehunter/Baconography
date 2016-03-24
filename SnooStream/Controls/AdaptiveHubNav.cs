@@ -54,11 +54,17 @@ namespace SnooStream.Controls
         IEnumerable<IHubNavCommand> Commands { get; }
     }
 
+    public interface IRefreshable
+    {
+        void Refresh();
+    }
+
     public interface IHubNavCommand
     {
         bool IsInput { get; }
+        string InputText { get; set; }
         string Text { get; }
-        string Glyph { get; }
+        object Glyph { get; }
         bool IsEnabled { get; }
         void Tapped();
     }

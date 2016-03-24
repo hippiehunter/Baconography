@@ -54,8 +54,20 @@ namespace SnooStream.Common
             }
         }
 
+        public bool BlockLoading { get { return this.OfType<LoadViewModel>().Any(); } }
         public abstract bool HasMoreItems { get; }
         public abstract IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count);
+
+        public void Refresh()
+        {
+            Clear();
+            RefreshImpl();
+        }
+
+        protected virtual void RefreshImpl()
+        {
+            throw new NotImplementedException();
+        }
 
         public bool IsCurrentAfterLast
         {

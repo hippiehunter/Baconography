@@ -94,7 +94,7 @@ namespace SnooStream.ViewModel
             _navigationContext = navigationContext;
             TargetUser = username;
             CommentBuilderContext = new UserCommentBuilderContext { NavigationContext = navigationContext, Reddit = reddit,  };
-            LinkBuilderContext = new LinkBuilderContext { LinkContext = linkContext, Offline = offline, Reddit = reddit, Subreddit = null };
+            LinkBuilderContext = new LinkBuilderContext { LinkContext = linkContext, Offline = offline, Reddit = reddit, Subreddit = null, NavigationContext = navigationContext };
         }
 
         INavigationContext _navigationContext;

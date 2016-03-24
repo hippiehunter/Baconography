@@ -29,18 +29,21 @@ namespace SnooStream.Controls
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            DataContext = e.Parameter;
-            if (e.Parameter is IHasHubNavCommands)
+            var hubNavItem = e.Parameter as HubNavItem;
+            DataContext = hubNavItem;
+            if (hubNavItem.Content is IHasHubNavCommands)
             {
                 var symbol = new FontFamily("Segoe UI Symbol");
                 var commandBar = new CommandBar();
-                var commands = ((IHasHubNavCommands)e.Parameter).Commands;
+                var commands = ((IHasHubNavCommands)hubNavItem.Content).Commands;
                 foreach (var command in commands)
                 {
 
+                    var icon = command.Glyph is string ? new FontIcon { FontFamily = symbol, Glyph = command.Glyph as string } : command.Glyph as IconElement;
+
                     var madeCommand = new AppBarButton
                     {
-                        Icon = new FontIcon { FontFamily = symbol, Glyph = command.Glyph },
+                        Icon = icon,
                         Label = command.Text,
                         IsEnabled = command.IsEnabled
                     };

@@ -84,7 +84,7 @@
             <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" Height="80" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption"/>
             </Grid>
-            <MediaElement AudioCategory="Media" AreTransportControlsEnabled="True" Grid.Row="1" Source="{x:Bind Url}" IsLooping="{x:Bind IsLooping}"/>
+            <MediaElement AudioCategory="Media" AreTransportControlsEnabled="True" Grid.Row="1" Source="{x:Bind PlayableUrl}" IsLooping="{x:Bind IsLooping}"/>
         </Grid>
     </DataTemplate>
 
