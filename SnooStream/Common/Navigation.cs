@@ -416,6 +416,8 @@ namespace SnooStream.Common
             madeContext.Comments = madeComments;
             var targetLink = linkViewModel ?? new LinkViewModel { Thing = new Link(), Context = new CommentLinkContext { NavigationContext = this, Reddit = Reddit, ViewModel = madeComments }, Votable = new VotableViewModel(new Link(), madeContext.ChangeVote) };
             madeContext.Link = targetLink;
+            //load needs to happen after everything is constructed but before we return otherwise things might be partially setup if we have cached data (or go too fast)
+            madeComments.Load(); 
             return madeComments;
         }
 

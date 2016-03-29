@@ -54,7 +54,6 @@ namespace SnooStream.ViewModel
             Comments = new RangeCollection();
             Thing = new Link();
             Votable = new VotableViewModel(Thing, Context.ChangeVote);
-            Load();
         }
 
         public void Reload()
@@ -88,7 +87,7 @@ namespace SnooStream.ViewModel
             RaisePropertyChanged("LinkTitle");
             Votable.MergeVotable(Thing);
             var comments = await Context.LoadRequested(false, progress, token);
-            CommentBuilder.FillFlatList(Context.Comments.Comments, comments.ToList(), Context);
+            CommentBuilder.FillFlatList(Comments, comments.ToList(), Context);
         }
     }
 

@@ -26,16 +26,20 @@ namespace SnooStream.Model
 
         public Task<Thing> GetThingById(string id)
         {
-            return Task.FromResult(_thingLookup[id.ToLower()]);
+            Thing thing;
+            if (_thingLookup.TryGetValue(id.ToLower(), out thing))
+                return Task.FromResult(thing);
+            else
+                return Task.FromResult<Thing>(null);
         }
 
         public Task SetListing(string url, Listing listing)
         {
             var timeAdded = DateTime.UtcNow;
             listing.DataAge = timeAdded;
-            if (_listingLookup.Count > 100)
+            if (_listingLookup.Count > 25)
             {
-                var evicted = _listingTimeoutLookup.Take(50).ToList();
+                var evicted = _listingTimeoutLookup.Take(15).ToList();
                 foreach (var key in evicted)
                 {
                     if(key.Value is string)
@@ -101,9 +105,9 @@ namespace SnooStream.Model
         {
             var timeAdded = DateTime.UtcNow;
             thing.DataAge = timeAdded;
-            if (_thingLookup.Count > 100)
+            if (_thingLookup.Count > 5000)
             {
-                var evicted = _listingTimeoutLookup.Take(50).ToList();
+                var evicted = _listingTimeoutLookup.Take(2500).ToList();
                 foreach (var evictedKey in evicted)
                 {
                     if (evictedKey.Value is string)
