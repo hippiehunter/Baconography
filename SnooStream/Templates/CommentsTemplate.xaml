@@ -36,18 +36,18 @@
                 <!-- Title block -->
                 <TextBlock Grid.Row="0"
                    Style="{StaticResource TitleTextBlock}"
-                   Text="{x:Bind LinkTitle}"
-                   TextTrimming="WordEllipsis"
+                   Text="{x:Bind LinkTitle, Mode=OneWay}"
+                   TextTrimming="None"
                    MinHeight="50">
                 </TextBlock>
 
                 <!-- Link info, user / time / subreddit / domain -->
                 <ContentControl x:Name="linkMetadata" Grid.Row="1"
                             Margin="0,5,0,-6" MinHeight="25"
-                            HorizontalAlignment="Stretch" Content="{x:Bind Link, Converter={StaticResource linkMetadataConverter}}"/>
+                            HorizontalAlignment="Stretch" DataContext="{x:Null}" Content="{x:Bind Link, Converter={StaticResource linkMetadataConverter}, Mode=OneWay}"/>
 
                 <!-- Non Editing Content block -->
-                <ContentControl Visibility="{x:Bind Link.IsEditing, Mode=OneWay, Converter={StaticResource invertedBooleanVisibilityConverter}}"  
+                <ContentControl  DataContext="{x:Null}" Visibility="{x:Bind Link.IsEditing, Mode=OneWay, Converter={StaticResource invertedBooleanVisibilityConverter}}"  
                             x:Name="contentSection" Grid.Row="2" Margin="0"
                             BorderThickness="0"
                             VerticalContentAlignment="Stretch" VerticalAlignment="Center"
@@ -64,7 +64,7 @@
                         <ColumnDefinition Width="2*" />
                     </Grid.ColumnDefinitions>
 
-                    <controls:MarkdownEditorControl DataContext="{x:Bind Link.Editing, Mode=OneWay}"
+                    <controls:MarkdownEditorControl DataContext="{Binding Link.Editing, Mode=OneWay}"
                             x:Name="editSection" Margin="0" Grid.ColumnSpan="2" Grid.Row="0"
                             VerticalContentAlignment="Stretch" VerticalAlignment="Center"
                             HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" />
@@ -100,7 +100,7 @@
                         </Button.Flyout>
                     </Button>
 
-                    <ContentControl Grid.Column="1" DataContext="{Binding Link.Votable, Mode=OneTime}" ContentTemplate="{StaticResource VotableControl}" />
+                    <ContentControl Grid.Column="1" DataContext="{Binding Link.Votable, Mode=OneWay}" ContentTemplate="{StaticResource VotableControl}" />
 
                     <Button Grid.Column="2"
                         HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
@@ -233,4 +233,5 @@
             </ListView.ItemContainerTransitions>
         </ListView>
     </DataTemplate>
+
 </ResourceDictionary>

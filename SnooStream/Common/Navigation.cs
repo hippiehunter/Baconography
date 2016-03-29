@@ -411,9 +411,11 @@ namespace SnooStream.Common
 
         public CommentsViewModel MakeCommentContext(string url, string focusId, string sort, LinkViewModel linkViewModel)
         {
-            var madeContext = new CommentBuilderContext { Reddit = Reddit, Url = url, Sort = sort ?? "best", ContextTarget = focusId, Link = linkViewModel, NavigationContext = this };
+            var madeContext = new CommentBuilderContext { Reddit = Reddit, Url = url, Sort = sort ?? "best", ContextTarget = focusId, NavigationContext = this };
             var madeComments = new CommentsViewModel(madeContext);
             madeContext.Comments = madeComments;
+            var targetLink = linkViewModel ?? new LinkViewModel { Thing = new Link(), Context = new CommentLinkContext { NavigationContext = this, Reddit = Reddit, ViewModel = madeComments }, Votable = new VotableViewModel(new Link(), madeContext.ChangeVote) };
+            madeContext.Link = targetLink;
             return madeComments;
         }
 

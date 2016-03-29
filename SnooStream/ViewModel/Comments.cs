@@ -83,7 +83,9 @@ namespace SnooStream.ViewModel
         public async Task LoadAsync(IProgress<float> progress, CancellationToken token)
         {
             Thing = await Context.GetLink(progress, token);
+            Link.UpdateThing(Thing);
             RaisePropertyChanged("Thing");
+            RaisePropertyChanged("LinkTitle");
             Votable.MergeVotable(Thing);
             var comments = await Context.LoadRequested(false, progress, token);
             CommentBuilder.FillFlatList(Context.Comments.Comments, comments.ToList(), Context);
@@ -1133,6 +1135,15 @@ namespace SnooStream.ViewModel
                 await Reddit.DeleteLinkOrComment(comment.Thing.Id);
             }
             catch { }
+        }
+    }
+
+    class CommentLinkContext : BaseLinkContext
+    {
+        public CommentsViewModel ViewModel { get; set; }
+        public override void GotoLink(LinkViewModel vm)
+        {
+            Navigation.GotoLink(ViewModel, vm.Thing.Url, NavigationContext);
         }
     }
 }

@@ -311,7 +311,17 @@ namespace SnooStream.ViewModel
                 RaisePropertyChanged("CommentCount");
             }
 
-            Thing = thing;
+            if (Thing == null)
+            {
+                Thing = thing;
+                RaisePropertyChanged("LinkTitle");
+                RaisePropertyChanged("Thing");
+            }
+            else
+            {
+                Thing = thing;
+            }
+            
             Votable.MergeVotable(thing);
             
         }

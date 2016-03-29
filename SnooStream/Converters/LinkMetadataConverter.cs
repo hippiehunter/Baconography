@@ -34,8 +34,8 @@ namespace SnooStream.Converters
 			rtb.FontWeight = FontWeights.SemiBold;
 			List<Inline> inlinesCollection = new List<Inline>();
 			
-			var subredditLink = new Run { Text = linkViewModel.Thing.Subreddit };
-			var authorLink = new Run { Text = linkViewModel.Thing.Author };
+			var subredditLink = new Run { Text = linkViewModel.Thing.Subreddit ?? "" };
+			var authorLink = new Run { Text = linkViewModel.Thing.Author ?? "" };
 
 			if (linkViewModel.Thing.Over18)
 				inlinesCollection.Add(new Run { Text = "NSFW", Foreground = new SolidColorBrush(Colors.Red)});
@@ -48,7 +48,7 @@ namespace SnooStream.Converters
 
 			inlinesCollection.Add(authorLink);
 			inlinesCollection.Add(new Run { Text = TimeRelationConverter.GetRelationString(linkViewModel.Thing.CreatedUTC) });
-			inlinesCollection.Add(new Run { Text = DomainConverter.GetDomain(linkViewModel.Thing.Url) });
+			inlinesCollection.Add(new Run { Text = DomainConverter.GetDomain(linkViewModel.Thing.Url)});
 
 			for (int i = 0; i < inlinesCollection.Count; i++)
 			{
