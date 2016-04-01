@@ -41,7 +41,7 @@ namespace SnooStream.ViewModel
         }
 
         public DateTime? LastRefresh { get; set; }
-        public RangeCollection Comments { get; set; }
+        public LoadItemCollectionBase Comments { get; set; }
 
         public CommentsViewModel()
         {
@@ -51,25 +51,32 @@ namespace SnooStream.ViewModel
         public CommentsViewModel(ICommentBuilderContext context)
         {
             Context = context;
-            Comments = new RangeCollection();
+            Comments = new CommentsCollection { Context = context };
             Thing = new Link();
             Votable = new VotableViewModel(Thing, Context.ChangeVote);
         }
 
-        public void Reload()
+        public async void Reload()
         {
-            LoadState = LoadViewModel.ReplaceLoadViewModel(LoadState, new LoadViewModel { LoadAction = (progress, token) => ReloadAsync(progress, token), IsCritical = false });
-            RaisePropertyChanged("LoadState");
-        }
-
-        public async Task ReloadAsync(IProgress<float> progress, CancellationToken token)
-        {
-            var comments = await Context.LoadRequested(true, progress, token);
-            Context.Comments.Comments.Clear();
-            Thing = comments.FirstOrDefault(thing => thing.Data is Link)?.Data as Link;
-            RaisePropertyChanged("Thing");
-            Votable.MergeVotable(Thing);
-            CommentBuilder.FillFlatList(Context.Comments.Comments, comments.ToList(), Context);
+            //only reload the entire model if the current load state is non success
+            if (LoadState != null)
+            {
+                switch (LoadState.State)
+                {
+                    case ViewModel.LoadState.Loaded:
+                        await Comments.Refresh();
+                        break;
+                    case ViewModel.LoadState.Loading:
+                        break; //do nothing we're already loading
+                    default:
+                        //clear the loaded status of the comments collection so we will get reloaded
+                        Comments.ClearState();
+                        LoadState = LoadViewModel.ReplaceLoadViewModel(LoadState, new LoadViewModel { LoadAction = (progress, token) => LoadAsync(progress, token), IsCritical = false });
+                        RaisePropertyChanged("LoadState");
+                        break;
+                }
+            }
+            
         }
 
         public void Load()
@@ -86,8 +93,36 @@ namespace SnooStream.ViewModel
             RaisePropertyChanged("Thing");
             RaisePropertyChanged("LinkTitle");
             Votable.MergeVotable(Thing);
+            
+        }
+    }
+
+    public class CommentsCollection : LoadItemCollectionBase
+    {
+        public ICommentBuilderContext Context { get; set; }
+        public override bool HasMoreItems
+        {
+            get
+            {
+                return base.HasMoreItems && !HasLoaded;
+            }
+        }
+
+        protected override Task LoadAdditional(IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override async Task LoadInitial(IProgress<float> progress, CancellationToken token)
+        {
             var comments = await Context.LoadRequested(false, progress, token);
-            CommentBuilder.FillFlatList(Comments, comments.ToList(), Context);
+            CommentBuilder.FillFlatList(this, comments.ToList(), Context);
+        }
+
+        protected override async Task Refresh(IProgress<float> progress, CancellationToken token)
+        {
+            var comments = await Context.LoadRequested(false, progress, token);
+            CommentBuilder.FillFlatList(this, comments.ToList(), Context);
         }
     }
 

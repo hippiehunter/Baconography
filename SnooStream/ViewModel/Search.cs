@@ -132,7 +132,7 @@ namespace SnooStream.ViewModel
         }
     }
 
-    public class SearchCollection : RangedCollectionBase
+    public class SearchCollection : LoadItemCollectionBase
     {
         public ISearchContext Context { get; set; }
 
@@ -144,78 +144,35 @@ namespace SnooStream.ViewModel
 
         private async void Context_ResultsInvalidated()
         {
-            //cancel any existing load
-            var activeLoad = _activeLoad;
-            if (activeLoad != null)
-            {
-                activeLoad.Cancel();
-            }
-            _activeLoad = null;
             Clear();
-
-            if(Context.IsValid)
-                await LoadMoreItemsAsync(100);
+            if (Context.IsValid)
+                await Refresh();
         }
 
         public override bool HasMoreItems
         {
             get
             {
-                return Context.HasAdditional && !this.OfType<LoadViewModel>().Any() && Context.IsValid;
+                return base.HasMoreItems && Context.HasAdditional && Context.IsValid;
             }
         }
 
-        LoadViewModel _activeLoad;
-
-        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        protected override async Task Refresh(IProgress<float> progress, CancellationToken token)
         {
-            //cancel any existing load
-            var activeLoad = _activeLoad;
-            if (activeLoad != null)
-            {
-                activeLoad.Cancel();
-            }
-            _activeLoad = null;
-
-            LoadViewModel loadItem = null;
-            //Load Additional
-            if (Count > 0)
-            {
-                loadItem =_activeLoad = new LoadViewModel { LoadAction = async (progress, token) =>
-                {
-                    var loadedListing = await Context.LoadAdditional(progress, token);
-                    AddRange(SearchViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
-                    _activeLoad = null;
-                }, IsCritical = false };
-                Add(loadItem);
-                return LoadItem(loadItem).AsAsyncOperation();
-            }
-            else //Load fresh
-            {
-                loadItem = _activeLoad = new LoadViewModel { LoadAction = async (progress, token) =>
-                {
-                    var loadedListing = await Context.Load(progress, token, false);
-                    AddRange(SearchViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
-                    _activeLoad = null;
-                }, IsCritical = true };
-                Add(loadItem);
-                return LoadItem(loadItem).AsAsyncOperation();
-            }
+            var loadedListing = await Context.Load(progress, token, true);
+            AddRange(SearchViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
         }
 
-        private void AddRange(IEnumerable<object> collection)
+        protected override async Task LoadInitial(IProgress<float> progress, CancellationToken token)
         {
-            foreach (var item in collection)
-                Add(item);
+            var loadedListing = await Context.Load(progress, token, false);
+            AddRange(SearchViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
         }
 
-        private async Task<LoadMoreItemsResult> LoadItem(LoadViewModel loadItem)
+        protected override async Task LoadAdditional(IProgress<float> progress, CancellationToken token)
         {
-            var itemCount = Count - 1;
-            await loadItem.LoadAsync();
-            //now that the load is finished the load item should be removed from the list
-            Remove(loadItem);
-            return new LoadMoreItemsResult { Count = (uint)(Count - itemCount) };
+            var loadedListing = await Context.LoadAdditional(progress, token);
+            AddRange(SearchViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
         }
     }
 

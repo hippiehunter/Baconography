@@ -34,7 +34,7 @@ namespace SnooStream.ViewModel
     public class ContentRiverViewModel
     {
         public IContentRiverContext Context { get; set; }
-        public RangedCollectionBase ContentItems { get; set; }
+        public LoadItemCollectionBase ContentItems { get; set; }
 
         public ContentRiverViewModel() { }
 
@@ -320,7 +320,7 @@ namespace SnooStream.ViewModel
                         loadViewModel.Load();
                     }
                 }
-                else if (loadViewModel.State == LoadState.Loading)
+                else if (loadViewModel.State == LoadState.Loading || loadViewModel.State == LoadState.Refreshing)
                 {
                     ((LoadViewModel)contentView[i]).Cancel();
                 }
@@ -328,89 +328,69 @@ namespace SnooStream.ViewModel
         }
     }
 
-    class WebContentCollection : RangedCollectionBase
+    class WebContentCollection : LoadItemCollectionBase
     {
         INetworkLayer _networkLayer;
         IContentRiverContext _context;
         public ICollectionView CollectionView { get; set; }
         string _nextUrl;
         string _originalUrl;
-        public WebContentCollection(IEnumerable<object> initial, string nextUrl, string originalUrl, INetworkLayer networkLayer, IContentRiverContext context) : base(initial)
+        public WebContentCollection(IEnumerable<object> initial, string nextUrl, string originalUrl, INetworkLayer networkLayer, IContentRiverContext context)
         {
             _networkLayer = networkLayer;
             _context = context;
             _nextUrl = nextUrl;
             _originalUrl = originalUrl;
+            AddRange(initial);
+            HasLoaded = true;
         }
 
         public override bool HasMoreItems
         {
             get
             {
-                return _nextUrl != null;
+                return base.HasMoreItems && _nextUrl != null;
             }
         }
 
-        Task<LoadMoreItemsResult> _loadTask;
-
-        async Task<LoadMoreItemsResult> LoadMoreItems()
+        async Task LoadImpl(IProgress<float> progress, CancellationToken token)
         {
-            try
+            var loadedContent = await ContentBuilder.LoadWebContent(_networkLayer, _nextUrl, progress, token, _context);
+            var first = loadedContent.Item3.FirstOrDefault() as ContentViewModel;
+            bool replacingCurrent = CollectionView.CurrentPosition == Count - 1;
+            this[Count - 1] = first;
+
+            if (replacingCurrent && first != null)
             {
-                var oldCount = Count;
-                var loadViewModel = new LoadViewModel
-                {
-                    Kind = LoadKind.Collection,
-                    IsCritical = false,
-                    LoadAction = async (progress, token) =>
-                    {
-                        var loadedContent = await ContentBuilder.LoadWebContent(_networkLayer, _nextUrl, progress, token, _context);
-                        var first = loadedContent.Item3.FirstOrDefault() as ContentViewModel;
-                        bool replacingCurrent = CollectionView.CurrentPosition == Count - 1;
-                        this[Count - 1] = first;
-
-                        if (replacingCurrent && first != null)
-                        {
-                            //switchback from LoadViewModel to ContentViewModel needs to be Current aware so it can reset the focus
-                            first.Focused = true;
-                        }
-
-                        foreach (var remaining in loadedContent.Item3.Skip(1))
-                            Add(remaining);
-
-                        if (loadedContent.Item2 != _nextUrl)
-                            _nextUrl = loadedContent.Item2;
-                    }
-                };
-                Add(loadViewModel);
-                await loadViewModel.LoadAsync();
-                return new LoadMoreItemsResult { Count = (uint)(Count - oldCount) };
+                //switchback from LoadViewModel to ContentViewModel needs to be Current aware so it can reset the focus
+                first.Focused = true;
             }
-            finally
-            {
-                //wipe out the old load task so we can do it again
-                _loadTask = null;
-            }
+
+            foreach (var remaining in loadedContent.Item3.Skip(1))
+                Add(remaining);
+
+            if (loadedContent.Item2 != _nextUrl)
+                _nextUrl = loadedContent.Item2;
         }
 
-        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        protected override Task Refresh(IProgress<float> progress, CancellationToken token)
         {
-            if (_loadTask == null)
-            {
-                lock (this)
-                {
-                    if (_loadTask == null)
-                    {
-                        _loadTask = LoadMoreItems();
-                    }
-                }
-            }
+            _nextUrl = null;
+            return LoadImpl(progress, token);
+        }
 
-            return _loadTask.AsAsyncOperation();
+        protected override Task LoadInitial(IProgress<float> progress, CancellationToken token)
+        {
+            return LoadImpl(progress, token);
+        }
+
+        protected override Task LoadAdditional(IProgress<float> progress, CancellationToken token)
+        {
+            return LoadImpl(progress, token);
         }
     }
 
-    class ContentCollection : RangedCollectionBase
+    class ContentCollection : LoadItemCollectionBase
     {
         public IContentRiverContext Context { get; set; }
 
@@ -423,65 +403,27 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return Context.HasAdditional;
+                return base.HasMoreItems && Context.HasAdditional;
             }
         }
 
-        Task<LoadMoreItemsResult> _loadTask;
-
-        async Task<LoadMoreItemsResult> LoadMoreItems()
+        async Task LoadImpl(IProgress<float> progress, CancellationToken token)
         {
-            try
-            {
-                var oldCount = Count;
-                var loadViewModel = new LoadViewModel
-                {
-                    Kind = LoadKind.Collection,
-                    IsCritical = false,
-                    LoadAction = async (progress, token) =>
-                    {
-                        var loadedContent = await Context.LoadMore(progress, token);
-                        var first = loadedContent.FirstOrDefault() as ContentViewModel;
-                        bool replacingCurrent = CurrentPosition == Count - 1;
-                        this[Count - 1] = first;
+            var loadedContent = await Context.LoadMore(progress, token);
+            var first = loadedContent.FirstOrDefault() as ContentViewModel;
+            bool replacingCurrent = CurrentPosition == Count - 1;
+            this[Count - 1] = first;
 
-                        if (replacingCurrent && first != null)
-                        {
-                            //switchback from LoadViewModel to ContentViewModel needs to be Current aware so it can reset the focus
-                            first.Focused = true;
-                        }
-
-                        foreach (var remaining in loadedContent.Skip(1))
-                            Add(remaining);
-                    }
-                };
-                Add(loadViewModel);
-                await loadViewModel.LoadAsync();
-                return new LoadMoreItemsResult { Count = (uint)(Count - oldCount) };
-            }
-            finally
+            if (replacingCurrent && first != null)
             {
-                //wipe out the old load task so we can do it again
-                _loadTask = null;
+                //switchback from LoadViewModel to ContentViewModel needs to be Current aware so it can reset the focus
+                first.Focused = true;
             }
+
+            foreach (var remaining in loadedContent.Skip(1))
+                Add(remaining);
         }
-
-        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
-        {
-            if (_loadTask == null)
-            {
-                lock (this)
-                {
-                    if (_loadTask == null)
-                    {
-                        _loadTask = LoadMoreItems();
-                    }
-                }
-            }
-
-            return _loadTask.AsAsyncOperation();
-        }
-
+        
         public async Task BlockingReplace(int index, object value)
         {
             bool notFinished = true;
@@ -501,6 +443,22 @@ namespace SnooStream.ViewModel
                 }
                 await Task.Yield();
             }
+        }
+
+        protected override Task Refresh(IProgress<float> progress, CancellationToken token)
+        {
+            AddRange(Context.LoadInitial());
+            return Task.FromResult(true);
+        }
+
+        protected override Task LoadInitial(IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Task LoadAdditional(IProgress<float> progress, CancellationToken token)
+        {
+            return LoadImpl(progress, token);
         }
     }
 

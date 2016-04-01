@@ -19,6 +19,7 @@ namespace SnooStream.ViewModel
     public enum LoadState
     {
         None,
+        Refreshing,
         Loading,
         Loaded,
         Cancelled,

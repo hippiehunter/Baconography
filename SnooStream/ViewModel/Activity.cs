@@ -48,6 +48,12 @@ namespace SnooStream.ViewModel
             ActivityBuilder.UpdateActivityGroups(Activities, activityListing.Data.Children, Context);
         }
 
+        public async Task LoadCleanAsync(IProgress<float> progress, CancellationToken token)
+        {
+            var activityListing = await Context.Load(progress, token, true);
+            ActivityBuilder.UpdateActivityGroups(Activities, activityListing.Data.Children, Context);
+        }
+
         public void Refresh()
         {
             LoadState = new LoadViewModel { LoadAction = (progress, token) => LoadAsync(progress, token, true), IsCritical = false };
@@ -55,7 +61,7 @@ namespace SnooStream.ViewModel
         }
     }
 
-    public class ActivityCollection : RangedCollectionBase
+    public class ActivityCollection : LoadItemCollectionBase
     {
         public IActivityBuilderContext Context { get; set; }
         public ActivitiesViewModel Activities { get; set; }
@@ -63,34 +69,23 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return Context.HasAdditional;
+                return base.HasMoreItems && Context.HasAdditional;
             }
         }
-
-        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        
+        protected override Task Refresh(IProgress<float> progress, CancellationToken token)
         {
-            //Load Additional
-            if (Count > 0)
-            {
-                var loadItem = new LoadViewModel { LoadAction = (progress, token) => Activities.LoadAdditionalAsync(progress, token), IsCritical = false };
-                Add(loadItem);
-                return LoadItem(loadItem).AsAsyncOperation();
-            }
-            else //Load fresh
-            {
-                var loadItem = new LoadViewModel { LoadAction = (progress, token) => Activities.LoadAsync(progress, token, false), IsCritical = true };
-                Add(loadItem);
-                return LoadItem(loadItem).AsAsyncOperation();
-            }
+            return Activities.LoadCleanAsync(progress, token);
         }
 
-        private async Task<LoadMoreItemsResult> LoadItem(LoadViewModel loadItem)
+        protected override Task LoadInitial(IProgress<float> progress, CancellationToken token)
         {
-            var itemCount = Count - 1;
-            await loadItem.LoadAsync();
-            //now that the load is finished the load item should be removed from the list
-            Remove(loadItem);
-            return new LoadMoreItemsResult { Count = (uint)(Count - itemCount) };
+            return Activities.LoadAsync(progress, token, false);
+        }
+
+        protected override Task LoadAdditional(IProgress<float> progress, CancellationToken token)
+        {
+            return Activities.LoadAdditionalAsync(progress, token);
         }
     }
 
@@ -505,7 +500,6 @@ namespace SnooStream.ViewModel
         private string _afterSent;
         private string _afterReceived;
         private string _afterActivity;
-        private bool _hasLoaded;
         public string CurrentUserName
         {
             get
@@ -518,8 +512,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return !_hasLoaded ||
-                    !string.IsNullOrWhiteSpace(_afterSent) ||
+                return !string.IsNullOrWhiteSpace(_afterSent) ||
                     !string.IsNullOrWhiteSpace(_afterReceived) ||
                     !string.IsNullOrWhiteSpace(_afterActivity);
             }
@@ -540,7 +533,6 @@ namespace SnooStream.ViewModel
             var sentListing = JsonConvert.DeserializeObject<Listing>(ActivityManager.SentBlob);
             var receivedListing = JsonConvert.DeserializeObject<Listing>(ActivityManager.ReceivedBlob);
             var activityListing = JsonConvert.DeserializeObject<Listing>(ActivityManager.ActivityBlob);
-            _hasLoaded = true;
 
             return ProcessListings(sentListing, receivedListing, activityListing);
         }

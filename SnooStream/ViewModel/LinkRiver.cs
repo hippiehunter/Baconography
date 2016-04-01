@@ -24,7 +24,7 @@ namespace SnooStream.ViewModel
         public Subreddit Thing { get; set; }
         public string Sort { get; set; }
         public DateTime? LastRefresh { get; set; }
-        public RangedCollectionBase Links {get; set;}
+        public LoadItemCollectionBase Links {get; set;}
         public string LastLinkId { get; set; }
         public IEnumerable<IHubNavCommand> Commands { get; set; }
 
@@ -92,13 +92,13 @@ namespace SnooStream.ViewModel
             return LinkBuilder.AppendLinkViewModels(Links, activityListing.Data.Children, Context);
         }
 
-        public void Refresh()
+        public async void Refresh()
         {
-            Links.Refresh();
+            await Links.Refresh();
         }
     }
 
-    public class LinkCollection : RangedCollectionBase
+    public class LinkCollection : LoadItemCollectionBase
     {
         public ILinkBuilderContext Context { get; set; }
         public LinkRiverViewModel LinkRiver { get; set; }
@@ -106,47 +106,23 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return Context.HasAdditional && !BlockLoading;
+                return base.HasMoreItems && Context.HasAdditional;
             }
         }
 
-        protected override async void RefreshImpl()
+        protected override Task Refresh(IProgress<float> progress, CancellationToken token)
         {
-            var loadItem = new LoadViewModel { LoadAction = (progress, token) => LinkRiver.LoadCleanAsync(progress, token), IsCritical = true };
-            Add(loadItem);
-            await LoadItem(loadItem);
+            return LinkRiver.LoadCleanAsync(progress, token);
         }
 
-        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        protected override Task LoadInitial(IProgress<float> progress, CancellationToken token)
         {
-            //Load Additional
-            if (Count > 0)
-            {
-                var loadItem = new LoadViewModel { LoadAction = (progress, token) => LinkRiver.LoadAdditionalAsync(progress, token), IsCritical = false };
-                Add(loadItem);
-                return LoadItem(loadItem).AsAsyncOperation();
-            }
-            else //Load fresh
-            {
-                var loadItem = new LoadViewModel { LoadAction = (progress, token) => LinkRiver.LoadAsync(progress, token, false), IsCritical = true };
-                Add(loadItem);
-                return LoadItem(loadItem).AsAsyncOperation();
-            }
+            return LinkRiver.LoadAsync(progress, token, false);
         }
 
-        private void AddRange(IEnumerable<LinkViewModel> collection)
+        protected override Task LoadAdditional(IProgress<float> progress, CancellationToken token)
         {
-            foreach (var item in collection)
-                Add(item);
-        }
-
-        private async Task<LoadMoreItemsResult> LoadItem(LoadViewModel loadItem)
-        {
-            var itemCount = Count - 1;
-            await loadItem.LoadAsync();
-            //now that the load is finished the load item should be removed from the list
-            Remove(loadItem);
-            return new LoadMoreItemsResult { Count = (uint)(Count - itemCount) };
+            return LinkRiver.LoadAdditionalAsync(progress, token);
         }
     }
 

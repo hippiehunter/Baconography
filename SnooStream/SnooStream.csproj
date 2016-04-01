@@ -107,6 +107,7 @@
     <Compile Include="Common\NSFWListingFilter.cs" />
     <Compile Include="Common\OfflineService.cs" />
     <Compile Include="Common\RangedCollectionBase.cs" />
+    <Compile Include="Common\RangedCollections.cs" />
     <Compile Include="Common\RoamingState.cs" />
     <Compile Include="Common\SnooObservableObject.cs" />
     <Compile Include="Common\Utility.cs" />

@@ -67,7 +67,7 @@ namespace SnooStream.Controls
             DataTemplate value;
             if (_templateLookup.TryGetValue(state, out value))
                 return value;
-            else if (state == LoadState.Loading)
+            else if (state == LoadState.Loading || state == LoadState.Refreshing)
                 return null;
             else if (state == LoadState.Failure)
                 return null;

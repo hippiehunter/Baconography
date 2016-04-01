@@ -295,7 +295,7 @@ namespace SnooStream.ViewModel
     }
 
 
-    public class UserMultiRedditCollection : RangedCollectionBase
+    public class UserMultiRedditCollection : LoadItemCollectionBase
     {
         public IUserContext Context { get; set; }
         bool _hasLoaded = false;
@@ -304,49 +304,35 @@ namespace SnooStream.ViewModel
             Context = context;
         }
 
-
         public override bool HasMoreItems
         {
             get
             {
-                return !_hasLoaded;
+                //we dont currently support getting more than the initial 100 multi reddits for a user
+                return base.HasMoreItems && !HasLoaded;
             }
         }
 
-        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        protected override async Task Refresh(IProgress<float> progress, CancellationToken token)
         {
-            _hasLoaded = true;
-            var loadItem = new LoadViewModel
-            {
-                LoadAction = async (progress, token) =>
-                {
-                    var loadedListing = await Context.LoadMultiReddits(progress, token, false);
-                    AddRange(UserViewModelBuilder.MakeViewModels(loadedListing, Context));
-                },
-                IsCritical = false
-            };
-            Add(loadItem);
-            return LoadItem(loadItem).AsAsyncOperation();
+            var loadedListing = await Context.LoadMultiReddits(progress, token, true);
+            AddRange(UserViewModelBuilder.MakeViewModels(loadedListing, Context));
         }
 
-        private void AddRange(IEnumerable<object> collection)
+        protected override async Task LoadInitial(IProgress<float> progress, CancellationToken token)
         {
-            foreach (var item in collection)
-                Add(item);
+            var loadedListing = await Context.LoadMultiReddits(progress, token, false);
+            AddRange(UserViewModelBuilder.MakeViewModels(loadedListing, Context));
         }
 
-        private async Task<LoadMoreItemsResult> LoadItem(LoadViewModel loadItem)
+        protected override Task LoadAdditional(IProgress<float> progress, CancellationToken token)
         {
-            var itemCount = Count - 1;
-            await loadItem.LoadAsync();
-            //now that the load is finished the load item should be removed from the list
-            Remove(loadItem);
-            return new LoadMoreItemsResult { Count = (uint)(Count - itemCount) };
+            throw new NotImplementedException();
         }
     }
 
 
-    public class UserActivityCollection : RangedCollectionBase
+    public class UserActivityCollection : LoadItemCollectionBase
     {
         public IUserContext Context { get; set; }
         
@@ -355,62 +341,30 @@ namespace SnooStream.ViewModel
             Context = context;
         }
 
-
         public override bool HasMoreItems
         {
             get
             {
-                return Context.HasAdditional;
+                return base.HasMoreItems && Context.HasAdditional;
             }
         }
-
-        public override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+        
+        protected override async Task Refresh(IProgress<float> progress, CancellationToken token)
         {
-            //Load Additional
-            if (Count > 0)
-            {
-                var loadItem = new LoadViewModel
-                {
-                    LoadAction = async (progress, token) =>
-                    {
-                        var loadedListing = await Context.LoadAdditional(progress, token);
-                        AddRange(UserViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
-                    },
-                    IsCritical = false
-                };
-                Add(loadItem);
-                return LoadItem(loadItem).AsAsyncOperation();
-            }
-            else //Load fresh
-            {
-                var loadItem = new LoadViewModel
-                {
-                    LoadAction = async (progress, token) =>
-                    {
-                        var loadedListing = await Context.Load(progress, token, false);
-                        AddRange(UserViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
-                    },
-                    IsCritical = true
-                };
-                Add(loadItem);
-                return LoadItem(loadItem).AsAsyncOperation();
-            }
+            var loadedListing = await Context.Load(progress, token, true);
+            AddRange(UserViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
         }
 
-
-        private void AddRange(IEnumerable<object> collection)
+        protected override async Task LoadInitial(IProgress<float> progress, CancellationToken token)
         {
-            foreach (var item in collection)
-                Add(item);
+            var loadedListing = await Context.Load(progress, token, false);
+            AddRange(UserViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
         }
 
-        private async Task<LoadMoreItemsResult> LoadItem(LoadViewModel loadItem)
+        protected override async Task LoadAdditional(IProgress<float> progress, CancellationToken token)
         {
-            var itemCount = Count - 1;
-            await loadItem.LoadAsync();
-            //now that the load is finished the load item should be removed from the list
-            Remove(loadItem);
-            return new LoadMoreItemsResult { Count = (uint)(Count - itemCount) };
+            var loadedListing = await Context.LoadAdditional(progress, token);
+            AddRange(UserViewModelBuilder.MakeViewModels(loadedListing.Data.Children, Context));
         }
     }
 

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using SnooStream.Common;
+using SnooStream.Controls;
 
 namespace SnooStream.Test
 {
@@ -72,6 +73,16 @@ namespace SnooStream.Test
             }
 
             public Task<Listing> LoadAdditional(IProgress<float> progress, CancellationToken token)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<IHubNavCommand> MakeHubNavCommands(IRefreshable refreshTarget)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<Listing> Refresh(IProgress<float> progress, CancellationToken token)
             {
                 throw new NotImplementedException();
             }
