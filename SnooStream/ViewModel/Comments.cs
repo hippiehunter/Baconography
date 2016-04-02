@@ -56,7 +56,7 @@ namespace SnooStream.ViewModel
             Votable = new VotableViewModel(Thing, Context.ChangeVote);
         }
 
-        public async void Reload()
+        public async Task ReloadAsync()
         {
             //only reload the entire model if the current load state is non success
             if (LoadState != null)
@@ -76,7 +76,11 @@ namespace SnooStream.ViewModel
                         break;
                 }
             }
-            
+        }
+
+        public async void Reload()
+        {
+            await ReloadAsync();
         }
 
         public void Load()

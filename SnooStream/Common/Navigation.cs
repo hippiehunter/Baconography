@@ -285,8 +285,8 @@ namespace SnooStream.Common
         {
             get
             {
-                if (HubNav.DataContext is IEnumerable<HubNavItem>)
-                    return ((IEnumerable<HubNavItem>)HubNav.DataContext).Select(item => item.Content);
+                if (HubNav.NavStack != null)
+                    return HubNav.NavStack.Select(item => item.Content);
                 else
                     return Enumerable.Empty<object>();
             }
@@ -298,7 +298,9 @@ namespace SnooStream.Common
         {
             Debug.Assert(Window.Current != null && Window.Current.Dispatcher != null, "CoreDispatcher was null for current window");
             _coreDispatcher = Window.Current.Dispatcher;
-           
+
+            CommonResourceAcquisition.ImageAcquisition.ImageAcquisition.ImgurAPIKey = "cf771dfe25a7462";
+
             var subredditRiverRD = new SubredditRiverTemplate();
             var linkRiverRD = new LinkRiverTemplate();
             var commentsRD = new CommentsTemplate();

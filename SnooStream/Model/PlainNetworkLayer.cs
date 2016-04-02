@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Web.Http;
+using Windows.Web.Http.Headers;
 
 namespace SnooStream.Model
 {
@@ -29,15 +30,25 @@ namespace SnooStream.Model
             _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
         }
 
+        List<Tuple<string, string>> _headers = new List<Tuple<string, string>>();
+
         public void AddHeaders(string name, string value)
         {
-            if (name == "User-Agent")
+            _headers.Add(Tuple.Create(name, value));
+        }
+
+        private void MakeHeaderCollection(HttpRequestHeaderCollection target)
+        {
+            foreach (var header in _headers)
             {
-                _httpClient.DefaultRequestHeaders.UserAgent.Clear();
-                _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(value);
+                if (header.Item1== "User-Agent")
+                {
+                    target.UserAgent.Clear();
+                    target.UserAgent.ParseAdd(header.Item2);
+                }
+                else
+                    target.Add(header.Item1, header.Item2);
             }
-            else
-                _httpClient.DefaultRequestHeaders.Add(name, value);
         }
 
         public async Task<string> CacheableGet(string url, CancellationToken token, IProgress<float> progress, Dictionary<string, string> body)
@@ -49,13 +60,14 @@ namespace SnooStream.Model
 
         public INetworkLayer Clone()
         {
-            var result = new PlainNetworkLayer();
-            foreach (var header in _httpClient.DefaultRequestHeaders)
-                result.AddHeaders(header.Key, header.Value);
-            
-            if(_httpClient.DefaultRequestHeaders.Referer != null)
-                result.SetReferer(_httpClient.DefaultRequestHeaders.Referer.ToString());
-            return result;
+            lock(this)
+            {
+                var result = new PlainNetworkLayer();
+                foreach (var header in _headers)
+                    result.AddHeaders(header.Item1, header.Item2);
+
+                return result;
+            }
         }
 
         public void Dispose()
@@ -73,10 +85,9 @@ namespace SnooStream.Model
         public async Task<string> Get(string url, CancellationToken token, IProgress<float> progress, Dictionary<string, string> body, bool ignoreErrors)
         {
             HttpRequestMessage sendMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(url));
-
+            MakeHeaderCollection(sendMessage.Headers);
             if (body != null)
             {
-
                 sendMessage.Content = new HttpFormUrlEncodedContent(body);
             }
 

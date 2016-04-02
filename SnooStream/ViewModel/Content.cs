@@ -165,6 +165,7 @@ namespace SnooStream.ViewModel
 
                             return new ContentContainerViewModel
                             {
+                                SingleViewItem = true,
                                 Url = url,
                                 Title = title,
                                 Context = context,

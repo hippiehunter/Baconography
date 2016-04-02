@@ -111,7 +111,7 @@ namespace SnooStream.Test
             Assert.AreEqual(context.Comments.Comments.Count(), 61);
             context.Sort = "new";
             context.UpdateAllThings(JsonConvert.DeserializeObject<Listing>(newSortedFullCommentsString).Data.Children);
-            await context.Comments.ReloadAsync(null, CancellationToken.None);
+            await context.Comments.ReloadAsync();
 
             var newIdOrder = context.Comments.Comments.OfType<CommentViewModel>().Select(comment => comment.Thing.Id).ToList();
             idOrder.SequenceEqual(newIdOrder);
@@ -127,6 +127,24 @@ namespace SnooStream.Test
             var indexOfAddTarget = context.Comments.Comments.IndexOf(context.Comments.Comments.OfType<CommentViewModel>().FirstOrDefault(vm => vm.Thing.Name == "t1_cv1e317"));
             Assert.AreSame(context.Comments.Comments[indexOfAddTarget + 1], madeComment); 
             Assert.AreEqual(context.Comments.Comments.Count(), 62);
+        }
+    }
+
+    public class TestCommentCollection : LoadItemCollectionBase
+    {
+        protected override Task LoadAdditional(IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Task LoadInitial(IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Task Refresh(IProgress<float> progress, CancellationToken token)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -150,7 +168,7 @@ namespace SnooStream.Test
             _moreThings = moreThings;
             _allThings = allThings;
             _requestedThings = requestedThings;
-            var commentsCollection = new RangeCollection();
+            var commentsCollection = new TestCommentCollection();
             Comments = new CommentsViewModel { Thing = thing, Sort = "best", Context = this, Comments = commentsCollection };
         }
 

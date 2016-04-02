@@ -48,18 +48,18 @@
     </DataTemplate>
 
     <DataTemplate x:Key="albumContentTemplate" x:DataType="vm:ContentContainerViewModel">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption"/>
             </Grid>
-            <FlipView Grid.Row="1" x:Name="albumSlideView" ItemsSource="{x:Bind ContentItems}" HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.IsVerticalRailEnabled="True" 
-                      ItemsPanel="{StaticResource VerticalItemsPanel}"
+            <FlipView x:Name="albumSlideView" common:RangedCollectionDataSource.DataSource ="{x:Bind ContentItems}" HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.IsVerticalRailEnabled="True"
                       IsSynchronizedWithCurrentItem="False">
+                <FlipView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel AreScrollSnapPointsRegular="True" Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </FlipView.ItemsPanel>
                 <FlipView.ItemContainerStyle>
                     <Style TargetType="FlipViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -68,7 +68,7 @@
                 </FlipView.ItemContainerStyle>
                 <FlipView.ItemTemplate>
                     <DataTemplate x:DataType="vm:ContentViewModel">
-                        <gif:ZoomableImageControl DataContext="{x:Bind Url}"/>
+                        <gif:ZoomableImageControl DataContext="{x:Bind Url}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                     </DataTemplate>
                 </FlipView.ItemTemplate>
             </FlipView>
@@ -142,8 +142,15 @@
                     <Style TargetType="FlipViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                         <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        <Setter Property="VerticalAlignment" Value="Stretch" />
                     </Style>
                 </FlipView.ItemContainerStyle>
+                <FlipView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel AreScrollSnapPointsRegular="True" Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </FlipView.ItemsPanel>
             </FlipView>
         </Grid>
     </DataTemplate>
