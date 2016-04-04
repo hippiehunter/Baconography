@@ -24,6 +24,9 @@
 
     <DataTemplate x:Key="CardCommentView" x:DataType="vm:CommentsViewModel">
         <Border HorizontalAlignment="Stretch">
+            <Border.Background>
+                <SolidColorBrush Color="#FF1F1F1F" Opacity="0.75" />
+            </Border.Background>
             <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0">
 
                 <Grid.RowDefinitions>
@@ -37,13 +40,12 @@
                 <TextBlock Grid.Row="0"
                    Style="{StaticResource TitleTextBlock}"
                    Text="{x:Bind LinkTitle, Mode=OneWay}"
-                   TextTrimming="None"
-                   MinHeight="50">
+                   TextTrimming="None">
                 </TextBlock>
 
                 <!-- Link info, user / time / subreddit / domain -->
                 <ContentControl x:Name="linkMetadata" Grid.Row="1"
-                            Margin="0,5,0,-6" MinHeight="25"
+                            Margin="0,5,0,-6"
                             HorizontalAlignment="Stretch" DataContext="{x:Null}" Content="{x:Bind Link, Converter={StaticResource linkMetadataConverter}, Mode=OneWay}"/>
 
                 <!-- Non Editing Content block -->
@@ -74,7 +76,7 @@
                 </Grid>
 
                 <!-- Action block, flyout menu / vote / comment count -->
-                <Grid x:Name="actionButtons" Grid.Row="3" Margin="0,0,0,0" HorizontalAlignment="Stretch">
+                <Grid x:Name="actionButtons" Grid.Row="3" Margin="0,0,0,0" HorizontalAlignment="Stretch" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
                         <ColumnDefinition Width="1*" />
@@ -100,12 +102,12 @@
                         </Button.Flyout>
                     </Button>
 
-                    <ContentControl Grid.Column="1" DataContext="{Binding Link.Votable, Mode=OneWay}" ContentTemplate="{StaticResource VotableControl}" />
+                    <ContentControl Grid.Column="1" DataContext="{x:Null}" Content="{x:Bind Link.Votable, Mode=OneWay}" ContentTemplate="{StaticResource VotableControl}" />
 
                     <Button Grid.Column="2"
-                        HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"
-                        Margin="0,-12,2,0"
-                        BorderThickness="0" Padding="0,0,0,0" 
+                        HorizontalContentAlignment="Right" HorizontalAlignment="Right"
+                        Margin="0,0,12,0"
+                        BorderThickness="0" Padding="24,6,24,6"  Background="Transparent"
                         IsEnabled="False" DataContext="{x:Bind Link}" ContentTemplate="{StaticResource CommentCountControl}">
                     </Button>
                 </Grid>
@@ -152,7 +154,7 @@
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <Border Margin="2,0,2,0" BorderThickness="0" Background="{x:Bind AuthorFlair, Converter={StaticResource authorFlairKindConverter}}">
-                                        <TextBlock Style="{StaticResource PlainButtonTextBlock}" Foreground="{Binding AuthorFlair, Mode=OneTime, Converter={StaticResource fgAuthorFlairKindConverter}}" Margin="0,1,0,0" Text="{Binding Thing.Author}" />
+                                        <TextBlock Style="{StaticResource PlainButtonTextBlock}" Foreground="{x:Bind AuthorFlair, Mode=OneTime, Converter={StaticResource fgAuthorFlairKindConverter}}" Margin="0,1,0,0" Text="{x:Bind Thing.Author, Mode=OneWay}" />
                                     </Border>
 
                                     <TextBlock Style="{StaticResource PlainButtonTextBlock}" Opacity="0.6" FontStyle="Italic" Text="{x:Bind Thing.AuthorFlairText}" Margin="4,2,2,0"
@@ -177,7 +179,7 @@
                     </Button>
 
                     <!-- Votable Section -->
-                    <ContentControl Grid.Column="1" DataContext="{Binding Votable, Mode=OneTime}" ContentTemplate="{StaticResource VotableControl}" />
+                    <ContentControl Grid.Column="1" DataContext="{x:Null}" Content="{x:Bind Votable, Mode=OneTime}" ContentTemplate="{StaticResource VotableControl}" />
                 </Grid>
                 <snoodom:MarkdownControl
                         Grid.ColumnSpan="2"
@@ -221,6 +223,7 @@
     <selector:CommentTemplateSelector x:Key="commentTemplateSelector"  CommentTemplate="{StaticResource CommentTemplate}" LoadFullyTemplate="{StaticResource LoadFullyTemplate}"
                                       LoadingTemplate="{StaticResource LoadingTemplate}" MoreTemplate="{StaticResource MoreItemTemplate}"/>
 
+    <!--this needs to be wrapped by a load control to prevent out of order access to the context and nasty looking visual artifacts -->
     <DataTemplate x:Key="CommentsView" x:DataType="vm:CommentsViewModel">
         <ListView HeaderTemplate="{StaticResource CardCommentView}"
                   ItemsSource="{x:Bind Comments}"

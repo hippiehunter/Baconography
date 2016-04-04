@@ -114,7 +114,7 @@ namespace SnooStream.Common
                 return;
             }
 
-            if (CommentRegex.IsMatch(url) || 
+            if (CommentRegex.IsMatch(url) ||
                 CommentsPageRegex.IsMatch(url) ||
                 ShortCommentsPageRegex.IsMatch(url))
             {
@@ -161,6 +161,11 @@ namespace SnooStream.Common
 
                 GotoUserDetails(userName, context);
             }
+            //TODO this should be using a regex and be less bad
+            else if (url.Contains("microsoft.com/") && url.Contains("/store/"))
+            {
+                context.LaunchUri(url);
+            }
             else
             {
                 GotoContentRiver(contextObj, url, context);
@@ -200,6 +205,15 @@ namespace SnooStream.Common
             return result;
         }
 
+        private static T GetOrNull<T>(Dictionary<string, object> source, string key) where T : class
+        {
+            object result;
+            if (source.TryGetValue(key, out result))
+                return result as T;
+            else
+                return null;
+        }
+
         public static void GotoStatePage(Dictionary<string, object> pageState, INavigationContext context)
         {
             var pageKind = pageState["kind"] as string;
@@ -209,10 +223,10 @@ namespace SnooStream.Common
                     context.HubNav.Navigate(context.SubredditRiver, context.SubredditRiverTemplate, true);
                     break;
                 case "subreddit":
-                    context.HubNav.Navigate(context.MakeLinkRiverContext(pageState["url"] as string, pageState["focusId"] as string, pageState["sort"] as string), context.LinkRiverTemplate, true);
+                    context.HubNav.Navigate(context.MakeLinkRiverContext(GetOrNull<string>(pageState, "url"), GetOrNull<string>(pageState, "focusId"), GetOrNull<string>(pageState, "sort")), context.LinkRiverTemplate, true);
                     break;
                 case "search":
-                    GotoSearch(pageState["query"] as string, pageState["restrictedToSubreddit"] as string, (bool)pageState["subredditsOnly"], context);
+                    GotoSearch(GetOrNull<string>(pageState, "query"), GetOrNull<string>(pageState, "restrictedToSubreddit"), (bool)GetOrNull<object>(pageState, "subredditsOnly"), context);
                     break;
                 case "self":
                     GotoSelf(context);
@@ -221,13 +235,13 @@ namespace SnooStream.Common
                     GotoLogin(context);
                     break;
                 case "content":
-                    GotoContentRiver(context.ViewModelStack.LastOrDefault(vm => vm is LinkRiverViewModel || vm is CommentsViewModel), pageState["url"] as string, context);
+                    GotoContentRiver(context.ViewModelStack.LastOrDefault(vm => vm is LinkRiverViewModel || vm is CommentsViewModel), GetOrNull<string>(pageState, "url"), context);
                     break;
                 case "comments":
-                    context.HubNav.Navigate(context.MakeCommentContext(pageState["url"] as string, pageState["focusId"] as string, pageState["sort"] as string, null), context.CommentTemplate, false);
+                    context.HubNav.Navigate(context.MakeCommentContext(GetOrNull<string>(pageState, "url"), GetOrNull<string>(pageState, "focusId"), GetOrNull<string>(pageState, "sort"), null), context.CommentTemplate, false);
                     break;
                 case "user":
-                    GotoUserDetails(pageState["username"] as string, context);
+                    GotoUserDetails(GetOrNull<string>(pageState, "username"), context);
                     break;
             }
         }
@@ -413,7 +427,7 @@ namespace SnooStream.Common
 
         public CommentsViewModel MakeCommentContext(string url, string focusId, string sort, LinkViewModel linkViewModel)
         {
-            var madeContext = new CommentBuilderContext { Reddit = Reddit, Url = url, Sort = sort ?? "best", ContextTarget = focusId, NavigationContext = this };
+            var madeContext = new CommentBuilderContext { Reddit = Reddit, PermaLink = linkViewModel?.Thing?.Permalink, Url = url, Sort = sort ?? "best", ContextTarget = focusId, NavigationContext = this, Dispatcher = _coreDispatcher };
             var madeComments = new CommentsViewModel(madeContext);
             madeContext.Comments = madeComments;
             var targetLink = linkViewModel ?? new LinkViewModel { Thing = new Link(), Context = new CommentLinkContext { NavigationContext = this, Reddit = Reddit, ViewModel = madeComments }, Votable = new VotableViewModel(new Link(), madeContext.ChangeVote) };
@@ -530,13 +544,18 @@ namespace SnooStream.Common
         public Dictionary<string, object> MakePageState(LinkRiverViewModel linkRiver)
         {
             var typedContext = linkRiver.Context as LinkBuilderContext;
-            return new Dictionary<string, object>
+            var state = new Dictionary<string, object>
             {
                 { "kind", "subreddit" },
                 { "url", typedContext.Subreddit },
-                { "focusId", GetIdFromLinkItem(linkRiver.Links.CurrentItem, linkRiver.LastLinkId) },
                 { "sort", typedContext.Sort }
             };
+
+            if (linkRiver.Links.CurrentItem != null)
+            {
+                state.Add("focusId", GetIdFromLinkItem(linkRiver.Links.CurrentItem, linkRiver.LastLinkId));
+            }
+            return state;
         }
 
         private string GetIdFromLinkItem(object linkItem, string lastLinkId)

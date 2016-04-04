@@ -39,7 +39,7 @@ namespace SnooStream.Model
             await ThrottleRequests(token);
             await EnsureRedditCookie(token);
 
-            HttpRequestMessage sendMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(RedditBaseUrl + url));
+            HttpRequestMessage sendMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(RedditBaseUrl + (url.Contains("://") ? new Uri(url).PathAndQuery : url)));
 
             if (body != null)
             {

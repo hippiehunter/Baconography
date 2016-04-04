@@ -221,11 +221,11 @@ namespace SnooStream.ViewModel
             return MakeSelfReplacingLoadViewModel(async (progress, token) =>
             {
                 var webContent = await LoadWebContent(networkLayer, url, progress, token, context);
-                var contentItems = new WebContentCollection(webContent.Item3, webContent.Item2, url, networkLayer, context);
+                var contentItems = new WebContentCollection(webContent.Item3, webContent.Item1, url, networkLayer, context);
                 return new ContentContainerViewModel
                 {
                     Url = url,
-                    Title = title,
+                    Title = webContent.Item2 ?? title,
                     Context = context,
                     HasComments = linkViewModel != null,
                     Votable = votable,
@@ -261,7 +261,10 @@ namespace SnooStream.ViewModel
                         }
                     }
                     var nextPageUrl = MultiPageUtils.FindNextPageLink(SgmlDomBuilder.GetBody(SgmlDomBuilder.BuildDocument(page)), url);
-                    return Tuple.Create(nextPageUrl, title, (IEnumerable<object>)result);
+                    if (Uri.IsWellFormedUriString(nextPageUrl, UriKind.RelativeOrAbsolute))
+                        return Tuple.Create(nextPageUrl, title, (IEnumerable<object>)result);
+                    else
+                        return Tuple.Create<string, string, IEnumerable<object>>(null, title, (IEnumerable<object>)result);
                 }
                 return Tuple.Create("", "", (IEnumerable<object>)result);
             });
@@ -371,7 +374,7 @@ namespace SnooStream.ViewModel
                 Add(remaining);
 
             if (loadedContent.Item2 != _nextUrl)
-                _nextUrl = loadedContent.Item2;
+                _nextUrl = loadedContent.Item1;
         }
 
         protected override Task Refresh(IProgress<float> progress, CancellationToken token)

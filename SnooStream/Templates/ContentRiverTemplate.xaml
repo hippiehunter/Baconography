@@ -41,7 +41,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption"/>
+                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption" Foreground="{ThemeResource InvertThemeForegroundBrush}"/>
             </Grid>
             <gif:ZoomableImageControl Grid.Row="1" DataContext="{x:Bind Url}" />
         </Grid>
@@ -50,7 +50,7 @@
     <DataTemplate x:Key="albumContentTemplate" x:DataType="vm:ContentContainerViewModel">
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption"/>
+                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption" Foreground="{ThemeResource InvertThemeForegroundBrush}"/>
             </Grid>
             <FlipView x:Name="albumSlideView" common:RangedCollectionDataSource.DataSource ="{x:Bind ContentItems}" HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.IsVerticalRailEnabled="True"
@@ -82,7 +82,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" Height="80" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption"/>
+                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption" Foreground="{ThemeResource InvertThemeForegroundBrush}"/>
             </Grid>
             <MediaElement AudioCategory="Media" AreTransportControlsEnabled="True" Grid.Row="1" Source="{x:Bind PlayableUrl}" IsLooping="{x:Bind IsLooping}"/>
         </Grid>
@@ -111,7 +111,7 @@
                 <ListView.Header>
                     <Grid x:Name="overlay" Background="{ThemeResource ContentBackgroundBrush}" MaxHeight="400" Padding="0,0,0,6" 
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                        <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption"/>
+                        <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption" Foreground="{ThemeResource InvertThemeForegroundBrush}"/>
                     </Grid>
                 </ListView.Header>
             </ListView>

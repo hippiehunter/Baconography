@@ -106,6 +106,7 @@
     <Compile Include="Common\Navigation.cs" />
     <Compile Include="Common\NSFWListingFilter.cs" />
     <Compile Include="Common\OfflineService.cs" />
+    <Compile Include="Common\ProgressLazy.cs" />
     <Compile Include="Common\RangedCollectionBase.cs" />
     <Compile Include="Common\RangedCollections.cs" />
     <Compile Include="Common\RoamingState.cs" />

@@ -94,6 +94,7 @@ namespace SnooStream.ViewModel
         {
             Thing = await Context.GetLink(progress, token);
             Link.UpdateThing(Thing);
+            
             RaisePropertyChanged("Thing");
             RaisePropertyChanged("LinkTitle");
             Votable.MergeVotable(Thing);
@@ -1067,13 +1068,18 @@ namespace SnooStream.ViewModel
         public string PermaLink { get; set; }
         public string Subreddit { get; set; }
         public string ContextTarget { get; set; }
-
+        private ProgressLazy<Link> _lazyLink;
         public override string CurrentUserName
         {
             get
             {
                 return Reddit.CurrentUserName;
             }
+        }
+
+        public CommentBuilderContext()
+        {
+            _lazyLink = new ProgressLazy<SnooSharp.Link>(GetLinkImpl);
         }
 
         public override async void ChangeVote(string id, int direction)
@@ -1089,11 +1095,13 @@ namespace SnooStream.ViewModel
 
         public override async Task<IEnumerable<Thing>> LoadAll(bool ignoreCache, IProgress<float> progress, CancellationToken token)
         {
+            await _lazyLink.Result(progress, token);
             return (await Reddit.GetCommentsOnPost(Subreddit, PermaLink, token, progress, true, sort: Sort))?.Data?.Children;
         }
 
         public override async Task<IEnumerable<Thing>> LoadRequested(bool ignoreCache, IProgress<float> progress, CancellationToken token)
         {
+            await _lazyLink.Result(progress, token);
             return (await Reddit.GetCommentsOnPost(Subreddit, PermaLink, token, progress, true, null, ContextTarget, Sort))?.Data?.Children;
         }
 
@@ -1109,8 +1117,16 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public override async Task<Link> GetLink(IProgress<float> progress, CancellationToken token)
+        public override Task<Link> GetLink(IProgress<float> progress, CancellationToken token)
         {
+            return _lazyLink.Result(progress, token);
+        }
+
+        private async Task<Link> GetLinkImpl(IProgress<float> progress, CancellationToken token)
+        {
+            if (this.Link != null && !string.IsNullOrWhiteSpace(PermaLink))
+                return this.Link.Thing;
+
             if (Navigation.CommentRegex.IsMatch(Url) ||
                 Navigation.CommentsPageRegex.IsMatch(Url))
             {

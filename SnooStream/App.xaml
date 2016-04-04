@@ -298,7 +298,7 @@
                 <Setter Property="Foreground" Value="{ThemeResource ThemeForegroundBrush}" />
             </Style>
 
-            <Style x:Key="TitleTextBlock" TargetType="TextBlock" BasedOn="{StaticResource SubheaderTextBlockStyle}">
+            <Style x:Key="TitleTextBlock" TargetType="TextBlock" BasedOn="{StaticResource TitleTextBlockStyle}">
                 <Setter Property="TextWrapping" Value="WrapWholeWords"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>
                 <Setter Property="FontFamily" Value="Calibri" />
@@ -321,6 +321,25 @@
                     <TextBlock Margin="0,0,0,0" Text="{Binding Converter={StaticResource stringToUpperConverter}}"/>
                 </Grid>
             </DataTemplate>
+
+            <Style x:Key="EmptyButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="VerticalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                <Setter Property="UseSystemFocusVisuals" Value="False" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
+                                <ContentPresenter x:Name="ContentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <Style x:Key="FullWidthListViewContainer" TargetType="ListViewItem">
                 <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
                 <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
