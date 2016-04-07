@@ -33,20 +33,24 @@ namespace SnooStream.ViewModel
             this.subredditContext = subredditContext;
             LoadState = new LoadViewModel
             {
-                LoadAction = async (progress, token) =>
-                {
-                    var fullListing = await SubredditGroupBuilder.MakeFullListing(subredditContext.LoadSubreddits(progress, token));
-                    var multiReddits = await subredditContext.LoadMultiReddits(progress, token);
-                    var featuredSubreddit = await subredditContext.LoadFeaturedSubreddit(progress, token);
-                    var groups = SubredditGroupBuilder.MakeGroups(fullListing, multiReddits, featuredSubreddit, subredditContext);
-                    SubredditGroups.Clear();
-                    foreach (var group in groups)
-                        SubredditGroups.Add(group);
-                },
+                LoadAction = Load,
                 IsCritical = true
             };
 
             CollectionView = new CollectionViewSource { Source = SubredditGroups, ItemsPath = new Windows.UI.Xaml.PropertyPath("Collection"), IsSourceGrouped = true };
+        }
+
+        //need to implemente Refresh, Periodic refresh and Reload on user change (make sure this doesnt wig out on first load)
+
+        private async Task Load(IProgress<float> progress, CancellationToken token)
+        {
+            var fullListing = await SubredditGroupBuilder.MakeFullListing(subredditContext.LoadSubreddits(progress, token));
+            var multiReddits = await subredditContext.LoadMultiReddits(progress, token);
+            var featuredSubreddit = await subredditContext.LoadFeaturedSubreddit(progress, token);
+            var groups = SubredditGroupBuilder.MakeGroups(fullListing, multiReddits, featuredSubreddit, subredditContext);
+            SubredditGroups.Clear();
+            foreach (var group in groups)
+                SubredditGroups.Add(group);
         }
 
         public ObservableCollection<object> SubredditGroups { get; set; } = new ObservableCollection<object>();

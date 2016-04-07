@@ -563,6 +563,32 @@ namespace SnooStream.Common
             return Task.Run(() => RetriveBlobImpl<T>(name, maxAge, true));
         }
 
+        public Task<Dictionary<string, T>> MaybeRetrieveBlobs<T>(IEnumerable<string> names, TimeSpan maxAge)
+        {
+            return Task.Run(() =>
+            {
+                var result = new Dictionary<string, T>();
+                foreach(var name in names)
+                {
+                    var foundBlob = RetriveBlobImpl<T>(name, maxAge, true);
+                    if (foundBlob != null)
+                        result.Add(name, foundBlob);
+                }
+                return result;
+            });
+        }
+
+        public Task StoreBlobs<T>(Dictionary<string, T> blobs)
+        {
+            return Task.Run(() =>
+            {
+                foreach (var pair in blobs)
+                {
+                    StoreBlobImpl(pair.Key, pair.Value, true);
+                }
+            });
+        }
+
         public void Defer(Dictionary<string, string> arguments, string action, string httpVerb)
         {
             var serializedDeferal = JsonConvert.SerializeObject(Tuple.Create(arguments, action, httpVerb));

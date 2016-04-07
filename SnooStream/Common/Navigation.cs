@@ -24,7 +24,7 @@ namespace SnooStream.Common
     {
         void LaunchUri(string uri);
         void Navigate(object viewModel);
-        void SaveNavigationState();
+        Task SaveState();
         ContentRiverViewModel MakeContentRiverContext(object context, string url);
         CommentsViewModel MakeCommentContext(string url, string focusId, string sort, LinkViewModel linkViewModel);
         LinkRiverViewModel MakeLinkRiverContext(string subreddit, string focusId, string sort);
@@ -273,7 +273,7 @@ namespace SnooStream.Common
         public Reddit Reddit { get; set; }
         public OfflineService Offline { get; set; }
         public PlainNetworkLayer NetworkLayer { get; set; }
-
+        public UserState UserState { get; set; }
         public ActivityManager ActivityManager { get; set; }
         public ActivitiesViewModel ActivitiesViewModel { get; set; }
         public LoginViewModel LoginViewModel { get; set; }
@@ -295,6 +295,7 @@ namespace SnooStream.Common
         public DataTemplate SettingsTemplate { get; set; }
 
         public List<ResourceDictionary> ResourceDictionaryHandles { get; set; } = new List<ResourceDictionary>();
+        public PeriodicTask PeriodicTasks;
         public IEnumerable<object> ViewModelStack
         {
             get
@@ -306,7 +307,14 @@ namespace SnooStream.Common
             }
         }
 
-        
+        //this should include anything that changes infrequently and needs to exist
+        static List<string> HighValueListingUrls = new List<string>
+        {
+            "https://oauth.reddit.com/subreddits/mine/subscriber",
+            "https://oauth.reddit.com/subreddits/mine/moderator",
+            "https://oauth.reddit.com/reddits/",
+            "http://www.reddit.com/reddits/"
+        };
 
         public NavigationContext(AdaptiveHubNav hubNav)
         {
@@ -314,6 +322,9 @@ namespace SnooStream.Common
             _coreDispatcher = Window.Current.Dispatcher;
 
             CommonResourceAcquisition.ImageAcquisition.ImageAcquisition.ImgurAPIKey = "cf771dfe25a7462";
+            PeriodicTask.DefaultTask = PeriodicTasks = new PeriodicTask(120000);
+            PeriodicTasks.Run();
+
 
             var subredditRiverRD = new SubredditRiverTemplate();
             var linkRiverRD = new LinkRiverTemplate();
@@ -343,22 +354,23 @@ namespace SnooStream.Common
             ActivityManager = new ActivityManager();
             Offline = new OfflineService();
             NetworkLayer = new PlainNetworkLayer();
-            var userState = RoamingState.UserCredentials?.FirstOrDefault(state => state.IsDefault);
+            UserState = RoamingState.UserCredentials?.FirstOrDefault(state => state.IsDefault);
             var listingFilterContext = new ListingFilterContext { Offline = Offline, SettingsAllowOver18 = SettingsViewModel.AllowOver18, SettingsAllowOver18Items = SettingsViewModel.AllowOver18Items };
+            var cacheProvider = new SnooSharpCacheProvider(Offline, HighValueListingUrls);
             Reddit = new Reddit(new NSFWListingFilter(listingFilterContext),
-               userState,
+               UserState,
                 Offline,
                 new CaptchaService(),
                 "3m9rQtBinOg_rA", 
                 null, 
                 "http://www.google.com",
-                new SnooSharpCacheProvider(), 
-                new SnooSharpNetworkLayer(userState, "3m9rQtBinOg_rA", null, "http://www.google.com"));
+                cacheProvider, 
+                new SnooSharpNetworkLayer(UserState, "3m9rQtBinOg_rA", null, "http://www.google.com"));
 
             listingFilterContext.Reddit = Reddit;
 
-            ActivitiesViewModel = new ActivitiesViewModel(new ActivityBuilderContext { Reddit = Reddit, ActivityManager = ActivityManager });
             var loginContext = new LoginContext { Reddit = Reddit, RoamingState = RoamingState };
+            ActivitiesViewModel = new ActivitiesViewModel(new ActivityBuilderContext(Reddit, ActivityManager, loginContext));
             var selfContext = new SelfContext();
             SelfViewModel = new SelfViewModel(selfContext);
             LoginViewModel = new LoginViewModel(loginContext);
@@ -493,10 +505,11 @@ namespace SnooStream.Common
             return madeViewModel;
         }
 
-        public void SaveNavigationState()
+        public async Task SaveState()
         {
             var hubNavItems = this.HubNav.NavStack;
             RoamingState.NavStack = hubNavItems.Select(hubNavItem => Navigation.MakeStatePage(hubNavItem.Content, this)).ToList();
+            await PeriodicTasks.Suspend();
         }
 
         public Dictionary<string, object> MakePageState(CommentsViewModel comment)

@@ -1,4 +1,5 @@
 ﻿using SnooSharp;
+using SnooStream.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,65 @@ namespace SnooStream.Model
 {
     class SnooSharpCacheProvider : ICachingProvider
     {
+        HashSet<string> _highValueListingUrls;
         Dictionary<string, Listing> _listingLookup = new Dictionary<string, Listing>();
         SortedList<DateTime, object> _listingTimeoutLookup = new SortedList<DateTime, object>();
 
         Dictionary<string, Thing> _thingLookup = new Dictionary<string, Thing>();
         SortedList<DateTime, object> _thingTimeoutLookup = new SortedList<DateTime, object>();
+
+        OfflineService _offlineService;
+        bool _hasChanges = false;
+        string _currentUser = "";
+
+
+        public SnooSharpCacheProvider(OfflineService offlineService, IEnumerable<string> highValueListingUrls)
+        {
+            _highValueListingUrls = new HashSet<string>(highValueListingUrls);
+            _offlineService = offlineService;
+            PeriodicTask.DefaultTask.AddTask(() => _hasChanges, DumpState);
+        }
+
+        public async Task LoadStateForUser(string currentUser)
+        {
+            //maybe we should register listeners for listings
+            //would be usefull to trigger auto refresh via this mechanism
+            //switching users we need to purge any old listing state we might have
+
+            List<string> invalidationList = new List<string>();
+
+            if (currentUser != _currentUser)
+            {
+                foreach (var url in _highValueListingUrls)
+                {
+                    if (_listingLookup.ContainsKey(url))
+                    {
+                        invalidationList.Add(url);
+                        _listingLookup.Remove(url);
+                    }
+                }
+            }
+
+            _currentUser = currentUser;
+
+            var foundBlobs = await _offlineService.MaybeRetrieveBlobs<Listing>(_highValueListingUrls.Select(url => currentUser + ":" + url), TimeSpan.FromDays(28));
+            foreach (var foundBlob in foundBlobs)
+            {
+                var targetKey = foundBlob.Key.Substring(foundBlob.Key.IndexOf(':') + 1);
+                if (_listingLookup.ContainsKey(targetKey))
+                    _listingLookup[targetKey] = foundBlob.Value;
+                else
+                    _listingLookup.Add(targetKey, foundBlob.Value);
+            }
+            _listingLookup = foundBlobs; //these dont have timeout values and should never be removed
+        }
+
+        private async Task DumpState()
+        {
+            _hasChanges = false;
+            var highValueListings = _listingLookup.Where(kvp => _highValueListingUrls.Contains(kvp.Key)).ToDictionary(kvp => _currentUser + ":" + kvp.Key, kvp => kvp.Value);
+            await _offlineService.StoreBlobs(highValueListings);
+        }
 
         public Task<Listing> GetListing(string url)
         {
@@ -35,6 +90,9 @@ namespace SnooStream.Model
 
         public Task SetListing(string url, Listing listing)
         {
+            if (_highValueListingUrls.Contains(url))
+                _hasChanges = true;
+
             var timeAdded = DateTime.UtcNow;
             listing.DataAge = timeAdded;
             if (_listingLookup.Count > 25)

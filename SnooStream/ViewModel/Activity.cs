@@ -19,11 +19,10 @@ namespace SnooStream.ViewModel
 {
     public class ActivitiesViewModel : SnooObservableObject
     {
-        public LoadViewModel LoadState { get; set; }
         public IActivityBuilderContext Context { get; set; }
         public DateTime? LastRefresh { get; set; }
         public ActivityCollection Activities { get; set; }
-
+        Action<bool> _refreshSuggestedHandler;
         public ActivitiesViewModel()
         {
         }
@@ -32,7 +31,16 @@ namespace SnooStream.ViewModel
         {
             Context = activityContext;
             Activities = new ActivityCollection { Context = Context };
-            LoadState = new LoadViewModel { IsCritical = false, State = ViewModel.LoadState.None };
+            _refreshSuggestedHandler = RefreshSuggested;
+            activityContext.RegisterWeakRefreshNotification(_refreshSuggestedHandler);
+        }
+
+        private void RefreshSuggested(bool isUserLogin)
+        {
+            if(isUserLogin)
+                Activities.Clear();
+
+            Refresh();
         }
 
         public async Task LoadAsync(IProgress<float> progress, CancellationToken token, bool ignoreCache)
@@ -54,10 +62,9 @@ namespace SnooStream.ViewModel
             ActivityBuilder.UpdateActivityGroups(Activities, activityListing.Data.Children, Context);
         }
 
-        public void Refresh()
+        public async void Refresh()
         {
-            LoadState = new LoadViewModel { LoadAction = (progress, token) => LoadAsync(progress, token, true), IsCritical = false };
-            RaisePropertyChanged("LoadState");
+            await Activities.Refresh();
         }
     }
 
@@ -127,6 +134,9 @@ namespace SnooStream.ViewModel
         bool HasAdditional { get; }
         Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache);
         Task<Listing> LoadAdditional(IProgress<float> progress, CancellationToken token);
+        //callback takes one bool parameter; true => Clear immediately; false => Load then merge
+        //Client is required to keep the lifetime of the passed in callback
+        void RegisterWeakRefreshNotification(Action<bool> callback);
     }
 
     public static class ActivityBuilder
@@ -496,6 +506,19 @@ namespace SnooStream.ViewModel
     {
         public Reddit Reddit { get; set; }
         public ActivityManager ActivityManager { get; set; }
+        public ILoginContext State { get; set; }
+        private WeakListener<bool> _refreshListener = new WeakListener<bool>();
+        Action<RedditOAuth> _userLoginHandler;
+        public ActivityBuilderContext(Reddit reddit, ActivityManager activityManager, ILoginContext loginContext)
+        {
+            State = loginContext;
+            Reddit = reddit;
+            ActivityManager = activityManager;
+            PeriodicTask.DefaultTask.AddTask(() => activityManager.NeedsRefresh, TriggerRefreshListeners);
+            _userLoginHandler = (sender) => TriggerRefreshListeners(true);
+            State.AddUserChangeWeakListener(_userLoginHandler);
+        }
+
         private Dictionary<string, ActivityGroup> _groupLookup = new Dictionary<string, ActivityGroup>();
         private string _afterSent;
         private string _afterReceived;
@@ -506,6 +529,17 @@ namespace SnooStream.ViewModel
             {
                 return Reddit.CurrentUserName;
             }
+        }
+
+        Task TriggerRefreshListeners()
+        {
+            TriggerRefreshListeners(false);
+            return Task.FromResult(true);
+        }
+
+        void TriggerRefreshListeners(bool isUserLogin)
+        {
+            _refreshListener.TriggerListeners(isUserLogin);
         }
 
         public bool HasAdditional
@@ -566,9 +600,25 @@ namespace SnooStream.ViewModel
             return ProcessListings(sentListing, receivedListing, activityListing);
         }
 
+        public async Task<Listing> Refresh(IProgress<float> progress, CancellationToken token)
+        {
+            //TODO: might need clear state here not sure
+            await ActivityManager.Refresh(JsonConvert.SerializeObject(Reddit.CurrentOAuth), (sender, args) => { }, true).AsTask(token, progress);
+            var sentListing = JsonConvert.DeserializeObject<Listing>(ActivityManager.SentBlob);
+            var receivedListing = JsonConvert.DeserializeObject<Listing>(ActivityManager.ReceivedBlob);
+            var activityListing = JsonConvert.DeserializeObject<Listing>(ActivityManager.ActivityBlob);
+
+            return ProcessListings(sentListing, receivedListing, activityListing);
+        }
+
         public bool TryGetGroup(string name, out ActivityGroup activityGroup)
         {
             return _groupLookup.TryGetValue(name, out activityGroup);
+        }
+
+        public void RegisterWeakRefreshNotification(Action<bool> callback)
+        {
+            _refreshListener.AddListener(callback);
         }
     }
 }

@@ -100,18 +100,21 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Common\CaptchaService.cs" />
+    <Compile Include="Common\CollectionMerger.cs" />
     <Compile Include="Common\DispatchTimer.cs" />
     <Compile Include="Common\LinkViewLayoutManager.cs" />
     <Compile Include="Common\MarkdownHelpers.cs" />
     <Compile Include="Common\Navigation.cs" />
     <Compile Include="Common\NSFWListingFilter.cs" />
     <Compile Include="Common\OfflineService.cs" />
+    <Compile Include="Common\PeriodicTask.cs" />
     <Compile Include="Common\ProgressLazy.cs" />
     <Compile Include="Common\RangedCollectionBase.cs" />
     <Compile Include="Common\RangedCollections.cs" />
     <Compile Include="Common\RoamingState.cs" />
     <Compile Include="Common\SnooObservableObject.cs" />
     <Compile Include="Common\Utility.cs" />
+    <Compile Include="Common\WeakListener.cs" />
     <Compile Include="Controls\AdaptiveHubNav.cs" />
     <Compile Include="Controls\LoadableControl.cs" />
     <Compile Include="Controls\MarkdownEditorControl.xaml.cs">

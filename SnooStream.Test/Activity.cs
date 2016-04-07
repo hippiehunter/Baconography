@@ -96,6 +96,11 @@ namespace SnooStream.Test
             throw new NotImplementedException();
         }
 
+        public void RegisterWeakRefreshNotification(Action<bool> callback)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool TryGetGroup(string name, out ActivityGroup activityGroup)
         {
             return _activityGroups.TryGetValue(name, out activityGroup);

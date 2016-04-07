@@ -173,12 +173,15 @@ namespace SnooStream.ViewModel
         Task AddStoredCredential(UserState newCredential);
         Task RemoveStoredCredential(string username);
         Task<User> SetActiveLogin(RedditOAuth credential);
+        //Client is required to keep the lifetime of the passed in listener
+        void AddUserChangeWeakListener(Action<RedditOAuth> listener);
     }
 
     class LoginContext : ILoginContext
     {
         public RoamingState RoamingState { get; set; }
         public Reddit Reddit { get; set; }
+        WeakListener<RedditOAuth> _userChangeListerner = new WeakListener<RedditOAuth>();
         public Task AddStoredCredential(UserState newCredential)
         {
             var credentials = RoamingState.UserCredentials;
@@ -203,6 +206,7 @@ namespace SnooStream.ViewModel
         public async Task<User> SetActiveLogin(RedditOAuth credential)
         {
             var gottenAccount = await Reddit.ChangeIdentity(credential);
+            _userChangeListerner.TriggerListeners(credential);
             return new User { Authenticated = true, Me = gottenAccount, Username = gottenAccount.Name };
         }
 
@@ -219,6 +223,11 @@ namespace SnooStream.ViewModel
         public Task<IEnumerable<UserState>> StoredCredentials()
         {
             return Task.FromResult((IEnumerable<UserState>)RoamingState.UserCredentials);
+        }
+
+        public void AddUserChangeWeakListener(Action<RedditOAuth> listener)
+        {
+            _userChangeListerner.AddListener(listener);
         }
     }
 }
