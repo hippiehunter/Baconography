@@ -17,7 +17,7 @@ namespace SnooStream.Test
         public void MergeTest()
         {
             Random rnd = new Random();
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 100000; i++)
             {
                 HashSet<int> mergeTargetIds = new HashSet<int>();
                 while (mergeTargetIds.Count < 50)

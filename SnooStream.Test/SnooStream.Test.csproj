@@ -92,7 +92,7 @@
   <ItemGroup>
     <!--A reference to the entire .Net Framework and Windows SDK are automatically included-->
     <None Include="project.json" />
-    <SDKReference Include="Microsoft.UniversalCRT.Debug, Version=10.0.10240.0">
+    <SDKReference Include="Microsoft.UniversalCRT.Debug, Version=10.0.10586.0">
       <Name>Microsoft Universal CRT Debug Runtime</Name>
     </SDKReference>
     <SDKReference Include="Microsoft.VCLibs, Version=14.0">

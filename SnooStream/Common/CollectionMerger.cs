@@ -68,12 +68,10 @@ namespace SnooStream.Common
                 }
             }
 
-            if (destination.Count > source.Count())
-            {
-                //remove all the extras so we dont end up with something stale floating around at the end of the collection
-                for (int i = source.Count() - 1; i < destination.Count; i++)
-                    destination.RemoveAt(i);
-            }
+            //remove all the extras so we dont end up with something stale floating around at the end of the collection
+            while(destination.Count > source.Count())
+                destination.RemoveAt(source.Count());
+            
         }
     }
 }

@@ -205,11 +205,21 @@ namespace SnooStream.ViewModel
                 LoadAction = async (progress, token) =>
                 {
                     var replacementViewModel = await viewModelMaker(progress, token);
-                    Window.Current.Dispatcher.CurrentPriority = Windows.UI.Core.CoreDispatcherPriority.Idle;
+                    if(Window.Current != null && Window.Current.Dispatcher != null)
+                        Window.Current.Dispatcher.CurrentPriority = Windows.UI.Core.CoreDispatcherPriority.Idle;
+
                     await Task.Yield();
 
                     var itemIndex = collection.IndexOf(loadViewModel);
-                    await ((ContentCollection)collection).BlockingReplace(itemIndex, replacementViewModel);
+                    if (collection is ContentCollection)
+                    {
+                        await ((ContentCollection)collection).BlockingReplace(itemIndex, replacementViewModel);
+                    }
+                    else
+                    {
+                        collection[itemIndex] = replacementViewModel;
+                    }
+                    
                     SetCurrentContentItem(collectionView.CurrentPosition, collectionView, itemIndex);
                 }
             };

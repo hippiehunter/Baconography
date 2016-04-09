@@ -30,6 +30,7 @@ namespace SnooStream.Test
         {
             var context = new TestCommentBuilderContext(JsonConvert.DeserializeObject<Link>(linkString), requestedThings: JsonConvert.DeserializeObject<Listing>(fullCommentsString).Data.Children);
             await context.Comments.LoadAsync(null, CancellationToken.None);
+            await context.Comments.Comments.LoadMoreItemsAsync(50);
             Assert.AreEqual(context.Comments.Comments.Count(), 61);
         }
 
@@ -40,6 +41,7 @@ namespace SnooStream.Test
                 requestedThings: JsonConvert.DeserializeObject<Listing>(giantCommentsString).Data.Children,
                 moreThings: new List<IEnumerable<Thing>> { JsonConvert.DeserializeObject<Thing[]>(giantCommentsInsertMoreString) } );
             await context.Comments.LoadAsync(null, CancellationToken.None);
+            await context.Comments.Comments.LoadMoreItemsAsync(50);
             var moreVMs = context.Comments.Comments.OfType<MoreViewModel>();
             var firstMoreVM = moreVMs.First();
             Assert.AreEqual(context.Comments.Comments.Count(), 356);
@@ -55,6 +57,7 @@ namespace SnooStream.Test
                 requestedThings: JsonConvert.DeserializeObject<Listing>(giantCommentsString).Data.Children,
                 moreThings: new List<IEnumerable<Thing>> { JsonConvert.DeserializeObject<Thing[]>(giantCommentsAppendMoreString) });
             await context.Comments.LoadAsync(null, CancellationToken.None);
+            await context.Comments.Comments.LoadMoreItemsAsync(50);
             var moreVMs = context.Comments.Comments.OfType<MoreViewModel>();
             Assert.AreEqual(context.Comments.Comments.OfType<LoadFullCommentsViewModel>().Count(), 0);
             var lastMoreVM = moreVMs.Last();
@@ -74,13 +77,14 @@ namespace SnooStream.Test
                 allThings: JsonConvert.DeserializeObject<Listing>(giantCommentsString).Data.Children,
                 moreThings: new List<IEnumerable<Thing>> { JsonConvert.DeserializeObject<Thing[]>(giantCommentsAppendMoreString) });
             await context.Comments.LoadAsync(null, CancellationToken.None);
+            await context.Comments.Comments.LoadMoreItemsAsync(50);
             var loadFullVM = context.Comments.Comments.OfType<LoadFullCommentsViewModel>().FirstOrDefault();
             Assert.AreEqual(context.Comments.Comments.OfType<LoadFullCommentsViewModel>().Count(), 1);
             Assert.AreEqual(context.Comments.Comments.Count(), 8);
             await loadFullVM.LoadFullyAsync(null, CancellationToken.None);
             Assert.AreEqual(context.Comments.Comments.OfType<LoadFullCommentsViewModel>().Count(), 0);
             //this is one more because the initial context load grabbed an otherwise hidden comment and then the fill of the flat list ends up containing it
-            Assert.AreEqual(context.Comments.Comments.Count(), 357);
+            Assert.AreEqual(context.Comments.Comments.Count(), 356);
         }
 
         [TestMethod]
@@ -88,6 +92,7 @@ namespace SnooStream.Test
         {
             var context = new TestCommentBuilderContext(JsonConvert.DeserializeObject<Link>(linkString), requestedThings: JsonConvert.DeserializeObject<Listing>(fullCommentsString).Data.Children);
             await context.Comments.LoadAsync(null, CancellationToken.None);
+            await context.Comments.Comments.LoadMoreItemsAsync(50);
             Assert.AreEqual(context.Comments.Comments.Count(), 61);
             var firstComment = context.Comments.Comments.First() as CommentViewModel;
             firstComment.Collapsed = true;
@@ -106,7 +111,7 @@ namespace SnooStream.Test
             var context = new TestCommentBuilderContext(JsonConvert.DeserializeObject<Link>(linkString),
                 requestedThings: JsonConvert.DeserializeObject<Listing>(fullCommentsString).Data.Children);
             await context.Comments.LoadAsync(null, CancellationToken.None);
-
+            await context.Comments.Comments.LoadMoreItemsAsync(50);
             var idOrder = context.Comments.Comments.OfType<CommentViewModel>().Select(comment => comment.Thing.Id).ToList();
             Assert.AreEqual(context.Comments.Comments.Count(), 61);
             context.Sort = "new";
@@ -123,6 +128,7 @@ namespace SnooStream.Test
         {
             var context = new TestCommentBuilderContext(JsonConvert.DeserializeObject<Link>(linkString), requestedThings: JsonConvert.DeserializeObject<Listing>(fullCommentsString).Data.Children);
             await context.Comments.LoadAsync(null, CancellationToken.None);
+            await context.Comments.Comments.LoadMoreItemsAsync(50);
             var madeComment = CommentBuilder.AddReplyComment("t1_cv1e317", context.Comments.Comments, context);
             var indexOfAddTarget = context.Comments.Comments.IndexOf(context.Comments.Comments.OfType<CommentViewModel>().FirstOrDefault(vm => vm.Thing.Name == "t1_cv1e317"));
             Assert.AreSame(context.Comments.Comments[indexOfAddTarget + 1], madeComment); 
@@ -132,14 +138,16 @@ namespace SnooStream.Test
 
     public class TestCommentCollection : LoadItemCollectionBase
     {
+        public TestCommentBuilderContext context { get; set; }
         protected override Task LoadAdditional(IProgress<float> progress, CancellationToken token)
         {
             throw new NotImplementedException();
         }
 
-        protected override Task LoadInitial(IProgress<float> progress, CancellationToken token)
+        protected override async Task LoadInitial(IProgress<float> progress, CancellationToken token)
         {
-            throw new NotImplementedException();
+            var comments = await context.LoadRequested(false, progress, token);
+            CommentBuilder.FillFlatList(this, comments.ToList(), context);
         }
 
         protected override Task Refresh(IProgress<float> progress, CancellationToken token)
@@ -165,16 +173,16 @@ namespace SnooStream.Test
 
         public TestCommentBuilderContext(Link thing = null, List<IEnumerable<Thing>> moreThings = null, IEnumerable<Thing> allThings = null, IEnumerable<Thing> requestedThings = null, bool isContextLoad = false)
         {
-            _link = thing;
+            _link = thing ?? new SnooSharp.Link();
             IsContextLoad = isContextLoad;
             _moreThings = moreThings;
             _allThings = allThings;
             _requestedThings = requestedThings;
-            var commentsCollection = new TestCommentCollection();
-            Comments = new CommentsViewModel { Thing = thing, Context = this, Comments = commentsCollection };
+            var commentsCollection = new TestCommentCollection { context = this };
+            Comments = new CommentsViewModel { Thing = _link, Context = this, Comments = commentsCollection };
             Comments.Sort = "best";
-            Comments.Votable = new VotableViewModel(thing, (str, val) => { });
-            Link = new LinkViewModel() { Thing = thing, Votable = Comments.Votable };
+            Comments.Votable = new VotableViewModel(_link, (str, val) => { });
+            Link = new LinkViewModel() { Thing = _link, Votable = Comments.Votable };
         }
 
         public void UpdateAllThings(IEnumerable<Thing> allThings)

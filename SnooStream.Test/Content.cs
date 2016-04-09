@@ -274,14 +274,9 @@ namespace SnooStream.Test
             throw new NotImplementedException();
         }
 
-        public Task<ICommentBuilderContext> MakeCommentContext(string commentUrl)
-        {
-            return Task.FromResult<ICommentBuilderContext>(new TestCommentBuilderContext());
-        }
-
         public Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<ICommentBuilderContext>(new TestCommentBuilderContext());
         }
 
         public void NavigateToComments(string contextUrl)
