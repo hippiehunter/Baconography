@@ -23,7 +23,7 @@ namespace SnooStreamCore.Test
             {
                 get
                 {
-                    throw new NotImplementedException();
+                    return true;
                 }
             }
 

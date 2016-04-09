@@ -92,11 +92,18 @@
   <ItemGroup>
     <!--A reference to the entire .Net Framework and Windows SDK are automatically included-->
     <None Include="project.json" />
+    <SDKReference Include="Microsoft.UniversalCRT.Debug, Version=10.0.10240.0">
+      <Name>Microsoft Universal CRT Debug Runtime</Name>
+    </SDKReference>
+    <SDKReference Include="Microsoft.VCLibs, Version=14.0">
+      <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
+    </SDKReference>
     <SDKReference Include="MSTestFramework.Universal, Version=$(UnitTestPlatformVersion)" />
     <SDKReference Include="TestPlatform.Universal, Version=$(UnitTestPlatformVersion)" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activity.cs" />
+    <Compile Include="CollectionMerge.cs" />
     <Compile Include="Comments.cs" />
     <Compile Include="Content.cs" />
     <Compile Include="LinkRiver.cs" />
@@ -120,22 +127,30 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\UnitTestApp.rd.xml" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <None Include="Assets\LockScreenLogo.scale-200.png" />
+    <None Include="Assets\SplashScreen.scale-200.png" />
+    <None Include="Assets\Square150x150Logo.scale-200.png" />
+    <None Include="Assets\Square44x44Logo.scale-200.png" />
+    <None Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <None Include="Assets\StoreLogo.png" />
+    <None Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonResourceAcquisition\CommonResourceAcquisition.csproj">
       <Project>{9316a5e4-85f8-4833-839f-a2e03c97bd67}</Project>
       <Name>CommonResourceAcquisition</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GifRenderer\GifRendererUniversal\GifRendererUniversal.vcxproj">
+      <Project>{f311ff43-5aee-4f90-8371-aa1e41e02735}</Project>
+      <Name>GifRendererUniversal</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NBoilerpipePortable\NBoilerpipePortable.csproj">
       <Project>{17272736-fe78-416b-96c4-90fcf0bea45b}</Project>
       <Name>NBoilerpipePortable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SnooDom\SnooDomUniversal\SnooDomUniversal.vcxproj">
+      <Project>{21c09002-c4bc-4f4d-abbd-53d17ad8b1da}</Project>
+      <Name>SnooDomUniversal</Name>
     </ProjectReference>
     <ProjectReference Include="..\SnooSharp\SnooSharp.csproj">
       <Project>{d9baa749-5bbe-4dae-b5ea-4d70def266fc}</Project>

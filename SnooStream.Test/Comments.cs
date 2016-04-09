@@ -153,6 +153,7 @@ namespace SnooStream.Test
         List<IEnumerable<Thing>> _moreThings;
         IEnumerable<Thing> _allThings;
         IEnumerable<Thing> _requestedThings;
+        Link _link;
 
         public override string CurrentUserName
         {
@@ -164,12 +165,16 @@ namespace SnooStream.Test
 
         public TestCommentBuilderContext(Link thing = null, List<IEnumerable<Thing>> moreThings = null, IEnumerable<Thing> allThings = null, IEnumerable<Thing> requestedThings = null, bool isContextLoad = false)
         {
+            _link = thing;
             IsContextLoad = isContextLoad;
             _moreThings = moreThings;
             _allThings = allThings;
             _requestedThings = requestedThings;
             var commentsCollection = new TestCommentCollection();
-            Comments = new CommentsViewModel { Thing = thing, Sort = "best", Context = this, Comments = commentsCollection };
+            Comments = new CommentsViewModel { Thing = thing, Context = this, Comments = commentsCollection };
+            Comments.Sort = "best";
+            Comments.Votable = new VotableViewModel(thing, (str, val) => { });
+            Link = new LinkViewModel() { Thing = thing, Votable = Comments.Votable };
         }
 
         public void UpdateAllThings(IEnumerable<Thing> allThings)
@@ -206,7 +211,7 @@ namespace SnooStream.Test
 
         public override Task<Link> GetLink(IProgress<float> progress, CancellationToken token)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(_link ?? new SnooSharp.Link());
         }
 
         public override void Report(string id)
