@@ -8,7 +8,7 @@ namespace SnooStream.Common
 {
     public class WeakListener<T>
     {
-        List<WeakReference<Action<T>>> _refreshRegistration;
+        List<WeakReference<Action<T>>> _refreshRegistration = new List<WeakReference<Action<T>>>();
 
         public void AddListener(Action<T> listener)
         {

@@ -100,6 +100,10 @@ namespace SnooStream.ViewModel
                     var progress = new AggregateProgress(async value => { LoadPercent = value; await UIDispatcher.TryRunIdleAsync((arg) => RaisePropertyChanged("LoadPercent")); });
                     await LoadAction(progress, CancelToken != null ? CancellationTokenSource.CreateLinkedTokenSource(CancelToken.Value, _internalCancelToken.Token).Token : _internalCancelToken.Token);
                     State = LoadState.Loaded;
+                    LoadAction = null;
+                    _internalCancelToken.Cancel();
+                    _internalCancelToken.Dispose();
+                    _internalCancelToken = null;
                 }
             }
             catch (OperationCanceledException)

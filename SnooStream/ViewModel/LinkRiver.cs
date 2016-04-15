@@ -89,7 +89,9 @@ namespace SnooStream.ViewModel
         public async Task<IEnumerable<LinkViewModel>> LoadCleanAsync(IProgress<float> progress, CancellationToken token)
         {
             var activityListing = await Context.Refresh(progress, token);
-            return LinkBuilder.AppendLinkViewModels(Links, activityListing.Data.Children, Context);
+            var madeLinkViewModels = LinkBuilder.MakeLinkViewModels(activityListing.Data.Children, Context).ToList();
+            CollectionMerger.Merge(Links, madeLinkViewModels);
+            return Links.OfType<LinkViewModel>();
         }
 
         public async void Refresh()
@@ -107,6 +109,14 @@ namespace SnooStream.ViewModel
             get
             {
                 return base.HasMoreItems && Context.HasAdditional;
+            }
+        }
+
+        protected override bool IsMergable
+        {
+            get
+            {
+                return true;
             }
         }
 
@@ -265,7 +275,7 @@ namespace SnooStream.ViewModel
         }
     }
 
-    public class LinkViewModel : SnooObservableObject
+    public class LinkViewModel : SnooObservableObject, IMergableViewModel<LinkViewModel>
     {
         public ILinkContext Context { get; set; }
         public Link Thing { get; set; }
@@ -337,6 +347,14 @@ namespace SnooStream.ViewModel
             }
         }
 
+        public string MergeID
+        {
+            get
+            {
+                return Thing.Name;
+            }
+        }
+
         public void UpdateMetadata(LinkMeta linkMeta)
         {
             Metadata = linkMeta;
@@ -405,6 +423,11 @@ namespace SnooStream.ViewModel
         public void GotoUserDetails()
         {
             Context.GotoUserDetails(this);
+        }
+
+        public void Merge(LinkViewModel source)
+        {
+            UpdateThing(source.Thing);
         }
     }
 

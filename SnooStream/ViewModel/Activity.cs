@@ -30,7 +30,7 @@ namespace SnooStream.ViewModel
         public ActivitiesViewModel(IActivityBuilderContext activityContext)
         {
             Context = activityContext;
-            Activities = new ActivityCollection { Context = Context };
+            Activities = new ActivityCollection { Context = Context, Activities = this };
             _refreshSuggestedHandler = RefreshSuggested;
             activityContext.RegisterWeakRefreshNotification(_refreshSuggestedHandler);
         }
@@ -59,6 +59,7 @@ namespace SnooStream.ViewModel
         public async Task LoadCleanAsync(IProgress<float> progress, CancellationToken token)
         {
             var activityListing = await Context.Load(progress, token, true);
+            LastRefresh = DateTime.UtcNow;
             ActivityBuilder.UpdateActivityGroups(Activities, activityListing.Data.Children, Context);
         }
 

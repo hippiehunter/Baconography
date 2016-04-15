@@ -87,6 +87,7 @@ namespace SnooStream.Common
             }
         }
 
+        protected virtual bool IsMergable { get { return false; } }
         protected abstract Task Refresh(IProgress<float> progress, CancellationToken token);
         protected abstract Task LoadInitial(IProgress<float> progress, CancellationToken token);
         protected abstract Task LoadAdditional(IProgress<float> progress, CancellationToken token);
@@ -126,9 +127,11 @@ namespace SnooStream.Common
             IsLoading = true;
             try
             {
-                Clear();
+                if(!IsMergable)
+                    Clear();
+                    
                 var loadItem = new LoadViewModel { LoadAction = (progress, token) => Refresh(progress, token), IsCritical = true, Kind = LoadKind.Collection };
-                Add(loadItem);
+                Insert(0, loadItem);
                 await LoadItem(loadItem);
             }
             finally
@@ -142,8 +145,12 @@ namespace SnooStream.Common
         {
             var itemCount = Count - 1;
             await loadItem.LoadAsync();
-            //now that the load is finished the load item should be removed from the list
-            Remove(loadItem);
+            //this needs to get attached into the retry for the load item somehow
+            if (loadItem.State == LoadState.Loaded)
+            {
+                //now that the load is finished the load item should be removed from the list
+                Remove(loadItem);
+            }
             return (uint)(Count - itemCount);
         }
     }
