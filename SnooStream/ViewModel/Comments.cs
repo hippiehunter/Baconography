@@ -869,6 +869,7 @@ namespace SnooStream.ViewModel
 
         public void QueueBodyChanged(CommentViewModel viewModel, SnooDom.SnooDom dom)
         {
+            _bodyChangedQueue.Enqueue(Tuple.Create(viewModel, dom));
             if (Dispatcher != null)
             {
                 if (_bodyChangedTask == null || (_bodyChangedTask?.IsCompleted ?? true))

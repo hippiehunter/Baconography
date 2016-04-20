@@ -25,6 +25,11 @@ namespace SnooStream.Converters
                 bg_op = Application.Current.Resources["SystemColorControlAccentColor"] as SolidColorBrush;
             else
                 bg_op = Utility.GetColorFromHexa("#FFDAA520");
+
+            //if (Application.Current.Resources.ContainsKey("ThemeForegroundBrush"))
+            //    bg_none = Application.Current.Resources["ThemeForegroundBrush"] as SolidColorBrush;
+            //else
+            //    bg_none = Utility.GetColorFromHexa("#FFFFFFFF");
         }
 
         public object Convert(object value, Type targetType, object parameter, string language)
@@ -62,14 +67,14 @@ namespace SnooStream.Converters
         public void PopulateBrushes()
         {
             if (Application.Current.Resources.ContainsKey("SystemColorControlAccentColor"))
-                fg_none = Application.Current.Resources["SystemColorControlAccentColor"] as SolidColorBrush;
-            else
-                fg_none = Utility.GetColorFromHexa("#FFDAA520");
-
-            if (Application.Current.Resources.ContainsKey("PhoneForegroundBrush"))
-                fg_op = Application.Current.Resources["PhoneForegroundBrush"] as SolidColorBrush;
+                fg_op = Application.Current.Resources["SystemColorControlAccentColor"] as SolidColorBrush;
             else
                 fg_op = Utility.GetColorFromHexa("#FFDAA520");
+
+            if (Application.Current.Resources.ContainsKey("ThemeForegroundBrush"))
+                fg_none = Application.Current.Resources["ThemeForegroundBrush"] as SolidColorBrush;
+            else
+                fg_none = Utility.GetColorFromHexa("#FFDAA520");
 
             fg_mod = new SolidColorBrush(Colors.Green);
         }
