@@ -332,6 +332,7 @@ namespace SnooStream.Common
             var contentRiverRD = new ContentRiverTemplate();
             var searchRD = new SearchViewTemplate();
             var userRD = new UserDetailsTemplate();
+            var selfRD = new SelfActivityTemplate();
 
             ResourceDictionaryHandles.Add(commentsRD);
             ResourceDictionaryHandles.Add(subredditRiverRD);
@@ -339,6 +340,7 @@ namespace SnooStream.Common
             ResourceDictionaryHandles.Add(contentRiverRD);
             ResourceDictionaryHandles.Add(searchRD);
             ResourceDictionaryHandles.Add(userRD);
+            ResourceDictionaryHandles.Add(selfRD);
 
             SubredditRiverTemplate = subredditRiverRD["SubredditRiverView"] as DataTemplate;
             LinkRiverTemplate = linkRiverRD["LinkRiverView"] as DataTemplate;
@@ -346,6 +348,7 @@ namespace SnooStream.Common
             ContentRiverTemplate = contentRiverRD["ContentRiverView"] as DataTemplate;
             SearchTemplate = searchRD["SearchView"] as DataTemplate;
             UserDetailsTemplate = userRD["UserDetails"] as DataTemplate;
+            SelfTemplate = userRD["SelfView"] as DataTemplate;
 
             HubNav = hubNav;
             RoamingState = new RoamingState();
@@ -421,8 +424,8 @@ namespace SnooStream.Common
         {
             if (vm is LoginViewModel)
                 return LoginTemplate;
-            //else if (vm is SelfStreamViewModel)
-            //    return typeof(SelfActivityPage);
+            else if (vm is ActivitiesViewModel)
+                return SelfTemplate;
             else if (vm is UserViewModel)
                 return UserDetailsTemplate;
             else if (vm is LinkRiverViewModel)

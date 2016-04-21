@@ -160,6 +160,7 @@
     <Compile Include="Selectors\LoadableItemTemplateSelector.cs" />
     <Compile Include="Selectors\PreviewTemplateSelector.cs" />
     <Compile Include="Selectors\SearchResultTemplateSelector.cs" />
+    <Compile Include="Selectors\SelfActivityTemplateSelector.cs" />
     <Compile Include="Selectors\UserActivityTemplateSelector.cs" />
     <Compile Include="Templates\CardLinkViewTemplate.xaml.cs">
       <DependentUpon>CardLinkViewTemplate.xaml</DependentUpon>
@@ -181,6 +182,9 @@
     </Compile>
     <Compile Include="Templates\SearchViewTemplate.xaml.cs">
       <DependentUpon>SearchViewTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\SelfActivityTemplate.xaml.cs">
+      <DependentUpon>SelfActivityTemplate.xaml</DependentUpon>
     </Compile>
     <Compile Include="Templates\SubredditRiverTemplate.xaml.cs">
       <DependentUpon>SubredditRiverTemplate.xaml</DependentUpon>
@@ -278,6 +282,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Templates\SearchViewTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Templates\SelfActivityTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

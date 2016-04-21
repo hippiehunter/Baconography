@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -33,6 +34,33 @@ namespace SnooStream
                 Microsoft.ApplicationInsights.WindowsCollectors.Session);
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+        }
+
+        protected override async void OnActivated(IActivatedEventArgs args)
+        {
+            base.OnActivated(args);
+            Debug.Assert(MainPage.Current != null, "Main page was not created yet");
+            if (args.Kind == ActivationKind.WebAuthenticationBrokerContinuation && MainPage.Current != null)
+            {
+                var wab = args as WebAuthenticationBrokerContinuationEventArgs;
+                if (wab.WebAuthenticationResult.ResponseStatus == Windows.Security.Authentication.Web.WebAuthenticationStatus.Success)
+                {
+                    var resultData = wab.WebAuthenticationResult.ResponseData;
+                    var decoder = new WwwFormUrlDecoder(new Uri(resultData).Query);
+                    var code = decoder.GetFirstValueByName("code");
+                    await MainPage.Current.NavContext.LoginViewModel.FinishLoginAsync(code);
+                }
+                else
+                {
+                    MainPage.Current.NavContext.LoginViewModel.ResultText = wab.WebAuthenticationResult.ResponseStatus.ToString();
+                    MainPage.Current.NavContext.LoginViewModel.Success = false;
+                    MainPage.Current.NavContext.LoginViewModel.Working = false;
+                }
+            }
+            else if (args.Kind == ActivationKind.Launch)
+            {
+
+            }
         }
 
         /// <summary>
