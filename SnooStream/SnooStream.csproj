@@ -180,6 +180,9 @@
     <Compile Include="Templates\LoadItemTemplate.xaml.cs">
       <DependentUpon>LoadItemTemplate.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Templates\LoginTemplate.xaml.cs">
+      <DependentUpon>LoginTemplate.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Templates\SearchViewTemplate.xaml.cs">
       <DependentUpon>SearchViewTemplate.xaml</DependentUpon>
     </Compile>
@@ -278,6 +281,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Templates\LoadItemTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Templates\LoginTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

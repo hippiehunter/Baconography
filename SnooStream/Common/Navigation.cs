@@ -48,6 +48,7 @@ namespace SnooStream.Common
         DataTemplate SelfTemplate { get; }
         DataTemplate UserDetailsTemplate { get; }
         DataTemplate SettingsTemplate { get; }
+        DataTemplate OAuthLandingTemplate { get; }
 
         IEnumerable<object> ViewModelStack { get; }
 
@@ -293,6 +294,7 @@ namespace SnooStream.Common
         public DataTemplate SelfTemplate { get; set; }
         public DataTemplate UserDetailsTemplate { get; set; }
         public DataTemplate SettingsTemplate { get; set; }
+        public DataTemplate OAuthLandingTemplate { get; set; }
 
         public List<ResourceDictionary> ResourceDictionaryHandles { get; set; } = new List<ResourceDictionary>();
         public PeriodicTask PeriodicTasks;
@@ -333,6 +335,7 @@ namespace SnooStream.Common
             var searchRD = new SearchViewTemplate();
             var userRD = new UserDetailsTemplate();
             var selfRD = new SelfActivityTemplate();
+            var loginRD = new LoginTemplate();
 
             ResourceDictionaryHandles.Add(commentsRD);
             ResourceDictionaryHandles.Add(subredditRiverRD);
@@ -341,6 +344,7 @@ namespace SnooStream.Common
             ResourceDictionaryHandles.Add(searchRD);
             ResourceDictionaryHandles.Add(userRD);
             ResourceDictionaryHandles.Add(selfRD);
+            ResourceDictionaryHandles.Add(loginRD);
 
             SubredditRiverTemplate = subredditRiverRD["SubredditRiverView"] as DataTemplate;
             LinkRiverTemplate = linkRiverRD["LinkRiverView"] as DataTemplate;
@@ -348,7 +352,9 @@ namespace SnooStream.Common
             ContentRiverTemplate = contentRiverRD["ContentRiverView"] as DataTemplate;
             SearchTemplate = searchRD["SearchView"] as DataTemplate;
             UserDetailsTemplate = userRD["UserDetails"] as DataTemplate;
-            SelfTemplate = userRD["SelfView"] as DataTemplate;
+            SelfTemplate = selfRD["SelfView"] as DataTemplate;
+            LoginTemplate = loginRD["LoginView"] as DataTemplate;
+            OAuthLandingTemplate = loginRD["OAuthLandingView"] as DataTemplate;
 
             HubNav = hubNav;
             RoamingState = new RoamingState();
@@ -372,7 +378,7 @@ namespace SnooStream.Common
 
             listingFilterContext.Reddit = Reddit;
 
-            var loginContext = new LoginContext { Reddit = Reddit, RoamingState = RoamingState };
+            var loginContext = new LoginContext { Reddit = Reddit, RoamingState = RoamingState, Navigation = this };
             ActivitiesViewModel = new ActivitiesViewModel(new ActivityBuilderContext(Reddit, ActivityManager, loginContext));
             var selfContext = new SelfContext();
             SelfViewModel = new SelfViewModel(selfContext);

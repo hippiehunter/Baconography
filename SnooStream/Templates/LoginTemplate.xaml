@@ -1,0 +1,86 @@
+﻿<ResourceDictionary
+    x:Class="SnooStream.Templates.LoginTemplate"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream.Templates"
+    xmlns:vm="using:SnooStream.ViewModel"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <DataTemplate x:Key="LoginView" x:DataType="vm:LoginViewModel">
+        <Grid>
+            <StackPanel>
+                <StackPanel Visibility="{x:Bind HasStoredLogins, Converter={StaticResource booleanVisibilityConverter}}">
+                    <TextBlock Text="STORED LOGINS" Style="{StaticResource SubtextButtonTitleTextBlock}"/>
+                    <ComboBox Grid.Row="0" Grid.ColumnSpan="3" ItemsSource="{Binding StoredCredentials}" 
+                                  SelectedItem="{Binding SelectedCredential, Mode=TwoWay}" HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Username}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <Button Style="{StaticResource SubtextButton}"
+                        Visibility="{Binding IsLoggedIn, Mode=OneWay, Converter={StaticResource booleanVisibilityConverter}}"
+                        Click="{x:Bind Logout}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            LOGOUT
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Logout from current user account
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource SubtextButton}"
+                        Visibility="{Binding IsLoggedIn, Converter={StaticResource booleanVisibilityConverter}}"
+                        Click="{x:Bind Delete}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            DELETE
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Delete authorization from this device
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource SubtextButton}"
+                        Click="{x:Bind Login}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            NEW LOGIN
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Login via OAuth on reddit.com
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="OAuthLandingView">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="2" FontSize="20" Text="{Binding ResultText}"/>
+            <CheckBox Grid.Row="1" Grid.ColumnSpan="2" Content="Remember credentials" IsChecked="{Binding IsRememberLogin, Mode=TwoWay}" Visibility="{Binding Success, Converter={StaticResource booleanVisibilityConverter}}"/>
+            <CheckBox Grid.Row="2" Grid.ColumnSpan="2" Content="Login automatically" IsChecked="{Binding IsAutoLogin, Mode=TwoWay}" Visibility="{Binding Success, Converter={StaticResource booleanVisibilityConverter}}"/>
+            <ProgressBar Grid.Row="3" Grid.ColumnSpan="2" IsIndeterminate="True" Visibility="{Binding Working, Converter={StaticResource booleanVisibilityConverter}}"/>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

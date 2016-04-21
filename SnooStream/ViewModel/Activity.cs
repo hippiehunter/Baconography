@@ -560,12 +560,12 @@ namespace SnooStream.ViewModel
 
         public async Task<Listing> Load(IProgress<float> progress, CancellationToken token, bool ignoreCache)
         {
-            if (Reddit.CurrentOAuth == null)
+            if (Reddit.CurrentOAuth == null || string.IsNullOrWhiteSpace(Reddit.CurrentUserName))
                 throw new RedditEmptyException("user activity");
 
             if (ActivityManager.NeedsRefresh)
             {
-                await ActivityManager.Refresh(JsonConvert.SerializeObject(Reddit.CurrentOAuth), (sender, args) => { }, true).AsTask(token, progress);
+                await ActivityManager.Refresh(JsonConvert.SerializeObject(new { OAuth = Reddit.CurrentOAuth, Username = Reddit.CurrentUserName }), (sender, args) => { }, true).AsTask(token, progress);
             }
 
             var sentListing = JsonConvert.DeserializeObject<Listing>(ActivityManager.SentBlob);

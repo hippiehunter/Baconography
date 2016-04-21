@@ -90,7 +90,7 @@ namespace SnooStream.Common
         {
             get
             {
-                return Get<List<UserState>>("credentials");
+                return Get<List<UserState>>("credentials") ?? new List<UserState>();
             }
             set
             {

@@ -119,7 +119,7 @@ namespace SnooStream.ViewModel
                 new SubredditGroup { Collection = new ObservableCollection<SubredditWrapper>(MakeWrappers(MakeBuiltins(featuredSubreddit), context)), IsMultiReddit = false, Name = "RedditBuiltIn" },
                 new SubredditGroup { Collection = new ObservableCollection<SubredditWrapper>(MakeWrappers(subscribed.Select(thing => thing.TypedData), context)), IsMultiReddit = false, Name = context.IsLoggedIn ? "Subscribed" : "Popular" }
             };
-            result.AddRange(multiReddits.Select(reddit => new SubredditGroup { Collection = new ObservableCollection<SubredditWrapper>(MakeWrappers(reddit.TypedData.Subreddits.Select(sub => sub.Data), context)), IsMultiReddit = true, Name = reddit.TypedData.Name, MultiReddit = reddit }));
+            result.AddRange(multiReddits.Select(reddit => new SubredditGroup { Collection = new ObservableCollection<SubredditWrapper>(MakeWrappers(reddit.TypedData.Subreddits.Select(sub => sub.Data ?? new Subreddit { DisplayName = sub.Name, Name = sub.Name, Url = "/r/" + sub.Name }), context)), IsMultiReddit = true, Name = reddit.TypedData.Name, MultiReddit = reddit }));
             return result;
         }
 
@@ -261,7 +261,7 @@ namespace SnooStream.ViewModel
     {
         public Reddit Reddit { get; set; }
         public INavigationContext NavigationContext { get; set; }
-        public bool IsLoggedIn { get { return string.IsNullOrEmpty(Reddit.CurrentUserName); } }
+        public bool IsLoggedIn { get { return !string.IsNullOrEmpty(Reddit.CurrentUserName); } }
         public async void ChangeMulti(string url, string multi, bool subscribe)
         {
             await Reddit.ChangeMulti(multi, url, subscribe);
