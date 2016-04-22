@@ -26,7 +26,7 @@
                         <EntranceThemeTransition FromHorizontalOffset="400" />
                     </TransitionCollection>
                 </Border.Transitions>
-                <Grid HorizontalAlignment="Stretch" Margin="12,0,12,0" x:Name="rootGrid">
+                <Grid HorizontalAlignment="Stretch" Margin="0" x:Name="rootGrid">
 
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -34,7 +34,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- Content block -->
-                    <Image Tapped="{x:Bind GotoLink}" HorizontalAlignment="Stretch" Visibility="{x:Bind HasPreview, Converter={StaticResource booleanVisibilityConverter}}"
+                    <Image Tapped="{x:Bind GotoLink}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="Uniform" Visibility="{x:Bind HasPreview, Converter={StaticResource booleanVisibilityConverter}}"
                        Source="{x:Bind PreviewSource, Converter={StaticResource clearableImageConverter}}" MaxHeight="{x:Bind PreviewHeight}"
                        Grid.Row="1" />
 

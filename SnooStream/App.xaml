@@ -329,6 +329,8 @@
                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 <Setter Property="VerticalContentAlignment" Value="Stretch" />
                 <Setter Property="UseSystemFocusVisuals" Value="False" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Margin" Value="0" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
@@ -356,7 +358,7 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="ListViewItem">
                             <ListViewItemPresenter CheckBrush="{ThemeResource SystemControlForegroundBaseMediumHighBrush}" 
-                                           ContentMargin="{TemplateBinding Padding}" 
+                                           ContentMargin="0" 
                                            CheckMode="Inline" 
                                            HorizontalAlignment="Stretch"
                                            ContentTransitions="{TemplateBinding ContentTransitions}" 
