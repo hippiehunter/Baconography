@@ -52,11 +52,11 @@
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" MinHeight="40" />
                         </Grid.RowDefinitions>
 
                         <!-- Title block -->
-                        <TextBlock Grid.Row="0" Grid.Column="0"
+                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
                         Style="{StaticResource TitleTextBlock}"
                         Text="{x:Bind LinkTitle, Mode=OneTime}"
                         TextTrimming="WordEllipsis"
@@ -67,16 +67,16 @@
                         </TextBlock>
 
                         <!-- Vote Content -->
-                        <ContentControl Grid.Column="2"
+                        <ContentControl Grid.Column="3" Grid.Row="1"
                                     HorizontalAlignment="Left"
-                                    VerticalAlignment="Top"
+                                    VerticalAlignment="Center"
                                     DataContext="{x:Null}"
                                     Content="{x:Bind Votable}" ContentTemplate="{StaticResource VotableControl}" 
                                     Margin="0,0,0,0" />
 
                         <!-- Link info, user / time / subreddit / domain -->
                         <ContentControl x:Name="linkMetadata"
-                        Grid.Row="1" Grid.ColumnSpan="2"
+                        Grid.Row="1" Grid.ColumnSpan="1"
                         Margin="0,5,0,-6" DataContext="{x:Null}"
                         HorizontalAlignment="Stretch" Content="{x:Bind Converter={StaticResource linkMetadataConverter}, Mode=OneWay}"/>
                     </Grid>
