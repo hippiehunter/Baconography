@@ -279,6 +279,7 @@ namespace SnooStream.ViewModel
     {
         public ILinkContext Context { get; set; }
         public Link Thing { get; set; }
+        public object SelfText { get; set; }
         public string LinkTitle { get { return WebUtility.HtmlDecode(Thing.Title); } }
         public VotableViewModel Votable { get; set; }
         public LinkMeta Metadata { get; set; }

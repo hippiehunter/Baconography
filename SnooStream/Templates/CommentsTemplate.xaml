@@ -45,15 +45,15 @@
 
                 <!-- Link info, user / time / subreddit / domain -->
                 <ContentControl Grid.Row="1"
-                            Margin="0,5,0,-6"
                             HorizontalAlignment="Stretch" DataContext="{x:Null}" Content="{x:Bind Link, Converter={StaticResource linkMetadataConverter}, Mode=OneWay}"/>
+                
+                <snoodom:MarkdownControl
+                        Grid.Row="2" Visibility="{x:Bind Link.IsEditing, Mode=OneWay, Converter={StaticResource invertedBooleanVisibilityConverter}}"
+                        Markdown="{x:Bind Link.SelfText, Mode=OneWay}"
+                        StyleProvider="{StaticResource markdownHelpers}"
+                        CommandFactory="{StaticResource markdownHelpers}"
+                        HorizontalAlignment="Stretch"/>
 
-                <!-- Non Editing Content block -->
-                <ContentControl  DataContext="{x:Null}" Visibility="{x:Bind Link.IsEditing, Mode=OneWay, Converter={StaticResource invertedBooleanVisibilityConverter}}"  
-                            Grid.Row="2" Margin="0"
-                            BorderThickness="0"
-                            VerticalContentAlignment="Stretch" VerticalAlignment="Center"
-                            HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" />
 
                 <!-- Editing Content block -->
                 <Grid Grid.Row="2" Visibility="{x:Bind Link.IsEditing, Mode=OneWay, Converter={StaticResource booleanVisibilityConverter}}">

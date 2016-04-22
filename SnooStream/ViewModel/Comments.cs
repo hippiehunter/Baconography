@@ -895,7 +895,7 @@ namespace SnooStream.ViewModel
             else
                 viewModel.Body = dom;
         }
-        private SnooDom.SimpleSessionMemoryPool _markdownMemoryPool = new SnooDom.SimpleSessionMemoryPool();
+        public SnooDom.SimpleSessionMemoryPool _markdownMemoryPool = new SnooDom.SimpleSessionMemoryPool();
 
         private string _sort;
         public string Sort
