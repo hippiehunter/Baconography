@@ -39,7 +39,7 @@ namespace SnooStream.Common
     {
         protected bool HasLoaded = false;
         protected bool IsLoading = false;
-        protected void AddRange<T>(IEnumerable<T> items) where T : class
+        public void AddRange<T>(IEnumerable<T> items) where T : class
         {
             foreach (var item in items)
             {

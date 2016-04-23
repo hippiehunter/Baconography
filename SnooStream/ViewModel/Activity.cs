@@ -47,7 +47,7 @@ namespace SnooStream.ViewModel
         {
             var activityListing = await Context.Load(progress, token, ignoreCache);
             LastRefresh = activityListing.DataAge ?? DateTime.UtcNow;
-            ActivityBuilder.UpdateActivityGroups(Activities, activityListing.Data.Children, Context);
+            Activities.AddRange(ActivityBuilder.CreateActivityGroups(activityListing.Data.Children, Context));
         }
 
         public async Task LoadAdditionalAsync(IProgress<float> progress, CancellationToken token)
@@ -77,7 +77,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return base.HasMoreItems && Context.HasAdditional;
+                return !HasLoaded || (base.HasMoreItems && Context.HasAdditional);
             }
         }
         
@@ -125,6 +125,17 @@ namespace SnooStream.ViewModel
         public bool IsExpandable { get; set; }
         public int ReadCount { get; set; }
         public int UnreadCount { get; set; }
+
+        public void Update(ActivityViewModel activity)
+        {
+            //TODO decide if this activity should fill in the sub title
+            //also update the read count and unread count
+            if (!IsExpandable)
+            {
+                IsExpandable = true;
+                RaisePropertyChanged("IsExpandable");
+            }
+        }
     }
 
     public interface IActivityBuilderContext
@@ -163,9 +174,8 @@ namespace SnooStream.ViewModel
                 {
                     activityGroup = new ActivityGroup { Children = new List<ActivityViewModel> { activity } };
                     context.AddGroup(activity.GroupId, activityGroup);
+                    AddSorted(madeGroups, activityGroup, comparer);
                 }
-
-                AddSorted(madeGroups, activityGroup, comparer);
             }
 
             List<object> flatList = new List<object>();
@@ -199,6 +209,7 @@ namespace SnooStream.ViewModel
                     {
                         AddSorted(activityGroup.Children, activity, comparer);
                         var collectionHeader = targetCollection.OfType<ActivityHeaderViewModel>().FirstOrDefault(header => header.GroupId == activityGroup.Children.First().GroupId);
+                        collectionHeader.Update(activity);
                         var collectionHeaderIndex = targetCollection.IndexOf(collectionHeader) + 1;
                         var followingHeaderItem = targetCollection.Skip(collectionHeaderIndex).FirstOrDefault();
                         if (followingHeaderItem is ActivityViewModel)
@@ -209,6 +220,18 @@ namespace SnooStream.ViewModel
                 {
                     activityGroup = new ActivityGroup { Children = new List<ActivityViewModel> { activity } };
                     context.AddGroup(activity.GroupId, activityGroup);
+
+                    //TODO: this is likely going to insert a header with the wrong properties and needs to be fixed up as more items are added to the group
+                    var groupHeader = new ActivityHeaderViewModel
+                    {
+                        GroupId = activity.GroupId,
+                        IsExpandable = activityGroup.Children.Count > 1,
+                        Title = activity.Title,
+                        SubTitle = activity.Author,
+                        Symbol = activity.Symbol,
+                        CreatedUTC = activity.CreatedUTC
+                    };
+                    AddSorted(targetCollection, groupHeader, comparer);
                 }
             }
         }

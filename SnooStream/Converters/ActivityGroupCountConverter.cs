@@ -41,6 +41,9 @@ namespace SnooStream.Converters
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
+            if (value == null)
+                return value;
+
             var group = value as ActivityHeaderViewModel;
             return string.Format("{0} {1}, {2} {3}", group.UnreadCount + group.ReadCount, "messages", group.ReadCount, "unread");
         }
