@@ -605,11 +605,12 @@ namespace SnooStream.ViewModel
             }
         }
 
+        public string InitialUrl { get; set; }
         public CommentsViewModel Comments { get; set; }
         public INetworkLayer NetworkLayer { get; set; }
         public ICollectionView CollectionView { get; set; }
         public ObservableCollection<object> Collection { get; set; }
-
+        private Dictionary<int, CommentViewModel> _contentToCommentMap = new Dictionary<int, CommentViewModel>(); 
         public bool MakeCollectionViewSource
         {
             get
@@ -633,7 +634,15 @@ namespace SnooStream.ViewModel
                     {
                         foreach (var link in bodyMD.GetLinks())
                         {
-                            result.Add(ContentBuilder.MakeContentViewModel(link.Key, link.Value, comment.Votable, null, this, CollectionView, NetworkLayer, Collection));
+                            var contentViewModel = ContentBuilder.MakeContentViewModel(link.Key, link.Value, comment.Votable, null, this, CollectionView, NetworkLayer, Collection);
+                            result.Add(contentViewModel);
+                            _contentToCommentMap.Add(result.Count - 1, comment);
+
+                            //only set it once
+                            if (link.Key == InitialUrl && Current == -1)
+                            {
+                                Current = result.Count - 1;
+                            }
                         }
                     }
                 }
@@ -656,17 +665,22 @@ namespace SnooStream.ViewModel
             throw new NotImplementedException();
         }
 
+        int _current = -1;
         public int Current
         {
             get
             {
-                return -1;
+                return _current;
             }
             set
             {
-
+                if (_contentToCommentMap.ContainsKey(value))
+                {
+                    var foundComment = _contentToCommentMap[value];
+                    Comments.Comments.MoveCurrentToPosition(Comments.Comments.IndexOf(foundComment));
+                }
+                _current = value;
             }
-            //set the focused item from the comment context we came from
         }
 
         public IEnumerable<object> LoadInitial()

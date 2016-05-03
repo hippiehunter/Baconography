@@ -202,12 +202,12 @@ namespace SnooStream.ViewModel
             Context.Report(Thing.Id);
         }
 
-        public async void Save()
+        public void Save()
         {
             Context.Save(Thing.Id);
         }
 
-        public async void Share()
+        public void Share()
         {
             Context.Share(this);
         }

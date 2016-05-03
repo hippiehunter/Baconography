@@ -24,21 +24,21 @@ namespace SnooStream.Test
         {
             var context = new TestActivityBuilderContext();
             var activityGroups = ActivityBuilder.CreateActivityGroups(JsonConvert.DeserializeObject<Thing[]>(escapedActivityString), context);
-            Assert.AreEqual(activityGroups.Count(), 74);
+            Assert.AreEqual(activityGroups.Count(), 33);
         }
         [TestMethod]
         public void AppendActivities()
         {
             var context = new TestActivityBuilderContext();
             var activityGroups = ActivityBuilder.CreateActivityGroups(JsonConvert.DeserializeObject<Thing[]>(escapedActivityString), context).ToList();
-            Assert.AreEqual(activityGroups.Count, 74);
+            Assert.AreEqual(activityGroups.Count, 33);
             ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(escapedActivityString), context);
-            Assert.AreEqual(activityGroups.Count, 74);
+            Assert.AreEqual(activityGroups.Count, 33);
             ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(updatedActivityString), context);
-            Assert.AreEqual(activityGroups.Count, 74);
+            Assert.AreEqual(activityGroups.Count, 33);
 
             ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(newerActivityString), context);
-            Assert.AreEqual(activityGroups.Count, 85);
+            Assert.AreEqual(activityGroups.Count, 44);
 
         }
         [TestMethod]
@@ -46,22 +46,22 @@ namespace SnooStream.Test
         {
             var context = new TestActivityBuilderContext();
             var activityGroups = ActivityBuilder.CreateActivityGroups(JsonConvert.DeserializeObject<Thing[]>(escapedActivityString), context).ToList();
-            Assert.AreEqual(activityGroups.Count, 74);
+            Assert.AreEqual(activityGroups.Count, 33);
             var lastExpandable = activityGroups.OfType<ActivityHeaderViewModel>().LastOrDefault(header => header.IsExpandable);
             ActivityBuilder.ExpandActivity(activityGroups, lastExpandable.GroupId, context);
-            Assert.AreEqual(activityGroups.Count, 76);
+            Assert.AreEqual(activityGroups.Count, 35);
             ActivityBuilder.CollapseActivity(activityGroups, lastExpandable.GroupId, context);
             var targetExpandable = activityGroups.OfType<ActivityHeaderViewModel>().FirstOrDefault(header => header.GroupId == "t3_2zdbnn");
             ActivityBuilder.ExpandActivity(activityGroups, targetExpandable.GroupId, context);
             ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(updatedActivityString), context);
-            Assert.AreEqual(activityGroups.Count, 96);
+            Assert.AreEqual(activityGroups.Count, 55);
             var activityGroupCopy = activityGroups.ToArray();
             ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(escapedActivityString), context);
-            Assert.AreEqual(activityGroups.Count, 96);
+            Assert.AreEqual(activityGroups.Count, 55);
             ActivityBuilder.CollapseActivity(activityGroups, targetExpandable.GroupId, context);
-            Assert.AreEqual(activityGroups.Count, 74);
+            Assert.AreEqual(activityGroups.Count, 33);
             ActivityBuilder.ExpandActivity(activityGroups, targetExpandable.GroupId, context);
-            Assert.AreEqual(activityGroups.Count, 96);
+            Assert.AreEqual(activityGroups.Count, 55);
             Assert.IsTrue(Enumerable.SequenceEqual(activityGroups, activityGroupCopy));
         }
     }

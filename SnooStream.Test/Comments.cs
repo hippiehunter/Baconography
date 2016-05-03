@@ -96,6 +96,7 @@ namespace SnooStream.Test
             Assert.AreEqual(context.Comments.Comments.Count(), 61);
             var firstComment = context.Comments.Comments.First() as CommentViewModel;
             firstComment.Collapsed = true;
+            
             Assert.AreEqual(context.Comments.Comments.Count(), 50);
             var lastComment = context.Comments.Comments.Last() as CommentViewModel;
             lastComment.Collapsed = true;
@@ -103,6 +104,10 @@ namespace SnooStream.Test
             Assert.AreEqual(context.Comments.Comments.Count(), 50);
             firstComment.Collapsed = false;
             Assert.AreEqual(context.Comments.Comments.Count(), 61);
+
+            var secondComment = context.Comments.Comments[1] as CommentViewModel;
+            secondComment.Collapsed = true;
+
         }
 
         [TestMethod]

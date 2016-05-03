@@ -3481,6 +3481,9 @@ namespace Sgml
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(name))
+                    return false;
+
                 XmlConvert.VerifyNMTOKEN(name);
                 int index = name.IndexOf(':');
                 if (index >= 0)
