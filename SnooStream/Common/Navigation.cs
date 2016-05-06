@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.System;
 using Windows.UI.Core;
@@ -87,7 +88,9 @@ namespace SnooStream.Common
             if (linkViewModel == null)
             {
                 var linkContext = context.MakeLinkContext(url);
-                linkViewModel = await LinkBuilder.MakeLinkViewModel(url, linkContext);
+                //TODO: if this takes too long pop a loading dialog with cancel
+                Progress<float> dummyProgress = new Progress<float>();
+                linkViewModel = await LinkBuilder.MakeLinkViewModel(url, linkContext, CancellationToken.None, dummyProgress);
 
             }
             var commentsViewModel = context.MakeCommentContext(url, null, null, linkViewModel);
@@ -454,7 +457,7 @@ namespace SnooStream.Common
             var targetLink = linkViewModel ?? new LinkViewModel { Thing = new Link(), Context = new CommentLinkContext { NavigationContext = this, Reddit = Reddit, ViewModel = madeComments }, Votable = new VotableViewModel(new Link(), madeContext.ChangeVote) };
             madeContext.Link = targetLink;
 
-            targetLink.SelfText = SnooDom.SnooDom.MarkdownToDOM(targetLink.Thing.Selftext, madeContext._markdownMemoryPool);
+            targetLink.SelfText = SnooDom.SnooDom.MarkdownToDOM(targetLink.Thing.Selftext ?? string.Empty, madeContext._markdownMemoryPool);
 
             //load needs to happen after everything is constructed but before we return otherwise things might be partially setup if we have cached data (or go too fast)
             madeComments.Load(); 
@@ -557,6 +560,10 @@ namespace SnooStream.Common
                 return ((MoreViewModel)commentItem).Ids.FirstOrDefault();
             }
             else if (commentItem is LoadFullCommentsViewModel || commentItem is LoadViewModel)
+            {
+                return null;
+            }
+            else if (commentItem == null)
             {
                 return null;
             }

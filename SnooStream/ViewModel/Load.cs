@@ -47,7 +47,19 @@ namespace SnooStream.ViewModel
     {
         public static CoreDispatcher UIDispatcher { get; set; }
         public LoadKind Kind { get; set; } = LoadKind.Item;
-        public LoadState State { get; set; } = LoadState.None;
+
+        private LoadState _state;
+        public LoadState State
+        {
+            get
+            {
+                return _state;
+            }
+            set
+            {
+                Set("State", ref _state, value);
+            }
+        }
         public float LoadPercent { get; set; } = 0;
         public Func<IProgress<float>, CancellationToken, Task> LoadAction { get; set; }
         public CancellationToken? CancelToken { get; set; }
@@ -96,7 +108,6 @@ namespace SnooStream.ViewModel
                 if (State != LoadState.Loaded)
                 {
                     State = LoadState.Loading;
-                    RaisePropertyChanged("State");
                     var progress = new AggregateProgress(async value => { LoadPercent = value; await UIDispatcher.TryRunIdleAsync((arg) => RaisePropertyChanged("LoadPercent")); });
                     await LoadAction(progress, CancelToken != null ? CancellationTokenSource.CreateLinkedTokenSource(CancelToken.Value, _internalCancelToken.Token).Token : _internalCancelToken.Token);
                     State = LoadState.Loaded;
@@ -202,7 +213,6 @@ namespace SnooStream.ViewModel
             {
                 _loadTask = null;
             }
-            RaisePropertyChanged("State");
         }
     }
 }

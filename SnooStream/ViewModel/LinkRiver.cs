@@ -141,7 +141,7 @@ namespace SnooStream.ViewModel
         bool IsHighBandwidth { get; }
         string CurrentUser { get; }
         void GotoComments(LinkViewModel linkViewModel);
-        Task<Thing> GetThing(string url);
+        Task<Thing> GetThing(string url, CancellationToken token, IProgress<float> progress);
         void UpdateVotable(string name, int direction);
         void GotoLink(LinkViewModel linkViewModel);
         void Share(LinkViewModel linkViewModel);
@@ -170,9 +170,9 @@ namespace SnooStream.ViewModel
 
     public static class LinkBuilder
     {
-        public static async Task<LinkViewModel> MakeLinkViewModel(string url, ILinkContext context)
+        public static async Task<LinkViewModel> MakeLinkViewModel(string url, ILinkContext context, CancellationToken token, IProgress<float> progress)
         {
-            var madeThing = await context.GetThing(url);
+            var madeThing = await context.GetThing(url, token, progress);
             var linkViewModel = new LinkViewModel { Context = context, Thing = madeThing.Data as Link, Votable = new VotableViewModel(madeThing.Data as Link, context.UpdateVotable), CommentCount = ((Link)madeThing.Data).CommentCount, FromMultiReddit = false };
             return linkViewModel;
         }
@@ -279,7 +279,18 @@ namespace SnooStream.ViewModel
     {
         public ILinkContext Context { get; set; }
         public Link Thing { get; set; }
-        public object SelfText { get; set; }
+        private object _selfText;
+        public object SelfText
+        {
+            get
+            {
+                return _selfText;
+            }
+            set
+            {
+                Set("SelfText", ref _selfText, value);
+            }
+        }
         public string LinkTitle { get { return WebUtility.HtmlDecode(Thing.Title); } }
         public VotableViewModel Votable { get; set; }
         public LinkMeta Metadata { get; set; }
@@ -451,9 +462,9 @@ namespace SnooStream.ViewModel
             Navigation.GotoComments(link.Thing.Permalink, NavigationContext, link);
         }
 
-        public Task<Thing> GetThing(string url)
+        public Task<Thing> GetThing(string url, CancellationToken token, IProgress<float> progress)
         {
-            throw new NotImplementedException();
+            return Reddit.GetLinkByUrl(url, token, progress, false);
         }
 
         public async void UpdateVotable(string name, int direction)

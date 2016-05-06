@@ -17,6 +17,7 @@ using NBoilerpipePortable.Util;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using System.Net;
+using System.Diagnostics;
 
 namespace SnooStream.ViewModel
 {
@@ -94,11 +95,11 @@ namespace SnooStream.ViewModel
         {
             Thing = await Context.GetLink(progress, token);
             Link.UpdateThing(Thing);
-            
             RaisePropertyChanged("Thing");
             RaisePropertyChanged("LinkTitle");
             Votable.MergeVotable(Thing);
-            
+            if(Thing != null && !string.IsNullOrWhiteSpace(Thing.Selftext))
+                await Context.QueueMarkdown(this);
         }
     }
 
@@ -328,7 +329,7 @@ namespace SnooStream.ViewModel
         void PopOrigin();
         void RemoveShell(string id);
         void ClearState();
-        Task QueueMarkdown(CommentViewModel comment);
+        Task QueueMarkdown(object comment);
         Task FinishMarkdownQueue();
         Task<Link> GetLink(IProgress<float> progress, CancellationToken token);
         AuthorFlairKind GetUsernameModifiers(string author);
@@ -865,9 +866,9 @@ namespace SnooStream.ViewModel
         public abstract void Delete(CommentViewModel comment);
 
         private Task _bodyChangedTask;
-        private ConcurrentQueue<Tuple<CommentViewModel, SnooDom.SnooDom>> _bodyChangedQueue = new ConcurrentQueue<Tuple<CommentViewModel, SnooDom.SnooDom>>();
+        private ConcurrentQueue<Tuple<object, SnooDom.SnooDom>> _bodyChangedQueue = new ConcurrentQueue<Tuple<object, SnooDom.SnooDom>>();
 
-        public void QueueBodyChanged(CommentViewModel viewModel, SnooDom.SnooDom dom)
+        public void QueueBodyChanged(object viewModel, SnooDom.SnooDom dom)
         {
             _bodyChangedQueue.Enqueue(Tuple.Create(viewModel, dom));
             if (Dispatcher != null)
@@ -876,24 +877,53 @@ namespace SnooStream.ViewModel
                 {
                     _bodyChangedTask = Dispatcher.RunIdleAsync((o) =>
                     {
-                        Tuple<CommentViewModel, SnooDom.SnooDom> result;
+                        Tuple<object, SnooDom.SnooDom> result;
                         while (_bodyChangedQueue.TryDequeue(out result))
                         {
-                            result.Item1.Body = result.Item2;
+                            var comment = result.Item1 as CommentViewModel;
+                            var comments = result.Item1 as CommentsViewModel;
+                            if (comment != null)
+                            {
+                                comment.Body = result.Item2;
+                            }
+                            else if (comments != null && comments.Link != null)
+                            {
+                                comments.Link.SelfText = result.Item2;
+                            }
                         }
                         _bodyChangedTask = null;
 
                         //flush out any leftovers we might end up with
                         while (_bodyChangedQueue.TryDequeue(out result))
                         {
-                            result.Item1.Body = result.Item2;
+                            var comment = result.Item1 as CommentViewModel;
+                            var comments = result.Item1 as CommentsViewModel;
+                            if (comment != null)
+                            {
+                                comment.Body = result.Item2;
+                            }
+                            else if (comments != null && comments.Link != null)
+                            {
+                                comments.Link.SelfText = result.Item2;
+                            }
                         }
 
                     }).AsTask();
                 }
             }
             else
-                viewModel.Body = dom;
+            {
+                var comment = viewModel as CommentViewModel;
+                var comments = viewModel as CommentsViewModel;
+                if (comment != null)
+                {
+                    comment.Body = dom;
+                }
+                else if (comments != null && comments.Link != null)
+                {
+                    comments.Link.SelfText = dom;
+                }
+            }
         }
         public SnooDom.SimpleSessionMemoryPool _markdownMemoryPool = new SnooDom.SimpleSessionMemoryPool();
 
@@ -1005,9 +1035,11 @@ namespace SnooStream.ViewModel
 
         Task _activeMarkdownBuilder;
         CancellationTokenSource _markdownBuilderCancelSource = new CancellationTokenSource();
-        BlockingCollection<CommentViewModel> _workQueue = new BlockingCollection<CommentViewModel>();
-        public Task QueueMarkdown(CommentViewModel viewModel)
+        BlockingCollection<object> _workQueue = new BlockingCollection<object>();
+        public Task QueueMarkdown(object viewModel)
         {
+            Debug.Assert(viewModel is CommentViewModel || viewModel is CommentsViewModel, "viewmodel must be comment or comments");
+
             _workQueue.Add(viewModel);
             if (_activeMarkdownBuilder == null || _activeMarkdownBuilder.IsCompleted)
             {
@@ -1016,21 +1048,36 @@ namespace SnooStream.ViewModel
                 {
                     try
                     {
-                        CommentViewModel result;
+                        object result;
                         while (_workQueue.TryTake(out result, Timeout.Infinite, cancelToken))
                         {
-                            QueueBodyChanged(result, MakeMarkdown(WebUtility.HtmlDecode(result.Thing.Body)));
+                            if (result is CommentViewModel)
+                            {
+                                QueueBodyChanged(result, MakeMarkdown(WebUtility.HtmlDecode(((CommentViewModel)result).Thing.Body)));
+                            }
+                            else if (result is CommentsViewModel)
+                            {
+                                QueueBodyChanged(result, MakeMarkdown(WebUtility.HtmlDecode(((CommentsViewModel)result).Link.Thing.Selftext)));
+                            }
                         }
                     }
                     catch (OperationCanceledException)
                     {
                         var remainingWork = _workQueue;
-                        _workQueue = new BlockingCollection<CommentViewModel>();
+                        _workQueue = new BlockingCollection<object>();
                         if (remainingWork.Count > 0)
                         {
                             foreach (var item in remainingWork)
-                            { 
-                                QueueBodyChanged(item, MakeMarkdown(WebUtility.HtmlDecode(item.Thing.Body)));
+                            {
+                                if (item is CommentViewModel)
+                                {
+                                    QueueBodyChanged(item, MakeMarkdown(WebUtility.HtmlDecode(((CommentViewModel)item).Thing.Body)));
+                                }
+                                else if(item is CommentsViewModel)
+                                {
+                                    QueueBodyChanged(item, MakeMarkdown(WebUtility.HtmlDecode(((CommentsViewModel)item).Link.Thing.Selftext)));
+                                }
+                                
                             }
                         }
                     }
@@ -1047,7 +1094,7 @@ namespace SnooStream.ViewModel
 
         public SnooDom.SnooDom MakeMarkdown(string body)
         {
-            return SnooDom.SnooDom.MarkdownToDOM(body, _markdownMemoryPool);
+            return SnooDom.SnooDom.MarkdownToDOM(body ?? string.Empty, _markdownMemoryPool);
         }
 
         public AuthorFlairKind GetUsernameModifiers(string author)
