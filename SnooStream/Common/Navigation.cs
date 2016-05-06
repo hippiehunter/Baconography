@@ -487,6 +487,8 @@ namespace SnooStream.Common
                 var madeContentRiver = new ContentRiverViewModel(madeContext);
                 madeContext.Collection = madeContentRiver.ContentItems;
                 madeContext.CollectionView = madeContentRiver.ContentItems;
+
+                madeContentRiver.ContentItems.LoadMoreItemsAsync(50).AsTask().ContinueWith(result => madeContentRiver.ContentItems.CurrentPosition = madeContext.Current);
                 return madeContentRiver;
             }
             else

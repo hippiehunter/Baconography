@@ -329,6 +329,7 @@ namespace SnooStream.ViewModel
         void PopOrigin();
         void RemoveShell(string id);
         void ClearState();
+        SnooDom.SnooDom MakeMarkdown(string body);
         Task QueueMarkdown(object comment);
         Task FinishMarkdownQueue();
         Task<Link> GetLink(IProgress<float> progress, CancellationToken token);
@@ -1049,7 +1050,7 @@ namespace SnooStream.ViewModel
                     try
                     {
                         object result;
-                        while (_workQueue.TryTake(out result, Timeout.Infinite, cancelToken))
+                        while (_workQueue.TryTake(out result))
                         {
                             if (result is CommentViewModel)
                             {
@@ -1060,6 +1061,7 @@ namespace SnooStream.ViewModel
                                 QueueBodyChanged(result, MakeMarkdown(WebUtility.HtmlDecode(((CommentsViewModel)result).Link.Thing.Selftext)));
                             }
                         }
+                        _activeMarkdownBuilder = null;
                     }
                     catch (OperationCanceledException)
                     {
@@ -1094,7 +1096,10 @@ namespace SnooStream.ViewModel
 
         public SnooDom.SnooDom MakeMarkdown(string body)
         {
-            return SnooDom.SnooDom.MarkdownToDOM(body ?? string.Empty, _markdownMemoryPool);
+            lock (_markdownMemoryPool)
+            {
+                return SnooDom.SnooDom.MarkdownToDOM(body ?? string.Empty, _markdownMemoryPool);
+            }
         }
 
         public AuthorFlairKind GetUsernameModifiers(string author)

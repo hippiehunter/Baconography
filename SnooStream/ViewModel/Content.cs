@@ -467,7 +467,7 @@ namespace SnooStream.ViewModel
 
         protected override Task LoadInitial(IProgress<float> progress, CancellationToken token)
         {
-            throw new NotImplementedException();
+            return LoadImpl(progress, token);
         }
 
         protected override Task LoadAdditional(IProgress<float> progress, CancellationToken token)
@@ -623,25 +623,34 @@ namespace SnooStream.ViewModel
         {
             _initialLoaded = true;
             List<object> result = new List<object>();
+            await Comments.LoadState.LoadAsync();
+            await Comments.Comments.LoadMoreItemsAsync(500).AsTask(token);
             foreach (var commentObj in Comments.Comments)
             {
                 var comment = commentObj as CommentViewModel;
                 if (comment != null)
                 {
-                    await comment.BodyMDTask;
-                    var bodyMD = comment.Body as SnooDom.SnooDom;
-                    if (bodyMD != null)
+                    var body = comment.Body;
+                    if (body != null)
                     {
-                        foreach (var link in bodyMD.GetLinks())
+                        var bodyMD = body as SnooDom.SnooDom;
+                        if (bodyMD == null && body is String)
                         {
-                            var contentViewModel = ContentBuilder.MakeContentViewModel(link.Key, link.Value, comment.Votable, null, this, CollectionView, NetworkLayer, Collection);
-                            result.Add(contentViewModel);
-                            _contentToCommentMap.Add(result.Count - 1, comment);
-
-                            //only set it once
-                            if (link.Key == InitialUrl && Current == -1)
+                            bodyMD = Comments.Context.MakeMarkdown(body as string);
+                        }
+                        if (bodyMD != null)
+                        {
+                            foreach (var link in bodyMD.GetLinks())
                             {
-                                Current = result.Count - 1;
+                                var contentViewModel = ContentBuilder.MakeContentViewModel(link.Key, link.Value, comment.Votable, null, this, CollectionView, NetworkLayer, Collection);
+                                result.Add(contentViewModel);
+                                _contentToCommentMap.Add(result.Count - 1, comment);
+
+                                //only set it once
+                                if (link.Key == InitialUrl && Current == -1)
+                                {
+                                    Current = result.Count - 1;
+                                }
                             }
                         }
                     }
@@ -685,7 +694,32 @@ namespace SnooStream.ViewModel
 
         public IEnumerable<object> LoadInitial()
         {
-            return Enumerable.Empty<object>();
+            _initialLoaded = true;
+            List<object> result = new List<object>();
+            foreach (var commentObj in Comments.Comments)
+            {
+                var comment = commentObj as CommentViewModel;
+                if (comment != null)
+                {
+                    var bodyMD = comment.Body as SnooDom.SnooDom;
+                    if (bodyMD != null)
+                    {
+                        foreach (var link in bodyMD.GetLinks())
+                        {
+                            var contentViewModel = ContentBuilder.MakeContentViewModel(link.Key, link.Value, comment.Votable, null, this, CollectionView, NetworkLayer, Collection);
+                            result.Add(contentViewModel);
+                            _contentToCommentMap.Add(result.Count - 1, comment);
+
+                            //only set it once
+                            if (link.Key == InitialUrl && Current == -1)
+                            {
+                                Current = result.Count - 1;
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
         }
     }
 }
