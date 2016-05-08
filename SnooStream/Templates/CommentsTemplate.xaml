@@ -158,7 +158,7 @@
                                             <TextBlock Style="{StaticResource PlainButtonTextBlock}" Foreground="{x:Bind AuthorFlair, Converter={StaticResource fgAuthorFlairKindConverter}}" Margin="0,1,0,0" Text="{x:Bind Thing.Author}" />
                                         </Border>
 
-                                        <TextBlock Style="{StaticResource PlainButtonTextBlock}" Opacity="0.6" FontStyle="Italic" Text="{x:Bind Thing.AuthorFlairText}" Margin="4,2,2,0" Visibility="{x:Bind HasAuthorFlair, Converter={StaticResource booleanVisibilityConverter}}"/>
+                                        <TextBlock Style="{StaticResource PlainButtonTextBlock}" Opacity="0.6" FontStyle="Italic" Text="{x:Bind AuthorFlairText}" Margin="4,2,2,0" Visibility="{x:Bind HasAuthorFlair, Converter={StaticResource booleanVisibilityConverter}}"/>
                                     </StackPanel>
                                     <TextBlock Opacity="0.6" Style="{StaticResource PlainButtonTextBlock}" Text="{x:Bind Thing.CreatedUTC, Converter={StaticResource timeRelationConverter}}" Margin="2,0,0,0" />
                                 </StackPanel>
