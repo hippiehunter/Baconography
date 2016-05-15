@@ -571,7 +571,7 @@ namespace SnooStream.ViewModel
     class LinkBuilderContext : ILinkBuilderContext
     {
         public INavigationContext NavigationContext { get; set; }
-        public string Title { get { return Reddit.MakePlainSubredditName(Subreddit); } }
+        public string Title { get { return MakeDisplaySubredditName(Subreddit); } }
         public ILinkContext LinkContext { get; set; }
         public string Subreddit { get; set; }
         public string Sort { get; set; }
@@ -588,6 +588,14 @@ namespace SnooStream.ViewModel
                 new SearchNavCommand { NavigationContext = NavigationContext, TargetSubreddit = Subreddit },
                 new AboutSubredditNavCommand { NavigationContext = NavigationContext, TargetSubreddit = Subreddit }
             };
+        }
+
+        public static string MakeDisplaySubredditName(string subreddit)
+        {
+            if (string.IsNullOrWhiteSpace(subreddit) || subreddit == "/")
+                return "front page";
+            else
+                return Reddit.MakePlainSubredditName(subreddit);
         }
 
         public bool IsMultiReddit
