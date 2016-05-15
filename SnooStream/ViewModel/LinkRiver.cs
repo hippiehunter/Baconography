@@ -17,7 +17,7 @@ using System.Net;
 
 namespace SnooStream.ViewModel
 {
-    public class LinkRiverViewModel : IHasTitle, IHasHubNavCommands, IRefreshable
+    public class LinkRiverViewModel : SnooObservableObject, IHasTitle, IHasHubNavCommands, IRefreshable
     {
         public string Title { get { return Context.Title; } }
         public ILinkBuilderContext Context { get; set; }
@@ -66,7 +66,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                if (Thing == null || Thing.Url == "/")
+                if (Thing == null || Thing.Url == "/" || Thing.Url.ToLower() == "/r/all")
                     return true;
                 else
                     return Thing.Url.Contains("/m/") || Thing.Url.Contains("+");
@@ -77,6 +77,7 @@ namespace SnooStream.ViewModel
         {
             var activityListing = await Context.Load(progress, token, ignoreCache);
             LastRefresh = activityListing.DataAge ?? DateTime.UtcNow;
+            RaisePropertyChanged("Title");
             return LinkBuilder.AppendLinkViewModels(Links, activityListing.Data.Children, Context);
         }
 
@@ -570,7 +571,7 @@ namespace SnooStream.ViewModel
     class LinkBuilderContext : ILinkBuilderContext
     {
         public INavigationContext NavigationContext { get; set; }
-        public string Title { get { return Subreddit; } }
+        public string Title { get { return Reddit.MakePlainSubredditName(Subreddit); } }
         public ILinkContext LinkContext { get; set; }
         public string Subreddit { get; set; }
         public string Sort { get; set; }
@@ -593,7 +594,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return string.IsNullOrWhiteSpace(Subreddit) || Subreddit.Contains("/m/") || Subreddit.Contains("+") || Subreddit == "/";
+                return string.IsNullOrWhiteSpace(Subreddit) || Subreddit.Contains("/m/") || Subreddit.Contains("+") || Subreddit == "/" || Subreddit.ToLower() == "/r/all";
             }
         }
 
@@ -630,6 +631,10 @@ namespace SnooStream.ViewModel
             Debug.Assert(!string.IsNullOrWhiteSpace(Subreddit), "subreddit was null while loading links from LinkBuilderContext");
             _hasLoaded = true;
             var listing = await Reddit.GetPostsBySubreddit(Subreddit, token, progress, ignoreCache, Sort, null);
+            if (!string.IsNullOrWhiteSpace(listing.RedirectedUrl))
+            {
+                Subreddit = "/r/" + Reddit.MakePlainSubredditName(listing.RedirectedUrl);
+            }
             _after = listing.Data.After;
             return listing;
         }

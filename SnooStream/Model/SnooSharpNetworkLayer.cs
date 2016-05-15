@@ -52,7 +52,12 @@ namespace SnooStream.Model
 
             if (!responseMessage.IsSuccessStatusCode && sendMessage.RequestUri != requestUri)
             {
-                return await Get(sendMessage.RequestUri.PathAndQuery, token, progress, body);
+                var result = await Get(sendMessage.RequestUri.PathAndQuery, token, progress, body);
+                if (body != null)
+                {
+                    body.Add("redirected-url", sendMessage.RequestUri.PathAndQuery);
+                }
+                return result;
             }
             else
             {

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using SnooStream.Common;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,12 +14,43 @@ using Windows.UI.Xaml.Navigation;
 
 namespace SnooStream.Controls
 {
-    public class HubNavItem
+    public class HubNavItem : SnooObservableObject
     {
         public AdaptiveHubNav Container { get; set; }
         public bool IsRoot { get; set; }
         public DataTemplate ContentTemplate { get; set; }
-        public object Content { get; set; }
+        private object _content;
+        public object Content
+        {
+            get
+            {
+                return _content;
+            }
+            set
+            {
+                if (_content is INotifyPropertyChanged)
+                {
+                    ((INotifyPropertyChanged)_content).PropertyChanged -= HandleContentPropertyChanged;
+                }
+                if (value is INotifyPropertyChanged)
+                {
+                    ((INotifyPropertyChanged)value).PropertyChanged += HandleContentPropertyChanged;
+                }
+                if (Set("Content", ref _content, value))
+                {
+                    RaisePropertyChanged("HeaderText");
+                }
+            }
+        }
+
+        private void HandleContentPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == "Title")
+            {
+                RaisePropertyChanged("HeaderText");
+            }
+        }
+
         public string HeaderText
         {
             get
@@ -30,6 +63,11 @@ namespace SnooStream.Controls
         }
         public void Close()
         {
+            if (_content is INotifyPropertyChanged)
+            {
+                ((INotifyPropertyChanged)_content).PropertyChanged -= HandleContentPropertyChanged;
+            }
+            _content = null;
             Container.Remove(this);
         }
         public IEnumerable<IHubNavCommand> Commands
