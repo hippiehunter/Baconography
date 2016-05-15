@@ -31,6 +31,7 @@ namespace SnooStream.Model
             _redirectUrl = redirectUrl;
 
             _httpClient = new HttpClient();
+            _httpClient.DefaultRequestHeaders.MaxForwards = 100;
             _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("SnooStream/1.0");
         }
 
@@ -38,8 +39,8 @@ namespace SnooStream.Model
         {
             await ThrottleRequests(token);
             await EnsureRedditCookie(token);
-
-            HttpRequestMessage sendMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(RedditBaseUrl + (url.Contains("://") ? new Uri(url).PathAndQuery : url)));
+            var requestUri = new Uri(RedditBaseUrl + (url.Contains("://") ? new Uri(url).PathAndQuery : url));
+            HttpRequestMessage sendMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
             if (body != null)
             {
@@ -48,55 +49,63 @@ namespace SnooStream.Model
             }
 
             var responseMessage = await _httpClient.SendRequestAsync(sendMessage, HttpCompletionOption.ResponseContentRead).AsTask(token, MakeHttpProgress(progress, url));
-            var bodyString = ProcessJsonErrors(await responseMessage.Content.ReadAsStringAsync());
-            if (bodyString.StartsWith("<!doctype html><html><title>") && bodyString.EndsWith("try again and hopefully we will be fast enough this time."))
-                return await Get(url, token, progress, body);
-            else if (responseMessage.IsSuccessStatusCode)
+
+            if (!responseMessage.IsSuccessStatusCode && sendMessage.RequestUri != requestUri)
             {
-                if (string.IsNullOrWhiteSpace(bodyString) || bodyString == "{}" || bodyString == "\"{}\"")
-                    throw new RedditEmptyException("body string was empty but no error code was present");
-                else
-                {
-                    _failedRequestCount = 0;
-                    return bodyString;
-                }
+                return await Get(sendMessage.RequestUri.PathAndQuery, token, progress, body);
             }
             else
             {
-                _failedRequestCount++;
-                switch (responseMessage.StatusCode)
+                var bodyString = ProcessJsonErrors(await responseMessage.Content.ReadAsStringAsync());
+                if (bodyString.StartsWith("<!doctype html><html><title>") && bodyString.EndsWith("try again and hopefully we will be fast enough this time."))
+                    return await Get(url, token, progress, body);
+                else if (responseMessage.IsSuccessStatusCode)
                 {
-                    case HttpStatusCode.GatewayTimeout:
-                    case HttpStatusCode.RequestTimeout:
-                    case HttpStatusCode.BadGateway:
-                    case HttpStatusCode.BadRequest:
-                    case HttpStatusCode.InternalServerError:
-                    case HttpStatusCode.ServiceUnavailable:
-                        {
-                            if (_failedRequestCount < 5)
+                    if (string.IsNullOrWhiteSpace(bodyString) || bodyString == "{}" || bodyString == "\"{}\"")
+                        throw new RedditEmptyException("body string was empty but no error code was present");
+                    else
+                    {
+                        _failedRequestCount = 0;
+                        return bodyString;
+                    }
+                }
+                else
+                {
+                    _failedRequestCount++;
+                    switch (responseMessage.StatusCode)
+                    {
+                        case HttpStatusCode.GatewayTimeout:
+                        case HttpStatusCode.RequestTimeout:
+                        case HttpStatusCode.BadGateway:
+                        case HttpStatusCode.BadRequest:
+                        case HttpStatusCode.InternalServerError:
+                        case HttpStatusCode.ServiceUnavailable:
+                            {
+                                if (_failedRequestCount < 5)
+                                    return await Get(url, token, progress, body);
+                                else
+                                {
+                                    switch (responseMessage.StatusCode)
+                                    {
+                                        case HttpStatusCode.InternalServerError:
+                                        case HttpStatusCode.ServiceUnavailable:
+                                            throw new RedditException("server down");
+                                    }
+                                }
+                                break;
+                            }
+                        case HttpStatusCode.NotFound:
+                            //reddit likes to return 404 for no apparent reason
+                            if (_failedRequestCount < 2)
                                 return await Get(url, token, progress, body);
                             else
-                            {
-                                switch (responseMessage.StatusCode)
-                                {
-                                    case HttpStatusCode.InternalServerError:
-                                    case HttpStatusCode.ServiceUnavailable:
-                                        throw new RedditException("server down");
-                                }
-                            }
-                            break;   
-                        }
-                    case HttpStatusCode.NotFound:
-                        //reddit likes to return 404 for no apparent reason
-                        if (_failedRequestCount < 2)
-                            return await Get(url, token, progress, body);
-                        else
-                            throw new RedditNotFoundException(url);
-                    case HttpStatusCode.Forbidden:
-                        throw new RedditUnauthorizedException(url);
+                                throw new RedditNotFoundException(url);
+                        case HttpStatusCode.Forbidden:
+                            throw new RedditUnauthorizedException(url);
+                    }
+                    responseMessage.EnsureSuccessStatusCode();
+                    return null;
                 }
-                responseMessage.EnsureSuccessStatusCode();
-                return null;
             }
         }
 
@@ -169,7 +178,7 @@ namespace SnooStream.Model
             }
             catch (Exception ex)
             {
-                throw new RedditException(ex.ToString());
+                //throw new RedditException(ex.ToString());
             }
 #endif
             return response;
