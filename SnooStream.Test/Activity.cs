@@ -30,17 +30,63 @@ namespace SnooStream.Test
         public void AppendActivities()
         {
             var context = new TestActivityBuilderContext();
-            var activityGroups = ActivityBuilder.CreateActivityGroups(JsonConvert.DeserializeObject<Thing[]>(escapedActivityString), context).ToList();
+            var activityArray = JsonConvert.DeserializeObject<Thing[]>(escapedActivityString);
+            
+
+            var activityGroups = new ObservableCollection<object>(ActivityBuilder.CreateActivityGroups(activityArray.Reverse(), context));
             Assert.AreEqual(activityGroups.Count, 33);
             ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(escapedActivityString), context);
             Assert.AreEqual(activityGroups.Count, 33);
             ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(updatedActivityString), context);
             Assert.AreEqual(activityGroups.Count, 33);
 
-            ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(newerActivityString), context);
+            ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(newerActivityString).Reverse(), context);
             Assert.AreEqual(activityGroups.Count, 44);
+            var currentNewest = new DateTime(2050, 1, 1);
+            foreach(var group in activityGroups)
+            {
+                if(group is ActivityHeaderViewModel)
+                {
+                    // var groupCreated = ((ActivityGroup)group).Children.FirstOrDefault().CreatedUTC;
+                    // Assert.IsTrue(groupCreated < currentNewest);
 
+                    var groupCreated = ((ActivityHeaderViewModel)group).CreatedUTC;
+                    Assert.IsTrue(groupCreated < currentNewest);
+                    currentNewest = groupCreated;
+                }
+            }
         }
+        [TestMethod]
+        public void AppendActivitiesList()
+        {
+            var context = new TestActivityBuilderContext();
+            var activityArray = JsonConvert.DeserializeObject<Thing[]>(escapedActivityString);
+
+
+            var activityGroups = ActivityBuilder.CreateActivityGroups(activityArray.Reverse(), context).ToList();
+            Assert.AreEqual(activityGroups.Count, 33);
+            ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(escapedActivityString), context);
+            Assert.AreEqual(activityGroups.Count, 33);
+            ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(updatedActivityString), context);
+            Assert.AreEqual(activityGroups.Count, 33);
+
+            ActivityBuilder.UpdateActivityGroups(activityGroups, JsonConvert.DeserializeObject<Thing[]>(newerActivityString).Reverse(), context);
+            Assert.AreEqual(activityGroups.Count, 44);
+            var currentNewest = new DateTime(2050, 1, 1);
+            foreach (var group in activityGroups)
+            {
+                if (group is ActivityHeaderViewModel)
+                {
+                    // var groupCreated = ((ActivityGroup)group).Children.FirstOrDefault().CreatedUTC;
+                    // Assert.IsTrue(groupCreated < currentNewest);
+
+                    var groupCreated = ((ActivityHeaderViewModel)group).CreatedUTC;
+                    Assert.IsTrue(groupCreated < currentNewest);
+                    currentNewest = groupCreated;
+                }
+            }
+        }
+
         [TestMethod]
         public void ExpandActivities()
         {

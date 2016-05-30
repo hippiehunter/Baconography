@@ -135,6 +135,11 @@ namespace SnooStream.ViewModel
                 IsExpandable = true;
                 RaisePropertyChanged("IsExpandable");
             }
+
+            if (activity.CreatedUTC > CreatedUTC)
+                CreatedUTC = activity.CreatedUTC;
+
+            RaisePropertyChanged("CreatedUTC");
         }
     }
 
@@ -160,7 +165,8 @@ namespace SnooStream.ViewModel
         private static string SoloMessageStatusIcon = "\uE122";
         public static IEnumerable<object> CreateActivityGroups(IEnumerable<Thing> things, IActivityBuilderContext context)
         {
-            var madeGroups = new List<ActivityGroup>();
+            //this doesnt appear to be dealing with expaded groups reciving updates
+            var madeGroups = new ObservableCollection<ActivityGroup>();
             var comparer = new ActivityAgeComparitor();
             var activities = things.Select(thing => CreateActivity(thing, context));
             foreach (var activity in activities)
@@ -169,6 +175,7 @@ namespace SnooStream.ViewModel
                 if (context.TryGetGroup(activity.GroupId, out activityGroup))
                 {
                     AddSorted(activityGroup.Children, activity, comparer);
+                    Resort(madeGroups, activityGroup, comparer);
                 }
                 else
                 {
@@ -214,6 +221,13 @@ namespace SnooStream.ViewModel
                         var followingHeaderItem = targetCollection.Skip(collectionHeaderIndex).FirstOrDefault();
                         if (followingHeaderItem is ActivityViewModel)
                             targetCollection.Insert(collectionHeaderIndex + activityGroup.Children.IndexOf(activity), activity);
+
+                        if (targetCollection is ObservableCollection<object>)
+                        {
+                            Resort(targetCollection as ObservableCollection<object>, collectionHeader, comparer);
+                        }
+                        else
+                            Resort(targetCollection, collectionHeader, comparer);
                     }
                 }
                 else
@@ -275,6 +289,49 @@ namespace SnooStream.ViewModel
                 foreach (var activity in group.Children)
                     targetCollection.Remove(activity);
             }
+        }
+
+        public static void Resort<T>(ObservableCollection<T> collection, T item, IComparer<T> comparer, int? initialLower = null, int? initialUpper = null)
+        {
+            int lower = initialLower ?? 0;
+            int upper = initialUpper ?? collection.Count - 1;
+            if (collection.Count <= 1)
+            {
+                return;
+            }
+
+            var currentIndex = collection.IndexOf(item);
+
+            if (comparer.Compare(collection[upper], item) <= 0)
+            {
+                if(currentIndex != upper)
+                    collection.Move(currentIndex,upper);
+                return;
+            }
+            if (comparer.Compare(collection[lower], item) >= 0)
+            {
+                if(currentIndex != lower)
+                    collection.Move(currentIndex, lower);
+                return;
+            }
+
+            var tempCollection = new List<T>(collection);
+            tempCollection.RemoveAt(currentIndex);
+            int index = BinarySearch(tempCollection, item, initialLower, initialUpper, comparer);
+            if (index < 0)
+                index = ~index;
+
+            if(index != currentIndex)
+                collection.Move(currentIndex, index);
+        }
+
+
+        public static void Resort<T>(IList<T> collection, T item, IComparer<T> comparer, int? initialLower = null, int? initialUpper = null)
+        {
+            var index = collection.IndexOf(item);
+            collection.RemoveAt(index);
+
+            AddSorted(collection, item, comparer, initialLower, initialUpper);
         }
 
         public static void AddSorted<T>(IList<T> collection, T item, IComparer<T> comparer, int? initialLower = null, int? initialUpper = null)

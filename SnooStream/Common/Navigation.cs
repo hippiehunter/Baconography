@@ -50,9 +50,12 @@ namespace SnooStream.Common
         DataTemplate UserDetailsTemplate { get; }
         DataTemplate SettingsTemplate { get; }
         DataTemplate OAuthLandingTemplate { get; }
+        DataTemplate ContentSettingsTemplate { get; }
 
         IEnumerable<object> ViewModelStack { get; }
 
+        Dictionary<string, object> MakePageState(ContentSettingsViewModel settings);
+        Dictionary<string, object> MakePageState(SettingsViewModel settings);
         Dictionary<string, object> MakePageState(UserViewModel user);
         Dictionary<string, object> MakePageState(CommentsViewModel comments);
         Dictionary<string, object> MakePageState(LinkRiverViewModel links);
@@ -95,6 +98,11 @@ namespace SnooStream.Common
             }
             var commentsViewModel = context.MakeCommentContext(url, null, null, linkViewModel);
             context.HubNav.Navigate(commentsViewModel, context.CommentTemplate, false);
+        }
+
+        public static void GotoContentSettings(ISettingsContext settingsContext, INavigationContext context)
+        {
+            context.HubNav.Navigate(new ContentSettingsViewModel(settingsContext), context.ContentSettingsTemplate, false);
         }
 
         public static void GotoUserDetails(string username, INavigationContext context)
@@ -183,11 +191,11 @@ namespace SnooStream.Common
             return contentContext;
         }
 
-        public static LoginViewModel GotoSearch(string query, string restrictedToSubreddit, bool subredditsOnly, INavigationContext context)
+        public static SearchViewModel GotoSearch(string query, string restrictedToSubreddit, bool subredditsOnly, INavigationContext context)
         {
             var result = context.MakeSearchContext(query, restrictedToSubreddit, subredditsOnly);
             context.HubNav.Navigate(result, context.SearchTemplate, true);
-            return context.LoginViewModel;
+            return result;
         }
 
         public static LoginViewModel GotoSelf(INavigationContext context)
@@ -288,18 +296,31 @@ namespace SnooStream.Common
         public NavMenu NavMenu { get; set; }
         public AdaptiveHubNav HubNav { get; set; }
 
-        public DataTemplate LinkRiverTemplate { get; set; }
-        public DataTemplate LoginTemplate { get; set; }
-        public DataTemplate ContentRiverTemplate { get; set; }
-        public DataTemplate CommentTemplate { get; set; }
-        public DataTemplate SubredditRiverTemplate { get; set; }
-        public DataTemplate SearchTemplate { get; set; }
-        public DataTemplate SelfTemplate { get; set; }
-        public DataTemplate UserDetailsTemplate { get; set; }
-        public DataTemplate SettingsTemplate { get; set; }
-        public DataTemplate OAuthLandingTemplate { get; set; }
+        public DataTemplate LinkRiverTemplate { get { return _linkRiverTemplate.Value; } }
+        public DataTemplate LoginTemplate { get { return _loginTemplate.Value; } }
+        public DataTemplate ContentRiverTemplate { get { return _contentRiverTemplate.Value; } }
+        public DataTemplate CommentTemplate { get { return _commentTemplate.Value; } }
+        public DataTemplate SubredditRiverTemplate { get { return _subredditRiverTemplate.Value; } }
+        public DataTemplate SearchTemplate { get { return _searchTemplate.Value; } }
+        public DataTemplate SelfTemplate { get { return _selfTemplate.Value; } }
+        public DataTemplate UserDetailsTemplate { get { return _userDetailsTemplate.Value; } }
+        public DataTemplate SettingsTemplate { get { return _settingsTemplate.Value; } }
+        public DataTemplate OAuthLandingTemplate { get { return _oAuthLandingTemplate.Value; } }
+        public DataTemplate ContentSettingsTemplate { get { return _contentSettingsTemplate.Value; } }
 
-        public List<ResourceDictionary> ResourceDictionaryHandles { get; set; } = new List<ResourceDictionary>();
+        private LazyTemplate _linkRiverTemplate;
+        private LazyTemplate _loginTemplate;
+        private LazyTemplate _contentRiverTemplate;
+        private LazyTemplate _commentTemplate;
+        private LazyTemplate _subredditRiverTemplate;
+        private LazyTemplate _searchTemplate;
+        private LazyTemplate _selfTemplate;
+        private LazyTemplate _userDetailsTemplate;
+        private LazyTemplate _settingsTemplate;
+        private LazyTemplate _oAuthLandingTemplate;
+        private LazyTemplate _contentSettingsTemplate;
+
+
         public PeriodicTask PeriodicTasks;
         public IEnumerable<object> ViewModelStack
         {
@@ -321,6 +342,8 @@ namespace SnooStream.Common
             "http://www.reddit.com/reddits/"
         };
 
+        
+
         public NavigationContext(AdaptiveHubNav hubNav)
         {
             Debug.Assert(Window.Current != null && Window.Current.Dispatcher != null, "CoreDispatcher was null for current window");
@@ -331,33 +354,18 @@ namespace SnooStream.Common
             PeriodicTasks.Run();
 
 
-            var subredditRiverRD = new SubredditRiverTemplate();
-            var linkRiverRD = new LinkRiverTemplate();
-            var commentsRD = new CommentsTemplate();
-            var contentRiverRD = new ContentRiverTemplate();
-            var searchRD = new SearchViewTemplate();
-            var userRD = new UserDetailsTemplate();
-            var selfRD = new SelfActivityTemplate();
-            var loginRD = new LoginTemplate();
+            _subredditRiverTemplate = new LazyTemplate<SubredditRiverTemplate>("SubredditRiverView"); 
+            _linkRiverTemplate = new LazyTemplate<LinkRiverTemplate>("LinkRiverView");
+            _commentTemplate = new LazyTemplate<CommentsTemplate>("CommentsView");
+            _contentRiverTemplate = new LazyTemplate<ContentRiverTemplate>("ContentRiverView");
+            _searchTemplate = new LazyTemplate<SearchViewTemplate>("SearchView");
+            _userDetailsTemplate = new LazyTemplate<UserDetailsTemplate>("UserDetails");
+            _selfTemplate = new LazyTemplate<SelfActivityTemplate>("SelfView");
+            _loginTemplate = new LazyTemplate<LoginTemplate>("LoginView");
+            _oAuthLandingTemplate = new LazyTemplate<LoginTemplate>("OAuthLandingView");
+            _settingsTemplate = new LazyTemplate<SettingsTemplate>("SettingsView");
+            _contentSettingsTemplate = new LazyTemplate<SettingsTemplate>("ContentSettingsView");
 
-            ResourceDictionaryHandles.Add(commentsRD);
-            ResourceDictionaryHandles.Add(subredditRiverRD);
-            ResourceDictionaryHandles.Add(linkRiverRD);
-            ResourceDictionaryHandles.Add(contentRiverRD);
-            ResourceDictionaryHandles.Add(searchRD);
-            ResourceDictionaryHandles.Add(userRD);
-            ResourceDictionaryHandles.Add(selfRD);
-            ResourceDictionaryHandles.Add(loginRD);
-
-            SubredditRiverTemplate = subredditRiverRD["SubredditRiverView"] as DataTemplate;
-            LinkRiverTemplate = linkRiverRD["LinkRiverView"] as DataTemplate;
-            CommentTemplate = commentsRD["CommentsView"] as DataTemplate;
-            ContentRiverTemplate = contentRiverRD["ContentRiverView"] as DataTemplate;
-            SearchTemplate = searchRD["SearchView"] as DataTemplate;
-            UserDetailsTemplate = userRD["UserDetails"] as DataTemplate;
-            SelfTemplate = selfRD["SelfView"] as DataTemplate;
-            LoginTemplate = loginRD["LoginView"] as DataTemplate;
-            OAuthLandingTemplate = loginRD["OAuthLandingView"] as DataTemplate;
 
             HubNav = hubNav;
             RoamingState = new RoamingState();
@@ -445,6 +453,10 @@ namespace SnooStream.Common
                 return SearchTemplate;
             else if (vm is SubredditRiverViewModel)
                 return SubredditRiverTemplate;
+            else if (vm is SettingsViewModel)
+                return SettingsTemplate;
+            else if (vm is ContentSettingsViewModel)
+                return ContentSettingsTemplate;
             //else
             return null;
         }
@@ -527,6 +539,22 @@ namespace SnooStream.Common
             var hubNavItems = this.HubNav.NavStack;
             RoamingState.NavStack = hubNavItems.Select(hubNavItem => Navigation.MakeStatePage(hubNavItem.Content, this)).ToList();
             await PeriodicTasks.Suspend();
+        }
+
+        public Dictionary<string, object> MakePageState(SettingsViewModel settings)
+        {
+            return new Dictionary<string, object>
+            {
+                { "kind", "settings" }
+            };
+        }
+
+        public Dictionary<string, object> MakePageState(ContentSettingsViewModel settings)
+        {
+            return new Dictionary<string, object>
+            {
+                { "kind", "contentSettings" }
+            };
         }
 
         public Dictionary<string, object> MakePageState(CommentsViewModel comment)

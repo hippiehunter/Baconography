@@ -12,18 +12,39 @@ namespace SnooStream.ViewModel
 {
     public interface ISettingsContext
     {
+        INavigationContext Navigation { get; }
         Dictionary<string, string> Settings { get; }
         void SettingsChanged();
     }
 
-    public class SettingsViewModel
+    public class ContentSettingsViewModel : BaseSettingsViewModel
     {
-        private ISettingsContext _settingsContext;
-        public SettingsViewModel(ISettingsContext settingsContext)
+        public ContentSettingsViewModel(ISettingsContext settingsContext) : base(settingsContext)
         {
-            _settingsContext = settingsContext;
         }
 
+        
+    }
+
+    public class SettingsViewModel : BaseSettingsViewModel
+    {
+        public SettingsViewModel(ISettingsContext settingsContext) : base(settingsContext)
+        {
+        }
+
+        public void ClearOffline()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ShowOfflineHelp()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class BaseSettingsViewModel
+    {
         public bool LeftSideNav { get { return DefaultGet("LeftSideNav", true); } set { Set("LeftSideNav", value); } }
         public int ContentTimeout { get { return DefaultGet("ContentTimeout", 60 * 1000); } set { Set("ContentTimeout", value); } }
         public bool AllowOver18 { get { return DefaultGet("AllowOver18", false); } set { Set("AllowOver18", value); } }
@@ -58,6 +79,19 @@ namespace SnooStream.ViewModel
         public DateTime LastUpdatedImages { get { return DefaultGet("LastUpdatedImages", new DateTime()); } set { Set("LastUpdatedImages", value); } }
         public DateTime LastCleanedCache { get { return DefaultGet("LastCleanedCache", new DateTime()); } set { Set("LastCleanedCache", value); } }
 
+
+        private ISettingsContext _settingsContext;
+        public BaseSettingsViewModel(ISettingsContext settingsContext)
+        {
+            _settingsContext = settingsContext;
+        }
+
+        public void GotoContentSettings()
+        {
+            _settingsContext.Navigation.Navigate(new ContentSettingsViewModel(_settingsContext));
+        }
+
+        
         internal string DefaultGet(string key, string defaultValue)
         {
             string result;
@@ -190,7 +224,7 @@ namespace SnooStream.ViewModel
     class SettingsContext : ISettingsContext
     {
         public Dictionary<string, string> Settings { get; set; }
-
+        public INavigationContext Navigation { get; set; }
         public void SettingsChanged()
         {
             Messenger.Default.Send<SettingsChangedMessage>(new SettingsChangedMessage());

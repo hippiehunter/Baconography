@@ -378,4 +378,5 @@ namespace SnooStream.ViewModel
             Navigation.GotoLink(SearchViewModel, vm.Thing.Url, NavigationContext);
         }
     }
+
 }

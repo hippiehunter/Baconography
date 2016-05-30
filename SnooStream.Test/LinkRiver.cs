@@ -112,10 +112,22 @@ namespace SnooStream.Test
             var madeLinks = LinkBuilder.MakeLinkViewModels(linkListing.Data.Children, builderContext).ToList();
             LinkBuilder.UpdateLinkViewModels(madeLinks, overlappingListing.Data.Children, builderContext);
 
-            Assert.IsFalse(madeLinks.Any(link => link.Metadata == null));
-            Assert.AreEqual(madeLinks.Count(), 25);
             Assert.AreEqual(((Link)overlappingListing.Data.Children.First().Data).Name, madeLinks.First().Thing.Name);
             Assert.AreEqual(((Link)overlappingListing.Data.Children.Last().Data).Name, madeLinks.Last().Thing.Name);
+
+            overlappingListing.Data.Children.Reverse();
+            LinkBuilder.UpdateLinkViewModels(madeLinks, overlappingListing.Data.Children, builderContext);
+
+            HashSet<string> titles = new HashSet<string>();
+            foreach (var link in madeLinks)
+            {
+                titles.Add(link.LinkTitle);
+            }
+
+
+            Assert.IsFalse(madeLinks.Any(link => link.Metadata == null));
+            Assert.AreEqual(madeLinks.Count(), 25);
+            
         }
 
         class LinkEqualityComparer : IEqualityComparer<LinkViewModel>

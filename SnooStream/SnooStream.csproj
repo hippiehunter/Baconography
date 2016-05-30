@@ -102,6 +102,7 @@
     <Compile Include="Common\CaptchaService.cs" />
     <Compile Include="Common\CollectionMerger.cs" />
     <Compile Include="Common\DispatchTimer.cs" />
+    <Compile Include="Common\LazyTemplate.cs" />
     <Compile Include="Common\LinkViewLayoutManager.cs" />
     <Compile Include="Common\MarkdownHelpers.cs" />
     <Compile Include="Common\Navigation.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Common\RangedCollectionBase.cs" />
     <Compile Include="Common\RangedCollections.cs" />
     <Compile Include="Common\RoamingState.cs" />
+    <Compile Include="Common\Searchable.cs" />
     <Compile Include="Common\SnooObservableObject.cs" />
     <Compile Include="Common\Utility.cs" />
     <Compile Include="Common\WeakListener.cs" />
@@ -188,6 +190,9 @@
     </Compile>
     <Compile Include="Templates\SelfActivityTemplate.xaml.cs">
       <DependentUpon>SelfActivityTemplate.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\SettingsTemplate.xaml.cs">
+      <DependentUpon>SettingsTemplate.xaml</DependentUpon>
     </Compile>
     <Compile Include="Templates\SubredditRiverTemplate.xaml.cs">
       <DependentUpon>SubredditRiverTemplate.xaml</DependentUpon>
@@ -293,6 +298,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Templates\SelfActivityTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Templates\SettingsTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

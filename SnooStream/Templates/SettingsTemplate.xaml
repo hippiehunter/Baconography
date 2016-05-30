@@ -1,0 +1,139 @@
+﻿<ResourceDictionary
+    x:Class="SnooStream.Templates.SettingsTemplate"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SnooStream.Templates"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:SnooStream.ViewModel"
+    mc:Ignorable="d">
+
+    <DataTemplate x:Key="ContentSettingsView" x:DataType="vm:SettingsViewModel">
+        <ScrollViewer Grid.Row="1" Margin="0,0,0,0">
+            <StackPanel Margin="12,12,12,0">
+                <ToggleSwitch Header="Allow NSFW (over 18) subreddits" IsOn="{x:Bind AllowOver18, Mode=TwoWay}" />
+                <ToggleSwitch Header="Allow NSFW (over 18) content" IsOn="{x:Bind AllowOver18Items, Mode=TwoWay}" />
+                <ToggleSwitch Header="Only flipview unvisited content" IsOn="{x:Bind OnlyFlipViewUnread, Mode=TwoWay}" />
+                <ToggleSwitch Header="Only flipview through images" IsOn="{x:Bind OnlyFlipViewImages, Mode=TwoWay}" />
+                <ToggleSwitch Header="Visit web links in browser" IsOn="{x:Bind OpenLinksInBrowser, Mode=TwoWay}"  />
+
+                <TextBlock FontWeight="SemiBold" Text="LAYOUT"/>
+                <ToggleSwitch Header="Invert system theme" IsOn="{x:Bind InvertSystemTheme, Mode=TwoWay}" />
+                <ToggleSwitch Header="Use multi-color comment margins" IsOn="{x:Bind MultiColorCommentMargins, Mode=TwoWay}" />
+
+
+                <TextBlock FontWeight="SemiBold" Text="BACKGROUND"/>
+                <ToggleSwitch Header="Disable background activity"
+                                        IsOn="{x:Bind DisableBackground, Mode=TwoWay}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock HorizontalAlignment="Left" FontWeight="SemiBold" Text="OFFLINE CONTENT"/>
+                    <Button 
+                                            Margin="20,-1,0,0"
+                                            FontFamily="Segoe UI Symbol" FontSize="14"
+                                            Width="34" Height="34"
+                                            Tapped="{x:Bind ShowOfflineHelp}"
+                                            Content="&#xE11B;" Style="{StaticResource RoundButtonStyle}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="12,0,0,0" Text="Cleanup data every"/>
+                    <TextBlock Margin="6,0,0,0" Text="{x:Bind OfflineCacheDays}" />
+                    <TextBlock Margin="6,0,0,0" Text="days" />
+                </StackPanel>
+                <Slider Margin="0,0,0,0" Minimum="1" Maximum="7" Value="{Binding OfflineCacheDays, Mode=TwoWay}"/>
+                <Button Margin="0,-12,0,0" Content="Clear Offline Data" Tapped="{x:Bind ClearOffline}"/>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="SettingsView" x:DataType="vm:SettingsViewModel">
+        <Grid>
+            <ScrollViewer>
+                <StackPanel Margin="0,-3,0,0">
+                    <Button Style="{StaticResource SubtextButton}"
+                        Tapped="{x:Bind GotoContentSettings}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            CONTENT
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Choose what you see and when you see it
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SubtextButton}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            LAYOUT
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Change the way the app looks
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SubtextButton}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            LOCK SCREEN
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Customize your reddit lock screen
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SubtextButton}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            LIVE TILE
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Have the live tile your way
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SubtextButton}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            OFFLINE DATA
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Decide what gets stored or clear your cache
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SubtextButton}"
+                        Visibility="{x:Bind AllowAdvertising, Mode=TwoWay, Converter={StaticResource booleanVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            DISABLE ADS
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Remove the Ads for good
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SubtextButton}"
+                        IsEnabled="False"
+                        Visibility="{x:Bind AllowAdvertising, Mode=TwoWay, Converter={StaticResource invertedBooleanVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource SubtextButtonTitleTextBlock}">
+                            THANK YOU!
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource SubtextButtonSubtextTextBlock}">
+                            Enjoy your Ad-Free experience
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DataTemplate>
+    
+</ResourceDictionary>

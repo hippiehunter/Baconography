@@ -32,7 +32,7 @@ namespace SnooStream.Test
                 var mergeTarget = RandomArrayTool.Randomize(mergeTargetIds.Select(id => (object)new MergableInt { MergeID = id.ToString() }).ToList());
 
                 HashSet<int> mergeSourceIds = new HashSet<int>();
-                while (mergeSourceIds.Count < 50)
+                while (mergeSourceIds.Count < 100)
                 {
                     var rndInt = rnd.Next(0, 200);
                     if (!mergeSourceIds.Contains(rndInt))

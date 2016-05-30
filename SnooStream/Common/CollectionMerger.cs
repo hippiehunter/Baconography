@@ -52,7 +52,7 @@ namespace SnooStream.Common
                 }
             }
 
-            foreach (var tpl in namePosMap.Values.Where(tpl =>tpl.Item1 == -1).OrderByDescending(tpl => tpl.Item2))
+            foreach (var tpl in namePosMap.Values.Where(tpl =>tpl.Item1 == -1).OrderBy(tpl => tpl.Item2))
             {
                 destination.Insert(tpl.Item2, tpl.Item3);
             }
