@@ -325,17 +325,30 @@ namespace SnooStream.ViewModel
             
         }
 
-        private PreviewImage Preview
+        private PreviewResolution Preview
+        {
+            get
+            {
+                if (PreviewFull != null)
+                {
+                    var result = PreviewFull.resolutions.OrderByDescending(thing => thing.height * thing.width);
+                    if (Context.IsHighBandwidth)
+                        return result.FirstOrDefault();
+                    else
+                        return result.LastOrDefault();
+                }
+                else
+                    return null;
+            }
+        }
+
+        private PreviewImage PreviewFull
         {
             get
             {
                 if (Thing.Preview?.images != null)
                 {
-                    var previewImages = Thing.Preview.images.OrderBy(thing => thing.source.height * thing.source.width);
-                    if (Context.IsHighBandwidth)
-                        return previewImages.FirstOrDefault();
-                    else
-                        return previewImages.LastOrDefault();
+                    return Thing.Preview.images.FirstOrDefault();
                 }
                 else
                     return null;
@@ -348,7 +361,8 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return Preview?.source.url;
+                //this came through json so the string is still html encoded
+                return WebUtility.HtmlDecode(Preview?.url);
             }
         }
 
@@ -356,7 +370,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return Preview?.source.height ?? 0.0;
+                return Preview?.height ?? 0.0;
             }
         }
 

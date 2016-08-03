@@ -126,9 +126,16 @@ namespace SnooStream.Common
                 return;
             }
 
+            Uri uri = new Uri(url);
+
+
             if (CommentRegex.IsMatch(url) ||
                 CommentsPageRegex.IsMatch(url) ||
-                ShortCommentsPageRegex.IsMatch(url))
+                ShortCommentsPageRegex.IsMatch(url) &&
+                !uri.AbsolutePath.EndsWith(".jpg") &&
+                !uri.AbsolutePath.EndsWith(".jpeg") &&
+                !uri.AbsolutePath.EndsWith(".png") &&
+                !uri.AbsolutePath.EndsWith(".gif"))
             {
                 GotoComments(url, context, contextObj as LinkViewModel);
             }

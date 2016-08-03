@@ -519,7 +519,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                return PlayableStreams.FirstOrDefault()?.Item1;
+                return PlayableStreams?.FirstOrDefault()?.Item1;
             }
         }
         public IEnumerable<Tuple<string, string>> PlayableStreams { get; set; }
