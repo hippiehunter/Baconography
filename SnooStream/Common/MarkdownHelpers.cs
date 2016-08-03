@@ -3,6 +3,7 @@ using SnooDom;
 using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -10,7 +11,7 @@ using Windows.UI.Xaml.Media;
 
 namespace SnooStream.Common
 {
-    public class MarkdownHelpers : IStyleProvider, ICommandFactory
+    public class MarkdownHelpers : IStyleProvider, ICommandFactory, IMarkdownUtility
     {
         public INavigationContext NavigationContext { get; set; }
 		private CommentViewModel FindCommentContext(DependencyObject obj)
@@ -56,7 +57,21 @@ namespace SnooStream.Common
             });
 		}
 
-		public Windows.UI.Xaml.Style BorderStyle
+        public string HTMLDecode(string input, int recurseCount)
+        {
+            string old = input;
+            for (int i = 0; i < recurseCount; i++)
+            {
+                string current = WebUtility.HtmlDecode(old);
+                if (current == old)
+                    return old;
+                else
+                    old = current;
+            }
+            return old;
+        }
+
+        public Windows.UI.Xaml.Style BorderStyle
 		{
             get { return Application.Current.Resources["MarkdownBorderStyle"] as Style; }
 		}
