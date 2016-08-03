@@ -24,6 +24,7 @@ namespace SnooStream.Common
                 if(!_loadedRDs.TryGetValue(typeof(T), out targetRD))
                 {
                     targetRD = new T();
+                    _loadedRDs.Add(typeof(T), targetRD);
                 }
 
                 return targetRD[targetKey] as DataTemplate;

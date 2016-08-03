@@ -59,20 +59,29 @@ namespace SnooStream.Common
 
         private async Task<LoadMoreItemsResult> LoadItemsAsyncWrapper(uint count)
         {
-            IsLoading = true;
-            try
+            if (HasMoreItems)
             {
-                return new LoadMoreItemsResult { Count = await LoadItemsAsync(count) };
+                IsLoading = true;
+                try
+                {
+                    return new LoadMoreItemsResult { Count = await LoadItemsAsync(count) };
+                }
+                finally
+                {
+                    HasLoaded = true;
+                    IsLoading = false;
+                }
             }
-            finally
+            else
             {
-                IsLoading = false;
+                HasLoaded = true;
+                return new LoadMoreItemsResult { Count = 0 };
             }
+                
         }
 
         public sealed override IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
         {
-            HasLoaded = true;
             return LoadItemsAsyncWrapper(count).AsAsyncOperation<LoadMoreItemsResult>();
         }
     }

@@ -264,6 +264,14 @@ namespace SnooStream.Test
             }
         }
 
+        public INavigationContext NavigationContext
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public IEnumerable<object> LoadInitial()
         {
             throw new NotImplementedException();

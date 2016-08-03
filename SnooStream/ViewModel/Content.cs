@@ -28,6 +28,7 @@ namespace SnooStream.ViewModel
         void NavigateToComments(string contextUrl);
         bool MakeCollectionViewSource { get; }
         Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token);
+        INavigationContext NavigationContext { get; }
         int Current { get; set; }
     }
 
@@ -101,10 +102,11 @@ namespace SnooStream.ViewModel
             }
             else if (LinkGlyphUtility.IsSubreddit(url) || LinkGlyphUtility.IsUserMultiReddit(url))
             {
+                result = context.NavigationContext.MakeLinkRiverContext(url, null, null);
             }
             else if (LinkGlyphUtility.IsUser(url))
             {
-                throw new NotImplementedException();
+                context.NavigationContext.MakeUserDetailsContext(url);
             }
             else if (fileName != null &&
                 (fileName.EndsWith(".mp4") ||
@@ -608,6 +610,7 @@ namespace SnooStream.ViewModel
         public string InitialUrl { get; set; }
         public CommentsViewModel Comments { get; set; }
         public INetworkLayer NetworkLayer { get; set; }
+        public INavigationContext NavigationContext { get; set; }
         public ICollectionView CollectionView { get; set; }
         public ObservableCollection<object> Collection { get; set; }
         private Dictionary<int, CommentViewModel> _contentToCommentMap = new Dictionary<int, CommentViewModel>(); 

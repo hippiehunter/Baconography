@@ -495,7 +495,7 @@ namespace SnooStream.Common
             }
             else if (context is CommentsViewModel)
             {
-                var madeContext = new CommentContentRiverContext { InitialUrl = url, Comments = context as CommentsViewModel, NetworkLayer = NetworkLayer };
+                var madeContext = new CommentContentRiverContext { InitialUrl = url, Comments = context as CommentsViewModel, NetworkLayer = NetworkLayer, NavigationContext = this };
                 var madeContentRiver = new ContentRiverViewModel(madeContext);
                 madeContext.Collection = madeContentRiver.ContentItems;
                 madeContext.CollectionView = madeContentRiver.ContentItems;
