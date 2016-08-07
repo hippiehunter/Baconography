@@ -23,15 +23,6 @@ namespace SnooStream.ViewModel
         {
         }
 
-        
-    }
-
-    public class SettingsViewModel : BaseSettingsViewModel
-    {
-        public SettingsViewModel(ISettingsContext settingsContext) : base(settingsContext)
-        {
-        }
-
         public void ClearOffline()
         {
             throw new NotImplementedException();
@@ -41,6 +32,15 @@ namespace SnooStream.ViewModel
         {
             throw new NotImplementedException();
         }
+    }
+
+    public class SettingsViewModel : BaseSettingsViewModel
+    {
+        public SettingsViewModel(ISettingsContext settingsContext) : base(settingsContext)
+        {
+        }
+
+        
     }
 
     public class BaseSettingsViewModel
@@ -88,7 +88,7 @@ namespace SnooStream.ViewModel
 
         public void GotoContentSettings()
         {
-            _settingsContext.Navigation.Navigate(new ContentSettingsViewModel(_settingsContext));
+            Navigation.GotoContentSettings(_settingsContext, _settingsContext.Navigation);
         }
 
         

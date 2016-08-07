@@ -8,7 +8,7 @@
     xmlns:vm="using:SnooStream.ViewModel"
     mc:Ignorable="d">
 
-    <DataTemplate x:Key="ContentSettingsView" x:DataType="vm:SettingsViewModel">
+    <DataTemplate x:Key="ContentSettingsView" x:DataType="vm:ContentSettingsViewModel">
         <ScrollViewer Grid.Row="1" Margin="0,0,0,0">
             <StackPanel Margin="12,12,12,0">
                 <ToggleSwitch Header="Allow NSFW (over 18) subreddits" IsOn="{x:Bind AllowOver18, Mode=TwoWay}" />

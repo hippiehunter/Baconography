@@ -1,4 +1,5 @@
 ﻿using SnooSharp;
+using SnooStream.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -151,9 +152,9 @@ namespace SnooStream.Common
         public Reddit Reddit { get; set; }
         public OfflineService Offline { get; set; }
         public Dictionary<string, bool> InitialFilter { get; set; }
-        public bool SettingsAllowOver18 { get; set; }
-        public bool SettingsAllowOver18Items { get; set; }
-
+        public bool SettingsAllowOver18 { get { return Settings.AllowOver18; } }
+        public bool SettingsAllowOver18Items { get { return Settings.AllowOver18Items; } }
+        public SettingsViewModel Settings { get; set; }
         public async Task<Subreddit> GetSubreddit(string name)
         {
             var subredditThing = await Offline.GetSubreddit(name) ?? await Reddit.GetSubredditAbout(name, CancellationToken.None, new Progress<float>());

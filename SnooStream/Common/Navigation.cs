@@ -376,13 +376,13 @@ namespace SnooStream.Common
 
             HubNav = hubNav;
             RoamingState = new RoamingState();
-            var settingsContext = new SettingsContext { Settings = RoamingState.Settings ?? new Dictionary<string, string>() };
+            var settingsContext = new SettingsContext { Settings = RoamingState.Settings ?? new Dictionary<string, string>(), Navigation = this };
             SettingsViewModel = new SettingsViewModel(settingsContext);
             ActivityManager = new ActivityManager();
             Offline = new OfflineService();
             NetworkLayer = new PlainNetworkLayer();
             UserState = RoamingState.UserCredentials?.FirstOrDefault(state => state.IsDefault);
-            var listingFilterContext = new ListingFilterContext { Offline = Offline, SettingsAllowOver18 = SettingsViewModel.AllowOver18, SettingsAllowOver18Items = SettingsViewModel.AllowOver18Items };
+            var listingFilterContext = new ListingFilterContext { Offline = Offline, Settings = SettingsViewModel };
             var cacheProvider = new SnooSharpCacheProvider(Offline, HighValueListingUrls);
             Reddit = new Reddit(new NSFWListingFilter(listingFilterContext),
                UserState,
