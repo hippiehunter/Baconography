@@ -112,7 +112,7 @@ namespace SnooStream.ViewModel
                 (fileName.EndsWith(".mp4") ||
                 fileName.EndsWith(".gifv")))
             {
-                result = new VideoContentViewModel { Url = url, Votable = votable, Context = context, Title = title, HasComments = linkViewModel != null };
+                result = new VideoContentViewModel { PlayableStreams = new List<Tuple<string, string>> { new Tuple<string, string>(url.Replace(".gifv", ".mp4"), title) }, Url = url, Votable = votable, Context = context, Title = title, HasComments = linkViewModel != null };
             }
             else if (targetHost == "www.youtube.com" ||
                 targetHost == "www.youtu.be" ||
@@ -672,9 +672,11 @@ namespace SnooStream.ViewModel
             //goto reddit url
         }
 
-        public Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
+        public async Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
         {
-            throw new NotImplementedException();
+            var madeViewModel = NavigationContext.MakeCommentContext(commentUrl, null, null, null);
+            await madeViewModel.LoadAsync(progress, token);
+            return madeViewModel.Context;
         }
 
         int _current = -1;

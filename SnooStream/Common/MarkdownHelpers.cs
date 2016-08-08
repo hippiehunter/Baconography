@@ -50,10 +50,14 @@ namespace SnooStream.Common
 			{
 				var commentContext = FindCommentContext(link);
 				var topContext = FindCommentsContext(link);
-                if(topContext is LinkViewModel)
+                if (topContext is LinkViewModel)
                     Navigation.GotoLink(topContext, url, NavigationContext);
                 else
+                {
+                    var commentsViewModel = topContext as CommentsViewModel;
+                    commentsViewModel.Comments.CurrentItem = commentContext;
                     Navigation.GotoLink(topContext as CommentsViewModel, url, NavigationContext);
+                }
             });
 		}
 

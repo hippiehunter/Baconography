@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream.Templates"
     xmlns:controls="using:SnooStream.Controls"
+    xmlns:common="using:SnooStream.Common"
     xmlns:selector="using:SnooStream.Selectors"
     xmlns:snoodom="using:SnooDom"
     xmlns:vm="using:SnooStream.ViewModel"
@@ -227,7 +228,7 @@
     <!--this needs to be wrapped by a load control to prevent out of order access to the context and nasty looking visual artifacts -->
     <DataTemplate x:Key="CommentsView" x:DataType="vm:CommentsViewModel">
         <ListView HeaderTemplate="{StaticResource CardCommentView}"
-                  ItemsSource="{x:Bind Comments}"
+                  common:RangedCollectionDataSource.DataSource="{x:Bind Comments}"
                   ItemContainerStyle="{StaticResource FullWidthListViewContainer}"
                   ItemTemplateSelector="{StaticResource commentTemplateSelector}">
             <ListView.ItemContainerTransitions>
