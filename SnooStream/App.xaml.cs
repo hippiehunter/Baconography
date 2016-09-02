@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SnooStreamBackground;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Background;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -56,7 +58,7 @@ namespace SnooStream
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
 
 #if DEBUG
@@ -95,6 +97,70 @@ namespace SnooStream
             }
             // Ensure the current window is active
             Window.Current.Activate();
+
+            try
+            {
+                var taskRegistered = false;
+                var taskName = "SnooStreamUpdateTask";
+
+                foreach (var task in BackgroundTaskRegistration.AllTasks)
+                {
+                    if (task.Value.Name == taskName)
+                    {
+                        taskRegistered = true;
+                        break;
+                    }
+                }
+
+                if (Windows.System.UserProfile.UserProfilePersonalizationSettings.IsSupported())
+                {
+
+                    //Windows.System.UserProfile.UserProfilePersonalizationSettings.Current.TrySetLockScreenImageAsync()
+                }
+
+                if (!taskRegistered)
+                {
+                    
+                    var lockscreenSettings = new LockScreenSettings();
+                    if (lockscreenSettings.LiveTileSettings == null || lockscreenSettings.LiveTileSettings.Count == 0)
+                    {
+                        lockscreenSettings.LiveTileSettings = new List<LiveTileSettings> { new LiveTileSettings() { CurrentImages = new List<string>(), LiveTileStyle = LiveTileStyle.TextImage, LiveTileItemsReddit = "/" } };
+                        lockscreenSettings.Store();
+                    }
+
+
+                    var result = await BackgroundExecutionManager.RequestAccessAsync();
+                    //
+                    // Must be the same entry point that is specified in the manifest.
+                    //
+                    String taskEntryPoint = typeof(SnooStreamBackground.UpdateBackgroundTask).FullName;
+
+                    //
+                    // A time trigger that repeats at 30-minute intervals.
+                    //
+                    IBackgroundTrigger trigger = new TimeTrigger(30, false);
+
+                    //
+                    // Builds the background task.
+                    //
+                    BackgroundTaskBuilder builder = new BackgroundTaskBuilder();
+
+                    builder.Name = taskName;
+                    builder.IsNetworkRequested = true;
+                    builder.TaskEntryPoint = taskEntryPoint;
+                    builder.SetTrigger(trigger);
+
+                    //
+                    // Registers the background task, and get back a BackgroundTaskRegistration object representing the registered task.
+                    //
+                    BackgroundTaskRegistration task = builder.Register();
+                }
+            }
+            catch (Exception ex)
+            {
+                //gotta catch em all!
+                Debug.WriteLine(ex);
+            }
         }
 
         /// <summary>

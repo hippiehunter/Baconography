@@ -45,7 +45,7 @@
             <Grid x:Name="overlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption" Foreground="{ThemeResource ThemeForegroundBrush}"/>
             </Grid>
-            <gif:ZoomableImageControl Grid.Row="1" DataContext="{x:Bind Url}" />
+            <gif:ZoomableImageControl Grid.Row="1" Url="{x:Bind Url}" />
         </Grid>
     </DataTemplate>
 
@@ -70,7 +70,7 @@
                 </FlipView.ItemContainerStyle>
                 <FlipView.ItemTemplate>
                     <DataTemplate x:DataType="vm:ContentViewModel">
-                        <gif:ZoomableImageControl DataContext="{x:Bind Url}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                        <gif:ZoomableImageControl Url="{x:Bind Url}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                     </DataTemplate>
                 </FlipView.ItemTemplate>
             </FlipView>

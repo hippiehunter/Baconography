@@ -11,7 +11,7 @@ namespace SnooStream.Common
 {
     public class SnooObservableObject : ObservableObject
     {
-        protected override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        public override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             try
             {
