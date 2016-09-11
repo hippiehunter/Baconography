@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using SnooStream.Common;
 using System.Collections.ObjectModel;
+using SnooStream.Controls;
 
 namespace SnooStream.Test
 {
@@ -285,6 +286,11 @@ namespace SnooStream.Test
         public Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
         {
             return Task.FromResult<ICommentBuilderContext>(new TestCommentBuilderContext());
+        }
+
+        public IEnumerable<IHubNavCommand> MakeHubNavCommands(ContentRiverViewModel contentRiverViewModel)
+        {
+            throw new NotImplementedException();
         }
 
         public void NavigateToComments(string contextUrl)

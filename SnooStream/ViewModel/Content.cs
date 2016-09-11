@@ -16,6 +16,7 @@ using NBoilerpipePortable.Util;
 using Windows.UI.Xaml;
 using SnooStream.Common;
 using System.Net;
+using SnooStream.Controls;
 
 namespace SnooStream.ViewModel
 {
@@ -30,12 +31,15 @@ namespace SnooStream.ViewModel
         Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token);
         INavigationContext NavigationContext { get; }
         int Current { get; set; }
+        ObservableCollection<IHubNavCommand> MakeHubNavCommands(ContentRiverViewModel contentRiverViewModel);
+        void UpdateHubNavCommands(ContentRiverViewModel contentRiverViewModel);
     }
 
-    public class ContentRiverViewModel
+    public class ContentRiverViewModel : IHasHubNavCommands
     {
         public IContentRiverContext Context { get; set; }
         public LoadItemCollectionBase ContentItems { get; set; }
+        public IEnumerable<IHubNavCommand> Commands { get; set; }
 
         public ContentRiverViewModel() { }
 
@@ -45,6 +49,7 @@ namespace SnooStream.ViewModel
             var contentCollection = new ContentCollection(context);
             contentCollection.CurrentChanged += View_CurrentChanged;
             ContentItems = contentCollection;
+            Commands = context.MakeHubNavCommands(this);
         }
 
         private async void View_CurrentChanged(object sender, object e)
@@ -52,6 +57,7 @@ namespace SnooStream.ViewModel
             var collectionView = sender as ICollectionView;
             await ContentBuilder.SetCurrentContent(collectionView.CurrentPosition, collectionView, Context);
             Context.Current = collectionView?.CurrentPosition ?? -1;
+            Context.UpdateHubNavCommands(this);
         }
     }
 
@@ -531,14 +537,69 @@ namespace SnooStream.ViewModel
         public RangedCollectionBase ContentItems { get; set; }
     }
 
-    public class LinkContentRiverContext : IContentRiverContext
+    public abstract class ContentRiverBaseContext : IContentRiverContext
     {
         public INavigationContext NavigationContext { get; set; }
+        public abstract bool HasAdditional { get; }
+        public abstract bool MakeCollectionViewSource { get; }
+        public abstract int Current { get; set; }
+
+        ObservableCollection<IHubNavCommand> _hubNavCommands;
+        public ObservableCollection<IHubNavCommand> MakeHubNavCommands(ContentRiverViewModel contentRiverViewModel)
+        {
+            if (_hubNavCommands == null)
+            {
+                _hubNavCommands = new ObservableCollection<IHubNavCommand>
+                {
+                    new DelayedLaunchUri { TargetUrl = () => (contentRiverViewModel.ContentItems.CurrentItem as ContentViewModel)?.Url, NavigationContext = NavigationContext },
+                    new DelayedVoteNavCommand(() => (contentRiverViewModel.ContentItems.CurrentItem as ContentViewModel)?.Votable) { NavigationContext = NavigationContext },
+                };
+            }
+
+            UpdateHubNavCommands(contentRiverViewModel);
+            return _hubNavCommands;
+        }
+
+        public void UpdateHubNavCommands(ContentRiverViewModel contentRiverViewModel)
+        {
+            var currentItem = contentRiverViewModel.ContentItems.CurrentItem;
+
+            var existingGalleryCommand = _hubNavCommands.OfType<DelayedGalleryCommand>().FirstOrDefault();
+            var existingRefreshCommand = _hubNavCommands.OfType<DelayedRefreshNavCommand>().FirstOrDefault();
+            //var existingCommentsCommand = _hubNavCommands.OfType<DelayedGalleryCommand>();
+
+            if (currentItem is ContentContainerViewModel && ((ContentContainerViewModel)currentItem).SingleViewItem)
+            {
+                if (existingGalleryCommand == null)
+                    _hubNavCommands.Insert(0, new DelayedGalleryCommand(() => { return; }, (obj) => obj is ContentContainerViewModel, contentRiverViewModel.ContentItems) { NavigationContext = NavigationContext });
+            }
+            else if (existingGalleryCommand != null)
+                _hubNavCommands.Remove(existingGalleryCommand);
+
+            if (currentItem is CommentsViewModel || !(currentItem is ContentContainerViewModel && ((ContentContainerViewModel)currentItem).SingleViewItem))
+            {
+                if (existingRefreshCommand != null)
+                    _hubNavCommands.Insert(0, new DelayedRefreshNavCommand(() => contentRiverViewModel.ContentItems.CurrentItem as IRefreshable, (obj) => obj is IRefreshable, contentRiverViewModel.ContentItems) { NavigationContext = NavigationContext });
+            }
+            else if (existingRefreshCommand != null)
+                _hubNavCommands.Remove(existingRefreshCommand);
+
+        }
+
+        public abstract IEnumerable<object> LoadInitial();
+        public abstract Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token);
+        public abstract void NavigateToWeb(string url);
+        public abstract void NavigateToComments(string contextUrl);
+        public abstract Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token);
+    }
+
+    public class LinkContentRiverContext : ContentRiverBaseContext
+    {
         public INetworkLayer NetworkLayer { get; set; }
         public LinkRiverViewModel LinkRiverContext { get; set; }
         public ICollectionView ContentView { get; set; }
         public ObservableCollection<object> Collection { get; set; }
-        public bool HasAdditional
+        public override bool HasAdditional
         {
             get
             {
@@ -546,7 +607,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public bool MakeCollectionViewSource
+        public override bool MakeCollectionViewSource
         {
             get
             {
@@ -555,30 +616,30 @@ namespace SnooStream.ViewModel
         }
 
 
-        public async Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token)
+        public override async Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token)
         {
             var additionalListing = await LinkRiverContext.LoadAdditionalAsync(progress, token);
             return additionalListing.Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
         }
 
-        public void NavigateToComments(string contextUrl)
+        public override void NavigateToComments(string contextUrl)
         {
             throw new NotImplementedException();
         }
 
-        public void NavigateToWeb(string url)
+        public override void NavigateToWeb(string url)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
+        public override async Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
         {
             var comments = NavigationContext.MakeCommentContext(commentUrl, null, null, null);
             await comments.LoadAsync(progress, token);
             return comments.Context;
         }
 
-        public int Current
+        public override int Current
         {
             get
             {
@@ -590,16 +651,16 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public IEnumerable<object> LoadInitial()
+        public override IEnumerable<object> LoadInitial()
         {
             return LinkRiverContext.Links.OfType<LinkViewModel>().Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
         }
     }
 
-    public class CommentContentRiverContext : IContentRiverContext
+    public class CommentContentRiverContext : ContentRiverBaseContext
     {
         bool _initialLoaded = false;
-        public bool HasAdditional
+        public override bool HasAdditional
         {
             get
             {
@@ -610,11 +671,10 @@ namespace SnooStream.ViewModel
         public string InitialUrl { get; set; }
         public CommentsViewModel Comments { get; set; }
         public INetworkLayer NetworkLayer { get; set; }
-        public INavigationContext NavigationContext { get; set; }
         public ICollectionView CollectionView { get; set; }
         public ObservableCollection<object> Collection { get; set; }
         private Dictionary<int, CommentViewModel> _contentToCommentMap = new Dictionary<int, CommentViewModel>(); 
-        public bool MakeCollectionViewSource
+        public override bool MakeCollectionViewSource
         {
             get
             {
@@ -622,7 +682,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public async Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token)
+        public override async Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token)
         {
             _initialLoaded = true;
             List<object> result = new List<object>();
@@ -662,17 +722,17 @@ namespace SnooStream.ViewModel
             return result;
         }
 
-        public void NavigateToComments(string contextUrl)
+        public override void NavigateToComments(string contextUrl)
         {
             //same as pressing back button
         }
 
-        public void NavigateToWeb(string url)
+        public override void NavigateToWeb(string url)
         {
             //goto reddit url
         }
 
-        public async Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
+        public override async Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
         {
             var madeViewModel = NavigationContext.MakeCommentContext(commentUrl, null, null, null);
             await madeViewModel.LoadAsync(progress, token);
@@ -680,7 +740,7 @@ namespace SnooStream.ViewModel
         }
 
         int _current = -1;
-        public int Current
+        public override int Current
         {
             get
             {
@@ -697,7 +757,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public IEnumerable<object> LoadInitial()
+        public override IEnumerable<object> LoadInitial()
         {
             _initialLoaded = true;
             List<object> result = new List<object>();
@@ -726,5 +786,7 @@ namespace SnooStream.ViewModel
             }
             return result;
         }
+
+        
     }
 }

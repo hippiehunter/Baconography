@@ -89,6 +89,10 @@ namespace SnooStream.Common
                 {
                     Movable = false;
                     VectorChanged(this, new VectorChangedEventArgs(e.Action, hasNewItems ? e.NewItems[0] : e.OldItems, hasNewItems ? e.NewStartingIndex : e.OldStartingIndex));
+                    if (e.Action == NotifyCollectionChangedAction.Replace && e.NewItems[0] == CurrentItem)
+                    {
+                        CurrentChanged(this, CurrentItem);
+                    }
                 }
                 finally
                 {

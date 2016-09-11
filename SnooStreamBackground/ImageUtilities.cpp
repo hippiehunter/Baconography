@@ -167,11 +167,11 @@ task<String^> ImageUtilities::MakeTileSizedImage(IRandomAccessStream^ imageSourc
 
 					ComPtr<IWICBitmapEncoder> encoder;
 					//try hardware encoder first
-					if (CoCreateInstance(CLSID_WICJpegQualcommPhoneEncoder, NULL, CLSCTX_INPROC_SERVER,
-						IID_IWICBitmapEncoder, (LPVOID*)&encoder) != S_OK)
-					{
+					//if (CoCreateInstance(CLSID_WICJpegQualcommPhoneEncoder, NULL, CLSCTX_INPROC_SERVER,
+					//	IID_IWICBitmapEncoder, (LPVOID*)&encoder) != S_OK)
+					//{
 						ThrowIfFailed(imagingFactory->CreateEncoder(GUID_ContainerFormatJpeg, 0, &encoder));
-					}
+					//}
 
 
 					ComPtr<IStream> targetComStream;
