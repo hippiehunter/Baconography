@@ -27,6 +27,7 @@ namespace SnooStream.ViewModel
         Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token);
         void NavigateToWeb(string url);
         void NavigateToComments(string contextUrl);
+        LinkViewModel CurrentLink();
         bool MakeCollectionViewSource { get; }
         Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token);
         INavigationContext NavigationContext { get; }
@@ -118,6 +119,7 @@ namespace SnooStream.ViewModel
                 (fileName.EndsWith(".mp4") ||
                 fileName.EndsWith(".gifv")))
             {
+                //only set looping if we're looking at a gif or a gif'alike 
                 result = new VideoContentViewModel { IsLooping = VideoAcquisition.IsGifType(url), PlayableStreams = new List<Tuple<string, string>> { new Tuple<string, string>(url.Replace(".gifv", ".mp4"), title) }, Url = url, Votable = votable, Context = context, Title = title, HasComments = linkViewModel != null };
             }
             else if (targetHost == "www.youtube.com" ||
@@ -568,7 +570,7 @@ namespace SnooStream.ViewModel
 
             var existingGalleryCommand = _hubNavCommands.OfType<DelayedGalleryCommand>().FirstOrDefault();
             var existingRefreshCommand = _hubNavCommands.OfType<DelayedRefreshNavCommand>().FirstOrDefault();
-            //var existingCommentsCommand = _hubNavCommands.OfType<DelayedGalleryCommand>();
+            var existingCommentsCommand = _hubNavCommands.OfType<CommentsNavCommand>().FirstOrDefault();
 
             if (currentItem is ContentContainerViewModel && ((ContentContainerViewModel)currentItem).SingleViewItem)
             {
@@ -586,6 +588,15 @@ namespace SnooStream.ViewModel
             else if (existingRefreshCommand != null)
                 _hubNavCommands.Remove(existingRefreshCommand);
 
+
+            if ((!(currentItem is CommentsViewModel) || (currentItem is ContentContainerViewModel && ((ContentContainerViewModel)currentItem).SingleViewItem)) && CurrentLink() != null)
+            {
+                if (existingCommentsCommand == null)
+                    _hubNavCommands.Insert(0, new CommentsNavCommand(CurrentLink, (obj) => CurrentLink() != null, contentRiverViewModel.ContentItems) { NavigationContext = NavigationContext });
+            }
+            else if (existingGalleryCommand != null)
+                _hubNavCommands.Remove(existingCommentsCommand);
+
         }
 
         public abstract IEnumerable<object> LoadInitial();
@@ -593,6 +604,7 @@ namespace SnooStream.ViewModel
         public abstract void NavigateToWeb(string url);
         public abstract void NavigateToComments(string contextUrl);
         public abstract Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token);
+        public abstract LinkViewModel CurrentLink();
     }
 
     public class LinkContentRiverContext : ContentRiverBaseContext
@@ -656,6 +668,11 @@ namespace SnooStream.ViewModel
         public override IEnumerable<object> LoadInitial()
         {
             return LinkRiverContext.Links.OfType<LinkViewModel>().Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+        }
+
+        public override LinkViewModel CurrentLink()
+        {
+            return LinkRiverContext.Links.CurrentItem as LinkViewModel;
         }
     }
 
@@ -789,6 +806,9 @@ namespace SnooStream.ViewModel
             return result;
         }
 
-        
+        public override LinkViewModel CurrentLink()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -43,6 +43,42 @@ namespace SnooStream.ViewModel
         }
     }
 
+    class InlineSearchCommand : BaseNavCommand
+    {
+        public InlineSearchCommand()
+        {
+            Text = "Search";
+            IsInput = true;
+            IsEnabled = true;
+            Glyph = "\uE11A";
+        }
+
+        public override void Tapped()
+        {
+            //Navigation.GotoSearch(InputText, TargetSubreddit, SubredditsOnly, NavigationContext);
+        }
+    }
+
+    class CommentsNavCommand : CollectionViewNavCommand
+    {
+        Func<LinkViewModel> _target;
+        public CommentsNavCommand(Func<LinkViewModel> target, Func<object, bool> checkEnabled, ICollectionView collectionView) :
+            base(checkEnabled, collectionView)
+        {
+            _target = target;
+            Text = "Comments";
+            IsInput = false;
+            IsEnabled = true;
+            Glyph = "\ue200";
+        }
+
+        public override void Tapped()
+        {
+            _target().GotoComments();
+            
+        }
+    }
+
     class RefreshNavCommand : BaseNavCommand
     {
         public IRefreshable Target { get; set; }
