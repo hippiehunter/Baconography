@@ -109,6 +109,7 @@
     <Compile Include="Common\NSFWListingFilter.cs" />
     <Compile Include="Common\OfflineService.cs" />
     <Compile Include="Common\PeriodicTask.cs" />
+    <Compile Include="Common\PlayableHelper.cs" />
     <Compile Include="Common\ProgressLazy.cs" />
     <Compile Include="Common\RangedCollectionBase.cs" />
     <Compile Include="Common\RangedCollections.cs" />

@@ -118,7 +118,7 @@ namespace SnooStream.ViewModel
                 (fileName.EndsWith(".mp4") ||
                 fileName.EndsWith(".gifv")))
             {
-                result = new VideoContentViewModel { PlayableStreams = new List<Tuple<string, string>> { new Tuple<string, string>(url.Replace(".gifv", ".mp4"), title) }, Url = url, Votable = votable, Context = context, Title = title, HasComments = linkViewModel != null };
+                result = new VideoContentViewModel { IsLooping = VideoAcquisition.IsGifType(url), PlayableStreams = new List<Tuple<string, string>> { new Tuple<string, string>(url.Replace(".gifv", ".mp4"), title) }, Url = url, Votable = votable, Context = context, Title = title, HasComments = linkViewModel != null };
             }
             else if (targetHost == "www.youtube.com" ||
                 targetHost == "www.youtu.be" ||
@@ -489,7 +489,7 @@ namespace SnooStream.ViewModel
         public IContentRiverContext Context { get; set; }
         public string Url { get; set; }
         public string Title { get; set; }
-        public bool Focused { get; set; }
+        public virtual bool Focused { get; set; }
         public bool Bound { get; set; }
         public bool HasComments { get; set; }
         public VotableViewModel Votable { get; set; }
@@ -517,7 +517,9 @@ namespace SnooStream.ViewModel
 
     public class VideoContentViewModel : ContentViewModel
     {
-        public bool IsPlaying { get; set; }
+        private bool _isPlaying;
+        public override bool Focused { get { return base.Focused; } set { base.Focused = value; IsPlaying = value; } }
+        public bool IsPlaying { get { return _isPlaying; } set { Set("IsPlaying", ref _isPlaying, value); } }
         public double PlayPosition { get; set; }
         public bool IsLooping { get; set; }
         public string PreviewUrl { get; set; }
