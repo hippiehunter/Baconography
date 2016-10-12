@@ -913,7 +913,7 @@ namespace SnooStream.ViewModel
 
         public override LinkViewModel CurrentLink()
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }
