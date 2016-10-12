@@ -21,7 +21,7 @@ namespace SnooStream.Common
             var target = d as MediaElement;
             var isPlaying = e.NewValue as bool?;
 
-            if ((isPlaying ?? false) && target.IsLooping)
+            if (isPlaying ?? false)
             {
                 try
                 {

@@ -193,12 +193,12 @@
                 </Grid>
 
                 <!-- Collapsed Comment Header -->
-                <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Visibility="{x:Bind Collapsed, Converter={StaticResource booleanVisibilityConverter}}">
+                <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Visibility="{x:Bind Collapsed, Mode=OneWay, Converter={StaticResource booleanVisibilityConverter}}">
                     <Button  Margin="0,0,0,0" Padding="6,0,0,0"
                      BorderThickness="0"
                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                      VerticalAlignment="Stretch" VerticalContentAlignment="Top"
-                     Tapped="{x:Bind Minimize}">
+                     Tapped="{x:Bind Maximize}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Style="{StaticResource PlainButtonTextBlock}" Margin="0,0,12,0" Text="[+]" />

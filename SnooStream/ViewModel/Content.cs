@@ -23,7 +23,7 @@ namespace SnooStream.ViewModel
     public interface IContentRiverContext
     {
         bool HasAdditional { get; }
-        IEnumerable<object> LoadInitial();
+        IEnumerable<object> LoadInitial(string url);
         Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token);
         void NavigateToWeb(string url);
         void NavigateToComments(string contextUrl);
@@ -173,15 +173,13 @@ namespace SnooStream.ViewModel
                                 contentItems.Add(vm);
                             }
 
-                            return new ContentContainerViewModel
+                            return new ContentContainerViewModel(true, contentItems)
                             {
-                                SingleViewItem = true,
                                 Url = url,
                                 Title = title,
                                 Context = context,
                                 HasComments = linkViewModel != null,
                                 Votable = votable,
-                                ContentItems = contentItems
                             };
                         }
                         else
@@ -242,14 +240,13 @@ namespace SnooStream.ViewModel
             {
                 var webContent = await LoadWebContent(networkLayer, url, progress, token, context);
                 var contentItems = new WebContentCollection(webContent.Item3, webContent.Item1, url, networkLayer, context);
-                return new ContentContainerViewModel
+                return new ContentContainerViewModel(false, contentItems)
                 {
                     Url = url,
                     Title = webContent.Item2 ?? title,
                     Context = context,
                     HasComments = linkViewModel != null,
                     Votable = votable,
-                    ContentItems = contentItems
                 };
             }, collectionView, collection);
         }
@@ -471,7 +468,7 @@ namespace SnooStream.ViewModel
 
         protected override Task Refresh(IProgress<float> progress, CancellationToken token)
         {
-            AddRange(Context.LoadInitial());
+            AddRange(Context.LoadInitial(null));
             return Task.FromResult(true);
         }
 
@@ -520,7 +517,7 @@ namespace SnooStream.ViewModel
     public class VideoContentViewModel : ContentViewModel
     {
         private bool _isPlaying;
-        public override bool Focused { get { return base.Focused; } set { base.Focused = value; IsPlaying = value; } }
+        public override bool Focused { get { return base.Focused; } set { base.Focused = value; IsPlaying = value && IsLooping; } }
         public bool IsPlaying { get { return _isPlaying; } set { Set("IsPlaying", ref _isPlaying, value); } }
         public double PlayPosition { get; set; }
         public bool IsLooping { get; set; }
@@ -537,6 +534,48 @@ namespace SnooStream.ViewModel
 
     public class ContentContainerViewModel : ContentViewModel
     {
+        public ContentContainerViewModel(bool singleViewItem, RangedCollectionBase collection)
+        {
+            SingleViewItem = singleViewItem;
+            ContentItems = collection;
+            if (SingleViewItem)
+            {
+                ContentItems.CurrentChanged += ContentItems_CurrentChanged;
+            }
+        }
+
+        private async void ContentItems_CurrentChanged(object sender, object e)
+        {
+            try
+            {
+                var collectionView = sender as ICollectionView;
+                await ContentBuilder.SetCurrentContent(collectionView.CurrentPosition, collectionView, null);
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public override bool Focused
+        {
+            get
+            {
+                return base.Focused;
+            }
+
+            set
+            {
+                base.Focused = value;
+                if (ContentItems.CurrentItem == null)
+                    ContentItems.MoveCurrentToFirst();
+
+                if (ContentItems.CurrentItem is ContentViewModel)
+                {
+                    ((ContentViewModel)ContentItems.CurrentItem).Focused = value;
+                }
+            }
+        }
+
         public bool SingleViewItem { get; set; }
         public RangedCollectionBase ContentItems { get; set; }
     }
@@ -599,12 +638,12 @@ namespace SnooStream.ViewModel
 
         }
 
-        public abstract IEnumerable<object> LoadInitial();
         public abstract Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token);
         public abstract void NavigateToWeb(string url);
         public abstract void NavigateToComments(string contextUrl);
         public abstract Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token);
         public abstract LinkViewModel CurrentLink();
+        public abstract IEnumerable<object> LoadInitial(string url);
     }
 
     public class LinkContentRiverContext : ContentRiverBaseContext
@@ -613,6 +652,8 @@ namespace SnooStream.ViewModel
         public LinkRiverViewModel LinkRiverContext { get; set; }
         public ICollectionView ContentView { get; set; }
         public ObservableCollection<object> Collection { get; set; }
+        private bool _initializingContent = false;
+
         public override bool HasAdditional
         {
             get
@@ -632,8 +673,15 @@ namespace SnooStream.ViewModel
 
         public override async Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token)
         {
-            var additionalListing = await LinkRiverContext.LoadAdditionalAsync(progress, token);
-            return additionalListing.Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+            if (!_initializingContent)
+            {
+                var additionalListing = await LinkRiverContext.LoadAdditionalAsync(progress, token);
+                return additionalListing.Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+            }
+            else
+            {
+                return Enumerable.Empty<object>();
+            }
         }
 
         public override void NavigateToComments(string contextUrl)
@@ -665,9 +713,66 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public override IEnumerable<object> LoadInitial()
+        private async void HandleEmptyInitialCollection(string url)
         {
-            return LinkRiverContext.Links.OfType<LinkViewModel>().Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+            try
+            {
+                _initializingContent = true;
+                LinkRiverContext.Links.CollectionChanged += Links_CollectionChanged;
+                await LinkRiverContext.Links.LoadMoreItemsAsync(20);
+            }
+            catch { }
+            finally
+            {
+                LinkRiverContext.Links.CollectionChanged -= Links_CollectionChanged;
+                _initializingContent = false;
+                var targetLink = LinkRiverContext.Links.OfType<LinkViewModel>().FirstOrDefault(link => link.Thing.Url == url);
+                if (targetLink != null)
+                    LinkRiverContext.Links.MoveCurrentTo(targetLink);
+                else
+                    LinkRiverContext.Links.MoveCurrentToFirst();
+
+                ContentView.MoveCurrentToPosition(Current);
+            }
+        }
+
+        public override IEnumerable<object> LoadInitial(string url)
+        {
+            if (LinkRiverContext.Links.OfType<LinkViewModel>().FirstOrDefault() == null && LinkRiverContext.Links.HasMoreItems)
+            {
+                HandleEmptyInitialCollection(url);
+                return Enumerable.Empty<object>();
+            }
+            else
+            {
+                return LinkRiverContext.Links.OfType<LinkViewModel>().Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+            }
+        }
+
+        //this is only used for initial collection population when we're getting dropped off directly into the content river
+        private void Links_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    if (e.NewItems[0] is LinkViewModel)
+                    {
+                        var link = e.NewItems[0] as LinkViewModel;
+                        ContentView.Add(ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                    this.Collection.Clear();
+                    break;
+                default:
+                    break;
+            }
         }
 
         public override LinkViewModel CurrentLink()
@@ -776,7 +881,7 @@ namespace SnooStream.ViewModel
             }
         }
 
-        public override IEnumerable<object> LoadInitial()
+        public override IEnumerable<object> LoadInitial(string url)
         {
             _initialLoaded = true;
             List<object> result = new List<object>();

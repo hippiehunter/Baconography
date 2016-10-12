@@ -34,7 +34,7 @@
                       IncrementalLoadingThreshold="10" 
                       HorizontalContentAlignment="Stretch"
                       HorizontalAlignment="Stretch"
-                      VirtualizingStackPanel.VirtualizationMode="Recycling"
+                      ContainerContentChanging="ListView_ContainerContentChanging"
                       ItemTemplateSelector="{StaticResource loadableItemTemplateSelector}"
                       ItemContainerStyle="{StaticResource FullWidthListViewContainer}">
                 <ListView.ItemContainerTransitions>

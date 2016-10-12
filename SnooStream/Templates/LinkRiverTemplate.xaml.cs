@@ -24,14 +24,20 @@ namespace SnooStream.Templates
             this.InitializeComponent();
         }
 
-        private void ListView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        private void ListView_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
-
-        }
-
-        private void Grid_Loaded(object sender, RoutedEventArgs e)
-        {
-
+            //nasty hack to prevent recycled items from getting misused by different data type content (that should have gotten selectored away
+            if (args.InRecycleQueue)
+            {
+                try
+                {
+                    args.ItemContainer.DataContext = null;
+                    args.ItemContainer.Content = null;
+                }
+                catch (Exception)
+                {
+                }
+            }
         }
     }
 }

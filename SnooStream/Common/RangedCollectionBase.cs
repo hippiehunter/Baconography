@@ -248,6 +248,20 @@ namespace SnooStream.Common
                         sb.Begin();
                     });
                 }
+
+                if (target is FlipView)
+                {
+                    var flipView = target as FlipView;
+                    if (targetItem != null)
+                    {
+                        flipView.SelectedItem = targetItem;
+                    }
+
+                    if(rcb == null)
+                        flipView.SelectionChanged -= FlipView_SelectionChanged;
+                    else
+                        flipView.SelectionChanged += FlipView_SelectionChanged;
+                }
             }
             catch
             {
@@ -257,6 +271,17 @@ namespace SnooStream.Common
             {
                 if (rcb != null)
                     rcb.Movable = true;
+            }
+        }
+
+        private static void FlipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var flipView = sender as FlipView;
+            var rcb = flipView?.ItemsSource as RangedCollectionBase;
+            if (rcb != null)
+            {
+                if (e.AddedItems.Count > 0)
+                    rcb.MoveCurrentTo(e.AddedItems[0]);
             }
         }
 

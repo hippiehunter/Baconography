@@ -92,7 +92,7 @@ namespace SnooStream.Common
         {
             get
             {
-                return !IsLoading && !this.OfType<LoadViewModel>().Any();
+                return !IsLoading && this.OfType<LoadViewModel>().FirstOrDefault(lvm => lvm.Kind == LoadKind.Collection) == null;
             }
         }
 

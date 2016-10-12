@@ -49,6 +49,41 @@
         </Grid>
     </DataTemplate>
 
+    <DataTemplate x:Key="plainImageContentTemplate" x:DataType="vm:ContentViewModel">
+        <gif:ZoomableImageControl Url="{x:Bind Url}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+    </DataTemplate>
+
+    <DataTemplate x:Key="webImageContentTemplate" x:DataType="vm:ContentViewModel">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid x:Name="overlay" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption" Foreground="{ThemeResource ThemeForegroundBrush}"/>
+            </Grid>
+            <gif:ZoomableImageControl Grid.Row="1" Url="{x:Bind Url}" ResizeToFitHorizontal="True" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="videoContentTemplate" x:DataType="vm:VideoContentViewModel">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid x:Name="overlay" Height="80" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{Binding Title}" x:Name="caption" Foreground="{ThemeResource ThemeForegroundBrush}"/>
+            </Grid>
+            <MediaElement AudioCategory="Media" AreTransportControlsEnabled="True" Grid.Row="1" Source="{Binding PlayableUrl}" AutoPlay="False" IsLooping="{x:Bind IsLooping}"
+                          common:PlayableHelper.IsPlaying="{x:Bind IsPlaying, Mode=OneWay}" />
+        </Grid>
+    </DataTemplate>
+    
+    <selector:ContentTemplateSelector x:Name="albumContentSelector" 
+                                    ImageContainerTemplate="{StaticResource webImageContentTemplate}"
+                                    VideoTemplate="{StaticResource videoContentTemplate}"/>
+
     <DataTemplate x:Key="albumContentTemplate" x:DataType="vm:ContentContainerViewModel">
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid x:Name="overlay" HorizontalAlignment="Stretch" VerticalAlignment="Top">
@@ -56,7 +91,7 @@
             </Grid>
             <FlipView x:Name="albumSlideView" common:RangedCollectionDataSource.DataSource ="{x:Bind ContentItems}" HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" ScrollViewer.IsHorizontalRailEnabled="True" ScrollViewer.IsVerticalRailEnabled="True"
-                      IsSynchronizedWithCurrentItem="False">
+                      IsSynchronizedWithCurrentItem="False" ItemTemplateSelector="{StaticResource albumContentSelector}">
                 <FlipView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel AreScrollSnapPointsRegular="True" Orientation="Vertical" />
@@ -68,32 +103,13 @@
                         <Setter Property="VerticalContentAlignment" Value="Stretch" />
                     </Style>
                 </FlipView.ItemContainerStyle>
-                <FlipView.ItemTemplate>
-                    <DataTemplate x:DataType="vm:ContentViewModel">
-                        <gif:ZoomableImageControl Url="{x:Bind Url}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                    </DataTemplate>
-                </FlipView.ItemTemplate>
             </FlipView>
         </Grid>
     </DataTemplate>
-
-    <DataTemplate x:Key="videoContentTemplate" x:DataType="vm:VideoContentViewModel">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid x:Name="overlay" Height="80" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <TextBlock Style="{StaticResource TitleTextBlock}" Margin="20,24,20,6" Text="{x:Bind Title}" x:Name="caption" Foreground="{ThemeResource ThemeForegroundBrush}"/>
-            </Grid>
-            <MediaElement AudioCategory="Media" AreTransportControlsEnabled="True" Grid.Row="1" Source="{x:Bind PlayableUrl}" AutoPlay="False"
-                          common:PlayableHelper.IsPlaying="{x:Bind IsPlaying, Mode=OneWay}"  IsLooping="{x:Bind IsLooping}"/>
-        </Grid>
-    </DataTemplate>
-
+    
     <selector:ContentTemplateSelector x:Name="webContentSelector" 
                                     PlainTextTemplate="{StaticResource textContentTemplate}"
-                                    ImageContainerTemplate="{StaticResource imageContentTemplate}"
+                                    ImageContainerTemplate="{StaticResource webImageContentTemplate}"
                                     AlbumViewTemplate="{StaticResource albumContentTemplate}"
                                     VideoTemplate="{StaticResource videoContentTemplate}"/>
 
@@ -101,16 +117,17 @@
         <Grid x:Name="controlRoot">
             <ListView ItemsSource="{x:Bind ContentItems}"
                       IsSynchronizedWithCurrentItem="False"
-                Margin="0" Padding="0"
-                BorderThickness="0" VerticalAlignment="Stretch" 
-                ScrollViewer.VerticalScrollBarVisibility="Auto"
-                ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                IsItemClickEnabled="False"
-                IsTapEnabled="False"
-                SelectionMode="None"
-                IsSwipeEnabled="False"
-                HorizontalContentAlignment="Stretch"
-                ItemTemplateSelector="{StaticResource webContentSelector}">
+                    Margin="0" Padding="0"
+                    BorderThickness="0" VerticalAlignment="Stretch" 
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                    IsItemClickEnabled="False"
+                    IsTapEnabled="False"
+                    SelectionMode="None"
+                    IsSwipeEnabled="False"
+                    HorizontalContentAlignment="Stretch"
+                    ItemTemplateSelector="{StaticResource webContentSelector}"
+                    ItemContainerStyle="{StaticResource FullWidthListViewContainer}">
                 <ListView.Header>
                     <Grid x:Name="overlay" MaxHeight="400" Padding="0,0,0,6" 
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

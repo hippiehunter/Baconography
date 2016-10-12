@@ -12,13 +12,13 @@
                     <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FFDCDCDC" />
                     <SolidColorBrush x:Key="InvertThemeForegroundBrush" Color="White" />
                     <SolidColorBrush x:Key="ThemeForegroundBrush" Color="Black" />
-                    <SolidColorBrush x:Key="ThemeForegroundOffsetBrush" Color="#99FFFFFF" />
+                    <SolidColorBrush x:Key="ThemeForegroundOffsetBrush" Color="#99000000" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Default">
                     <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FF1F1F1F" />
                     <SolidColorBrush x:Key="InvertThemeForegroundBrush" Color="Black" />
                     <SolidColorBrush x:Key="ThemeForegroundBrush" Color="White" />
-                    <SolidColorBrush x:Key="ThemeForegroundOffsetBrush" Color="#99000000" />
+                    <SolidColorBrush x:Key="ThemeForegroundOffsetBrush" Color="#99FFFFFF" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
             <converters:NullToEmptyConverter x:Key="nullToEmptyConverter" />

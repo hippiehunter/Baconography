@@ -492,7 +492,7 @@ namespace SnooStream.Common
                 madeContext.Collection = madeContentRiver.ContentItems;
                 madeContext.ContentView = madeContentRiver.ContentItems;
 
-                foreach (var item in madeContext.LoadInitial())
+                foreach (var item in madeContext.LoadInitial(url))
                 {
                     madeContentRiver.ContentItems.Add(item);
                 }

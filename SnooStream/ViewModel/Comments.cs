@@ -164,6 +164,11 @@ namespace SnooStream.ViewModel
             Collapsed = true;
         }
 
+        public void Maximize()
+        {
+            Collapsed = false;
+        }
+
         internal bool _collapsed;
         public bool Collapsed
         {

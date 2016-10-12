@@ -31,5 +31,14 @@ namespace SnooStream.Templates
             if(parent != null)
                 ((Image)parent.FindName("imageControl")).Opacity = 0;
         }
+
+        private void Button_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        {
+            if (!(args.NewValue is ViewModel.LinkViewModel) && args.NewValue != null)
+            {
+                args.Handled = true;
+                sender.DataContext = null;
+            }
+        }
     }
 }
