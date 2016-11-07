@@ -102,6 +102,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Common\BladeBinder.cs" />
     <Compile Include="Common\CaptchaService.cs" />
     <Compile Include="Common\CollectionMerger.cs" />
     <Compile Include="Common\DispatchTimer.cs" />
@@ -122,7 +123,9 @@
     <Compile Include="Common\Utility.cs" />
     <Compile Include="Common\WeakListener.cs" />
     <Compile Include="Controls\AdaptiveHubNav.cs" />
+    <Compile Include="Controls\LoadableBaseControl.cs" />
     <Compile Include="Controls\LoadableControl.cs" />
+    <Compile Include="Controls\LoadableItemControl.cs" />
     <Compile Include="Controls\MarkdownEditorControl.xaml.cs">
       <DependentUpon>MarkdownEditorControl.xaml</DependentUpon>
     </Compile>

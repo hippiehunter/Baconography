@@ -20,6 +20,18 @@ namespace SnooStream.Model
         public const string UserGlyph = "\uE136";
         public const string CommentGlyph = "\uE14C";
 
+        private static string GetRedditGlyph(string url)
+        {
+            if (LinkGlyphUtility.UserMultiredditRegex.IsMatch(url) || LinkGlyphUtility.SubredditRegex.IsMatch(url))
+                return MultiredditGlyph;
+            else if (LinkGlyphUtility.UserRegex.IsMatch(url))
+                return UserGlyph;
+            else if (LinkGlyphUtility.CommentRegex.IsMatch(url) || LinkGlyphUtility.CommentsPageRegex.IsMatch(url))
+                return CommentGlyph;
+            else
+                return null;
+        }
+
         public static string GetLinkGlyph(Object value)
         {
             try
@@ -36,6 +48,10 @@ namespace SnooStream.Model
                     if (linkViewModel.Thing.IsSelf)
                         return DetailsGlyph;
 
+                    var redditGlyph = GetRedditGlyph(linkViewModel.Thing.Url);
+                    if (redditGlyph != null)
+                        return redditGlyph;
+
                     uri = new Uri(linkViewModel.Thing.Url);
                     filename = uri.AbsolutePath;
                     targetHost = uri.DnsSafeHost.ToLower();
@@ -48,6 +64,10 @@ namespace SnooStream.Model
                     if (link.IsSelf)
                         return DetailsGlyph;
 
+                    var redditGlyph = GetRedditGlyph(link.Url);
+                    if (redditGlyph != null)
+                        return redditGlyph;
+
                     uri = new Uri(link.Url);
                     filename = uri.AbsolutePath;
                     targetHost = uri.DnsSafeHost.ToLower();
@@ -55,6 +75,12 @@ namespace SnooStream.Model
                 }
                 else if (value is string)
                 {
+                    var stringValue = value as string;
+
+                    var redditGlyph = GetRedditGlyph(stringValue);
+                    if (redditGlyph != null)
+                        return redditGlyph;
+
                     uri = new Uri(value as string);
                     filename = uri.AbsolutePath;
                     targetHost = uri.DnsSafeHost.ToLower();
@@ -99,17 +125,13 @@ namespace SnooStream.Model
 
                 if (uri != null)
                 {
-
-                    if (LinkGlyphUtility.UserMultiredditRegex.IsMatch(uri.AbsoluteUri) || LinkGlyphUtility.SubredditRegex.IsMatch(uri.AbsoluteUri))
-                        return MultiredditGlyph;
-                    else if (LinkGlyphUtility.UserRegex.IsMatch(uri.AbsoluteUri))
-                        return UserGlyph;
-                    else if (LinkGlyphUtility.CommentRegex.IsMatch(uri.AbsoluteUri) || LinkGlyphUtility.CommentsPageRegex.IsMatch(uri.AbsoluteUri))
-                        return CommentGlyph;
+                    var redditGlyph = GetRedditGlyph(uri.AbsoluteUri);
+                    if (redditGlyph != null)
+                        return redditGlyph;
                 }
 
             }
-            catch { }
+            catch { return null; }
             return WebGlyph;
         }
 

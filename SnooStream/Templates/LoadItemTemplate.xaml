@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SnooStream.Templates"
+    xmlns:controls="using:SnooStream.Controls"
     xmlns:converters="using:SnooStream.Converters"
     xmlns:vm="using:SnooStream.ViewModel"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -26,6 +27,107 @@
         <Grid DataContextChanged="Grid_DataContextChanged">
             <ProgressBar HorizontalAlignment="Stretch" IsIndeterminate="{x:Bind LoadPercent, Converter={StaticResource invertedFloatToBooleanConverter}, Mode=OneWay}" Value="{x:Bind LoadPercent, Mode=OneWay}"  Visibility="{x:Bind State, Converter={StaticResource loadingConverter}, Mode=OneWay}"/>
         </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="CancelledItemView" x:DataType="vm:LoadViewModel">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Operation was cancelled" HorizontalAlignment="Center"/>
+            <Button Grid.Row="1" Content="Retry" Tapped="{x:Bind Retry}" HorizontalAlignment="Center"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="NoItemsView" x:DataType="vm:LoadViewModel">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="No items were found" HorizontalAlignment="Center"/>
+            <Button Grid.Row="1" Content="Retry" Tapped="{x:Bind Retry}" HorizontalAlignment="Center"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="NotFoundItemView" x:DataType="vm:LoadViewModel">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="404 not found" HorizontalAlignment="Center"/>
+            <Button Grid.Row="1" Content="Retry" Tapped="{x:Bind Retry}" HorizontalAlignment="Center"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="DisallowedItemView" x:DataType="vm:LoadViewModel">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="the server responded that you do not have permission to view this resource" TextWrapping="WrapWholeWords" HorizontalAlignment="Center"/>
+            <Button Grid.Row="1" Content="Retry" Tapped="{x:Bind Retry}" HorizontalAlignment="Center"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="NetworkFailureItemView" x:DataType="vm:LoadViewModel">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="The server failed to respond, please check you internet connection. If your device is connected to the internet there may be a problem with the server you are trying to reach" TextWrapping="WrapWholeWords" HorizontalAlignment="Center"/>
+            <Button Grid.Row="1" Content="Retry" Tapped="{x:Bind Retry}" HorizontalAlignment="Center"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="NetworkCapturedItemView" x:DataType="vm:LoadViewModel">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Either the server you are attempting to reach is experiancing security issues or your are currently on a captive network that is trying to redirect your requests to a login portal. Please open your web browser to resolve this issue." TextWrapping="WrapWholeWords" HorizontalAlignment="Center"/>
+            <Button Grid.Row="1" Content="Retry" Tapped="{x:Bind Retry}" HorizontalAlignment="Center"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="FailureItemView" x:DataType="vm:LoadViewModel">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="An unknown error occured, if this issue continues please report it at reddit.com/r/SnooStream" TextWrapping="WrapWholeWords" HorizontalAlignment="Center"/>
+            <Button Grid.Row="1" Content="Retry" Tapped="{x:Bind Retry}" HorizontalAlignment="Center"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="NotAuthorizedItemView" x:DataType="vm:LoadViewModel">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="The server responded that you were not authorized to view this resource" TextWrapping="WrapWholeWords" HorizontalAlignment="Center"/>
+            <Button Grid.Row="1" Content="Retry" Tapped="{x:Bind Retry}" HorizontalAlignment="Center"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="LoadItemViewEx" x:DataType="vm:LoadViewModel">
+        <controls:LoadableItemControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            LoadingContentTemplate="{StaticResource LoadItemView}"
+            CancelledContentTemplate="{StaticResource CancelledItemView}"
+            NoItemsContentTemplate="{StaticResource NoItemsView}"
+            NotFoundContentTemplate="{StaticResource NotFoundItemView}"
+            DisallowedContentTemplate="{StaticResource DisallowedItemView}"
+            NetworkFailureContentTemplate="{StaticResource NetworkFailureItemView}"
+            NetworkCapturedContentTemplate="{StaticResource NetworkCapturedItemView}"
+            FailureContentTemplate="{StaticResource FailureItemView}"
+            NotAuthorizedContentTemplate="{StaticResource NotAuthorizedItemView}"/>
     </DataTemplate>
 
 </ResourceDictionary>
