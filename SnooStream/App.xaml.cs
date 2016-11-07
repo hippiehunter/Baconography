@@ -1,4 +1,5 @@
-﻿using SnooStreamBackground;
+﻿using Microsoft.HockeyApp;
+using SnooStreamBackground;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,6 +11,7 @@ using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Background;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -31,9 +33,11 @@ namespace SnooStream
         /// </summary>
         public App()
         {
-            Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(
-                Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
-                Microsoft.ApplicationInsights.WindowsCollectors.Session);
+            Microsoft.HockeyApp.HockeyClient.Current.Configure("787daeede4e140c8876e8cff891543de", 
+                new Microsoft.HockeyApp.TelemetryConfiguration()
+            {
+                Collectors = WindowsCollectors.Metadata | WindowsCollectors.Session | WindowsCollectors.UnhandledException
+            });
             this.InitializeComponent();
             this.Suspending += OnSuspending;
         }

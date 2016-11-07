@@ -21,7 +21,6 @@ namespace SnooStream.ViewModel
     {
         public string Title { get { return Context.Title; } }
         public ILinkBuilderContext Context { get; set; }
-        public Subreddit Thing { get; set; }
         public string Sort { get; set; }
         public DateTime? LastRefresh { get; set; }
         public LoadItemCollectionBase Links {get; set;}
@@ -44,21 +43,22 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                if (Thing == null || Thing.Url == "/")
-                    return false;
-                else
-                    return Thing.Url.Contains("/m/") || Thing.Url.Contains("+");
+                return Context.IsMultiReddit;
             }
         }
 
+        private bool _isModerator;
         public bool IsModerator
         {
             get
             {
-                if (Thing == null)
-                    return false;
+                var task = Context.IsModeratorReddit();
+                if (task.IsCompleted)
+                    return _isModerator = task.Result;
                 else
-                    return Thing.Moderator;
+                    task.ContinueWith(async tsk => Set(nameof(IsModerator), ref _isModerator, (await tsk)));
+
+                return _isModerator;
             }
         }
 
@@ -66,10 +66,7 @@ namespace SnooStream.ViewModel
         {
             get
             {
-                if (Thing == null || Thing.Url == "/" || Thing.Url.ToLower() == "/r/all")
-                    return true;
-                else
-                    return Thing.Url.Contains("/m/") || Thing.Url.Contains("+");
+                return Context.IsMultiReddit;
             }
         }
 
@@ -165,6 +162,8 @@ namespace SnooStream.ViewModel
         Task<Listing> LoadAdditional(IProgress<float> progress, CancellationToken token);
         Task<Listing> Refresh(IProgress<float> progress, CancellationToken token);
         bool IsMultiReddit { get; }
+        bool IsUserMultiReddit { get; }
+        Task<bool> IsModeratorReddit();
         ILinkContext LinkContext { get; }
         IEnumerable<IHubNavCommand> MakeHubNavCommands(IRefreshable refreshTarget);
     }
@@ -588,20 +587,31 @@ namespace SnooStream.ViewModel
         public string Title { get { return MakeDisplaySubredditName(Subreddit); } }
         public ILinkContext LinkContext { get; set; }
         public string Subreddit { get; set; }
+        public Lazy<Task<Subreddit>> Thing { get; set; }
         public string Sort { get; set; }
         public SnooSharp.Reddit Reddit { get; set; }
         public OfflineService Offline { get; set; }
         private string _after;
         private bool _hasLoaded = false;
+
+        public LinkBuilderContext()
+        {
+            Thing = new Lazy<Task<SnooSharp.Subreddit>>(async () => (await Reddit.GetSubredditAbout(Subreddit, CancellationToken.None, new Progress<float>()))?.Data as Subreddit);
+        }
+
         public IEnumerable<IHubNavCommand> MakeHubNavCommands(IRefreshable refreshTarget)
         {
-            return new List<IHubNavCommand>
+            var result = new List<IHubNavCommand>
             {
                 new PostNavCommand { NavigationContext = NavigationContext },
                 new RefreshNavCommand { NavigationContext = NavigationContext, Target = refreshTarget },
-                new SearchNavCommand { NavigationContext = NavigationContext, TargetSubreddit = Subreddit },
-                new AboutSubredditNavCommand { NavigationContext = NavigationContext, TargetSubreddit = Subreddit }
+                new SearchNavCommand { NavigationContext = NavigationContext, TargetSubreddit = Subreddit }
             };
+
+            if (!IsMultiReddit)
+                result.Add(new AboutSubredditNavCommand { NavigationContext = NavigationContext, TargetSubreddit = Subreddit });
+
+            return result;
         }
 
         public static string MakeDisplaySubredditName(string subreddit)
@@ -618,6 +628,19 @@ namespace SnooStream.ViewModel
             {
                 return string.IsNullOrWhiteSpace(Subreddit) || Subreddit.Contains("/m/") || Subreddit.Contains("+") || Subreddit == "/" || Subreddit.ToLower() == "/r/all";
             }
+        }
+
+        public bool IsUserMultiReddit
+        {
+            get
+            {
+                return !string.IsNullOrWhiteSpace(Subreddit) && Subreddit.Contains("/m/");
+            }
+        }
+
+        public async Task<bool> IsModeratorReddit()
+        {
+            return (await Thing.Value)?.Moderator ?? false;
         }
 
         public bool HasAdditional

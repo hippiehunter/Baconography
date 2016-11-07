@@ -676,7 +676,7 @@ namespace SnooStream.ViewModel
             if (!_initializingContent)
             {
                 var additionalListing = await LinkRiverContext.LoadAdditionalAsync(progress, token);
-                return additionalListing.Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+                return additionalListing.Select(link => ContentBuilder.MakeContentViewModel(WebUtility.HtmlDecode(link.Thing.Url), WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
             }
             else
             {
@@ -745,7 +745,7 @@ namespace SnooStream.ViewModel
             }
             else
             {
-                return LinkRiverContext.Links.OfType<LinkViewModel>().Select(link => ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+                return LinkRiverContext.Links.OfType<LinkViewModel>().Select(link => ContentBuilder.MakeContentViewModel(WebUtility.HtmlDecode(link.Thing.Url), WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
             }
         }
 
@@ -758,7 +758,7 @@ namespace SnooStream.ViewModel
                     if (e.NewItems[0] is LinkViewModel)
                     {
                         var link = e.NewItems[0] as LinkViewModel;
-                        ContentView.Add(ContentBuilder.MakeContentViewModel(link.Thing.Url, WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+                        ContentView.Add(ContentBuilder.MakeContentViewModel(WebUtility.HtmlDecode(link.Thing.Url), WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:

@@ -34,9 +34,10 @@ namespace SnooStream.ViewModel
     public class UserViewModel : IHasLoadableState
     {
         public IUserContext Context;
-
-        public UserViewModel(IUserContext userContext)
+        public INavigationContext NavigationContext;
+        public UserViewModel(IUserContext userContext, INavigationContext navigationContext)
         {
+            NavigationContext = navigationContext;
             TargetUser = userContext.TargetUser;
             Context = userContext;
             KarmaCollection = new ObservableCollection<KarmaData>();
@@ -61,6 +62,11 @@ namespace SnooStream.ViewModel
             {
                 return (Thing != null ? Thing.CreatedUTC : new DateTime()).ToString("MMMM d");
             }
+        }
+
+        public void NavigateTo()
+        {
+            Navigation.GotoUserDetails(TargetUser, NavigationContext);
         }
 
         public string TargetUser { get; set; }

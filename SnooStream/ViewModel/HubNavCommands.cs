@@ -272,7 +272,7 @@ namespace SnooStream.ViewModel
 
         public override void Tapped()
         {
-            throw new NotImplementedException();
+            Navigation.GotoSubredditSidebar(TargetSubreddit, NavigationContext);
         }
     }
 }

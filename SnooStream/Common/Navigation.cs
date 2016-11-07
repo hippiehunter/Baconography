@@ -31,6 +31,7 @@ namespace SnooStream.Common
         LinkRiverViewModel MakeLinkRiverContext(string subreddit, string focusId, string sort);
         SearchViewModel MakeSearchContext(string query, string restrictedToSubreddit, bool subredditsOnly);
         UserViewModel MakeUserDetailsContext(string username);
+        SubredditSidebarViewModel MakeSubredditSidebarContext(string subreddit);
 
         LoginViewModel LoginViewModel { get; }
         ActivitiesViewModel ActivitiesViewModel { get; }
@@ -51,6 +52,7 @@ namespace SnooStream.Common
         DataTemplate SettingsTemplate { get; }
         DataTemplate OAuthLandingTemplate { get; }
         DataTemplate ContentSettingsTemplate { get; }
+        DataTemplate SubredditSidebarTemplate { get; }
 
         IEnumerable<object> ViewModelStack { get; }
 
@@ -63,6 +65,7 @@ namespace SnooStream.Common
         Dictionary<string, object> MakePageState(SearchViewModel search);
         Dictionary<string, object> MakePageState(LoginViewModel login);
         Dictionary<string, object> MakePageState(SelfViewModel self);
+        Dictionary<string, object> MakePageState(SubredditSidebarViewModel sidebar);
         ILinkContext MakeLinkContext(string url);
     }
 
@@ -117,6 +120,12 @@ namespace SnooStream.Common
                 var userContext = context.MakeUserDetailsContext(username);
                 context.HubNav.Navigate(userContext, context.UserDetailsTemplate, false);
             }
+        }
+
+        public static void GotoSubredditSidebar(string subreddit, INavigationContext context)
+        {
+            var subredditSidebarContext = context.MakeSubredditSidebarContext(subreddit);
+            context.HubNav.Navigate(subredditSidebarContext, context.SubredditSidebarTemplate, false);
         }
 
         public static void GotoLink(object contextObj, string url, INavigationContext context)
@@ -256,6 +265,9 @@ namespace SnooStream.Common
                 case "content":
                     GotoContentRiver(context.ViewModelStack.LastOrDefault(vm => vm is LinkRiverViewModel || vm is CommentsViewModel), GetOrNull<string>(pageState, "url"), context);
                     break;
+                case "subredditSidebar":
+                    context.HubNav.Navigate(context.MakeSubredditSidebarContext(GetOrNull<string>(pageState, "subreddit")), context.SubredditSidebarTemplate, false);
+                    break;
                 case "comments":
                     context.HubNav.Navigate(context.MakeCommentContext(GetOrNull<string>(pageState, "url"), GetOrNull<string>(pageState, "focusId"), GetOrNull<string>(pageState, "sort"), null), context.CommentTemplate, false);
                     break;
@@ -277,6 +289,8 @@ namespace SnooStream.Common
                 return context.MakePageState((SearchViewModel)viewModel);
             else if (viewModel is UserViewModel)
                 return context.MakePageState((UserViewModel)viewModel);
+            else if (viewModel is SubredditSidebarViewModel)
+                return context.MakePageState((SubredditSidebarViewModel)viewModel);
             else if (viewModel is LoginViewModel)
                 return new Dictionary<string, object> { { "kind", "login" } };
             else if (viewModel is SubredditRiverViewModel)
@@ -314,6 +328,7 @@ namespace SnooStream.Common
         public DataTemplate SettingsTemplate { get { return _settingsTemplate.Value; } }
         public DataTemplate OAuthLandingTemplate { get { return _oAuthLandingTemplate.Value; } }
         public DataTemplate ContentSettingsTemplate { get { return _contentSettingsTemplate.Value; } }
+        public DataTemplate SubredditSidebarTemplate { get { return _subredditSidebarTemplate.Value; } }
 
         private LazyTemplate _linkRiverTemplate;
         private LazyTemplate _loginTemplate;
@@ -326,6 +341,7 @@ namespace SnooStream.Common
         private LazyTemplate _settingsTemplate;
         private LazyTemplate _oAuthLandingTemplate;
         private LazyTemplate _contentSettingsTemplate;
+        private LazyTemplate _subredditSidebarTemplate;
 
 
         public PeriodicTask PeriodicTasks;
@@ -372,6 +388,7 @@ namespace SnooStream.Common
             _oAuthLandingTemplate = new LazyTemplate<LoginTemplate>("OAuthLandingView");
             _settingsTemplate = new LazyTemplate<SettingsTemplate>("SettingsView");
             _contentSettingsTemplate = new LazyTemplate<SettingsTemplate>("ContentSettingsView");
+            _subredditSidebarTemplate = new LazyTemplate<SubredditSidebarTemplate>("SubredditSidebarView");
 
 
             HubNav = hubNav;
@@ -464,6 +481,8 @@ namespace SnooStream.Common
                 return SettingsTemplate;
             else if (vm is ContentSettingsViewModel)
                 return ContentSettingsTemplate;
+            else if (vm is SubredditSidebarViewModel)
+                return SubredditSidebarTemplate;
             //else
             return null;
         }
@@ -524,6 +543,13 @@ namespace SnooStream.Common
             return madeViewModel;
         }
 
+        public SubredditSidebarViewModel MakeSubredditSidebarContext(string subreddit)
+        {
+            var madeContext = new SubredditContext { SubredditName = Utility.CleanRedditLink(subreddit, this.Reddit.CurrentUserName), Reddit = Reddit };
+            var madeViewModel = new SubredditSidebarViewModel(this, madeContext);
+            return madeViewModel;
+        }
+
         public SearchViewModel MakeSearchContext(string query, string restrictedToSubreddit, bool subredditsOnly)
         {
             var linkContext = new SearchLinkContext { NavigationContext = this, Reddit = Reddit };
@@ -537,7 +563,7 @@ namespace SnooStream.Common
         {
             var linkContext = new UserLinkContext { NavigationContext = this, Reddit = Reddit };
             var userContext = new UserContext(username, Reddit, this, Offline, linkContext);
-            var madeViewModel = new UserViewModel(userContext);
+            var madeViewModel = new UserViewModel(userContext, this);
             return madeViewModel;
         }
 
@@ -583,6 +609,15 @@ namespace SnooStream.Common
             {
                 { "kind", "user" },
                 { "username", typedContext.TargetUser }
+            };
+        }
+
+        public Dictionary<string, object> MakePageState(SubredditSidebarViewModel sidebar)
+        {
+            return new Dictionary<string, object>
+            {
+                { "kind", "subredditSidebar" },
+                { "username", sidebar.Title }
             };
         }
 

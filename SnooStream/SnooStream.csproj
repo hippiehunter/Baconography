@@ -17,10 +17,11 @@
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>SnooStream_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>SnooStream_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
-    <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
+    <AppxBundlePlatforms>arm</AppxBundlePlatforms>
+    <PackageCertificateThumbprint>8631EAF4180D9B6CBDC3A5E9D4A417044A8257AB</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -202,6 +203,9 @@
     <Compile Include="Templates\SubredditRiverTemplate.xaml.cs">
       <DependentUpon>SubredditRiverTemplate.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Templates\SubredditSidebarTemplate.xaml.cs">
+      <DependentUpon>SubredditSidebarTemplate.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Templates\UserDetailsTemplate.xaml.cs">
       <DependentUpon>UserDetailsTemplate.xaml</DependentUpon>
     </Compile>
@@ -227,6 +231,7 @@
     <Compile Include="ViewModel\Self.cs" />
     <Compile Include="ViewModel\Settings.cs" />
     <Compile Include="ViewModel\SubredditRiver.cs" />
+    <Compile Include="ViewModel\SubredditSidebar.cs" />
     <Compile Include="ViewModel\User.cs" />
     <Compile Include="ViewModel\Votable.cs" />
   </ItemGroup>
@@ -234,6 +239,7 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="SnooStream_StoreKey.pfx" />
     <None Include="SnooStream_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +250,7 @@
     <Content Include="Assets\Buttons\updown_up_fill.png" />
     <Content Include="Assets\SplashScreen.scale-100.png" />
     <Content Include="Assets\Square71x71Logo.scale-200.png" />
+    <None Include="Package.StoreAssociation.xml" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -317,6 +324,10 @@
     <Page Include="Templates\SubredditRiverTemplate.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Templates\SubredditSidebarTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Templates\UserDetailsTemplate.xaml">
       <SubType>Designer</SubType>
