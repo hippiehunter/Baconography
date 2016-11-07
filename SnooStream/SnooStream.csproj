@@ -20,8 +20,9 @@
     <PackageCertificateKeyFile>SnooStream_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
-    <AppxBundlePlatforms>arm</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x86|arm</AppxBundlePlatforms>
     <PackageCertificateThumbprint>8631EAF4180D9B6CBDC3A5E9D4A417044A8257AB</PackageCertificateThumbprint>
+    <HockeyAppResourceId>787daeede4e140c8876e8cff891543de</HockeyAppResourceId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>

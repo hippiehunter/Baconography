@@ -40,7 +40,8 @@ namespace SnooStream.ViewModel
             if(isUserLogin)
                 Activities.Clear();
 
-            Refresh();
+            if(!string.IsNullOrWhiteSpace(Context.CurrentUserName))
+                Refresh();
         }
 
         public async Task LoadAsync(IProgress<float> progress, CancellationToken token, bool ignoreCache)

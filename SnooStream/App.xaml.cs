@@ -33,11 +33,11 @@ namespace SnooStream
         /// </summary>
         public App()
         {
-            Microsoft.HockeyApp.HockeyClient.Current.Configure("787daeede4e140c8876e8cff891543de", 
-                new Microsoft.HockeyApp.TelemetryConfiguration()
-            {
-                Collectors = WindowsCollectors.Metadata | WindowsCollectors.Session | WindowsCollectors.UnhandledException
-            });
+            //Microsoft.HockeyApp.HockeyClient.Current.Configure("787daeede4e140c8876e8cff891543de",
+            //    new Microsoft.HockeyApp.TelemetryConfiguration()
+            //    {
+            //        Collectors = WindowsCollectors.Metadata | WindowsCollectors.Session | WindowsCollectors.UnhandledException
+            //    });
             this.InitializeComponent();
             this.Suspending += OnSuspending;
         }

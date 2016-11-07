@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="14678WaffleStudios.SnooStreamBeta" Publisher="CN=A886C99A-59C6-434D-B1CD-45847BABA214" Version="1.1.2.0" />
+  <Identity Name="14678WaffleStudios.SnooStreamBeta" Publisher="CN=A886C99A-59C6-434D-B1CD-45847BABA214" Version="1.1.3.0" />
   <mp:PhoneIdentity PhoneProductId="8695b35b-fd2d-4218-89c1-7225232a0511" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>SnooStream Beta</DisplayName>
