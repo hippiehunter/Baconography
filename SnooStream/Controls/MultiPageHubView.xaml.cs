@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SnooStream.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,7 +30,8 @@ namespace SnooStream.Controls
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            HubBinder.SetDataSource(hub, e.Parameter);
+            DataContext = e.Parameter;
+            BladeBinder.SetDataSource(blade, e.Parameter);
         }
     }
 }

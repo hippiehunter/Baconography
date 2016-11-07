@@ -45,8 +45,9 @@ namespace SnooStream.ViewModel
 
     public class LoadViewModel : SnooObservableObject
     {
-        public static CoreDispatcher UIDispatcher { get; set; }
         public LoadKind Kind { get; set; } = LoadKind.Item;
+
+        public string Url { get; set; }
 
         private LoadState _state;
         public LoadState State
@@ -72,6 +73,13 @@ namespace SnooStream.ViewModel
                 existing.Cancel();
 
             return newViewModel;
+        }
+
+        public async void Retry()
+        {
+            _internalCancelToken = new CancellationTokenSource();
+            _loadTask = null;
+            await LoadAsync();
         }
 
         public void Cancel()
@@ -108,10 +116,10 @@ namespace SnooStream.ViewModel
                 if (State != LoadState.Loaded)
                 {
                     State = LoadState.Loading;
-                    var progress = new AggregateProgress(async value => { LoadPercent = value; await UIDispatcher.TryRunIdleAsync((arg) => RaisePropertyChanged("LoadPercent")); });
+                    var progress = new AggregateProgress(value => { LoadPercent = value; RaisePropertyChanged("LoadPercent"); });
                     await LoadAction(progress, CancelToken != null ? CancellationTokenSource.CreateLinkedTokenSource(CancelToken.Value, _internalCancelToken.Token).Token : _internalCancelToken.Token);
-                    State = LoadState.Loaded;
                     LoadAction = null;
+                    State = LoadState.Loaded;
                     _internalCancelToken.Cancel();
                     _internalCancelToken.Dispose();
                     _internalCancelToken = null;

@@ -334,27 +334,27 @@ namespace SnooStream.Controls
 
         private void NavToHubItem(bool doNavigate, bool insertCurrent, HubNavItem hubNav)
         {
-            //if (_isLarge.Value)
-            //{
-            //    if (hubNav.IsRoot || !(((Page)_mainFrame.Content)?.DataContext is HubNavGroup))
-            //    {
-            //        var hubSections = new HubNavGroup { Sections = new ObservableCollection<HubNavItem> { hubNav } };
-            //        if (doNavigate)
-            //        {
-            //            _mainFrame.Navigate(typeof(MultiPageHubView), hubSections);
-            //        }
-            //        else
-            //        {
-            //            _mainFrame.BackStack.Add(new PageStackEntry(typeof(MultiPageHubView), hubSections, null));
-            //        }
-            //    }
-            //    else
-            //    {
-            //        var hubGroup = insertCurrent ? _mainFrame.BackStack.Last().Parameter as HubNavGroup : ((Page)_mainFrame.Content).DataContext as HubNavGroup;
-            //        hubGroup.Sections.Add(hubNav);
-            //    }
-            //}
-            //else
+            if (_isLarge.Value)
+            {
+                if (hubNav.IsRoot || !(((Page)_mainFrame.Content)?.DataContext is HubNavGroup))
+                {
+                    var hubSections = new HubNavGroup { Sections = new ObservableCollection<HubNavItem> { hubNav } };
+                    if (doNavigate)
+                    {
+                        _mainFrame.Navigate(typeof(MultiPageHubView), hubSections);
+                    }
+                    else
+                    {
+                        _mainFrame.BackStack.Add(new PageStackEntry(typeof(MultiPageHubView), hubSections, null));
+                    }
+                }
+                else
+                {
+                    var hubGroup = insertCurrent ? _mainFrame.BackStack.Last().Parameter as HubNavGroup : ((Page)_mainFrame.Content).DataContext as HubNavGroup;
+                    hubGroup.Sections.Add(hubNav);
+                }
+            }
+            else
             {
                 if (doNavigate)
                 {
@@ -377,7 +377,7 @@ namespace SnooStream.Controls
             if (NavStack == null)
                 return;
 
-            if (width > 500)
+            if (width > 960)
             {
                 if (_isLarge == null || !_isLarge.Value)
                 {

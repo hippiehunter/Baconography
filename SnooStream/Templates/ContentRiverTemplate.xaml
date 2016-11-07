@@ -13,6 +13,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <local:CommentsTemplate />
+        <local:LoadItemTemplate />
     </ResourceDictionary.MergedDictionaries>
 
     <Storyboard x:Name="fadeInOverlay">
@@ -138,10 +139,6 @@
         </Grid>
     </DataTemplate>
 
-    <DataTemplate x:Name="loadingTemplate" x:DataType="vm:LoadViewModel" >
-        <ProgressBar HorizontalAlignment="Stretch" IsIndeterminate="{x:Bind LoadPercent, Converter={StaticResource invertedFloatToBooleanConverter}, Mode=OneWay}" Value="{x:Bind LoadPercent, Mode=OneWay}" />
-    </DataTemplate>
-
     <selector:ContentTemplateSelector x:Name="contentSelector" 
                                           PlainTextTemplate="{StaticResource textContentTemplate}"
                                           ImageContainerTemplate="{StaticResource imageContentTemplate}"
@@ -149,7 +146,7 @@
                                           VideoTemplate="{StaticResource videoContentTemplate}"
                                           PlainWebTemplate="{StaticResource plainWebContentTemplate}"
                                           CommentsViewTemplate="{StaticResource CommentsView}"
-                                          LoadingTemplate="{StaticResource loadingTemplate}"/>
+                                          LoadingTemplate="{StaticResource LoadItemViewEx}"/>
 
 
     <DataTemplate x:Key="ContentRiverView" x:DataType="vm:ContentRiverViewModel">

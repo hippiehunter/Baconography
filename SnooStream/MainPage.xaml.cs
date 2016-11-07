@@ -38,7 +38,7 @@ namespace SnooStream
         /// </summary>
         public MainPage()
         {
-            LoadViewModel.UIDispatcher = Dispatcher;
+            SnooObservableObject.UIDispatcher = Dispatcher;
             this.InitializeComponent();
             this.Loaded += (sender, args) =>
             {

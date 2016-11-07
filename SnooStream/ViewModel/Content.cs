@@ -84,6 +84,8 @@ namespace SnooStream.ViewModel
             }
 
             var glyph = LinkGlyphUtility.GetLinkGlyph((linkViewModel as object) ?? (url as object));
+            if (glyph == null)
+                return null;
 
             if (linkViewModel != null && ((LinkViewModel)linkViewModel).Thing.IsSelf)
             {
@@ -92,7 +94,7 @@ namespace SnooStream.ViewModel
                 {
                     var commentContext = await context.MakeCommentContext(url, progress, token);
                     return commentContext.Comments;
-                }, contentView, collection);
+                }, contentView, collection, url);
             }
             //needs to return a CommentsViewModel for a comment/commentspage
             //AboutSubreddit for a subreddit
@@ -105,7 +107,7 @@ namespace SnooStream.ViewModel
                 {
                     var commentContext = await context.MakeCommentContext(url, progress, token);
                     return commentContext.Comments;
-                }, contentView, collection);
+                }, contentView, collection, url);
             }
             else if (LinkGlyphUtility.IsSubreddit(url) || LinkGlyphUtility.IsUserMultiReddit(url))
             {
@@ -151,7 +153,7 @@ namespace SnooStream.ViewModel
                             PreviewUrl = await videoResult.PreviewUrl(networkLayer as IResourceNetworkLayer, progress, token),
                             PlayableStreams = await videoResult.PlayableStreams(networkLayer as IResourceNetworkLayer, progress, token)
                         };
-                    }, contentView, collection);
+                    }, contentView, collection, url);
                 else
                     result = ContentBuilder.MakeWebContent(url, title, contentView, networkLayer, context, linkViewModel, votable, collection);
 
@@ -170,7 +172,8 @@ namespace SnooStream.ViewModel
                             var contentItems = new RangeCollection();
                             foreach (var vm in imageResult.Select(tpl => MakeContentViewModel(tpl.Item2, tpl.Item1, null, null, context, contentItems, networkLayer, collection)))
                             {
-                                contentItems.Add(vm);
+                                if(vm != null)
+                                    contentItems.Add(vm);
                             }
 
                             return new ContentContainerViewModel(true, contentItems)
@@ -186,7 +189,7 @@ namespace SnooStream.ViewModel
                         {
                             return new ImageContentViewModel { Url = imageResult.First().Item2, Title = title, HasComments = linkViewModel != null, Context = context, Votable = votable };
                         }
-                    }, contentView, collection);
+                    }, contentView, collection, url);
                 }
                 else if (imageAPIType == ImageAPIType.Simple)
                 {
@@ -202,7 +205,7 @@ namespace SnooStream.ViewModel
             return result;
         }
 
-        public static LoadViewModel MakeSelfReplacingLoadViewModel(Func<IProgress<float>, CancellationToken, Task<object>> viewModelMaker, ICollectionView collectionView, ObservableCollection<object> collection)
+        public static LoadViewModel MakeSelfReplacingLoadViewModel(Func<IProgress<float>, CancellationToken, Task<object>> viewModelMaker, ICollectionView collectionView, ObservableCollection<object> collection, string url)
         {
             if (collectionView == null)
                 throw new ArgumentNullException();
@@ -210,6 +213,7 @@ namespace SnooStream.ViewModel
             LoadViewModel loadViewModel = null;
             loadViewModel = new LoadViewModel
             {
+                Url = url,
                 LoadAction = async (progress, token) =>
                 {
                     var replacementViewModel = await viewModelMaker(progress, token);
@@ -248,7 +252,7 @@ namespace SnooStream.ViewModel
                     HasComments = linkViewModel != null,
                     Votable = votable,
                 };
-            }, collectionView, collection);
+            }, collectionView, collection, url);
         }
 
         public static async Task<Tuple<string, string, IEnumerable<object>>> LoadWebContent(INetworkLayer networkLayer, string url, IProgress<float> progress, CancellationToken token, IContentRiverContext context)
@@ -353,7 +357,6 @@ namespace SnooStream.ViewModel
     {
         INetworkLayer _networkLayer;
         IContentRiverContext _context;
-        public ICollectionView CollectionView { get; set; }
         string _nextUrl;
         string _originalUrl;
         public WebContentCollection(IEnumerable<object> initial, string nextUrl, string originalUrl, INetworkLayer networkLayer, IContentRiverContext context)
@@ -378,7 +381,7 @@ namespace SnooStream.ViewModel
         {
             var loadedContent = await ContentBuilder.LoadWebContent(_networkLayer, _nextUrl, progress, token, _context);
             var first = loadedContent.Item3.FirstOrDefault() as ContentViewModel;
-            bool replacingCurrent = CollectionView.CurrentPosition == Count - 1;
+            bool replacingCurrent = CurrentPosition == Count - 1;
             this[Count - 1] = first;
 
             if (replacingCurrent && first != null)
@@ -594,13 +597,23 @@ namespace SnooStream.ViewModel
             {
                 _hubNavCommands = new ObservableCollection<IHubNavCommand>
                 {
-                    new DelayedLaunchUri { TargetUrl = () => (contentRiverViewModel.ContentItems.CurrentItem as ContentViewModel)?.Url, NavigationContext = NavigationContext },
+                    new DelayedLaunchUri { TargetUrl = () => GetContentUrl(contentRiverViewModel.ContentItems.CurrentItem), NavigationContext = NavigationContext },
                     new DelayedVoteNavCommand(() => (contentRiverViewModel.ContentItems.CurrentItem as ContentViewModel)?.Votable) { NavigationContext = NavigationContext },
                 };
             }
 
             UpdateHubNavCommands(contentRiverViewModel);
             return _hubNavCommands;
+        }
+
+        private string GetContentUrl(object content)
+        {
+            if (content is ContentViewModel)
+                return ((ContentViewModel)content).Url;
+            else if (content is LoadViewModel)
+                return ((LoadViewModel)content).Url;
+            else
+                throw new NotImplementedException(string.Format("invalid content type was {0}", content?.GetType()?.FullName ?? "null"));
         }
 
         public void UpdateHubNavCommands(ContentRiverViewModel contentRiverViewModel)
@@ -676,7 +689,7 @@ namespace SnooStream.ViewModel
             if (!_initializingContent)
             {
                 var additionalListing = await LinkRiverContext.LoadAdditionalAsync(progress, token);
-                return additionalListing.Select(link => ContentBuilder.MakeContentViewModel(WebUtility.HtmlDecode(link.Thing.Url), WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+                return additionalListing.Select(link => ContentBuilder.MakeContentViewModel(WebUtility.HtmlDecode(link.Thing.Url), WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection)).Where(vm => vm != null);
             }
             else
             {
@@ -745,7 +758,7 @@ namespace SnooStream.ViewModel
             }
             else
             {
-                return LinkRiverContext.Links.OfType<LinkViewModel>().Select(link => ContentBuilder.MakeContentViewModel(WebUtility.HtmlDecode(link.Thing.Url), WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+                return LinkRiverContext.Links.OfType<LinkViewModel>().Select(link => ContentBuilder.MakeContentViewModel(WebUtility.HtmlDecode(link.Thing.Url), WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection)).Where(vm => vm != null);
             }
         }
 
@@ -758,7 +771,9 @@ namespace SnooStream.ViewModel
                     if (e.NewItems[0] is LinkViewModel)
                     {
                         var link = e.NewItems[0] as LinkViewModel;
-                        ContentView.Add(ContentBuilder.MakeContentViewModel(WebUtility.HtmlDecode(link.Thing.Url), WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection));
+                        var content = ContentBuilder.MakeContentViewModel(WebUtility.HtmlDecode(link.Thing.Url), WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection);
+                        if(content != null)
+                        ContentView.Add(content);
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
@@ -830,13 +845,16 @@ namespace SnooStream.ViewModel
                             foreach (var link in bodyMD.GetLinks())
                             {
                                 var contentViewModel = ContentBuilder.MakeContentViewModel(link.Key, link.Value, comment.Votable, null, this, CollectionView, NetworkLayer, Collection);
-                                result.Add(contentViewModel);
-                                _contentToCommentMap.Add(result.Count - 1, comment);
-
-                                //only set it once
-                                if (link.Key == InitialUrl && Current == -1)
+                                if (contentViewModel != null)
                                 {
-                                    Current = result.Count - 1;
+                                    result.Add(contentViewModel);
+                                    _contentToCommentMap.Add(result.Count - 1, comment);
+
+                                    //only set it once
+                                    if (link.Key == InitialUrl && Current == -1)
+                                    {
+                                        Current = result.Count - 1;
+                                    }
                                 }
                             }
                         }
@@ -896,13 +914,16 @@ namespace SnooStream.ViewModel
                         foreach (var link in bodyMD.GetLinks())
                         {
                             var contentViewModel = ContentBuilder.MakeContentViewModel(link.Key, link.Value, comment.Votable, null, this, CollectionView, NetworkLayer, Collection);
-                            result.Add(contentViewModel);
-                            _contentToCommentMap.Add(result.Count - 1, comment);
-
-                            //only set it once
-                            if (link.Key == InitialUrl && Current == -1)
+                            if (contentViewModel != null)
                             {
-                                Current = result.Count - 1;
+                                result.Add(contentViewModel);
+                                _contentToCommentMap.Add(result.Count - 1, comment);
+
+                                //only set it once
+                                if (link.Key == InitialUrl && Current == -1)
+                                {
+                                    Current = result.Count - 1;
+                                }
                             }
                         }
                     }
