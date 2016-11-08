@@ -25,6 +25,8 @@ namespace SnooStream.ViewModel
             };
 
             Commands = Context.MakeHubNavCommands(this);
+            Recommendations = new RecommendationCollection() { Context = Context, NavigationContext = NavigationContext };
+            Moderators = new ModeratorCollection() { Context = Context, NavigationContext = NavigationContext };
         }
 
         public LoadItemCollectionBase Recommendations { get; set; }
@@ -51,6 +53,8 @@ namespace SnooStream.ViewModel
             var thing = await Context.Load(arg1, arg2, false);
             Thing = thing.Data as Subreddit;
             DescriptionMD = new SimpleMarkdownContainer(((Subreddit)thing.Data).Description);
+            RaisePropertyChanged(nameof(Thing));
+            RaisePropertyChanged(nameof(DescriptionMD));
         }
     }
 
