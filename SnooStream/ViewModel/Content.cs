@@ -69,7 +69,7 @@ namespace SnooStream.ViewModel
     {
         //if we know what the content is make its view model
         //if we need to call an API first, make it a LoadViewModel
-        public static object MakeContentViewModel(string url, string title, VotableViewModel votable, 
+        public static object MakeContentViewModel(string url, string title, VotableViewModel votable,
             LinkViewModel linkViewModel, IContentRiverContext context, ICollectionView contentView, INetworkLayer networkLayer, ObservableCollection<object> collection)
         {
             object result = null;
@@ -172,7 +172,7 @@ namespace SnooStream.ViewModel
                             var contentItems = new RangeCollection();
                             foreach (var vm in imageResult.Select(tpl => MakeContentViewModel(tpl.Item2, tpl.Item1, null, null, context, contentItems, networkLayer, collection)))
                             {
-                                if(vm != null)
+                                if (vm != null)
                                     contentItems.Add(vm);
                             }
 
@@ -217,7 +217,7 @@ namespace SnooStream.ViewModel
                 LoadAction = async (progress, token) =>
                 {
                     var replacementViewModel = await viewModelMaker(progress, token);
-                    if(Window.Current != null && Window.Current.Dispatcher != null)
+                    if (Window.Current != null && Window.Current.Dispatcher != null)
                         Window.Current.Dispatcher.CurrentPriority = Windows.UI.Core.CoreDispatcherPriority.Idle;
 
                     await Task.Yield();
@@ -231,7 +231,7 @@ namespace SnooStream.ViewModel
                     {
                         collection[itemIndex] = replacementViewModel;
                     }
-                    
+
                     SetCurrentContentItem(collectionView.CurrentPosition, collectionView, itemIndex);
                 }
             };
@@ -447,7 +447,7 @@ namespace SnooStream.ViewModel
             foreach (var remaining in loadedContent.Skip(1))
                 Add(remaining);
         }
-        
+
         public async Task BlockingReplace(int index, object value)
         {
             bool notFinished = true;
@@ -772,8 +772,8 @@ namespace SnooStream.ViewModel
                     {
                         var link = e.NewItems[0] as LinkViewModel;
                         var content = ContentBuilder.MakeContentViewModel(WebUtility.HtmlDecode(link.Thing.Url), WebUtility.HtmlDecode(link.Thing.Title), link.Votable, link, this, ContentView, NetworkLayer, Collection);
-                        if(content != null)
-                        ContentView.Add(content);
+                        if (content != null)
+                            ContentView.Add(content);
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
@@ -795,6 +795,99 @@ namespace SnooStream.ViewModel
             return LinkRiverContext.Links.CurrentItem as LinkViewModel;
         }
     }
+    public class ArbitraryContentRiverContext : ContentRiverBaseContext
+    {
+        bool _initialLoaded = false;
+        public override bool HasAdditional
+        {
+            get
+            {
+                return !_initialLoaded;
+            }
+        }
+
+        public string InitialUrl { get; set; }
+        public SimpleMarkdownContainer Markdown { get; set; }
+        public INetworkLayer NetworkLayer { get; set; }
+        public ICollectionView CollectionView { get; set; }
+        public ObservableCollection<object> Collection { get; set; }
+        public override bool MakeCollectionViewSource
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override Task<IEnumerable<object>> LoadMore(IProgress<float> progress, CancellationToken token)
+        {
+            _initialLoaded = true;
+            List<object> result = new List<object>();
+
+            foreach (var link in Markdown.Dom.GetLinks())
+            {
+                var contentViewModel = ContentBuilder.MakeContentViewModel(link.Key, link.Value, null, null, this, CollectionView, NetworkLayer, Collection);
+                if (contentViewModel != null)
+                {
+                    result.Add(contentViewModel);
+
+                    //only set it once
+                    if (link.Key == InitialUrl && Current == -1)
+                    {
+                        Current = result.Count - 1;
+                    }
+                }
+            }
+            return Task.FromResult<IEnumerable<object>>(result);
+        }
+
+        public override void NavigateToComments(string contextUrl)
+        {
+            //same as pressing back button
+        }
+
+        public override void NavigateToWeb(string url)
+        {
+            //goto reddit url
+        }
+
+        public override async Task<ICommentBuilderContext> MakeCommentContext(string commentUrl, IProgress<float> progress, CancellationToken token)
+        {
+            var madeViewModel = NavigationContext.MakeCommentContext(commentUrl, null, null, null);
+            await madeViewModel.LoadAsync(progress, token);
+            return madeViewModel.Context;
+        }
+
+        public override int Current { get; set; } = -1;
+
+        public override IEnumerable<object> LoadInitial(string url)
+        {
+            _initialLoaded = true;
+            List<object> result = new List<object>();
+
+            foreach (var link in Markdown.Dom.GetLinks())
+            {
+                var contentViewModel = ContentBuilder.MakeContentViewModel(link.Key, link.Value, null, null, this, CollectionView, NetworkLayer, Collection);
+                if (contentViewModel != null)
+                {
+                    result.Add(contentViewModel);
+
+                    //only set it once
+                    if (link.Key == InitialUrl && Current == -1)
+                    {
+                        Current = result.Count - 1;
+                    }
+                }
+            }
+            return result;
+        }
+
+        public override LinkViewModel CurrentLink()
+        {
+            return null;
+        }
+    }
+
 
     public class CommentContentRiverContext : ContentRiverBaseContext
     {

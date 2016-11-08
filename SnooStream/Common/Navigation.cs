@@ -263,7 +263,7 @@ namespace SnooStream.Common
                     GotoLogin(context);
                     break;
                 case "content":
-                    GotoContentRiver(context.ViewModelStack.LastOrDefault(vm => vm is LinkRiverViewModel || vm is CommentsViewModel), GetOrNull<string>(pageState, "url"), context);
+                    GotoContentRiver(context.ViewModelStack.LastOrDefault(vm => vm is LinkRiverViewModel || vm is CommentsViewModel || vm is SubredditSidebarViewModel), GetOrNull<string>(pageState, "url"), context);
                     break;
                 case "subredditSidebar":
                     context.HubNav.Navigate(context.MakeSubredditSidebarContext(GetOrNull<string>(pageState, "subreddit")), context.SubredditSidebarTemplate, false);
@@ -528,6 +528,15 @@ namespace SnooStream.Common
 
                 madeContentRiver.ContentItems.LoadMoreItemsAsync(50).AsTask().ContinueWith(result => madeContentRiver.ContentItems.CurrentPosition = madeContext.Current);
                 return madeContentRiver;
+            }
+            else if (context is SubredditSidebarViewModel)
+            {
+                var madeContext = new ArbitraryContentRiverContext() { Markdown = ((SubredditSidebarViewModel)context).DescriptionMD, InitialUrl = url, NetworkLayer = NetworkLayer, NavigationContext = this };
+                var madeContentRiver = new ContentRiverViewModel(madeContext);
+                madeContext.Collection = madeContentRiver.ContentItems;
+                madeContext.CollectionView = madeContentRiver.ContentItems;
+                madeContentRiver.ContentItems.LoadMoreItemsAsync(50).AsTask().ContinueWith(result => madeContentRiver.ContentItems.CurrentPosition = madeContext.Current);
+                return madeContentRiver; 
             }
             else
                 throw new InvalidOperationException("unknown context type");

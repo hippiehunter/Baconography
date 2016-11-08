@@ -40,6 +40,9 @@ namespace SnooStream.Common
                     return frameworkElement.DataContext as CommentsViewModel;
                 else if (frameworkElement.DataContext is LinkViewModel)
                     return NavigationContext.MakeCommentContext((frameworkElement.DataContext as LinkViewModel).Thing.Permalink, null, null, (frameworkElement.DataContext as LinkViewModel));
+                else if (frameworkElement.DataContext is SubredditSidebarViewModel)
+                    return frameworkElement.DataContext;
+
             }
             return FindCommentsContext(VisualTreeHelper.GetParent(obj));
         }
@@ -52,11 +55,15 @@ namespace SnooStream.Common
                 var topContext = FindCommentsContext(link);
                 if (topContext is LinkViewModel)
                     Navigation.GotoLink(topContext, url, NavigationContext);
-                else
+                else if(topContext is CommentsViewModel)
                 {
                     var commentsViewModel = topContext as CommentsViewModel;
                     commentsViewModel.Comments.CurrentItem = commentContext;
                     Navigation.GotoLink(topContext as CommentsViewModel, url, NavigationContext);
+                }
+                else
+                {
+                    Navigation.GotoLink(topContext, url, NavigationContext);
                 }
             });
         }
